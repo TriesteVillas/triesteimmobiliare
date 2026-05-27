@@ -1,0 +1,44 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import Section from '../components/Section.astro';
+import FormPlaceholder from '../components/FormPlaceholder.astro';
+---
+<Base
+  title="Valutazione gratuita in 24h"
+  description="Richiedi una valutazione gratuita della tua casa a Trieste e nel Friuli-Venezia Giulia. Sopralluogo entro 48h, stima documentata in pochi giorni."
+>
+  <Hero
+    eyebrow="01 · Valutazione"
+    title={`Valutazione <em>gratuita</em><br/>in 24 ore.`}
+    lede="Compila il modulo: ti contattiamo entro 24 ore, fissiamo il sopralluogo entro 48, ti consegniamo la stima documentata in pochi giorni."
+  />
+
+  <Section pad="lg">
+    <div class="grid">
+      <article class="text">
+        <h2>Cosa valutiamo</h2>
+        <ul>
+          <li><strong>Posizione</strong> — confronto con vendite reali della zona ultimi 24 mesi.</li>
+          <li><strong>Stato dell'immobile</strong> — finiture, impianti, classe energetica.</li>
+          <li><strong>Distribuzione e potenziale</strong> — superficie commerciale, esposizione, eventuali interventi.</li>
+          <li><strong>Mercato in tempo reale</strong> — assorbimento, prezzi di chiusura, time-to-sell.</li>
+        </ul>
+        <h2>Cosa ricevi</h2>
+        <p>Un documento PDF con: range di prezzo realistico, comparables usati, suggerimenti pre-vendita per massimizzare il risultato. Nessun impegno commerciale.</p>
+      </article>
+      <aside class="form-side">
+        <FormPlaceholder cta="Modulo di valutazione" intro="Indirizzo, metratura, condizioni, timeline. Risposta in 24h." />
+      </aside>
+    </div>
+  </Section>
+</Base>
+
+<style>
+  .grid { display: grid; grid-template-columns: 1fr; gap: var(--space-6); }
+  @media (min-width: 900px) { .grid { grid-template-columns: 1fr 1fr; } }
+  .text ul { padding-left: 1.25rem; }
+  .text li { font-size: var(--fs-lg); line-height: var(--lh-relaxed); margin-bottom: 0.5rem; list-style: disc; color: var(--c-ink-soft); }
+  .text h2 { margin-top: var(--space-5); }
+  .text h2:first-child { margin-top: 0; }
+</style>

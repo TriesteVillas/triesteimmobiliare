@@ -1,0 +1,42 @@
+---
+import Base from '../../layouts/Base.astro';
+import Hero from '../../components/Hero.astro';
+import Section from '../../components/Section.astro';
+import Eyebrow from '../../components/Eyebrow.astro';
+import Button from '../../components/Button.astro';
+---
+<Base
+  title="Immobili in vendita"
+  description="Portfolio immobili in vendita a Trieste e nel Friuli-Venezia Giulia con TriesteImmobiliare."
+>
+  <Hero
+    eyebrow="10 · Immobili"
+    title={`Immobili in <em>vendita</em>.`}
+    lede="Il portafoglio TriesteImmobiliare aggiornato. Filtra per zona, tipologia, fascia di prezzo."
+  />
+
+  <Section pad="lg">
+    <div class="empty">
+      <Eyebrow num="—">In arrivo</Eyebrow>
+      <h2>Listing in costruzione.</h2>
+      <p>Stiamo collegando il sito al nostro DB immobili. Nel frattempo, per vedere il portafoglio attuale:</p>
+      <div style="margin-top: var(--space-4); display: inline-flex; gap: var(--space-2); flex-wrap: wrap; justify-content: center;">
+        <Button href="https://www.immobiliare.it/agenzie-immobiliari/triesteimmobiliare/" variant="primary" external>Vedi su Immobiliare.it</Button>
+        <Button href="/compra" variant="outline">Ricerca guidata</Button>
+      </div>
+    </div>
+  </Section>
+</Base>
+
+<style>
+  .empty {
+    padding: var(--space-7) var(--space-4);
+    text-align: center;
+    background: var(--c-surface);
+    border-radius: var(--r-md);
+    max-width: 48rem;
+    margin-inline: auto;
+  }
+  .empty h2 { margin-top: var(--space-2); }
+  .empty p { margin-top: var(--space-2); color: var(--c-mute); max-width: 36ch; margin-inline: auto; }
+</style>

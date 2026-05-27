@@ -1,0 +1,23 @@
+---
+import Base from '../../layouts/Base.astro';
+import Hero from '../../components/Hero.astro';
+import Section from '../../components/Section.astro';
+import Button from '../../components/Button.astro';
+---
+<Base
+  title="Demnächst auf Deutsch"
+  description="Die deutsche Version der TriesteImmobiliare-Webseite ist in Vorbereitung."
+>
+  <Hero
+    eyebrow="Demnächst"
+    title={`Bald <em>auf Deutsch</em>.`}
+    lede="Die vollständige deutsche Version ist in Vorbereitung. Für sofortige Anfragen kontaktieren Sie uns gerne direkt."
+  />
+  <Section pad="lg">
+    <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+      <Button href="mailto:info@triesteimmobiliare.com?subject=Anfrage" variant="primary" size="lg">E-Mail schreiben</Button>
+      <Button href="/en/" variant="outline" size="lg">English version</Button>
+      <Button href="/" variant="ghost" size="lg">Versione italiana</Button>
+    </div>
+  </Section>
+</Base>

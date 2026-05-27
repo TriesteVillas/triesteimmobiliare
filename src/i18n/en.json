@@ -1,0 +1,57 @@
+{
+  "lang_name": "English",
+  "lang_code": "EN",
+  "nav": {
+    "home": "Home",
+    "valutazione": "Valuation",
+    "vendi": "Sell",
+    "compra": "Buy",
+    "immobili": "Properties",
+    "il_gruppo": "The Group",
+    "blog": "Insights",
+    "altro": "More",
+    "check_up": "Pre-sale check-up",
+    "house_tour": "Book a house tour",
+    "affitta_vendi": "Rent while you sell",
+    "faq": "FAQ",
+    "contatti": "Contact"
+  },
+  "footer": {
+    "company": "TriesteImmobiliare",
+    "powered_by": "Powered by TriesteVillas",
+    "sede_label": "Office",
+    "sede": "Via Torino 34, Trieste (by appointment)",
+    "vat": "VAT 01235580329",
+    "email": "info@triesteimmobiliare.com",
+    "phone": "+39 040 2473628",
+    "brand_network": "Group",
+    "brands": {
+      "tsv": "TriesteVillas",
+      "ta": "TriesteAffitti",
+      "fv": "FriuliVillas",
+      "lv": "LignanoVillas"
+    },
+    "legal": {
+      "privacy": "Privacy",
+      "cookie": "Cookie Policy"
+    },
+    "tagline": "The smart agency selling homes with 0% commission to the seller."
+  },
+  "cta": {
+    "valuta_casa": "Request valuation",
+    "ricerca_guidata": "Start guided search",
+    "richiedi_info": "Get in touch",
+    "scopri": "Learn more",
+    "prenota": "Book an appointment",
+    "tutti_immobili": "Browse all properties"
+  },
+  "common": {
+    "italiano": "Italiano",
+    "english": "English",
+    "deutsch": "Deutsch",
+    "slovensko": "Slovensko",
+    "loading": "Loading…",
+    "soon": "Coming soon",
+    "back": "Back"
+  }
+}

@@ -1,0 +1,68 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import Section from '../components/Section.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import Button from '../components/Button.astro';
+import FormPlaceholder from '../components/FormPlaceholder.astro';
+
+const buyerTypes = [
+  { eyebrow: 'Residenza principale', title: 'Vuoi vivere a Trieste.', body: 'Selezione personalizzata su zona, esposizione, vita di quartiere. Visite raggruppate, niente perdite di tempo.' },
+  { eyebrow: 'Seconda casa', title: 'Pied-à-terre o vacanza.', body: 'Immobili nelle zone più amate — Costiera, Barcola, centro storico, Sistiana, Carso.' },
+  { eyebrow: 'Investimento', title: 'Rendita o capital gain.', body: 'Analisi yield, copertura affitto, comparables zona. Possibilità di gestione locativa con TriesteAffitti.' },
+  { eyebrow: 'Ristrutturazione', title: 'Vuoi rifare tutto da zero.', body: 'Immobili da rivedere a costi competitivi, contatti con architetti e impresari locali di fiducia.' },
+];
+---
+<Base
+  title="Comprare a Trieste con ricerca guidata"
+  description="Acquistare casa a Trieste con un consulente dedicato: residenza, seconda casa, investimento, ristrutturazione. House tour mirati."
+>
+  <Hero
+    eyebrow="03 · Compra"
+    title={`Cercare casa a Trieste,<br/><em>con un consulente</em>.`}
+    lede="Oltre gli annunci. Capiamo cosa cerchi, filtriamo per davvero, organizziamo visite mirate. Vale per residenza, secondary home, investimento."
+  >
+    <div style="margin-top: var(--space-4); display: flex; gap: var(--space-2); flex-wrap: wrap;">
+      <Button href="/immobili" variant="primary" size="lg">Vedi gli immobili</Button>
+      <Button href="/pianifica-house-tour" variant="outline" size="lg">Prenota un house tour</Button>
+    </div>
+  </Hero>
+
+  <Section pad="lg">
+    <Eyebrow num="01">Profili</Eyebrow>
+    <h2 style="margin-top: var(--space-2); max-width: 18ch;">Per chi compriamo casa.</h2>
+    <div class="grid-2">
+      {buyerTypes.map((b) => (
+        <div class="card">
+          <span class="card__eyebrow">{b.eyebrow}</span>
+          <h3>{b.title}</h3>
+          <p>{b.body}</p>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <Section variant="surface" pad="lg">
+    <div class="split">
+      <div>
+        <Eyebrow num="02">Buyer internazionali</Eyebrow>
+        <h2 style="margin-top: var(--space-2);">Esperienza con clienti austriaci, tedeschi, sloveni.</h2>
+        <p style="margin-top: var(--space-3);">Documenti tradotti, accompagnamento al notaio, codice fiscale, apertura conto, gestione iter completo. Sito multilingua e referenti dedicati EN / DE.</p>
+      </div>
+      <FormPlaceholder cta="Avvia una ricerca guidata" intro="Budget, zona, tempi: ti facciamo una prima rosa entro pochi giorni." />
+    </div>
+  </Section>
+</Base>
+
+<style>
+  .grid-2 { display: grid; grid-template-columns: 1fr; gap: var(--space-4); margin-top: var(--space-5); }
+  @media (min-width: 800px) { .grid-2 { grid-template-columns: 1fr 1fr; gap: var(--space-5); } }
+
+  .card { padding: var(--space-4); background: var(--c-surface); border-radius: var(--r-md); border: 1px solid var(--c-border); }
+  .card__eyebrow { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: var(--ls-wider); color: var(--c-secondary); font-weight: var(--fw-semibold); }
+  .card h3 { font-size: var(--fs-xl); margin: 0.5rem 0; }
+  .card p { font-size: var(--fs-base); }
+
+  .split { display: grid; grid-template-columns: 1fr; gap: var(--space-5); }
+  @media (min-width: 900px) { .split { grid-template-columns: 1fr 1fr; gap: var(--space-7); align-items: start; } }
+</style>

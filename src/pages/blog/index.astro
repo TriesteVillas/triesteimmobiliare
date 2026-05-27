@@ -1,0 +1,57 @@
+---
+import Base from '../../layouts/Base.astro';
+import Hero from '../../components/Hero.astro';
+import Section from '../../components/Section.astro';
+import Eyebrow from '../../components/Eyebrow.astro';
+---
+<Base
+  title="Blog — risorse e analisi"
+  description="Insights, guide e analisi sul mercato immobiliare di Trieste e del Friuli-Venezia Giulia."
+>
+  <Hero
+    eyebrow="09 · Blog"
+    title={`Blog &<br/><em>insights</em>.`}
+    lede="Guide pratiche per chi vende e chi compra, analisi del mercato locale, focus su zone, normative, casi reali."
+  />
+
+  <Section pad="lg">
+    <div class="categories">
+      <a href="#owners" class="cat">
+        <Eyebrow>Owners</Eyebrow>
+        <h3>Per chi vende</h3>
+      </a>
+      <a href="#buyers" class="cat">
+        <Eyebrow>Buyers</Eyebrow>
+        <h3>Per chi compra</h3>
+      </a>
+    </div>
+    <div class="empty">
+      <Eyebrow num="—">In migrazione</Eyebrow>
+      <h2>Articoli in arrivo.</h2>
+      <p>Stiamo migrando gli articoli dal vecchio sito. Il blog completo torna online a breve.</p>
+    </div>
+  </Section>
+</Base>
+
+<style>
+  .categories { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-bottom: var(--space-6); }
+  .cat {
+    padding: var(--space-4);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    background: var(--c-surface);
+    transition: border-color var(--t-fast) var(--ease);
+  }
+  .cat:hover { border-color: var(--c-primary); }
+  .cat h3 { font-size: var(--fs-xl); margin-top: 0.25rem; color: var(--c-ink); }
+
+  .empty {
+    padding: var(--space-7) var(--space-4);
+    text-align: center;
+    background: var(--c-bg);
+    border: 1px dashed var(--c-border-strong);
+    border-radius: var(--r-md);
+  }
+  .empty h2 { margin-top: var(--space-2); }
+  .empty p { margin-top: var(--space-2); color: var(--c-mute); }
+</style>

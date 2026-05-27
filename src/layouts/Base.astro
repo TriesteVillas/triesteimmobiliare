@@ -1,0 +1,137 @@
+---
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { getLocaleFromPath, getTranslations, localeMeta, locales, defaultLocale, type Locale } from '../i18n';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+  noIndex?: boolean;
+  pathWithoutLocale?: string;
+}
+
+const {
+  title,
+  description = "TriesteImmobiliare — l'agenzia smart che vende casa al 0% del venditore. Vendita, acquisto, valutazione, affitti a Trieste e in FVG.",
+  ogImage = '/og/default.jpg',
+  noIndex = false,
+  pathWithoutLocale,
+} = Astro.props;
+
+const currentLocale = (Astro.currentLocale ?? getLocaleFromPath(Astro.url.pathname)) as Locale;
+const meta = localeMeta[currentLocale];
+const t = getTranslations(currentLocale);
+
+const siteOrigin = Astro.site?.origin ?? 'https://www.triesteimmobiliare.com';
+
+const cleanPath = pathWithoutLocale ?? (() => {
+  const p = Astro.url.pathname;
+  if (currentLocale === defaultLocale) return p;
+  return p.replace(new RegExp(`^/${currentLocale}`), '') || '/';
+})();
+
+const canonical = `${siteOrigin}${currentLocale === defaultLocale ? cleanPath : `/${currentLocale}${cleanPath === '/' ? '' : cleanPath}`}`;
+
+const hreflangs = locales.map((loc) => ({
+  loc,
+  href: `${siteOrigin}${loc === defaultLocale ? cleanPath : `/${loc}${cleanPath === '/' ? '' : cleanPath}`}`,
+}));
+
+const fullTitle = title.includes('TriesteImmobiliare') ? title : `${title} · TriesteImmobiliare`;
+---
+<!doctype html>
+<html lang={meta.htmlLang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="generator" content={Astro.generator} />
+    {noIndex && <meta name="robots" content="noindex,nofollow" />}
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate icon" href="/favicon.ico" />
+    <link rel="canonical" href={canonical} />
+
+    {hreflangs.map(({ loc, href }) => (
+      <link rel="alternate" hreflang={loc} href={href} />
+    ))}
+    <link rel="alternate" hreflang="x-default" href={`${siteOrigin}${cleanPath}`} />
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+
+    {/* Open Graph */}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(ogImage, siteOrigin).href} />
+    <meta property="og:locale" content={meta.ogLocale} />
+    <meta property="og:site_name" content="TriesteImmobiliare" />
+
+    {/* Twitter */}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(ogImage, siteOrigin).href} />
+
+    {/* Theme color */}
+    <meta name="theme-color" content="#381d92" />
+
+    {/* Google Fonts — Inter + Arsenal */}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Arsenal:ital,wght@0,400;0,700;1,400;1,700&display=swap" />
+
+    {/* JSON-LD — RealEstateAgent */}
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'RealEstateAgent',
+      name: 'TriesteImmobiliare',
+      url: siteOrigin,
+      logo: `${siteOrigin}/images/logo.svg`,
+      email: 'info@triesteimmobiliare.com',
+      telephone: '+390402473628',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Via Torino 34',
+        addressLocality: 'Trieste',
+        addressRegion: 'FVG',
+        postalCode: '34123',
+        addressCountry: 'IT',
+      },
+      sameAs: [
+        'https://www.triestevillas.com',
+        'https://www.triesteaffitti.com',
+        'https://www.friulivillas.com',
+        'https://www.lignanovillas.com',
+      ],
+      vatID: 'IT01235580329',
+    })} />
+  </head>
+  <body>
+    <a href="#main" class="skip-link">{currentLocale === 'it' ? 'Salta al contenuto' : 'Skip to content'}</a>
+    <Nav locale={currentLocale} pathWithoutLocale={cleanPath} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer locale={currentLocale} />
+
+    <style>
+      .skip-link {
+        position: absolute;
+        top: -40px;
+        left: var(--space-3);
+        background: var(--c-primary);
+        color: var(--c-on-primary);
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--r-md);
+        z-index: var(--z-modal);
+        transition: top var(--t-fast) var(--ease);
+      }
+      .skip-link:focus { top: var(--space-3); }
+      main { min-height: calc(100dvh - 200px); }
+    </style>
+  </body>
+</html>

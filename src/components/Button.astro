@@ -1,0 +1,87 @@
+---
+interface Props {
+  href?: string;
+  variant?: 'primary' | 'secondary' | 'ghost' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
+  type?: 'button' | 'submit' | 'reset';
+  external?: boolean;
+  class?: string;
+  fullWidth?: boolean;
+}
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  type = 'button',
+  external = false,
+  class: className = '',
+  fullWidth = false,
+} = Astro.props;
+
+const classes = ['btn', `btn--${variant}`, `btn--${size}`, fullWidth && 'btn--full', className].filter(Boolean);
+const externalAttrs = external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+const Tag = href ? 'a' : 'button';
+---
+{href ? (
+  <a href={href} class:list={classes} {...externalAttrs}>
+    <slot />
+  </a>
+) : (
+  <button type={type} class:list={classes}>
+    <slot />
+  </button>
+)}
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    font-family: var(--font-sans);
+    font-weight: var(--fw-semibold);
+    line-height: 1;
+    text-align: center;
+    border-radius: var(--r-button);
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    transition: background var(--t-base) var(--ease), color var(--t-base) var(--ease), border-color var(--t-base) var(--ease), transform var(--t-fast) var(--ease);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .btn:active { transform: translateY(1px); }
+
+  .btn--sm { font-size: var(--fs-sm); padding: 0.55rem 1.1rem; }
+  .btn--md { font-size: var(--fs-base); padding: 0.85rem 1.6rem; }
+  .btn--lg { font-size: var(--fs-lg); padding: 1.05rem 2.2rem; }
+
+  .btn--full { width: 100%; }
+
+  .btn--primary {
+    background: var(--c-primary);
+    color: var(--c-on-primary);
+  }
+  .btn--primary:hover { background: var(--c-primary-deep); color: var(--c-on-primary); }
+
+  .btn--secondary {
+    background: var(--c-secondary);
+    color: var(--c-on-primary);
+  }
+  .btn--secondary:hover { background: var(--c-secondary-deep); color: var(--c-on-primary); }
+
+  .btn--outline {
+    background: transparent;
+    color: var(--c-primary);
+    border-color: var(--c-primary);
+  }
+  .btn--outline:hover {
+    background: var(--c-primary);
+    color: var(--c-on-primary);
+  }
+
+  .btn--ghost {
+    background: transparent;
+    color: var(--c-ink);
+  }
+  .btn--ghost:hover { background: var(--c-surface); color: var(--c-ink); }
+</style>

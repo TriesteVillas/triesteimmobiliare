@@ -1,0 +1,62 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import Section from '../components/Section.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import FormPlaceholder from '../components/FormPlaceholder.astro';
+
+const steps = [
+  { num: '01', title: 'Brief', body: 'Ci dici cosa cerchi (zona, budget, tipologia, vincoli). Quando puoi essere a Trieste.' },
+  { num: '02', title: 'Selezione', body: 'Prepariamo una rosa di immobili reali — del nostro portafoglio e dei colleghi quando ha senso — coerenti col brief.' },
+  { num: '03', title: 'Visite', body: 'Mezza giornata o giornata intera. Ti accompagniamo, ti spieghiamo, prendiamo nota.' },
+  { num: '04', title: 'Follow-up', body: 'Schede dettagliate, pro/contro per ogni immobile, comparables, eventuali contro-offerte da preparare.' },
+];
+---
+<Base
+  title="Pianifica un house tour"
+  description="Visite a Trieste organizzate da TriesteImmobiliare. Selezione su misura, accompagnamento, follow-up dettagliato."
+>
+  <Hero
+    eyebrow="07 · House tour"
+    title={`Un giorno a Trieste,<br/>case <em>fatte sul serio</em>.`}
+    lede="House tour mirato per chi non vive in città. Tre o cinque immobili selezionati su misura, visitati in sequenza, con un consulente che ti accompagna."
+  />
+
+  <Section pad="lg">
+    <Eyebrow num="01">Processo</Eyebrow>
+    <h2 style="margin-top: var(--space-2);">Come funziona.</h2>
+    <ol class="steps">
+      {steps.map((s) => (
+        <li class="step">
+          <span class="step__num">{s.num}</span>
+          <div>
+            <h3>{s.title}</h3>
+            <p>{s.body}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </Section>
+
+  <Section variant="surface" pad="lg">
+    <div class="split">
+      <div>
+        <Eyebrow num="02">Per chi viene da fuori</Eyebrow>
+        <h2 style="margin-top: var(--space-2);">Suggerimenti logistici.</h2>
+        <p style="margin-top: var(--space-3);">Possiamo segnalare hotel di riferimento, ristoranti per la pausa, parcheggi vicino agli immobili. Se serve un trasferimento dall'aeroporto di Ronchi, si organizza.</p>
+      </div>
+      <FormPlaceholder cta="Pianifica il tuo house tour" intro="Quando vieni, cosa cerchi, budget di massima. Risposta entro 24h." />
+    </div>
+  </Section>
+</Base>
+
+<style>
+  .steps { display: flex; flex-direction: column; gap: var(--space-4); margin-top: var(--space-5); }
+  .step { display: grid; grid-template-columns: 56px 1fr; gap: var(--space-3); padding: var(--space-3) 0; border-bottom: 1px solid var(--c-border); }
+  .step__num { font-size: var(--fs-2xl); font-weight: var(--fw-semibold); color: var(--c-primary); }
+  .step h3 { font-size: var(--fs-xl); }
+  .step p { margin-top: 0.5rem; }
+
+  .split { display: grid; grid-template-columns: 1fr; gap: var(--space-5); }
+  @media (min-width: 900px) { .split { grid-template-columns: 1fr 1fr; gap: var(--space-7); align-items: start; } }
+</style>

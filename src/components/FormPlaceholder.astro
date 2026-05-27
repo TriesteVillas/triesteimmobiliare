@@ -1,0 +1,49 @@
+---
+interface Props {
+  variant?: 'inline' | 'card';
+  cta?: string;
+  intro?: string;
+}
+const {
+  variant = 'card',
+  cta = 'Form in arrivo',
+  intro = 'Questo modulo sarà attivo nella prossima fase di sviluppo.',
+} = Astro.props;
+---
+<div class:list={['placeholder', `placeholder--${variant}`]} role="note" aria-live="polite">
+  <span class="placeholder__badge">Placeholder</span>
+  <p class="placeholder__cta">{cta}</p>
+  <p class="placeholder__intro">{intro}</p>
+  <a class="placeholder__mail" href="mailto:info@triesteimmobiliare.com?subject=Richiesta%20dal%20sito">
+    info@triesteimmobiliare.com →
+  </a>
+</div>
+
+<style>
+  .placeholder {
+    border: 1px dashed var(--c-border-strong);
+    background: var(--c-surface);
+    padding: var(--space-5);
+    border-radius: var(--r-md);
+    max-width: 32rem;
+  }
+  .placeholder--inline { background: transparent; }
+
+  .placeholder__badge {
+    display: inline-block;
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-wider);
+    font-weight: var(--fw-semibold);
+    color: var(--c-warning);
+    margin-bottom: var(--space-2);
+  }
+  .placeholder__cta { font-size: var(--fs-xl); font-weight: var(--fw-semibold); color: var(--c-ink); }
+  .placeholder__intro { margin-top: var(--space-2); font-size: var(--fs-base); color: var(--c-mute); }
+  .placeholder__mail {
+    display: inline-block;
+    margin-top: var(--space-3);
+    color: var(--c-primary);
+    font-weight: var(--fw-semibold);
+  }
+</style>

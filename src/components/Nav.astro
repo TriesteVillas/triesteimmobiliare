@@ -1,0 +1,271 @@
+---
+import { getTranslations, localizePath, defaultLocale, type Locale } from '../i18n';
+import LanguagePicker from './LanguagePicker.astro';
+
+interface Props {
+  locale: Locale;
+  pathWithoutLocale: string;
+}
+const { locale, pathWithoutLocale } = Astro.props;
+const t = getTranslations(locale);
+
+const primaryLinks = [
+  { key: 'valutazione', href: '/valutazione' },
+  { key: 'vendi', href: '/vendi' },
+  { key: 'compra', href: '/compra' },
+  { key: 'immobili', href: '/immobili' },
+  { key: 'il_gruppo', href: '/il-gruppo' },
+  { key: 'blog', href: '/blog' },
+] as const;
+
+const moreLinks = [
+  { key: 'check_up', href: '/check-up-pre-vendita' },
+  { key: 'house_tour', href: '/pianifica-house-tour' },
+  { key: 'affitta_vendi', href: '/affitta-mentre-vendi' },
+  { key: 'faq', href: '/faq' },
+] as const;
+
+const homeHref = locale === defaultLocale ? '/' : `/${locale}/`;
+function lh(href: string) { return localizePath(href, locale); }
+function isActive(href: string) { return pathWithoutLocale.startsWith(href); }
+---
+<header class="nav" data-nav>
+  <div class="nav__inner">
+    <a href={homeHref} class="nav__brand" aria-label="TriesteImmobiliare home">
+      <span class="nav__brand-name">Trieste<strong>Immobiliare</strong></span>
+    </a>
+
+    <nav class="nav__links" aria-label="Primary">
+      {primaryLinks.map((l) => (
+        <a
+          href={lh(l.href)}
+          class:list={['nav__link', isActive(l.href) && 'is-active']}
+        >{t.nav[l.key]}</a>
+      ))}
+      <details class="nav__more">
+        <summary class="nav__link nav__more-trigger">
+          {t.nav.altro}
+          <svg width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+        </summary>
+        <div class="nav__more-panel">
+          {moreLinks.map((l) => (
+            <a href={lh(l.href)} class="nav__more-link">{t.nav[l.key]}</a>
+          ))}
+        </div>
+      </details>
+    </nav>
+
+    <div class="nav__right">
+      <LanguagePicker current={locale} pathWithoutLocale={pathWithoutLocale} />
+      <a href={lh('/valutazione')} class="nav__cta">{t.cta.valuta_casa}</a>
+    </div>
+
+    <button class="nav__mobile-toggle" aria-label="Menu" data-mobile-toggle>
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <!-- Mobile drawer -->
+  <div class="nav__drawer" data-drawer aria-hidden="true">
+    <nav class="nav__drawer-links">
+      {[...primaryLinks, ...moreLinks].map((l) => (
+        <a href={lh(l.href)} class="nav__drawer-link">{t.nav[l.key]}</a>
+      ))}
+      <div class="nav__drawer-lang">
+        <LanguagePicker current={locale} pathWithoutLocale={pathWithoutLocale} variant="menu" />
+      </div>
+      <a href={lh('/valutazione')} class="nav__drawer-cta">{t.cta.valuta_casa}</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-nav);
+    background: var(--c-bg);
+    border-bottom: 1px solid var(--c-border);
+    transition: background var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease);
+  }
+  .nav.is-scrolled {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    box-shadow: var(--shadow-1);
+  }
+
+  .nav__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    max-width: var(--container-wide);
+    margin-inline: auto;
+    padding: 0.75rem var(--gutter);
+  }
+
+  .nav__brand {
+    display: inline-flex;
+    align-items: center;
+    color: var(--c-ink);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-medium);
+    letter-spacing: var(--ls-tight);
+  }
+  .nav__brand strong { font-weight: var(--fw-semibold); }
+  .nav__brand:hover { color: var(--c-primary); }
+
+  .nav__links {
+    display: none;
+    align-items: center;
+    gap: var(--space-1);
+    margin-left: var(--space-4);
+  }
+  @media (min-width: 1000px) { .nav__links { display: flex; } }
+
+  .nav__link {
+    position: relative;
+    padding: 0.5rem 0.75rem;
+    font-size: var(--fs-sm);
+    color: var(--c-ink-soft);
+    font-weight: var(--fw-medium);
+    border-radius: var(--r-sm);
+    transition: color var(--t-fast) var(--ease);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .nav__link:hover { color: var(--c-primary); }
+  .nav__link.is-active { color: var(--c-primary); }
+  .nav__link.is-active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0.75rem; right: 0.75rem;
+    height: 2px;
+    background: var(--c-primary);
+    border-radius: 2px;
+  }
+
+  .nav__more { position: relative; }
+  .nav__more summary { list-style: none; cursor: pointer; }
+  .nav__more summary::-webkit-details-marker { display: none; }
+  .nav__more-trigger svg { transition: transform var(--t-fast) var(--ease); }
+  .nav__more[open] .nav__more-trigger svg { transform: rotate(180deg); }
+
+  .nav__more-panel {
+    position: absolute;
+    top: calc(100% + 8px); right: 0;
+    min-width: 240px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-3);
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+  }
+  .nav__more-link {
+    padding: 0.6rem 0.75rem;
+    font-size: var(--fs-sm);
+    color: var(--c-ink-soft);
+    border-radius: var(--r-sm);
+  }
+  .nav__more-link:hover { background: var(--c-surface); color: var(--c-primary); }
+
+  .nav__right {
+    display: none;
+    align-items: center;
+    gap: var(--space-3);
+    margin-left: auto;
+  }
+  @media (min-width: 1000px) { .nav__right { display: inline-flex; } }
+
+  .nav__cta {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.55rem 1.1rem;
+    background: var(--c-primary);
+    color: var(--c-on-primary);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    border-radius: var(--r-button);
+    transition: background var(--t-base) var(--ease);
+  }
+  .nav__cta:hover { background: var(--c-primary-deep); color: var(--c-on-primary); }
+
+  .nav__mobile-toggle {
+    margin-left: auto;
+    display: inline-flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0.5rem;
+  }
+  .nav__mobile-toggle span {
+    display: block;
+    width: 24px; height: 2px;
+    background: var(--c-ink);
+    transition: transform var(--t-base) var(--ease), opacity var(--t-base) var(--ease);
+    border-radius: 2px;
+  }
+  @media (min-width: 1000px) { .nav__mobile-toggle { display: none; } }
+
+  .nav.is-mobile-open .nav__mobile-toggle span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .nav.is-mobile-open .nav__mobile-toggle span:nth-child(2) { opacity: 0; }
+  .nav.is-mobile-open .nav__mobile-toggle span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  .nav__drawer {
+    position: fixed;
+    top: 56px;
+    left: 0; right: 0; bottom: 0;
+    background: var(--c-bg);
+    padding: var(--space-4) var(--gutter);
+    transform: translateY(-100%);
+    transition: transform var(--t-base) var(--ease);
+    overflow-y: auto;
+    z-index: calc(var(--z-nav) - 1);
+  }
+  .nav.is-mobile-open .nav__drawer {
+    transform: translateY(0);
+  }
+  @media (min-width: 1000px) { .nav__drawer { display: none; } }
+
+  .nav__drawer-links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  .nav__drawer-link {
+    padding: 0.85rem 0;
+    font-size: var(--fs-lg);
+    color: var(--c-ink);
+    border-bottom: 1px solid var(--c-border);
+  }
+  .nav__drawer-lang { margin-top: var(--space-3); }
+  .nav__drawer-cta {
+    margin-top: var(--space-3);
+    display: inline-flex;
+    justify-content: center;
+    padding: 0.95rem 1.6rem;
+    background: var(--c-primary);
+    color: var(--c-on-primary);
+    border-radius: var(--r-button);
+    font-weight: var(--fw-semibold);
+  }
+</style>
+
+<script>
+  // Sticky scrolled state
+  const nav = document.querySelector('[data-nav]') as HTMLElement | null;
+  if (nav) {
+    const onScroll = () => nav.classList.toggle('is-scrolled', window.scrollY > 12);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    const toggle = nav.querySelector('[data-mobile-toggle]');
+    toggle?.addEventListener('click', () => nav.classList.toggle('is-mobile-open'));
+
+    nav.querySelectorAll('.nav__drawer-link').forEach((a) =>
+      a.addEventListener('click', () => nav.classList.remove('is-mobile-open'))
+    );
+  }
+</script>

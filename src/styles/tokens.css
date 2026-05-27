@@ -1,0 +1,114 @@
+/* ============================================
+   TriesteImmobiliare — Design Tokens
+   Derivati dal theme.json del sito attuale,
+   razionalizzati per coerenza visiva.
+   ============================================ */
+
+:root {
+  /* ---------- PALETTE ---------- */
+  --c-primary: #381d92;          /* viola profondo — CTA, accent forte */
+  --c-primary-deep: #1c0a63;     /* hover/active CTA */
+  --c-primary-soft: #5a3fb5;     /* primary più chiaro per stati hover bg */
+
+  --c-secondary: #3d7bb1;        /* blu listing immobili (continuità OnOffice) */
+  --c-secondary-deep: #174770;   /* hover secondary */
+
+  --c-ink: #0b0620;              /* testo principale (nero blu) */
+  --c-ink-soft: #2a2440;         /* testo secondario forte */
+  --c-mute: #5a5570;             /* testo terziario / captions */
+
+  --c-bg: #ffffff;               /* sfondo principale */
+  --c-surface: #f2f2fa;          /* sezioni alternate, card bg */
+  --c-surface-deep: #e6e4f2;     /* surface più contrastata */
+
+  --c-border: rgba(11, 6, 32, 0.10);
+  --c-border-strong: rgba(11, 6, 32, 0.20);
+
+  --c-danger: #dc2625;
+  --c-success: #28a745;
+  --c-warning: #d97706;
+
+  /* On-color text (per superfici scure) */
+  --c-on-primary: #ffffff;
+  --c-on-dark: #f2f2fa;
+
+  /* ---------- TYPOGRAPHY ---------- */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-serif: 'Arsenal', 'Iowan Old Style', 'Apple Garamond', Georgia, serif;
+  --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+
+  /* Type scale (fluid clamp) */
+  --fs-xs: 0.8125rem;                                 /* 13px */
+  --fs-sm: 0.9375rem;                                 /* 15px */
+  --fs-base: 1.0625rem;                               /* 17px */
+  --fs-lg: 1.125rem;                                  /* 18px */
+  --fs-xl: clamp(1.25rem, 1rem + 0.6vw, 1.5rem);      /* 20→24 */
+  --fs-2xl: clamp(1.5rem, 1.2rem + 1vw, 2rem);        /* 24→32 */
+  --fs-3xl: clamp(2rem, 1.5rem + 2vw, 3rem);          /* 32→48 */
+  --fs-4xl: clamp(2.5rem, 1.8rem + 3vw, 4rem);        /* 40→64 */
+  --fs-5xl: clamp(3rem, 2rem + 4vw, 5rem);            /* 48→80 */
+
+  /* Line heights */
+  --lh-tight: 1.1;
+  --lh-snug: 1.25;
+  --lh-normal: 1.55;
+  --lh-relaxed: 1.7;
+
+  /* Letter spacing */
+  --ls-tight: -0.02em;
+  --ls-normal: 0;
+  --ls-wide: 0.03em;
+  --ls-wider: 0.08em;
+
+  /* Weights */
+  --fw-light: 300;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* ---------- SPACING (fluid) ---------- */
+  --space-1: 0.5rem;                                  /* 8 */
+  --space-2: 0.75rem;                                 /* 12 */
+  --space-3: 1rem;                                    /* 16 */
+  --space-4: 1.5rem;                                  /* 24 */
+  --space-5: clamp(1.75rem, 4vw, 2.5rem);             /* 28→40 */
+  --space-6: clamp(2.25rem, 6vw, 3.5rem);             /* 36→56 */
+  --space-7: clamp(3rem, 8vw, 5rem);                  /* 48→80 */
+  --space-8: clamp(4rem, 10vw, 6.5rem);               /* 64→104 */
+  --space-9: clamp(5rem, 12vw, 8rem);                 /* 80→128 */
+
+  /* ---------- LAYOUT ---------- */
+  --container-wide: 1280px;
+  --container-narrow: 672px;
+  --container-prose: 65ch;
+  --gutter: clamp(1rem, 4vw, 2rem);
+
+  /* ---------- RADIUS ---------- */
+  --r-sm: 4px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-pill: 9999px;
+  --r-button: 2rem;          /* preservato dal sito attuale — cifra stilistica */
+
+  /* ---------- SHADOWS ---------- */
+  --shadow-1: 0 1px 2px rgba(11, 6, 32, 0.06);
+  --shadow-2: 0 4px 12px rgba(11, 6, 32, 0.08);
+  --shadow-3: 0 12px 32px rgba(11, 6, 32, 0.12);
+  --shadow-card-hover: 0 8px 24px rgba(11, 6, 32, 0.15);
+
+  /* ---------- MOTION ---------- */
+  --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --t-fast: 150ms;
+  --t-base: 220ms;
+  --t-slow: 400ms;
+
+  /* ---------- Z-INDEX ---------- */
+  --z-nav: 100;
+  --z-modal: 1000;
+  --z-toast: 2000;
+}
+
+@media (prefers-color-scheme: dark) {
+  /* Dark mode opt-in for later — disabilitato in v1 per allineamento al sito attuale */
+}

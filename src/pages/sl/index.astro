@@ -1,0 +1,23 @@
+---
+import Base from '../../layouts/Base.astro';
+import Hero from '../../components/Hero.astro';
+import Section from '../../components/Section.astro';
+import Button from '../../components/Button.astro';
+---
+<Base
+  title="Kmalu v slovenščini"
+  description="Slovenska različica spletne strani TriesteImmobiliare je v pripravi."
+>
+  <Hero
+    eyebrow="Kmalu"
+    title={`Kmalu <em>v slovenščini</em>.`}
+    lede="Pripravljamo slovensko različico spletne strani. Za takojšnje povpraševanje nas kontaktirajte neposredno."
+  />
+  <Section pad="lg">
+    <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+      <Button href="mailto:info@triesteimmobiliare.com?subject=Povpraševanje" variant="primary" size="lg">Pišite nam</Button>
+      <Button href="/en/" variant="outline" size="lg">English version</Button>
+      <Button href="/" variant="ghost" size="lg">Versione italiana</Button>
+    </div>
+  </Section>
+</Base>

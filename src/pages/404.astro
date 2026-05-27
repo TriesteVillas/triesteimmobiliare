@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import Button from '../components/Button.astro';
+---
+<Base title="Pagina non trovata · 404" description="La pagina richiesta non esiste." noIndex>
+  <Hero
+    eyebrow="404"
+    title={`Pagina <em>non trovata</em>.`}
+    lede="L'indirizzo che hai aperto non esiste o è stato spostato. Torna alla home o contattaci."
+    align="center"
+  >
+    <div style="margin-top: var(--space-5); display: inline-flex; gap: var(--space-2); flex-wrap: wrap; justify-content: center;">
+      <Button href="/" variant="primary" size="lg">Torna alla home</Button>
+      <Button href="mailto:info@triesteimmobiliare.com" variant="ghost" size="lg">Scrivici</Button>
+    </div>
+  </Hero>
+</Base>

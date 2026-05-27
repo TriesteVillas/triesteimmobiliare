@@ -1,0 +1,52 @@
+---
+interface Props {
+  id?: string;
+  variant?: 'default' | 'surface' | 'dark';
+  bleed?: boolean;
+  width?: 'wide' | 'narrow';
+  pad?: 'sm' | 'md' | 'lg' | 'xl';
+  class?: string;
+}
+const {
+  id,
+  variant = 'default',
+  bleed = false,
+  width = 'wide',
+  pad = 'lg',
+  class: className = '',
+} = Astro.props;
+---
+<section
+  id={id}
+  class:list={['section', `section--${variant}`, `section--pad-${pad}`, className]}
+>
+  {bleed ? (
+    <slot />
+  ) : (
+    <div class:list={['container', `container--${width}`]}>
+      <slot />
+    </div>
+  )}
+</section>
+
+<style>
+  .section { width: 100%; }
+  .section--default { background: var(--c-bg); color: var(--c-ink); }
+  .section--surface { background: var(--c-surface); color: var(--c-ink); }
+  .section--dark { background: var(--c-ink); color: var(--c-on-dark); }
+  .section--dark :global(h1),
+  .section--dark :global(h2),
+  .section--dark :global(h3),
+  .section--dark :global(h4) { color: var(--c-on-dark); }
+  .section--dark :global(p) { color: var(--c-on-dark); opacity: 0.85; }
+  .section--dark :global(.eyebrow) { color: #b8b0e6; }
+
+  .section--pad-sm { padding-block: var(--space-5); }
+  .section--pad-md { padding-block: var(--space-6); }
+  .section--pad-lg { padding-block: var(--space-8); }
+  .section--pad-xl { padding-block: var(--space-9); }
+
+  .container { width: 100%; margin-inline: auto; padding-inline: var(--gutter); }
+  .container--wide { max-width: var(--container-wide); }
+  .container--narrow { max-width: var(--container-narrow); }
+</style>

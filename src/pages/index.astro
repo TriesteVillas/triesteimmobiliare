@@ -1,0 +1,97 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import Section from '../components/Section.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import Button from '../components/Button.astro';
+import FormPlaceholder from '../components/FormPlaceholder.astro';
+
+const sections = [
+  { num: '01', eyebrow: 'Velocità', title: 'Valutazione in 24 ore.', body: 'Contatto entro 24 ore, sopralluogo entro 48, valutazione documentata in pochi giorni. Niente promesse: tempi misurati su ogni mandato.', cta: { href: '/valutazione', label: 'Richiedi valutazione' } },
+  { num: '02', eyebrow: 'Mandato', title: 'Mandato di 3 mesi. 0% al venditore.', body: 'Provvigione interamente a carico dell\'acquirente. Mandato breve, esclusivo, rinnovabile solo se vuoi. Nessun vincolo annuale.', cta: { href: '/vendi', label: 'Come vendiamo' } },
+  { num: '03', eyebrow: 'Marketing', title: 'Foto, video, drone, tour 3D.', body: 'Ogni immobile riceve un servizio fotografico professionale, video editoriale, riprese da drone dove utili, tour virtuale Matterport. Pubblicazione sui portali principali e sulla rete TriesteVillas.', cta: { href: '/vendi#marketing', label: 'Vedi il processo' } },
+  { num: '04', eyebrow: 'Pre-vendita', title: 'Check-up documentale prima di andare online.', body: 'Verifichiamo APE, conformità urbanistica, planimetrie, situazione condominiale. Quando l\'immobile va sul mercato, è pronto al rogito.', cta: { href: '/check-up-pre-vendita', label: 'Cosa controlliamo' } },
+  { num: '05', eyebrow: 'Clienti esteri', title: 'Specialisti su buyer internazionali.', body: 'Lavoriamo abitualmente con clienti austriaci, tedeschi, sloveni. Documenti tradotti, accompagnamento al notaio, gestione dell\'intero iter.', cta: { href: '/compra', label: 'Servizi per acquirenti' } },
+  { num: '06', eyebrow: 'Locazione', title: 'Affitta mentre vendi.', body: 'Se vendi e nel frattempo vuoi avere reddito, attiviamo un contratto flessibile gestito da TriesteAffitti. Vendita e affitto coordinati sotto un\'unica regia.', cta: { href: '/affitta-mentre-vendi', label: 'Strategia ibrida' } },
+  { num: '07', eyebrow: 'Network', title: 'Buyer network del gruppo TriesteVillas.', body: 'Accesso al pool di acquirenti del gruppo: TriesteVillas (lusso), FriuliVillas, LignanoVillas. Match diretti prima ancora della pubblicazione.', cta: { href: '/il-gruppo', label: 'Il Gruppo' } },
+];
+---
+<Base
+  title="L'agenzia smart che vende casa al 0% del venditore"
+  description="TriesteImmobiliare — vendita, valutazione, acquisto a Trieste. Mandato 3 mesi, 0% al venditore, marketing curato, network di gruppo."
+>
+  <Hero
+    eyebrow="TriesteImmobiliare"
+    title={`L'<em>agenzia smart</em><br/>che vende casa<br/>al 0% del venditore.`}
+    lede="Mandato di 3 mesi. Valutazione in 24h. Foto, video, tour 3D inclusi. Una sola provvigione, a carico dell'acquirente."
+    full
+  >
+    <div class="hero-cta">
+      <Button href="/valutazione" variant="primary" size="lg">Richiedi valutazione</Button>
+      <Button href="/vendi" variant="outline" size="lg">Come vendiamo</Button>
+    </div>
+    <div class="hero-meta">
+      <dl class="hero-meta__grid">
+        <div><dt>Mandato</dt><dd>3 mesi</dd></div>
+        <div><dt>Provvigione venditore</dt><dd>0%</dd></div>
+        <div><dt>Valutazione</dt><dd>entro 24h</dd></div>
+        <div><dt>Lingue</dt><dd>IT · EN · DE · SL</dd></div>
+      </dl>
+    </div>
+  </Hero>
+
+  {sections.map((s, i) => (
+    <Section variant={i % 2 === 0 ? 'default' : 'surface'} pad="lg">
+      <div class="row">
+        <div class="row__left">
+          <Eyebrow num={s.num}>{s.eyebrow}</Eyebrow>
+          <h2 class="row__title">{s.title}</h2>
+        </div>
+        <div class="row__right">
+          <p class="row__body">{s.body}</p>
+          <a href={s.cta.href} class="row__link">{s.cta.label} →</a>
+        </div>
+      </div>
+    </Section>
+  ))}
+
+  <Section variant="dark" pad="xl">
+    <div class="cta-band">
+      <Eyebrow num="08">Inizia</Eyebrow>
+      <h2 class="cta-band__title">Pronto a parlare della tua casa?</h2>
+      <p class="cta-band__lede">Una valutazione gratuita, senza impegno, in 24 ore. Oppure scrivici per qualsiasi domanda.</p>
+      <div class="cta-band__actions">
+        <Button href="/valutazione" variant="secondary" size="lg">Richiedi valutazione</Button>
+        <Button href="mailto:info@triesteimmobiliare.com" variant="ghost" size="lg">Scrivici</Button>
+      </div>
+    </div>
+  </Section>
+</Base>
+
+<style>
+  .hero-cta { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-5); }
+  .hero-meta { margin-top: var(--space-6); }
+  .hero-meta__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3) var(--space-5);
+    border-top: 1px solid var(--c-border);
+    padding-top: var(--space-4);
+    max-width: 36rem;
+  }
+  @media (min-width: 700px) { .hero-meta__grid { grid-template-columns: repeat(4, 1fr); } }
+  .hero-meta__grid dt { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: var(--ls-wider); color: var(--c-mute); }
+  .hero-meta__grid dd { font-size: var(--fs-lg); font-weight: var(--fw-semibold); margin-top: 0.25rem; }
+
+  .row { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
+  @media (min-width: 800px) { .row { grid-template-columns: 5fr 6fr; gap: var(--space-6); align-items: start; } }
+  .row__title { font-size: var(--fs-3xl); max-width: 14ch; margin-top: var(--space-2); }
+  .row__body { font-size: var(--fs-lg); line-height: var(--lh-relaxed); max-width: 50ch; }
+  .row__link { display: inline-block; margin-top: var(--space-3); color: var(--c-primary); font-weight: var(--fw-semibold); }
+  .row__link:hover { color: var(--c-primary-deep); }
+
+  .cta-band { text-align: center; max-width: 48rem; margin-inline: auto; }
+  .cta-band__title { font-size: var(--fs-4xl); margin-top: var(--space-2); }
+  .cta-band__lede { margin-top: var(--space-3); font-size: var(--fs-xl); }
+  .cta-band__actions { margin-top: var(--space-5); display: inline-flex; gap: var(--space-2); flex-wrap: wrap; justify-content: center; }
+</style>

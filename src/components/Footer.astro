@@ -1,0 +1,186 @@
+---
+import { getTranslations, localizePath, type Locale } from '../i18n';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const t = getTranslations(locale);
+const lh = (href: string) => localizePath(href, locale);
+
+const primaryNav = [
+  { key: 'valutazione', href: '/valutazione' },
+  { key: 'vendi', href: '/vendi' },
+  { key: 'compra', href: '/compra' },
+  { key: 'immobili', href: '/immobili' },
+] as const;
+
+const servizi = [
+  { key: 'check_up', href: '/check-up-pre-vendita' },
+  { key: 'house_tour', href: '/pianifica-house-tour' },
+  { key: 'affitta_vendi', href: '/affitta-mentre-vendi' },
+  { key: 'faq', href: '/faq' },
+] as const;
+
+const brandSites = [
+  { name: 'TriesteVillas', href: 'https://www.triestevillas.com', label: t.footer.brands.tsv },
+  { name: 'TriesteAffitti', href: 'https://www.triesteaffitti.com', label: t.footer.brands.ta },
+  { name: 'FriuliVillas', href: 'https://www.friulivillas.com', label: t.footer.brands.fv },
+  { name: 'LignanoVillas', href: 'https://www.lignanovillas.com', label: t.footer.brands.lv },
+];
+
+const year = new Date().getFullYear();
+---
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__col footer__col--brand">
+      <p class="footer__brand">Trieste<strong>Immobiliare</strong></p>
+      <p class="footer__tag">{t.footer.tagline}</p>
+      <address class="footer__address">
+        <span class="footer__label">{t.footer.sede_label}</span>
+        <span>{t.footer.sede}</span>
+        <a href={`mailto:${t.footer.email}`}>{t.footer.email}</a>
+        <a href={`tel:${t.footer.phone.replace(/\s/g, '')}`}>{t.footer.phone}</a>
+      </address>
+    </div>
+
+    <div class="footer__col">
+      <h4 class="footer__h">{t.nav.altro}</h4>
+      <ul class="footer__list">
+        {primaryNav.map((l) => (
+          <li><a href={lh(l.href)}>{t.nav[l.key]}</a></li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="footer__col">
+      <h4 class="footer__h">{t.nav.altro}</h4>
+      <ul class="footer__list">
+        {servizi.map((l) => (
+          <li><a href={lh(l.href)}>{t.nav[l.key]}</a></li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="footer__col">
+      <h4 class="footer__h">{t.footer.brand_network}</h4>
+      <ul class="footer__list">
+        {brandSites.map((b) => (
+          <li><a href={b.href} target="_blank" rel="noopener noreferrer">{b.label}</a></li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer__bar">
+    <div class="footer__bar-inner">
+      <div class="footer__legal">
+        <span>© {year} TriesteImmobiliare</span>
+        <span class="footer__sep">·</span>
+        <span>{t.footer.vat}</span>
+        <span class="footer__sep">·</span>
+        <span>{t.footer.powered_by}</span>
+      </div>
+      <div class="footer__legal-links">
+        <a href={lh('/privacy')}>{t.footer.legal.privacy}</a>
+        <a href={lh('/cookie')}>{t.footer.legal.cookie}</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--c-ink);
+    color: var(--c-on-dark);
+    margin-top: var(--space-8);
+  }
+  .footer__inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+    max-width: var(--container-wide);
+    margin-inline: auto;
+    padding: var(--space-7) var(--gutter);
+  }
+  @media (min-width: 700px) {
+    .footer__inner { grid-template-columns: 2fr 1fr 1fr 1fr; }
+  }
+
+  .footer__col--brand { max-width: 24rem; }
+  .footer__brand {
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-medium);
+    letter-spacing: var(--ls-tight);
+    color: var(--c-on-dark);
+    margin-bottom: var(--space-2);
+  }
+  .footer__brand strong { font-weight: var(--fw-semibold); }
+
+  .footer__tag {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--fs-base);
+    color: rgba(242, 242, 250, 0.7);
+    margin-bottom: var(--space-4);
+  }
+
+  .footer__address {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-style: normal;
+    font-size: var(--fs-sm);
+    color: rgba(242, 242, 250, 0.85);
+  }
+  .footer__address a { color: rgba(242, 242, 250, 0.85); }
+  .footer__address a:hover { color: var(--c-on-dark); }
+
+  .footer__label {
+    text-transform: uppercase;
+    font-size: var(--fs-xs);
+    letter-spacing: var(--ls-wider);
+    color: rgba(242, 242, 250, 0.5);
+    margin-bottom: 0.25rem;
+  }
+
+  .footer__h {
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-wider);
+    color: rgba(242, 242, 250, 0.5);
+    font-weight: var(--fw-semibold);
+    margin-bottom: var(--space-3);
+  }
+
+  .footer__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .footer__list a {
+    font-size: var(--fs-sm);
+    color: rgba(242, 242, 250, 0.8);
+  }
+  .footer__list a:hover { color: var(--c-on-dark); }
+
+  .footer__bar {
+    border-top: 1px solid rgba(242, 242, 250, 0.12);
+  }
+  .footer__bar-inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    max-width: var(--container-wide);
+    margin-inline: auto;
+    padding: var(--space-4) var(--gutter);
+    font-size: var(--fs-xs);
+    color: rgba(242, 242, 250, 0.55);
+  }
+  @media (min-width: 700px) {
+    .footer__bar-inner { flex-direction: row; align-items: center; justify-content: space-between; }
+  }
+
+  .footer__sep { opacity: 0.5; }
+
+  .footer__legal-links { display: inline-flex; gap: var(--space-3); }
+  .footer__legal-links a { color: rgba(242, 242, 250, 0.65); }
+  .footer__legal-links a:hover { color: var(--c-on-dark); }
+</style>

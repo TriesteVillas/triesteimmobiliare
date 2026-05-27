@@ -1,0 +1,83 @@
+---
+interface Props {
+  eyebrow?: string;
+  title: string;
+  lede?: string;
+  align?: 'left' | 'center';
+  variant?: 'default' | 'dark' | 'surface';
+  full?: boolean;
+}
+const {
+  eyebrow,
+  title,
+  lede,
+  align = 'left',
+  variant = 'default',
+  full = false,
+} = Astro.props;
+---
+<section class:list={['hero', `hero--${variant}`, `hero--${align}`, full && 'hero--full']}>
+  <div class="hero__inner">
+    {eyebrow && <span class="hero__eyebrow">{eyebrow}</span>}
+    <h1 class="hero__title" set:html={title} />
+    {lede && <p class="hero__lede">{lede}</p>}
+    <slot />
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-block: var(--space-8) var(--space-7);
+    position: relative;
+  }
+  .hero--default { background: var(--c-bg); color: var(--c-ink); }
+  .hero--surface { background: var(--c-surface); color: var(--c-ink); }
+  .hero--dark { background: var(--c-ink); color: var(--c-on-dark); }
+  .hero--dark .hero__title { color: var(--c-on-dark); }
+  .hero--dark .hero__lede { color: var(--c-on-dark); opacity: 0.85; }
+  .hero--dark .hero__eyebrow { color: #b8b0e6; }
+  .hero--full { min-height: 80vh; min-height: 80dvh; display: flex; align-items: center; }
+
+  .hero__inner {
+    width: 100%;
+    max-width: var(--container-wide);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+  .hero--center .hero__inner { text-align: center; max-width: 56rem; }
+
+  .hero__eyebrow {
+    display: inline-block;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-wider);
+    color: var(--c-secondary);
+    margin-bottom: var(--space-3);
+  }
+
+  .hero__title {
+    font-size: var(--fs-5xl);
+    font-weight: var(--fw-semibold);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    max-width: 22ch;
+  }
+  .hero--center .hero__title { max-width: none; margin-inline: auto; }
+  .hero__title :global(em) {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: var(--fw-regular);
+    color: var(--c-primary);
+  }
+  .hero--dark .hero__title :global(em) { color: #b8a8ff; }
+
+  .hero__lede {
+    margin-top: var(--space-3);
+    max-width: 54ch;
+    font-size: var(--fs-xl);
+    line-height: var(--lh-snug);
+    color: var(--c-ink-soft);
+  }
+  .hero--center .hero__lede { margin-inline: auto; }
+</style>
