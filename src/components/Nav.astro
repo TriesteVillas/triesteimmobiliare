@@ -32,7 +32,8 @@ function isActive(href: string) { return pathWithoutLocale.startsWith(href); }
 <header class="nav" data-nav>
   <div class="nav__inner">
     <a href={homeHref} class="nav__brand" aria-label="TriesteImmobiliare home">
-      <span class="nav__brand-name">Trieste<strong>Immobiliare</strong></span>
+      <img src="/images/logo-boat.svg" alt="" class="nav__brand-mark" width="44" height="30" loading="eager" />
+      <span class="nav__brand-name">Trieste<span class="nav__brand-strong">Immobiliare</span><span class="nav__brand-tld">.com</span></span>
     </a>
 
     <nav class="nav__links" aria-label="Primary">
@@ -107,13 +108,26 @@ function isActive(href: string) { return pathWithoutLocale.startsWith(href); }
   .nav__brand {
     display: inline-flex;
     align-items: center;
+    gap: 0.6rem;
     color: var(--c-ink);
-    font-size: var(--fs-lg);
-    font-weight: var(--fw-medium);
-    letter-spacing: var(--ls-tight);
+    font-family: var(--font-display);
+    font-size: var(--fs-base);
+    font-weight: var(--fw-black);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-wider);
+    line-height: 1;
   }
-  .nav__brand strong { font-weight: var(--fw-semibold); }
-  .nav__brand:hover { color: var(--c-primary); }
+  .nav__brand-mark { width: 36px; height: auto; flex-shrink: 0; }
+  .nav__brand-name { display: inline-flex; align-items: baseline; }
+  .nav__brand-strong { font-weight: var(--fw-black); }
+  .nav__brand-tld { color: var(--c-primary-soft); font-weight: var(--fw-bold); }
+  .nav__brand:hover { color: var(--c-primary-deep); }
+  .nav__brand:hover .nav__brand-tld { color: var(--c-primary); }
+
+  @media (max-width: 600px) {
+    .nav__brand-tld { display: none; }
+    .nav__brand-mark { width: 32px; }
+  }
 
   .nav__links {
     display: none;

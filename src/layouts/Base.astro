@@ -76,13 +76,14 @@ const fullTitle = title.includes('TriesteImmobiliare') ? title : `${title} · Tr
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={new URL(ogImage, siteOrigin).href} />
 
-    {/* Theme color */}
-    <meta name="theme-color" content="#381d92" />
+    {/* Theme color — navy del logo */}
+    <meta name="theme-color" content="#0d2942" />
+    <meta name="msapplication-TileColor" content="#0d2942" />
 
-    {/* Google Fonts — Inter + Arsenal */}
+    {/* Google Fonts — Inter (UI) + Arsenal (serif accent) + Archivo (display wordmark) */}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Arsenal:ital,wght@0,400;0,700;1,400;1,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Arsenal:ital,wght@0,400;0,700;1,400;1,700&family=Archivo:wght@700;800;900&display=swap" />
 
     {/* JSON-LD — RealEstateAgent */}
     <script type="application/ld+json" set:html={JSON.stringify({
