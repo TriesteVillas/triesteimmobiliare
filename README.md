@@ -6,7 +6,7 @@ Restyling del sito ufficiale TriesteImmobiliare (TSI), brand mid-budget del grup
 - **Hosting**: Vercel (adapter ufficiale, Cron per rebuild listing immobili)
 - **i18n**: 4 lingue — IT (default, no prefix), EN, DE, SL
 - **Data immobili**: build-time fetch da Airtable `TSV_PROPERTIES`
-- **Repo upstream**: `github.com/TriesteVillas/triesteimmobiliare-site`
+- **Repo upstream**: `github.com/TriesteVillas/triesteimmobiliare`
 
 ## Setup locale
 
