@@ -1,0 +1,185 @@
+{
+  "nav": {
+    "home": "Home",
+    "properties": "Compra",
+    "sell": "Vendi",
+    "group": "Il Gruppo",
+    "contact": "Contatti"
+  },
+  "home": {
+    "heroTitle": "Comprare e vendere casa a Trieste, in modo semplice",
+    "heroSubtitle": "TriesteImmobiliare è l'agenzia smart per comprare e vendere casa a Trieste e in provincia. Provvigione 0% per chi vende, accompagnamento reale per chi compra.",
+    "ctaProperties": "Sfoglia gli immobili",
+    "ctaContact": "Parla con noi",
+    "featuredTitle": "Immobili in evidenza",
+    "viewAll": "Vedi tutti",
+    "featured": {
+      "costiera": "Costiera",
+      "barcola": "Barcola",
+      "centro": "Centro città",
+      "carso": "Carso e Altopiano",
+      "fvg": "Friuli-Venezia Giulia",
+      "viewMore": "Vedi altro"
+    },
+    "beyond": {
+      "eyebrow": "Come lavoriamo",
+      "publicLabel": "Provvigione 0% per chi vende",
+      "publicText": "Il venditore non paga la nostra provvigione. Curiamo prezzo, annuncio, foto, visite e trattativa, dall'incarico fino al rogito.",
+      "privateLabel": "Affiancamento per chi compra",
+      "privateText": "Ti aiutiamo a trovare la casa giusta nella fascia di prezzo giusta, con le verifiche tecniche e documentali fatte prima della firma.",
+      "cta": "Parla con noi"
+    },
+    "tour": {
+      "eyebrow": "Vuoi vendere?",
+      "title": "Valutazione gratuita del tuo immobile",
+      "text": "Ti diciamo a che prezzo realistico puoi vendere e come, sulla base dei dati di mercato di Trieste. Senza impegno e senza provvigione a tuo carico.",
+      "cta": "Richiedi la valutazione"
+    }
+  },
+  "immobili": {
+    "title": "Immobili",
+    "intro": "Tutti gli immobili attualmente disponibili, raggruppati per zona.",
+    "filterAll": "Tutte le zone"
+  },
+  "zones": {
+    "CENTRO": "Centro",
+    "SEMICENTRO": "Semicentro",
+    "BARCOLA": "Barcola",
+    "BARCOLA-MIRAMARE": "Barcola-Miramare",
+    "COSTIERA": "Costiera",
+    "SISTIANA-DUINO": "Sistiana-Duino",
+    "ALTE": "Carso e Altopiano",
+    "MUGGIA": "Muggia",
+    "FVG": "Friuli Venezia Giulia",
+    "ALTRE": "Altre zone"
+  },
+  "listing": {
+    "count": "{count, plural, =0 {Nessun immobile} =1 {1 immobile} other {# immobili}}",
+    "empty": "Al momento nessun immobile in questa zona. Scrivici cosa cerchi e ti avvisiamo appena ne arriva uno."
+  },
+  "property": {
+    "forSale": "In vendita",
+    "forRent": "In affitto",
+    "priceOnRequest": "Prezzo su richiesta",
+    "perMonth": "/mese",
+    "sqm": "{value} m²",
+    "rooms": "Locali",
+    "baths": "Bagni",
+    "floor": "Piano",
+    "energyClass": "Classe energetica",
+    "surface": "Superficie",
+    "descriptionTitle": "Descrizione",
+    "featuresTitle": "Caratteristiche",
+    "locationTitle": "Posizione",
+    "locationApprox": "Posizione indicativa nell'area. La collocazione esatta viene condivisa su richiesta.",
+    "photosComing": "Foto in arrivo",
+    "backToList": "Torna agli immobili",
+    "contactCta": "Richiedi informazioni",
+    "reference": "Rif.",
+    "virtualTour": "Virtual tour",
+    "characteristicsTitle": "Caratteristiche immobile",
+    "type": "Tipologia",
+    "contract": "Contratto",
+    "elevator": "Ascensore",
+    "furnished": "Arredato",
+    "parking": "Box / posti auto",
+    "pool": "Piscina"
+  },
+  "group": {
+    "eyebrow": "TriesteVillas Group",
+    "title": "Il Gruppo",
+    "intro": "TriesteImmobiliare è il brand del gruppo dedicato alla casa di ogni giorno a Trieste e in provincia.",
+    "story": {
+      "eyebrow": "Cos'eravamo, cosa siamo",
+      "title": "Un gruppo, un mercato intero",
+      "intro": "TriesteImmobiliare nasce dentro un gruppo che conosce Trieste da cima a fondo, dal premium alla casa di tutti i giorni.",
+      "start": {
+        "title": "L'inizio nell'hospitality di pregio",
+        "text": "Il gruppo è nato gestendo ville e appartamenti per una clientela internazionale, in larga parte di lingua tedesca. È lì che si è costruita la lettura della città e del suo mercato."
+      },
+      "pivot": {
+        "title": "Il pivot alle compravendite",
+        "text": "Relazioni e conoscenza del mercato sono diventate una pratica di compravendita. Le locazioni sono maturate in TriesteAffitti, le vendite premium in TriesteVillas."
+      },
+      "group": {
+        "title": "Un gruppo, ruoli chiari",
+        "text": "TriesteImmobiliare copre la casa di ogni fascia a Trieste e provincia; TriesteVillas resta sul premium, TriesteAffitti sugli affitti, FriuliVillas e LignanoVillas presidiano il territorio. Meno dispersione, più chiarezza."
+      }
+    },
+    "groupTitle": "Cinque brand, un'unica regia",
+    "groupSubtitle": "Una sola struttura per coprire ogni esigenza abitativa a Trieste e in tutto il Friuli-Venezia Giulia.",
+    "brands": {
+      "tsv": { "name": "TriesteVillas", "desc": "Immobili luxury nel cuore di Trieste e sulla Costiera." },
+      "tsi": { "name": "TriesteImmobiliare", "desc": "La casa di ogni fascia a Trieste e provincia." },
+      "affitti": { "name": "TriesteAffitti", "desc": "Gestione matura degli affitti, da 1 a 18 mesi." },
+      "friuli": { "name": "FriuliVillas", "desc": "Il resto del Friuli-Venezia Giulia." },
+      "lignano": { "name": "LignanoVillas", "desc": "Il verticale locale del lusso a Lignano." }
+    },
+    "valuesTitle": "Cosa ci rende diversi",
+    "values": {
+      "local": { "title": "Locali e indipendenti", "text": "Conosciamo Trieste a fondo, perché è casa nostra." },
+      "tailored": { "title": "Soluzioni su misura", "text": "Ogni cliente è unico, come ogni casa." },
+      "journey": { "title": "Dal primo contatto al rogito", "text": "Ti accompagniamo in ogni fase del percorso." },
+      "promo": { "title": "Annuncio fatto bene", "text": "Foto, descrizione e pubblicazione curate, perché ogni casa merita di essere raccontata al meglio." }
+    },
+    "teamTitle": "Le persone del gruppo",
+    "team": {
+      "carlin": { "name": "Davide Carlin", "role": "Agente · Titolare e Amministratore" },
+      "martino": { "name": "Martino Coppola di Canzano", "role": "Socio · Sviluppo del gruppo" },
+      "giada": { "name": "Giada Comelli", "role": "Agente · Affitti" },
+      "cecile": { "name": "Cécile Van der Salm", "role": "Agente · Affitti" }
+    },
+    "legalTitle": "Dati societari",
+    "legal": {
+      "company": "TriesteVillas srl",
+      "address": "Via Milano 5, 34132 Trieste",
+      "vat": "C.F. / P.IVA 01235580329",
+      "rea": "Iscritta alla C.C.I.A.A. di Trieste · REA n° TS 134793",
+      "capital": "Capitale sociale 10.200,00 € i.v.",
+      "pec": "milou@pec.emailc.it"
+    }
+  },
+  "sell": {
+    "eyebrow": "Vendi con TriesteImmobiliare",
+    "title": "Vendi casa a Trieste con provvigione 0% a tuo carico.",
+    "intro": "Il venditore non paga la nostra provvigione. Ci occupiamo di tutto — prezzo, annuncio, visite, trattativa — fino al rogito. Tu porti a casa il risultato, senza costi di agenzia.",
+    "ctaPrimary": "Richiedi una valutazione gratuita",
+    "ctaSecondary": "Parla con noi",
+    "strategy": {
+      "title": "Prezzo realistico, subito",
+      "text": "Partiamo da una valutazione onesta basata sui dati di mercato di Trieste, non da un numero gonfiato per prendere l'incarico."
+    },
+    "channel": {
+      "title": "Provvigione 0% per chi vende",
+      "text": "La nostra provvigione è a carico della parte acquirente. Per te niente commissioni di agenzia: un vantaggio concreto sul prezzo netto che incassi."
+    },
+    "craft": {
+      "title": "Annuncio fatto bene",
+      "text": "Foto curate, descrizione completa, pubblicazione sui portali e gestione delle visite. La casa si presenta al meglio e arriva alle persone giuste."
+    },
+    "closing": {
+      "title": "Vuoi sapere quanto vale la tua casa?",
+      "text": "Raccontaci l'immobile: ti rispondiamo con una valutazione gratuita e senza impegno."
+    }
+  },
+  "contact": {
+    "title": "Contatti",
+    "intro": "Scrivici cosa cerchi o cosa vuoi vendere: ti rispondiamo in fretta.",
+    "emailLabel": "Email",
+    "phoneLabel": "Telefono",
+    "whatsappLabel": "Telefono",
+    "officeLabel": "Sede",
+    "hoursLabel": "Orari",
+    "email": "info@triesteimmobiliare.com",
+    "phone": "040 2473628",
+    "office": "Via Torino 34, secondo piano · Trieste",
+    "hours": "Su appuntamento"
+  },
+  "footer": {
+    "tagline": "L'agenzia smart per la casa a Trieste.",
+    "rights": "Tutti i diritti riservati.",
+    "sitemapTitle": "Mappa del sito",
+    "contactTitle": "Contatti",
+    "followUs": "Seguici"
+  }
+}

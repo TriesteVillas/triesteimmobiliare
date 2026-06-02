@@ -1,0 +1,185 @@
+{
+  "nav": {
+    "home": "Home",
+    "properties": "Buy",
+    "sell": "Sell",
+    "group": "The Group",
+    "contact": "Contact"
+  },
+  "home": {
+    "heroTitle": "Buying and selling homes in Trieste, made simple",
+    "heroSubtitle": "TriesteImmobiliare is the smart agency for buying and selling homes in Trieste and its province. 0% commission for sellers, real guidance for buyers.",
+    "ctaProperties": "Browse properties",
+    "ctaContact": "Talk to us",
+    "featuredTitle": "Featured listings",
+    "viewAll": "View all",
+    "featured": {
+      "costiera": "Coastline",
+      "barcola": "Barcola",
+      "centro": "City Centre",
+      "carso": "Karst & Plateau",
+      "fvg": "Friuli-Venezia Giulia",
+      "viewMore": "See more"
+    },
+    "beyond": {
+      "eyebrow": "How we work",
+      "publicLabel": "0% commission for sellers",
+      "publicText": "Sellers don't pay our commission. We handle pricing, the listing, photos, viewings and negotiation, from the mandate to the deed.",
+      "privateLabel": "Guidance for buyers",
+      "privateText": "We help you find the right home in the right price range, with the technical and document checks done before you sign.",
+      "cta": "Talk to us"
+    },
+    "tour": {
+      "eyebrow": "Thinking of selling?",
+      "title": "Free valuation of your property",
+      "text": "We tell you the realistic price you can sell at and how, based on Trieste market data. No obligation, and no commission on your side.",
+      "cta": "Request a valuation"
+    }
+  },
+  "immobili": {
+    "title": "Properties",
+    "intro": "All currently available properties, grouped by area.",
+    "filterAll": "All areas"
+  },
+  "zones": {
+    "CENTRO": "City Centre",
+    "SEMICENTRO": "Semi-central",
+    "BARCOLA": "Barcola",
+    "BARCOLA-MIRAMARE": "Barcola-Miramare",
+    "COSTIERA": "Coastline",
+    "SISTIANA-DUINO": "Sistiana-Duino",
+    "ALTE": "Karst & Plateau",
+    "MUGGIA": "Muggia",
+    "FVG": "Friuli Venezia Giulia",
+    "ALTRE": "Other areas"
+  },
+  "listing": {
+    "count": "{count, plural, =0 {No properties} =1 {1 property} other {# properties}}",
+    "empty": "No properties in this area right now. Tell us what you're after and we'll let you know as soon as one comes in."
+  },
+  "property": {
+    "forSale": "For sale",
+    "forRent": "For rent",
+    "priceOnRequest": "Price on request",
+    "perMonth": "/month",
+    "sqm": "{value} m²",
+    "rooms": "Rooms",
+    "baths": "Bathrooms",
+    "floor": "Floor",
+    "energyClass": "Energy class",
+    "surface": "Surface",
+    "descriptionTitle": "Description",
+    "featuresTitle": "Features",
+    "locationTitle": "Location",
+    "locationApprox": "Approximate location within the area. The exact address is shared on request.",
+    "photosComing": "Photos coming soon",
+    "backToList": "Back to listings",
+    "contactCta": "Request information",
+    "reference": "Ref.",
+    "virtualTour": "Virtual tour",
+    "characteristicsTitle": "Property features",
+    "type": "Type",
+    "contract": "Contract",
+    "elevator": "Lift",
+    "furnished": "Furnished",
+    "parking": "Garage / parking",
+    "pool": "Pool"
+  },
+  "group": {
+    "eyebrow": "TriesteVillas Group",
+    "title": "The Group",
+    "intro": "TriesteImmobiliare is the group's brand for everyday homes in Trieste and its province.",
+    "story": {
+      "eyebrow": "What we were, what we are",
+      "title": "One group, a whole market",
+      "intro": "TriesteImmobiliare was born inside a group that knows Trieste inside out — from the premium to the everyday home.",
+      "start": {
+        "title": "A start in high-end hospitality",
+        "text": "The group began by managing villas and apartments for an international, largely German-speaking clientele. That is where its reading of the city and its market was built."
+      },
+      "pivot": {
+        "title": "The pivot to sales",
+        "text": "Relationships and market knowledge turned into a sales practice. Rentals matured into TriesteAffitti, premium sales into TriesteVillas."
+      },
+      "group": {
+        "title": "One group, clear roles",
+        "text": "TriesteImmobiliare covers homes in every price range across Trieste and its province; TriesteVillas stays premium, TriesteAffitti handles rentals, FriuliVillas and LignanoVillas cover the wider territory. Less dispersion, more clarity."
+      }
+    },
+    "groupTitle": "Five brands, one direction",
+    "groupSubtitle": "A single structure covering every housing need across Trieste and the wider Friuli-Venezia Giulia region.",
+    "brands": {
+      "tsv": { "name": "TriesteVillas", "desc": "Luxury property in the heart of Trieste and along the coast." },
+      "tsi": { "name": "TriesteImmobiliare", "desc": "Everyday homes in every price range in Trieste and its province." },
+      "affitti": { "name": "TriesteAffitti", "desc": "Considered rental management, from 1 to 18 months." },
+      "friuli": { "name": "FriuliVillas", "desc": "The rest of Friuli-Venezia Giulia." },
+      "lignano": { "name": "LignanoVillas", "desc": "Our local luxury vertical in Lignano." }
+    },
+    "valuesTitle": "What sets us apart",
+    "values": {
+      "local": { "title": "Local and independent", "text": "We know Trieste inside out — it is home." },
+      "tailored": { "title": "Tailored solutions", "text": "Every client is unique, like every home." },
+      "journey": { "title": "From first contact to the deed", "text": "We stay with you at every step of the way." },
+      "promo": { "title": "Listings done right", "text": "Careful photos, descriptions and publishing — every home deserves to be told well." }
+    },
+    "teamTitle": "The people of the group",
+    "team": {
+      "carlin": { "name": "Davide Carlin", "role": "Agent · Owner & Managing Director" },
+      "martino": { "name": "Martino Coppola di Canzano", "role": "Partner · Group development" },
+      "giada": { "name": "Giada Comelli", "role": "Agent · Rentals" },
+      "cecile": { "name": "Cécile Van der Salm", "role": "Agent · Rentals" }
+    },
+    "legalTitle": "Company details",
+    "legal": {
+      "company": "TriesteVillas srl",
+      "address": "Via Milano 5, 34132 Trieste, Italy",
+      "vat": "VAT / Tax code 01235580329",
+      "rea": "Registered with the Trieste Chamber of Commerce · REA no. TS 134793",
+      "capital": "Share capital €10,200.00 fully paid",
+      "pec": "milou@pec.emailc.it"
+    }
+  },
+  "sell": {
+    "eyebrow": "Sell with TriesteImmobiliare",
+    "title": "Sell your home in Trieste with 0% commission on your side.",
+    "intro": "Sellers don't pay our commission. We handle everything — pricing, the listing, viewings, negotiation — through to the deed. You keep the result, with no agency fees.",
+    "ctaPrimary": "Request a free valuation",
+    "ctaSecondary": "Talk to us",
+    "strategy": {
+      "title": "A realistic price, right away",
+      "text": "We start from an honest valuation based on Trieste market data, not an inflated number to win the mandate."
+    },
+    "channel": {
+      "title": "0% commission for sellers",
+      "text": "Our commission is paid by the buyer's side. For you, no agency fees — a real advantage on the net price you take home."
+    },
+    "craft": {
+      "title": "Listings done right",
+      "text": "Careful photos, a complete description, publishing on the portals and managed viewings. The home shows at its best and reaches the right people."
+    },
+    "closing": {
+      "title": "Want to know what your home is worth?",
+      "text": "Tell us about the property and we'll come back with a free, no-obligation valuation."
+    }
+  },
+  "contact": {
+    "title": "Contact",
+    "intro": "Tell us what you're looking for or what you'd like to sell — we'll get back to you quickly.",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone",
+    "whatsappLabel": "Phone",
+    "officeLabel": "Office",
+    "hoursLabel": "Opening hours",
+    "email": "info@triesteimmobiliare.com",
+    "phone": "040 2473628",
+    "office": "Via Torino 34, second floor · Trieste",
+    "hours": "By appointment"
+  },
+  "footer": {
+    "tagline": "The smart agency for homes in Trieste.",
+    "rights": "All rights reserved.",
+    "sitemapTitle": "Site map",
+    "contactTitle": "Contact",
+    "followUs": "Follow us"
+  }
+}

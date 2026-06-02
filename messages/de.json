@@ -1,0 +1,185 @@
+{
+  "nav": {
+    "home": "Home",
+    "properties": "Kaufen",
+    "sell": "Verkaufen",
+    "group": "Die Gruppe",
+    "contact": "Kontakt"
+  },
+  "home": {
+    "heroTitle": "Immobilien in Triest kaufen und verkaufen, ganz einfach",
+    "heroSubtitle": "TriesteImmobiliare ist die smarte Agentur für den Kauf und Verkauf von Wohnimmobilien in Triest und Umgebung. 0 % Provision für Verkäufer, echte Begleitung für Käufer.",
+    "ctaProperties": "Immobilien ansehen",
+    "ctaContact": "Sprechen Sie mit uns",
+    "featuredTitle": "Ausgewählte Angebote",
+    "viewAll": "Alle ansehen",
+    "featured": {
+      "costiera": "Küste",
+      "barcola": "Barcola",
+      "centro": "Stadtzentrum",
+      "carso": "Karst & Hochebene",
+      "fvg": "Friaul-Julisch Venetien",
+      "viewMore": "Mehr ansehen"
+    },
+    "beyond": {
+      "eyebrow": "So arbeiten wir",
+      "publicLabel": "0 % Provision für Verkäufer",
+      "publicText": "Verkäufer zahlen unsere Provision nicht. Wir kümmern uns um Preis, Inserat, Fotos, Besichtigungen und Verhandlung — vom Auftrag bis zum Notartermin.",
+      "privateLabel": "Begleitung für Käufer",
+      "privateText": "Wir helfen Ihnen, das richtige Zuhause in der richtigen Preisklasse zu finden — mit technischen und dokumentarischen Prüfungen vor der Unterschrift.",
+      "cta": "Sprechen Sie mit uns"
+    },
+    "tour": {
+      "eyebrow": "Möchten Sie verkaufen?",
+      "title": "Kostenlose Bewertung Ihrer Immobilie",
+      "text": "Wir sagen Ihnen, zu welchem realistischen Preis Sie verkaufen können und wie — auf Basis der Marktdaten von Triest. Unverbindlich und ohne Provision zu Ihren Lasten.",
+      "cta": "Bewertung anfragen"
+    }
+  },
+  "immobili": {
+    "title": "Immobilien",
+    "intro": "Alle aktuell verfügbaren Immobilien, nach Gebiet gruppiert.",
+    "filterAll": "Alle Gebiete"
+  },
+  "zones": {
+    "CENTRO": "Stadtzentrum",
+    "SEMICENTRO": "Stadtnah",
+    "BARCOLA": "Barcola",
+    "BARCOLA-MIRAMARE": "Barcola-Miramare",
+    "COSTIERA": "Küste",
+    "SISTIANA-DUINO": "Sistiana-Duino",
+    "ALTE": "Karst & Hochebene",
+    "MUGGIA": "Muggia",
+    "FVG": "Friaul-Julisch Venetien",
+    "ALTRE": "Weitere Gebiete"
+  },
+  "listing": {
+    "count": "{count, plural, =0 {Keine Immobilien} =1 {1 Immobilie} other {# Immobilien}}",
+    "empty": "Derzeit keine Immobilien in diesem Gebiet. Sagen Sie uns, was Sie suchen, und wir melden uns, sobald etwas hereinkommt."
+  },
+  "property": {
+    "forSale": "Zu verkaufen",
+    "forRent": "Zu vermieten",
+    "priceOnRequest": "Preis auf Anfrage",
+    "perMonth": "/Monat",
+    "sqm": "{value} m²",
+    "rooms": "Zimmer",
+    "baths": "Badezimmer",
+    "floor": "Etage",
+    "energyClass": "Energieklasse",
+    "surface": "Fläche",
+    "descriptionTitle": "Beschreibung",
+    "featuresTitle": "Ausstattung",
+    "locationTitle": "Lage",
+    "locationApprox": "Ungefähre Lage im Gebiet. Die genaue Adresse teilen wir auf Anfrage mit.",
+    "photosComing": "Fotos folgen in Kürze",
+    "backToList": "Zurück zu den Angeboten",
+    "contactCta": "Informationen anfragen",
+    "reference": "Ref.",
+    "virtualTour": "Virtueller Rundgang",
+    "characteristicsTitle": "Objektmerkmale",
+    "type": "Typ",
+    "contract": "Vertrag",
+    "elevator": "Aufzug",
+    "furnished": "Möbliert",
+    "parking": "Garage / Stellplatz",
+    "pool": "Pool"
+  },
+  "group": {
+    "eyebrow": "TriesteVillas Group",
+    "title": "Die Gruppe",
+    "intro": "TriesteImmobiliare ist die Marke der Gruppe für das alltägliche Zuhause in Triest und Umgebung.",
+    "story": {
+      "eyebrow": "Was wir waren, was wir sind",
+      "title": "Eine Gruppe, ein ganzer Markt",
+      "intro": "TriesteImmobiliare ist in einer Gruppe entstanden, die Triest genau kennt — vom Premium-Segment bis zum alltäglichen Zuhause.",
+      "start": {
+        "title": "Der Anfang in der gehobenen Hospitality",
+        "text": "Die Gruppe begann mit der Verwaltung von Villen und Wohnungen für eine internationale, überwiegend deutschsprachige Klientel. Dort entstand das Gespür für die Stadt und ihren Markt."
+      },
+      "pivot": {
+        "title": "Der Wechsel zum Verkauf",
+        "text": "Beziehungen und Marktwissen wurden zu einer Verkaufspraxis. Die Vermietung reifte zu TriesteAffitti, der Premium-Verkauf zu TriesteVillas."
+      },
+      "group": {
+        "title": "Eine Gruppe, klare Rollen",
+        "text": "TriesteImmobiliare deckt Wohnimmobilien jeder Preisklasse in Triest und Umgebung ab; TriesteVillas bleibt premium, TriesteAffitti übernimmt die Vermietung, FriuliVillas und LignanoVillas das weitere Gebiet. Weniger Zerstreuung, mehr Klarheit."
+      }
+    },
+    "groupTitle": "Fünf Marken, eine Regie",
+    "groupSubtitle": "Eine einzige Struktur für jeden Wohnbedarf in Triest und in der gesamten Region Friaul-Julisch Venetien.",
+    "brands": {
+      "tsv": { "name": "TriesteVillas", "desc": "Luxusimmobilien im Herzen von Triest und an der Küste." },
+      "tsi": { "name": "TriesteImmobiliare", "desc": "Das alltägliche Zuhause jeder Preisklasse in Triest und Umgebung." },
+      "affitti": { "name": "TriesteAffitti", "desc": "Durchdachte Mietverwaltung, von 1 bis 18 Monaten." },
+      "friuli": { "name": "FriuliVillas", "desc": "Der Rest von Friaul-Julisch Venetien." },
+      "lignano": { "name": "LignanoVillas", "desc": "Unser lokales Luxussegment in Lignano." }
+    },
+    "valuesTitle": "Was uns auszeichnet",
+    "values": {
+      "local": { "title": "Lokal und unabhängig", "text": "Wir kennen Triest genau — es ist unser Zuhause." },
+      "tailored": { "title": "Maßgeschneiderte Lösungen", "text": "Jeder Kunde ist einzigartig, wie jedes Zuhause." },
+      "journey": { "title": "Vom ersten Kontakt bis zum Notartermin", "text": "Wir begleiten Sie in jeder Phase." },
+      "promo": { "title": "Inserate, die sitzen", "text": "Sorgfältige Fotos, Beschreibungen und Veröffentlichung — jede Immobilie verdient es, gut erzählt zu werden." }
+    },
+    "teamTitle": "Die Menschen der Gruppe",
+    "team": {
+      "carlin": { "name": "Davide Carlin", "role": "Makler · Inhaber & Geschäftsführer" },
+      "martino": { "name": "Martino Coppola di Canzano", "role": "Gesellschafter · Entwicklung der Gruppe" },
+      "giada": { "name": "Giada Comelli", "role": "Maklerin · Vermietung" },
+      "cecile": { "name": "Cécile Van der Salm", "role": "Maklerin · Vermietung" }
+    },
+    "legalTitle": "Unternehmensdaten",
+    "legal": {
+      "company": "TriesteVillas srl",
+      "address": "Via Milano 5, 34132 Triest, Italien",
+      "vat": "St.-Nr. / USt-IdNr. 01235580329",
+      "rea": "Eingetragen bei der Handelskammer Triest · REA Nr. TS 134793",
+      "capital": "Stammkapital 10.200,00 € voll eingezahlt",
+      "pec": "milou@pec.emailc.it"
+    }
+  },
+  "sell": {
+    "eyebrow": "Verkaufen mit TriesteImmobiliare",
+    "title": "Verkaufen Sie Ihre Immobilie in Triest mit 0 % Provision zu Ihren Lasten.",
+    "intro": "Verkäufer zahlen unsere Provision nicht. Wir kümmern uns um alles — Preis, Inserat, Besichtigungen, Verhandlung — bis zum Notartermin. Sie behalten das Ergebnis, ohne Maklergebühren.",
+    "ctaPrimary": "Kostenlose Bewertung anfragen",
+    "ctaSecondary": "Sprechen Sie mit uns",
+    "strategy": {
+      "title": "Ein realistischer Preis, sofort",
+      "text": "Wir beginnen mit einer ehrlichen Bewertung auf Basis der Marktdaten von Triest — keine überhöhte Zahl, um den Auftrag zu gewinnen."
+    },
+    "channel": {
+      "title": "0 % Provision für Verkäufer",
+      "text": "Unsere Provision trägt die Käuferseite. Für Sie keine Maklergebühren — ein echter Vorteil beim Nettopreis, den Sie erhalten."
+    },
+    "craft": {
+      "title": "Inserate, die sitzen",
+      "text": "Sorgfältige Fotos, eine vollständige Beschreibung, Veröffentlichung auf den Portalen und organisierte Besichtigungen. Die Immobilie zeigt sich von ihrer besten Seite und erreicht die richtigen Menschen."
+    },
+    "closing": {
+      "title": "Möchten Sie wissen, was Ihre Immobilie wert ist?",
+      "text": "Erzählen Sie uns von der Immobilie — wir melden uns mit einer kostenlosen, unverbindlichen Bewertung zurück."
+    }
+  },
+  "contact": {
+    "title": "Kontakt",
+    "intro": "Sagen Sie uns, was Sie suchen oder verkaufen möchten — wir melden uns schnell zurück.",
+    "emailLabel": "E-Mail",
+    "phoneLabel": "Telefon",
+    "whatsappLabel": "Telefon",
+    "officeLabel": "Büro",
+    "hoursLabel": "Öffnungszeiten",
+    "email": "info@triesteimmobiliare.com",
+    "phone": "040 2473628",
+    "office": "Via Torino 34, zweiter Stock · Triest",
+    "hours": "Nach Vereinbarung"
+  },
+  "footer": {
+    "tagline": "Die smarte Agentur für Wohnen in Triest.",
+    "rights": "Alle Rechte vorbehalten.",
+    "sitemapTitle": "Sitemap",
+    "contactTitle": "Kontakt",
+    "followUs": "Folgen Sie uns"
+  }
+}

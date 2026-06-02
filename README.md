@@ -1,12 +1,18 @@
 # TriesteImmobiliare — sito
 
-Restyling del sito ufficiale TriesteImmobiliare (TSI), brand mid-budget del gruppo TriesteVillas.
+Sito ufficiale di **TriesteImmobiliare**, il brand mid-market del gruppo TriesteVillas
+("l'agenzia smart per vendere casa a Trieste con provvigione 0% per il venditore").
 
-- **Stack**: Astro 6 (static export) · TypeScript · CSS vanilla con custom properties
-- **Hosting**: Vercel (adapter ufficiale, Cron per rebuild listing immobili)
-- **i18n**: 4 lingue — IT (default, no prefix), EN, DE, SL
-- **Data immobili**: build-time fetch da Airtable `TSV_PROPERTIES`
-- **Repo upstream**: `github.com/TriesteVillas/triesteimmobiliare`
+Fork strutturale del sito `triestevillas-web`: stessa logica, stesso header/footer,
+stessa pipeline immobili da Airtable. Cambiano branding, copy e il filtro della
+collection (`TS_Immobilaire` invece di `TSV_PUBLIC`).
+
+- **Stack**: Next.js 16 (App Router) · React 19 · TypeScript · Tailwind 4 · next-intl · Leaflet
+- **Hosting**: Vercel
+- **i18n**: IT (default, root) · EN · DE — `localePrefix: as-needed`
+- **Dati immobili**: fetch build/ISR da Airtable `TSV_PROPERTIES`
+  (base `app1ZDay9vQNU5V2u`, tabella `PROPRIETA`), filtro
+  `status = ACTIVE AND COLLECTION contiene "TS_Immobilaire"`.
 
 ## Setup locale
 
@@ -14,49 +20,33 @@ Richiede **Node ≥ 22.12**.
 
 ```bash
 npm install
-cp .env.example .env.local   # poi compila le chiavi Airtable
-npm run dev                  # http://localhost:4321
+cp .env.example .env.local   # opzionale: senza token usa lo snapshot src/lib/seed.json
+npm run dev                  # http://localhost:3000
 ```
 
-## Script
-
-| Comando | Cosa fa |
-|---|---|
-| `npm run dev` | dev server con HMR |
-| `npm run build` | build statica in `dist/` (gen Vercel adapter) |
-| `npm run preview` | preview locale del build |
-| `npm run astro -- ...` | accesso diretto al CLI Astro |
+Senza `AIRTABLE_TOKEN` il sito rende i dati dallo snapshot committato
+`src/lib/seed.json` (gli immobili reali al momento del build). In produzione,
+impostare `AIRTABLE_TOKEN` (PAT read-only, scope `data.records:read` sulla base
+`TSV_PROPERTIES`) per il fetch live con revalidation ogni 10 minuti.
 
 ## Struttura
 
 ```
 src/
-├── components/      # Astro components riusabili
-├── content/         # Content Collections (blog, faq) — MDX
-├── data/            # JSON generato al build (es. properties.generated.json)
-├── i18n/            # dizionari + helper localizzazione
-├── layouts/         # layout root (Base, Editorial)
-├── pages/           # routing file-based — IT no prefix, EN/DE/SL prefissati
-├── styles/          # tokens.css + reset.css + global.css
-└── utils/           # helper generici
-
-scripts/
-└── fetch-properties.mjs   # pull build-time da Airtable
+├── app/[locale]/        # routing i18n — home, immobili, annuncio/[slug], gruppo, vendi, contatti
+├── components/          # Header, Footer, Logo, HeroVideo, ImmobiliBrowser, PropertyCard, PropertyMap, ...
+├── i18n/                # routing + request config next-intl
+└── lib/                 # airtable.ts (fetch+filtro), properties.ts (map+zone), seed.json (snapshot)
+messages/                # it.json (master) · en.json · de.json
 ```
 
-## i18n
+## Branding
 
-Routing nativo Astro: IT è default senza prefisso (`/`), le altre lingue stanno sotto `/en/`, `/de/`, `/sl/`. Tutte le pagine devono avere il `hreflang` corretto — viene gestito automaticamente da `Base.astro`.
+- Logo: barchetta origami ufficiale (`src/components/Logo.tsx`, glyph + wordmark).
+- Palette: blu del logo — token in `src/app/globals.css` (`--color-brand*`).
+- Contatti: `info@triesteimmobiliare.com` · 040 2473628 · Via Torino 34, Trieste (su appuntamento).
 
-Master traduzioni: `src/i18n/it.json`. Le altre derivano (EN scritto direttamente, DE + SL placeholder finché non passa per TranslatePress + revisione madrelingua — vedi piano fase 7).
+## Owner
 
-## Design tokens
-
-Tutti i token vivono in `src/styles/tokens.css` come CSS custom properties.
-Modifiche centrali al brand passano da lì.
-
-## Contatti progetto
-
-- Owner: Martino Coppola di Canzano · TriesteVillas
-- Dev/AI: Claude · Assistente AI TriesteVillas
-- Mail tecniche: `info@triesteimmobiliare.com`
+- Owner: Martino Coppola di Canzano · TriesteVillas Group
+- Repo: `github.com/TriesteVillas/triesteimmobiliare`
