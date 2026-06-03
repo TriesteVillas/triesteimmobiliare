@@ -7,15 +7,17 @@ const TOKEN = process.env.AIRTABLE_TOKEN;
 const REVALIDATE_SECONDS = 600;
 
 const FIELD_IDS = Object.values(F);
-// Publish rule for the TriesteImmobiliare site: pubblicato_su contains one of
-// SITE_TARGETS. pubblicato_su is a multipleSelects field, so membership is tested
-// via ARRAYJOIN+FIND. (There is no TI-specific online checkbox yet — membership
-// in pubblicato_su is the publish signal; add a ti_com_online gate here if one
-// gets created in Airtable.)
+// Publish rule for the TriesteImmobiliare site:
+//   1) tsv_com_online (checkbox) = true  — MASTER online/offline switch shared by
+//      every TriesteVillas Group site (if false, the unit is offline everywhere).
+//   2) pubblicato_su contains one of SITE_TARGETS.
+// pubblicato_su is multipleSelects → membership via ARRAYJOIN+FIND.
+// NOTE: the formula references {tsv_com_online} and {pubblicato_su} by NAME — if
+// either field is renamed in Airtable, update this formula (and the TSV site's).
 const SITE_TARGETS = ["triesteimmobiliare.com"];
-const FILTER = `OR(${SITE_TARGETS.map(
+const FILTER = `AND({tsv_com_online}=TRUE(),OR(${SITE_TARGETS.map(
   (s) => `FIND("${s}",ARRAYJOIN({pubblicato_su}))`,
-).join(",")})`;
+).join(",")}))`;
 
 type RawRecord = { id: string; fields: Record<string, unknown> };
 
