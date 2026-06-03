@@ -7,10 +7,15 @@ const TOKEN = process.env.AIRTABLE_TOKEN;
 const REVALIDATE_SECONDS = 600;
 
 const FIELD_IDS = Object.values(F);
-// Publish rule: only records flagged for the TriesteImmobiliare site AND commercially active.
-// COLLECTION is a multipleSelects field, so we test membership via ARRAYJOIN+FIND
-// rather than equality. "TS_Immobilaire" is not a substring of any other option.
-const FILTER = `AND({status}="ACTIVE",FIND("TS_Immobilaire",ARRAYJOIN({COLLECTION})))`;
+// Publish rule for the TriesteImmobiliare site: pubblicato_su contains one of
+// SITE_TARGETS. pubblicato_su is a multipleSelects field, so membership is tested
+// via ARRAYJOIN+FIND. (There is no TI-specific online checkbox yet — membership
+// in pubblicato_su is the publish signal; add a ti_com_online gate here if one
+// gets created in Airtable.)
+const SITE_TARGETS = ["triesteimmobiliare.com"];
+const FILTER = `OR(${SITE_TARGETS.map(
+  (s) => `FIND("${s}",ARRAYJOIN({pubblicato_su}))`,
+).join(",")})`;
 
 type RawRecord = { id: string; fields: Record<string, unknown> };
 
