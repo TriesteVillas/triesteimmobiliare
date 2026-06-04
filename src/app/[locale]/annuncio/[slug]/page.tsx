@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { notFound } from "next/navigation";
-import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { getProperties, getProperty } from "@/lib/airtable";
-import { formatPrice } from "@/lib/format";
-import type { Property } from "@/lib/properties";
 import PropertyCharacteristics, {
   type Characteristic,
 } from "@/components/PropertyCharacteristics";
 import PropertyMap from "@/components/PropertyMap";
+import PropertyGallery from "@/components/PropertyGallery";
+import { contractBadge, clusterBadge, priceLabel } from "@/lib/propertyView";
 
 type Params = Promise<{ locale: string; slug: string }>;
 
@@ -35,15 +34,6 @@ export async function generateMetadata({
   };
 }
 
-function priceLine(p: Property, locale: string, t: (k: string) => string) {
-  if (p.contratto === "AFFITTO") {
-    return p.priceRent
-      ? `${formatPrice(p.priceRent, locale)}${t("perMonth")}`
-      : t("priceOnRequest");
-  }
-  return p.priceSale ? formatPrice(p.priceSale, locale) : t("priceOnRequest");
-}
-
 export default async function PropertyPage({ params }: { params: Params }) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
@@ -66,6 +56,8 @@ export default async function PropertyPage({ params }: { params: Params }) {
     property.rooms && { icon: "rooms", label: t("rooms"), value: property.rooms },
     property.baths && { icon: "baths", label: t("baths"), value: String(property.baths) },
     property.floor && { icon: "floor", label: t("floor"), value: property.floor },
+    property.pianiEdificio && { icon: "building", label: t("floorsBuilding"), value: String(property.pianiEdificio) },
+    property.annoCostruzione && { icon: "year", label: t("yearBuilt"), value: String(property.annoCostruzione) },
     property.ascensore && { icon: "elevator", label: t("elevator"), value: property.ascensore },
     property.arredato && { icon: "furnished", label: t("furnished"), value: property.arredato },
     property.parcheggio && { icon: "parking", label: t("parking"), value: property.parcheggio },
@@ -82,67 +74,34 @@ export default async function PropertyPage({ params }: { params: Params }) {
         ← {t("backToList")}
       </Link>
 
-      {property.photos.length > 0 ? (
-        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {property.photos.slice(0, 5).map((photo, i) => (
-            <div
-              key={photo.url}
-              className={`relative overflow-hidden rounded-xl bg-neutral-100 ${
-                i === 0 ? "aspect-video sm:col-span-2" : "aspect-[4/3]"
-              }`}
-            >
-              <Image
-                src={photo.url}
-                alt={photo.alt}
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover"
-                priority={i === 0}
-              />
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="mt-4 flex aspect-video items-center justify-center rounded-xl bg-gradient-to-br from-neutral-100 to-neutral-200 text-neutral-400">
-          {t("photosComing")}
-        </div>
-      )}
+      <div className="mt-6">
+        <PropertyGallery
+          title={property.title}
+          reference={`${t("reference")} ${property.id}`}
+          place={place}
+          badge={contractBadge(property, t)}
+          clusterBadge={clusterBadge(property, t)}
+          cover={property.coverPhoto}
+          topPhotos={property.topPhotos}
+          allPhotos={property.photos}
+          planimetrie={property.planimetrie}
+          videos={[...property.videos, ...property.walkthroughs]}
+          matterportUrl={property.matterportUrl}
+          labels={{
+            photos: t("galPhotos"),
+            plans: t("galPlans"),
+            video: t("galVideo"),
+            tour: t("galTour"),
+            viewAll: t("galViewAll", { count: property.photos.length }),
+            close: t("galClose"),
+            photosComing: t("photosComing"),
+          }}
+        />
+      </div>
 
-      {property.matterportUrl && (
-        <section className="mt-3">
-          <p className="mb-2 text-sm font-medium uppercase tracking-wide text-brand-light">
-            {t("virtualTour")}
-          </p>
-          <div className="relative aspect-video overflow-hidden rounded-xl bg-neutral-100">
-            <iframe
-              src={property.matterportUrl}
-              title={t("virtualTour")}
-              allow="fullscreen; xr-spatial-tracking; gyroscope; accelerometer"
-              allowFullScreen
-              loading="lazy"
-              className="absolute inset-0 h-full w-full border-0"
-            />
-          </div>
-        </section>
-      )}
-
-      <header className="mt-8 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <span className="text-sm font-medium uppercase tracking-wide text-brand-light">
-            {property.contratto === "AFFITTO" ? t("forRent") : t("forSale")}
-          </span>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight">
-            {property.title}
-          </h1>
-          {place && <p className="mt-1 text-neutral-500">{place}</p>}
-          <p className="mt-1 text-xs text-neutral-400">
-            {t("reference")} {property.id}
-          </p>
-        </div>
-        <p className="text-2xl font-semibold text-neutral-900">
-          {priceLine(property, locale, t)}
-        </p>
-      </header>
+      <p className="mt-6 text-2xl font-semibold text-neutral-900">
+        {priceLabel(property, locale, t)}
+      </p>
 
       <PropertyCharacteristics
         title={t("characteristicsTitle")}
@@ -187,11 +146,11 @@ export default async function PropertyPage({ params }: { params: Params }) {
       <section className="mt-10 rounded-xl bg-brand-dark p-6 text-white">
         <h2 className="text-lg font-semibold">{t("contactCta")}</h2>
         <div className="mt-3 flex flex-wrap gap-4 text-sm">
-          <a className="underline decoration-white/40 hover:decoration-white" href="mailto:info@triesteimmobiliare.com">
-            info@triesteimmobiliare.com
+          <a className="underline decoration-white/40 hover:decoration-white" href="mailto:luxury@triestevillas.com">
+            luxury@triestevillas.com
           </a>
-          <a className="underline decoration-white/40 hover:decoration-white" href="tel:0402473628">
-            040 2473628
+          <a className="underline decoration-white/40 hover:decoration-white" href="https://wa.me/393400700699">
+            WhatsApp
           </a>
         </div>
       </section>

@@ -74,6 +74,18 @@ const ICONS = {
       <path d="M2 22 9 15" />
     </>
   ),
+  year: (
+    <>
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <path d="M3 10h18M8 2v4M16 2v4" />
+    </>
+  ),
+  building: (
+    <>
+      <rect x="5" y="3" width="14" height="18" rx="1" />
+      <path d="M9 7h.01M15 7h.01M9 11h.01M15 11h.01M9 15h6" />
+    </>
+  ),
 } satisfies Record<string, ReactNode>;
 
 export default function PropertyCharacteristics({

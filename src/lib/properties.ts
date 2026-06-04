@@ -6,6 +6,7 @@ export const F = {
   internalName: "fldv1buS8yk2NZKOZ",
   publicName: "fldcGog8cRFRjZIrI",
   contratto: "fld8sD96k6YChA8pA",
+  cluster: "fldcdPH8aCWSfvFlD",
   tipologia: "fldr7auGhgNEOpiHg",
   via: "fldSOUwCWIs69WX8B",
   civico: "fld9eWwzOafQXHNFC",
@@ -24,11 +25,19 @@ export const F = {
   oneliner: "fldIMsfxvOW95HV90",
   tags: "fldVdulUcA3uTtx5v",
   foto: "fldUS4uDvqXibknNL",
+  coverPhoto: "fldvlnrfE1zdXFOsF",
+  topPhotos: "flduAPbRd81GwJhlw",
+  planimetrie: "fld8kB5lTpuzZ2IB9",
+  youtubeVideos: "fldzBgkjk7K8ACVxa",
+  youtubeWalkthrough: "fldfJBFclRBTD4oGs",
   matterport: "fldVT95yZFaGa8yFv",
   arredato: "fldRZiLzqQpZS24n9",
   ascensore: "fld1cWZRm66Pc1pRI",
   piscina: "fldUsLdpcMqlSPUG2",
   parcheggio: "fldQCABCfjCb1HDYE",
+  annoCostruzione: "fldjDrYlFEMxhW2E8",
+  pianiEdificio: "fld2Xc2ADuhSU21dv",
+  trattativaRiservata: "fld6JmapDP4Qi8RT6",
 } as const;
 
 // Display order of the zona codes (Airtable singleSelect). Codes not listed here
@@ -60,6 +69,7 @@ export type Property = {
   slug: string;
   title: string;
   contratto: "VENDITA" | "AFFITTO" | null;
+  cluster: string | null;
   tipologia: string | null;
   zona: string | null;
   comune: string | null;
@@ -77,11 +87,19 @@ export type Property = {
   oneliner: string | null;
   tags: string[];
   photos: Photo[];
+  coverPhoto: Photo | null;
+  topPhotos: Photo[];
+  planimetrie: Photo[];
+  videos: string[];
+  walkthroughs: string[];
   matterportUrl: string | null;
   arredato: string | null;
   ascensore: string | null;
   piscina: string | null;
   parcheggio: string | null;
+  annoCostruzione: number | null;
+  pianiEdificio: number | null;
+  trattativaRiservata: boolean;
 };
 
 type RawAttachment = {
@@ -98,6 +116,25 @@ function str(v: unknown): string | null {
 }
 function num(v: unknown): number | null {
   return typeof v === "number" && Number.isFinite(v) ? v : null;
+}
+// Map an Airtable attachment cell to our Photo[] (skips entries without a url).
+function attachments(v: unknown, alt: string): Photo[] {
+  return Array.isArray(v)
+    ? (v as RawAttachment[])
+        .filter((a) => typeof a?.url === "string")
+        .map((a) => ({
+          url: a.url,
+          width: a.width ?? null,
+          height: a.height ?? null,
+          alt,
+        }))
+    : [];
+}
+// Split a multiline text cell into trimmed non-empty lines (one URL per line).
+function lines(v: unknown): string[] {
+  return typeof v === "string"
+    ? v.split(/\r?\n/).map((s) => s.trim()).filter(Boolean)
+    : [];
 }
 
 export function slugify(input: string): string {
@@ -137,22 +174,18 @@ export function mapRecord(recordId: string, f: Fields): Property {
   // Public display name: public_tsv_name when set, else the internal name.
   const title = str(f[F.publicName]) ?? name;
 
-  const photos: Photo[] = Array.isArray(f[F.foto])
-    ? (f[F.foto] as RawAttachment[])
-        .filter((a) => typeof a?.url === "string")
-        .map((a) => ({
-          url: a.url,
-          width: a.width ?? null,
-          height: a.height ?? null,
-          alt: title,
-        }))
-    : [];
+  const photos = attachments(f[F.foto], title); // full gallery
+  const topPhotos = attachments(f[F.topPhotos], title); // curated in-card order
+  const planimetrie = attachments(f[F.planimetrie], title);
+  // Cover: dedicated foto_copertina, else first curated, else first gallery photo.
+  const coverPhoto = attachments(f[F.coverPhoto], title)[0] ?? topPhotos[0] ?? photos[0] ?? null;
 
   return {
     id,
     slug: `${slugify(name)}-${idNumber(id)}`,
     title,
     contratto,
+    cluster: str(f[F.cluster]),
     tipologia: str(f[F.tipologia]),
     zona: str(f[F.zona]),
     comune: str(f[F.comune]),
@@ -170,11 +203,19 @@ export function mapRecord(recordId: string, f: Fields): Property {
     oneliner: str(f[F.oneliner]),
     tags,
     photos,
+    coverPhoto,
+    topPhotos,
+    planimetrie,
+    videos: lines(f[F.youtubeVideos]),
+    walkthroughs: lines(f[F.youtubeWalkthrough]),
     matterportUrl: str(f[F.matterport]),
     arredato: str(f[F.arredato]),
     ascensore: str(f[F.ascensore]),
     piscina: str(f[F.piscina]),
     parcheggio: str(f[F.parcheggio]),
+    annoCostruzione: num(f[F.annoCostruzione]),
+    pianiEdificio: num(f[F.pianiEdificio]),
+    trattativaRiservata: f[F.trattativaRiservata] === true,
   };
 }
 

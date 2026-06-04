@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import type { PropertyView } from "@/lib/propertyView";
+import PropertyBadge from "./PropertyBadge";
 
 export default function PropertyCard({
   view,
@@ -28,9 +29,13 @@ export default function PropertyCard({
             {photosComing}
           </div>
         )}
-        <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-xs font-medium text-neutral-700">
-          {view.badge}
-        </span>
+        <PropertyBadge {...view.badge} className="absolute left-3 top-3" />
+        {view.clusterBadge && (
+          <PropertyBadge
+            {...view.clusterBadge}
+            className="absolute right-3 top-3 shadow-sm"
+          />
+        )}
       </div>
       <div className="space-y-1 p-4">
         <p className="text-lg font-semibold text-neutral-900">{view.priceLabel}</p>
