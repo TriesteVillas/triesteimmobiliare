@@ -67,7 +67,7 @@ export default async function GroupPage({
     <>
       <section className="bg-gradient-to-b from-brand to-brand-dark text-white">
         <div className="mx-auto max-w-4xl px-4 pb-20 pt-36">
-          <p className="eyebrow text-sand">{t("eyebrow")}</p>
+          <p className="eyebrow text-white/85">{t("eyebrow")}</p>
           <h1 className="mt-2 text-4xl font-semibold tracking-tight sm:text-5xl">
             {t("title")}
           </h1>

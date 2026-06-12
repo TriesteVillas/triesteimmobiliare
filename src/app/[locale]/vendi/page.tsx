@@ -28,7 +28,7 @@ export default async function SellPage({
       {/* Plain hero on brand gradient — no film, just the promise. */}
       <section className="bg-gradient-to-b from-brand to-brand-dark text-white">
         <div className="mx-auto max-w-4xl px-4 pb-20 pt-40">
-          <p className="eyebrow text-sand">{t("eyebrow")}</p>
+          <p className="eyebrow text-white/85">{t("eyebrow")}</p>
           <h1 className="display-hero mt-3" data-reveal>
             {t("title")}
           </h1>
