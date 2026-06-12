@@ -1,18 +1,37 @@
 # TriesteImmobiliare — sito
 
 Sito ufficiale di **TriesteImmobiliare**, il brand mid-market del gruppo TriesteVillas
-("l'agenzia smart per vendere casa a Trieste con provvigione 0% per il venditore").
+("l'agenzia smart per comprare e vendere casa a Trieste: provvigione 0% per chi vende").
 
-Fork strutturale del sito `triestevillas-web`: stessa logica, stesso header/footer,
-stessa pipeline immobili da Airtable. Cambiano branding, copy e il filtro della
-collection (`TS_Immobilaire` invece di `TSV_PUBLIC`).
+Gemello strutturale di `triestevillas-web` (stessi componenti, stessa pipeline immobili
+da Airtable, stessi nomi di classe CSS per la portabilità), ma con una skin volutamente
+più semplice: tema chiaro, palette blu nautica dal logo a barchetta, niente coreografie
+cinematografiche.
 
 - **Stack**: Next.js 16 (App Router) · React 19 · TypeScript · Tailwind 4 · next-intl · Leaflet
-- **Hosting**: Vercel
+- **Hosting**: Vercel (progetto `trieste-villas/triesteimmobiliare`, deploy automatico a ogni push su `main`)
 - **i18n**: IT (default, root) · EN · DE — `localePrefix: as-needed`
-- **Dati immobili**: fetch build/ISR da Airtable `TSV_PROPERTIES`
-  (base `app1ZDay9vQNU5V2u`, tabella `PROPRIETA`), filtro
-  `status = ACTIVE AND COLLECTION contiene "TS_Immobilaire"`.
+- **Dati immobili**: fetch live/ISR (10 min) da Airtable `TSV_PROPERTIES`
+  (base `app1ZDay9vQNU5V2u`, tabella `PROPRIETA`)
+
+## Regola di pubblicazione (gate)
+
+Un immobile appare su questo sito solo se **entrambe** vere:
+
+1. `tsv_com_online` (checkbox) = ✓ — interruttore master di gruppo (se spento,
+   l'immobile è offline su tutti i siti);
+2. `pubblicato_su` (multipleSelects) contiene **`triesteimmobiliare.com`**.
+
+Il filtro vive in `src/lib/airtable.ts` (`SITE_TARGETS`) e referenzia i campi
+per **nome**; le colonne della scheda sono invece agganciate per **field ID**
+(`src/lib/properties.ts`, oggetto `F`) — rinominare è sicuro, cancellare no.
+
+## Lead
+
+I form (richiesta info, prenota visita, invia a un amico, popup buyer, valutazione
+venditore) scrivono nella tabella `LEAD_` della stessa base via `/api/lead`, con
+`azienda: TriesteImmobiliare` e `canale: Sito TriesteImmobiliare`. Le email
+(Resend) sono best-effort e al momento non configurate: fa fede il record Airtable.
 
 ## Setup locale
 
@@ -25,28 +44,11 @@ npm run dev                  # http://localhost:3000
 ```
 
 Senza `AIRTABLE_TOKEN` il sito rende i dati dallo snapshot committato
-`src/lib/seed.json` (gli immobili reali al momento del build). In produzione,
-impostare `AIRTABLE_TOKEN` (PAT read-only, scope `data.records:read` sulla base
-`TSV_PROPERTIES`) per il fetch live con revalidation ogni 10 minuti.
+`src/lib/seed.json` (i soli immobili TSI al momento della rigenerazione). In
+produzione impostare `AIRTABLE_TOKEN` (PAT con `data.records:read` +
+`data.records:write` per i lead sulla base `TSV_PROPERTIES`) e, se serve,
+`AIRTABLE_BASE_ID`.
 
-## Struttura
+## Contatti del brand
 
-```
-src/
-├── app/[locale]/        # routing i18n — home, immobili, annuncio/[slug], gruppo, vendi, contatti
-├── components/          # Header, Footer, Logo, HeroVideo, ImmobiliBrowser, PropertyCard, PropertyMap, ...
-├── i18n/                # routing + request config next-intl
-└── lib/                 # airtable.ts (fetch+filtro), properties.ts (map+zone), seed.json (snapshot)
-messages/                # it.json (master) · en.json · de.json
-```
-
-## Branding
-
-- Logo: barchetta origami ufficiale (`src/components/Logo.tsx`, glyph + wordmark).
-- Palette: blu del logo — token in `src/app/globals.css` (`--color-brand*`).
-- Contatti: `info@triesteimmobiliare.com` · 040 2473628 · Via Torino 34, Trieste (su appuntamento).
-
-## Owner
-
-- Owner: Martino Coppola di Canzano · TriesteVillas Group
-- Repo: `github.com/TriesteVillas/triesteimmobiliare`
+info@triesteimmobiliare.com · 040 2473628 · Via Torino 34, secondo piano · Trieste

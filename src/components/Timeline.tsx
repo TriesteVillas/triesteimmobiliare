@@ -78,7 +78,7 @@ export default function Timeline({ items }: { items: Item[] }) {
             className="absolute -left-[31px] top-1 h-3 w-3 rounded-full ring-4 ring-white transition-colors duration-500"
             style={{ backgroundColor: visible[i] ? "var(--color-brand-light)" : "#d4d4d4" }}
           />
-          <p className="text-sm font-semibold text-brand-light">{s.year}</p>
+          <p className="text-sm font-semibold text-brand">{s.year}</p>
           <h3 className="mt-1 font-semibold text-neutral-900">{s.title}</h3>
           <p className="mt-1 text-neutral-600">{s.text}</p>
         </li>

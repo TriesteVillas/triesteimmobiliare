@@ -19,7 +19,7 @@
       "centro": "Stadtzentrum",
       "carso": "Karst & Hochebene",
       "fvg": "Friaul-Julisch Venetien",
-      "viewMore": "Mehr ansehen"
+      "viewMore": "Im Fokus"
     },
     "beyond": {
       "eyebrow": "So arbeiten wir",
@@ -60,10 +60,10 @@
   "property": {
     "forSale": "Zu verkaufen",
     "forRent": "Zu vermieten",
-    "priceOnRequest": "Preis auf Anfrage",
-    "priceReserved": "Preis auf Anfrage",
     "badgePrivate": "Private Collection",
     "badgeNewBuild": "Neubau",
+    "priceOnRequest": "Preis auf Anfrage",
+    "priceReserved": "Preis auf Anfrage",
     "yearBuilt": "Baujahr",
     "floorsBuilding": "Etagen im Gebäude",
     "galPhotos": "Fotos",
@@ -89,6 +89,7 @@
     "reference": "Ref.",
     "virtualTour": "Virtueller Rundgang",
     "characteristicsTitle": "Objektmerkmale",
+    "similarTitle": "Ähnliche Angebote",
     "type": "Typ",
     "contract": "Vertrag",
     "elevator": "Aufzug",
@@ -120,25 +121,64 @@
     "groupTitle": "Fünf Marken, eine Regie",
     "groupSubtitle": "Eine einzige Struktur für jeden Wohnbedarf in Triest und in der gesamten Region Friaul-Julisch Venetien.",
     "brands": {
-      "tsv": { "name": "TriesteVillas", "desc": "Luxusimmobilien im Herzen von Triest und an der Küste." },
-      "tsi": { "name": "TriesteImmobiliare", "desc": "Das alltägliche Zuhause jeder Preisklasse in Triest und Umgebung." },
-      "affitti": { "name": "TriesteAffitti", "desc": "Durchdachte Mietverwaltung, von 1 bis 18 Monaten." },
-      "friuli": { "name": "FriuliVillas", "desc": "Der Rest von Friaul-Julisch Venetien." },
-      "lignano": { "name": "LignanoVillas", "desc": "Unser lokales Luxussegment in Lignano." }
+      "tsv": {
+        "name": "TriesteVillas",
+        "desc": "Luxusimmobilien im Herzen von Triest und an der Küste."
+      },
+      "tsi": {
+        "name": "TriesteImmobiliare",
+        "desc": "Das alltägliche Zuhause jeder Preisklasse in Triest und Umgebung."
+      },
+      "affitti": {
+        "name": "TriesteAffitti",
+        "desc": "Durchdachte Mietverwaltung, von 1 bis 18 Monaten."
+      },
+      "friuli": {
+        "name": "FriuliVillas",
+        "desc": "Der Rest von Friaul-Julisch Venetien."
+      },
+      "lignano": {
+        "name": "LignanoVillas",
+        "desc": "Unser lokales Luxussegment in Lignano."
+      }
     },
     "valuesTitle": "Was uns auszeichnet",
     "values": {
-      "local": { "title": "Lokal und unabhängig", "text": "Wir kennen Triest genau — es ist unser Zuhause." },
-      "tailored": { "title": "Maßgeschneiderte Lösungen", "text": "Jeder Kunde ist einzigartig, wie jedes Zuhause." },
-      "journey": { "title": "Vom ersten Kontakt bis zum Notartermin", "text": "Wir begleiten Sie in jeder Phase." },
-      "promo": { "title": "Inserate, die sitzen", "text": "Sorgfältige Fotos, Beschreibungen und Veröffentlichung — jede Immobilie verdient es, gut erzählt zu werden." }
+      "local": {
+        "title": "Lokal und unabhängig",
+        "text": "Wir kennen Triest genau — es ist unser Zuhause."
+      },
+      "tailored": {
+        "title": "Maßgeschneiderte Lösungen",
+        "text": "Jeder Kunde ist einzigartig, wie jedes Zuhause."
+      },
+      "journey": {
+        "title": "Vom ersten Kontakt bis zum Notartermin",
+        "text": "Wir begleiten Sie in jeder Phase."
+      },
+      "promo": {
+        "title": "Inserate, die sitzen",
+        "text": "Sorgfältige Fotos, Beschreibungen und Veröffentlichung — jede Immobilie verdient es, gut erzählt zu werden."
+      }
     },
     "teamTitle": "Die Menschen der Gruppe",
     "team": {
-      "carlin": { "name": "Davide Carlin", "role": "Makler · Inhaber & Geschäftsführer" },
-      "martino": { "name": "Martino Coppola di Canzano", "role": "Gesellschafter · Entwicklung der Gruppe" },
-      "giada": { "name": "Giada Comelli", "role": "Maklerin · Vermietung" },
-      "cecile": { "name": "Cécile Van der Salm", "role": "Maklerin · Vermietung" }
+      "carlin": {
+        "name": "Davide Carlin",
+        "role": "Makler · Inhaber & Geschäftsführer"
+      },
+      "martino": {
+        "name": "Martino Coppola di Canzano",
+        "role": "Gesellschafter · Entwicklung der Gruppe"
+      },
+      "giada": {
+        "name": "Giada Comelli",
+        "role": "Maklerin · Vermietung"
+      },
+      "cecile": {
+        "name": "Cécile Van der Salm",
+        "role": "Maklerin · Vermietung"
+      }
     },
     "legalTitle": "Unternehmensdaten",
     "legal": {
@@ -186,11 +226,140 @@
     "office": "Via Torino 34, zweiter Stock · Triest",
     "hours": "Nach Vereinbarung"
   },
+  "lead": {
+    "title": "Informationen anfragen",
+    "reason": "Grund der Anfrage",
+    "motivo": {
+      "info": "Weitere Informationen anfragen",
+      "foto": "Weitere Fotos anfragen",
+      "disp": "Verfügbarkeit anfragen",
+      "altro": "Sonstiges"
+    },
+    "messagePlaceholder": "Ihre Nachricht (optional)",
+    "name": "Vor- und Nachname",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "privacyPre": "Ich akzeptiere die",
+    "privacyLink": "Datenschutzerklärung",
+    "submit": "Informationen anfragen",
+    "or": "Oder",
+    "brochureNote": "Wir antworten Ihnen so schnell wie möglich per E-Mail.",
+    "send": "Anfrage senden",
+    "sending": "Senden…",
+    "thanks": "Danke! Wir melden uns in Kürze.",
+    "error": "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
+    "friendToggle": "An einen Freund senden",
+    "friendTitle": "Diese Immobilie an einen Freund senden",
+    "friendNote": "Wir senden Ihrem Freund den Link zur Immobilie und die Broschüre.",
+    "friendEmail": "E-Mail des Freundes",
+    "yourEmail": "Ihre E-Mail",
+    "friendSend": "Senden",
+    "friendThanks": "Gesendet!",
+    "visitTitle": "Besichtigung anfragen",
+    "visitSubtitle": "Wählen Sie, wann Sie die Immobilie besichtigen möchten.",
+    "visitCta": "Besichtigung anfragen",
+    "visitHow": "Wie möchten Sie besichtigen",
+    "visitInPerson": "Vor Ort",
+    "visitAvail": "Wählen Sie Ihre Verfügbarkeit",
+    "visitAsap": "So bald wie möglich",
+    "visitSlots": "Zeitfenster wählen",
+    "slotAny": "Beliebig",
+    "visitDisclaimer": "Dies ist keine Buchung: Ihre Verfügbarkeit wird an die Agentur gesendet, die Sie kontaktiert.",
+    "visitNext": "Weiter",
+    "visitRecapDates": "Verfügbarkeit",
+    "visitRecapSlots": "Zeitfenster",
+    "visitBack": "Zurück",
+    "visitSend": "Bestätigen und senden",
+    "visitThanks": "Anfrage gesendet! Wir melden uns, um die Besichtigung zu vereinbaren."
+  },
   "footer": {
     "tagline": "Die smarte Agentur für Wohnen in Triest.",
     "rights": "Alle Rechte vorbehalten.",
     "sitemapTitle": "Sitemap",
     "contactTitle": "Kontakt",
     "followUs": "Folgen Sie uns"
+  },
+  "buyerForm": {
+    "title": "Sagen Sie uns, was Sie suchen",
+    "subtitle": "Zwei Minuten, unverbindlich: ein Kontakt und Ihre Wünsche genügen.",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "phone": "Mobil",
+    "email": "E-Mail",
+    "zones": "Interessensgebiete",
+    "budget": "Budget",
+    "size": "Größe",
+    "purpose": "Wofür ist es gedacht?",
+    "purposeOptions": {
+      "0": "Zum Wohnen",
+      "1": "Investment / Rendite",
+      "2": "Ferienhaus"
+    },
+    "condition": "Zustand der Immobilie",
+    "conditionOptions": {
+      "0": "Erstbezug",
+      "1": "Sofort bewohnbar",
+      "2": "Auch renovierungsbedürftig",
+      "3": "Egal"
+    },
+    "privacy": "Ich stimme der Verarbeitung meiner Daten gemäß Datenschutzerklärung zu.",
+    "submit": "Anfrage senden",
+    "sending": "Wird gesendet…",
+    "okTitle": "Anfrage erhalten",
+    "okText": "Wir melden uns in Kürze mit einer maßgeschneiderten Auswahl.",
+    "error": "Etwas ist schiefgelaufen: Versuchen Sie es erneut oder schreiben Sie an info@triesteimmobiliare.com.",
+    "close": "Schließen"
+  },
+  "sellerForm": {
+    "eyebrow": "Verkaufen mit TriesteImmobiliare",
+    "title": "Kostenlose Bewertung anfragen",
+    "subtitle": "Unverbindlich und ohne Provision zu Ihren Lasten: einfach eine ehrliche Bewertung Ihrer Immobilie.",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "phone": "Mobil",
+    "email": "E-Mail",
+    "address": "Wo befindet sich die Immobilie?",
+    "addressPlaceholder": "Straße und Hausnummer, Ort (z. B. Strada Costiera 28, Triest)",
+    "type": "Typ",
+    "typeOptions": {
+      "0": "Wohnung",
+      "1": "Penthouse",
+      "2": "Villa",
+      "3": "Haus mit Garten",
+      "4": "Grundstück",
+      "5": "Sonstiges"
+    },
+    "size": "Größe",
+    "sizeOptions": {
+      "0": "Unter 80 m²",
+      "1": "80 – 150 m²",
+      "2": "150 – 250 m²",
+      "3": "Über 250 m²"
+    },
+    "condition": "Zustand",
+    "conditionOptions": {
+      "0": "Sehr gut / renoviert",
+      "1": "Gut / bewohnbar",
+      "2": "Renovierungsbedürftig"
+    },
+    "timing": "Zeitrahmen",
+    "timingOptions": {
+      "0": "So bald wie möglich",
+      "1": "Innerhalb von 6 Monaten",
+      "2": "Nur orientierend"
+    },
+    "notes": "Anmerkungen",
+    "notesPlaceholder": "Alles, was uns hilft: Aussicht, Terrassen, Stellplatz…",
+    "privacy": "Ich stimme der Verarbeitung meiner Daten gemäß Datenschutzerklärung zu.",
+    "submit": "Bewertung anfragen",
+    "sending": "Wird gesendet…",
+    "okTitle": "Anfrage erhalten",
+    "okText": "Wir melden uns, um eine Besichtigung zu vereinbaren.",
+    "error": "Etwas ist schiefgelaufen: Versuchen Sie es erneut oder schreiben Sie an info@triesteimmobiliare.com.",
+    "close": "Schließen"
+  },
+  "meta": {
+    "title": "TriesteImmobiliare — Immobilien kaufen und verkaufen in Triest",
+    "description": "Die smarte Agentur für den Kauf und Verkauf von Wohnimmobilien in Triest und Umgebung: 0 % Provision für Verkäufer, echte Begleitung für Käufer. Inserate mit Fotos, Grundrissen und virtuellen Rundgängen."
   }
 }

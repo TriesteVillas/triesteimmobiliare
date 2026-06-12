@@ -10,7 +10,11 @@ export const F = {
   tipologia: "fldr7auGhgNEOpiHg",
   via: "fldSOUwCWIs69WX8B",
   civico: "fld9eWwzOafQXHNFC",
-  comune: "fldF3kZ0vA8j99CXr",
+  // 2026-06-12: the free-text "comune" field was dropped from Airtable in
+  // favour of the comune_fvg singleSelect (REST returns the option name as a
+  // plain string, so handling is unchanged). Foreign listings (e.g. Croatia)
+  // have no value and the place line simply omits the city.
+  comune: "fldIE9Aoao5sWbLIL",
   zona: "fld9TInMRcGm41BgC",
   lat: "fldfnLewUQSpJHUyK",
   lng: "fldwDeiuG7O48DPhl",
@@ -217,6 +221,34 @@ export function mapRecord(recordId: string, f: Fields): Property {
     pianiEdificio: num(f[F.pianiEdificio]),
     trattativaRiservata: f[F.trattativaRiservata] === true,
   };
+}
+
+// Suggest similar listings: same contract type, prioritising the same zona and
+// a nearby price (±30% best, ±60% ok), then closest price wins.
+export function similarProperties(
+  current: Property,
+  all: Property[],
+  limit = 4,
+): Property[] {
+  const price = current.priceSale ?? current.priceRent ?? null;
+  return all
+    .filter((p) => p.slug !== current.slug && p.contratto === current.contratto)
+    .map((p) => {
+      const pp = p.priceSale ?? p.priceRent ?? null;
+      let score = 0;
+      if (current.zona && p.zona === current.zona) score += 3;
+      else if (current.comune && p.comune === current.comune) score += 1;
+      let dist = Number.POSITIVE_INFINITY;
+      if (price && pp) {
+        dist = Math.abs(pp - price) / price;
+        if (dist <= 0.3) score += 2;
+        else if (dist <= 0.6) score += 1;
+      }
+      return { p, score, dist };
+    })
+    .sort((a, b) => b.score - a.score || a.dist - b.dist)
+    .slice(0, limit)
+    .map((x) => x.p);
 }
 
 // Normalize a property's zona to a known ZONE_ORDER code, or the "other" bucket.

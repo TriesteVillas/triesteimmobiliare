@@ -1,15 +1,28 @@
 import type { Metadata } from "next";
+import { ViewTransition } from "react";
+import Image from "next/image";
 import { notFound } from "next/navigation";
+import { redirect } from "@/i18n/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { getProperties, getProperty } from "@/lib/airtable";
+import { similarProperties, zoneKey } from "@/lib/properties";
 import PropertyCharacteristics, {
   type Characteristic,
 } from "@/components/PropertyCharacteristics";
 import PropertyMap from "@/components/PropertyMap";
-import PropertyGallery from "@/components/PropertyGallery";
-import { contractBadge, clusterBadge, priceLabel } from "@/lib/propertyView";
+import PhotoGallery from "@/components/PhotoGallery";
+import Planimetrie from "@/components/Planimetrie";
+import PropertyBadge from "@/components/PropertyBadge";
+import PropertyCard from "@/components/PropertyCard";
+import StickyNav from "@/components/StickyNav";
+import Scene from "@/components/motion/Scene";
+import LeadForm from "@/components/LeadForm";
+import VisitForm from "@/components/VisitForm";
+import { buildPropertyView, contractBadge, clusterBadge, priceLabel } from "@/lib/propertyView";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.triesteimmobiliare.com";
 
 type Params = Promise<{ locale: string; slug: string }>;
 
@@ -34,16 +47,57 @@ export async function generateMetadata({
   };
 }
 
+// Split a description into readable paragraphs. Honours author-made line breaks
+// (blank lines or single newlines); for a single wall of text, groups sentences
+// into chunks of ~3. Sentence split only on punctuation + space + capital, so
+// "10.200,00" / "ecc." don't cause false breaks.
+function toParagraphs(text: string): string[] {
+  const byBreak = text.split(/\n+/).map((s) => s.trim()).filter(Boolean);
+  if (byBreak.length > 1) return byBreak;
+  const sentences = text
+    .trim()
+    .split(/(?<=[.!?])\s+(?=[A-ZÀ-Ý"«])/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const chunks: string[] = [];
+  for (let i = 0; i < sentences.length; i += 3) {
+    chunks.push(sentences.slice(i, i + 3).join(" "));
+  }
+  return chunks.length ? chunks : [text];
+}
+
+// Extract 11-char YouTube ids from the common URL shapes.
+function youtubeIds(urls: string[]): string[] {
+  return urls
+    .map(
+      (u) =>
+        u.match(
+          /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([\w-]{11})/,
+        )?.[1],
+    )
+    .filter((x): x is string => Boolean(x));
+}
+
 export default async function PropertyPage({ params }: { params: Params }) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
-  const property = await getProperty(slug);
-  if (!property) notFound();
+  const all = await getProperties();
+  const property = all.find((p) => p.slug === slug);
+  // Old-site /annuncio/<slug> links still indexed by Google land here:
+  // send them to the listing index instead of a dead end.
+  if (!property) {
+    redirect({ href: "/immobili", locale });
+    notFound(); // unreachable — narrows the type (redirect isn't typed never)
+  }
 
   const t = await getTranslations("property");
+  const tZones = await getTranslations("zones");
+  const similar = similarProperties(property, all);
   const place = [property.via, property.zona, property.comune]
     .filter(Boolean)
     .join(", ");
+  const hasLocation = property.lat != null && property.lng != null;
+  const ytIds = youtubeIds([...property.videos, ...property.walkthroughs]);
 
   const characteristics = [
     property.tipologia && { icon: "home", label: t("type"), value: property.tipologia },
@@ -65,95 +119,238 @@ export default async function PropertyPage({ params }: { params: Params }) {
     property.energyClass && { icon: "energy", label: t("energyClass"), value: property.energyClass },
   ].filter((c): c is Characteristic => Boolean(c));
 
+  // Sticky anchor nav (immobiliare.it style) — only sections that exist.
+  const nav = [
+    (property.coverPhoto || property.photos.length) && { id: "foto", label: t("galPhotos") },
+    property.description && { id: "descrizione", label: t("descriptionTitle") },
+    property.planimetrie.length && { id: "planimetrie", label: t("galPlans") },
+    ytIds.length && { id: "video", label: t("galVideo") },
+    property.matterportUrl && { id: "tour", label: t("galTour") },
+    hasLocation && { id: "posizione", label: t("locationTitle") },
+  ].filter((x): x is { id: string; label: string } => Boolean(x));
+
   return (
-    <article className="mx-auto max-w-5xl px-4 py-10">
-      <Link
-        href="/immobili"
-        className="text-sm text-neutral-500 hover:text-neutral-800"
-      >
-        ← {t("backToList")}
-      </Link>
+    <article>
+      {/* Cinematic hero — parallax cover, shared-element morph target */}
+      <Scene as="header" mode="cover" smooth={0.14} className="relative h-[82vh] min-h-[520px] overflow-hidden bg-ink-2">
+        {(property.coverPhoto ?? property.photos[0]) ? (
+          <ViewTransition name={`prop-${property.slug}`} share="morph">
+            <Image
+              src={(property.coverPhoto ?? property.photos[0])!.url}
+              alt={(property.coverPhoto ?? property.photos[0])!.alt}
+              fill
+              sizes="100vw"
+              priority
+              className="par-zoom object-cover"
+            />
+          </ViewTransition>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-brand-dark to-ink" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-b from-ink/55 via-ink/10 to-ink/90" />
 
-      <div className="mt-6">
-        <PropertyGallery
-          title={property.title}
-          reference={`${t("reference")} ${property.id}`}
-          place={place}
-          badge={contractBadge(property, t)}
-          clusterBadge={clusterBadge(property, t)}
-          cover={property.coverPhoto}
-          topPhotos={property.topPhotos}
-          allPhotos={property.photos}
-          planimetrie={property.planimetrie}
-          videos={[...property.videos, ...property.walkthroughs]}
-          matterportUrl={property.matterportUrl}
-          labels={{
-            photos: t("galPhotos"),
-            plans: t("galPlans"),
-            video: t("galVideo"),
-            tour: t("galTour"),
-            viewAll: t("galViewAll", { count: property.photos.length }),
-            close: t("galClose"),
-            photosComing: t("photosComing"),
-          }}
-        />
-      </div>
-
-      <p className="mt-6 text-2xl font-semibold text-neutral-900">
-        {priceLabel(property, locale, t)}
-      </p>
-
-      <PropertyCharacteristics
-        title={t("characteristicsTitle")}
-        items={characteristics}
-      />
-
-      {property.description && (
-        <section className="mt-8">
-          <h2 className="text-lg font-semibold">{t("descriptionTitle")}</h2>
-          <div className="mt-3 whitespace-pre-line leading-relaxed text-neutral-700">
-            {property.description}
-          </div>
-        </section>
-      )}
-
-      {property.tags.length > 0 && (
-        <section className="mt-8">
-          <h2 className="text-lg font-semibold">{t("featuresTitle")}</h2>
-          <ul className="mt-3 flex flex-wrap gap-2">
-            {property.tags.map((tag) => (
-              <li
-                key={tag}
-                className="rounded-full bg-neutral-100 px-3 py-1 text-sm text-neutral-700"
-              >
-                {tag.replace(/_/g, " ").toLowerCase()}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {property.lat != null && property.lng != null && (
-        <section className="mt-8">
-          <h2 className="text-lg font-semibold">{t("locationTitle")}</h2>
-          <div className="mt-3">
-            <PropertyMap lat={property.lat} lng={property.lng} />
-          </div>
-          <p className="mt-2 text-sm text-neutral-500">{t("locationApprox")}</p>
-        </section>
-      )}
-
-      <section className="mt-10 rounded-xl bg-brand-dark p-6 text-white">
-        <h2 className="text-lg font-semibold">{t("contactCta")}</h2>
-        <div className="mt-3 flex flex-wrap gap-4 text-sm">
-          <a className="underline decoration-white/40 hover:decoration-white" href="mailto:luxury@triestevillas.com">
-            luxury@triestevillas.com
-          </a>
-          <a className="underline decoration-white/40 hover:decoration-white" href="https://wa.me/393400700699">
-            WhatsApp
-          </a>
+        <div className="absolute left-0 right-0 top-24 mx-auto max-w-5xl px-6">
+          <Link
+            href="/immobili"
+            transitionTypes={["nav-back"]}
+            className="group/back text-sm font-medium text-white/70 transition-colors hover:text-white"
+          >
+            <span className="inline-block transition-transform duration-300 ease-[var(--ease-lux)] group-hover/back:-translate-x-1">
+              ←
+            </span>{" "}
+            {t("backToList")}
+          </Link>
         </div>
-      </section>
+
+        <div className="absolute inset-x-0 bottom-0 mx-auto max-w-5xl px-6 pb-12">
+          <div className="flex flex-wrap items-center gap-2" data-reveal>
+            <PropertyBadge {...contractBadge(property, t)} />
+            {clusterBadge(property, t) && (
+              <PropertyBadge {...clusterBadge(property, t)!} />
+            )}
+          </div>
+          <h1 className="display-chapter mt-4 max-w-3xl text-white [text-shadow:0_4px_30px_rgba(0,0,0,0.5)]">
+            {property.title}
+          </h1>
+          <p className="mt-2 text-sm text-white/65">
+            {t("reference")} {property.id}
+            {place && (
+              <>
+                {" · "}
+                {hasLocation ? (
+                  <a href="#posizione" className="underline-offset-2 hover:text-white hover:underline">
+                    {place}
+                  </a>
+                ) : (
+                  place
+                )}
+              </>
+            )}
+          </p>
+          <p className="mt-5 text-3xl font-semibold tracking-tight text-white">
+            {priceLabel(property, locale, t)}
+          </p>
+        </div>
+      </Scene>
+
+      {/* Paper sheet — the dossier */}
+      <div className="relative z-10 -mt-5 rounded-t-[2.25rem] bg-paper text-neutral-900 shadow-[0_-24px_60px_rgba(15,39,55,0.16)]">
+        <div className="mx-auto max-w-5xl px-4 pb-20 pt-8">
+          {nav.length > 1 && (
+            <StickyNav
+              title={property.title}
+              reference={`${t("reference")} ${property.id}`}
+              items={nav}
+            />
+          )}
+
+          <div className="mt-6">
+            <PhotoGallery
+              cover={property.coverPhoto}
+              topPhotos={property.topPhotos}
+              allPhotos={property.photos}
+              compact
+              labels={{
+                viewAll: t("galViewAll", { count: property.photos.length }),
+                close: t("galClose"),
+                photosComing: t("photosComing"),
+              }}
+            />
+          </div>
+
+          <PropertyCharacteristics
+            title={t("characteristicsTitle")}
+            items={characteristics}
+          />
+
+          {property.description && (
+            <section id="descrizione" className="mt-8 scroll-mt-32" data-reveal>
+              <h2 className="text-lg font-semibold">{t("descriptionTitle")}</h2>
+              <div className="mt-3 space-y-4 leading-relaxed text-neutral-700">
+                {toParagraphs(property.description).map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
+              </div>
+            </section>
+          )}
+
+          <Planimetrie
+            items={property.planimetrie}
+            title={t("galPlans")}
+            closeLabel={t("galClose")}
+          />
+
+          {ytIds.length > 0 && (
+            <section id="video" className="mt-8 scroll-mt-32">
+              <h2 className="text-lg font-semibold">{t("galVideo")}</h2>
+              <div className="mt-3 space-y-4">
+                {ytIds.map((id) => (
+                  <div
+                    key={id}
+                    className="relative aspect-video overflow-hidden rounded-xl bg-neutral-900"
+                  >
+                    <iframe
+                      src={`https://www.youtube-nocookie.com/embed/${id}`}
+                      title={property.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      loading="lazy"
+                      className="absolute inset-0 h-full w-full border-0"
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {property.matterportUrl && (
+            <section id="tour" className="mt-8 scroll-mt-32">
+              <h2 className="text-lg font-semibold">{t("galTour")}</h2>
+              <div className="relative mt-3 aspect-video overflow-hidden rounded-xl bg-neutral-100">
+                <iframe
+                  src={property.matterportUrl}
+                  title={t("galTour")}
+                  allow="fullscreen; xr-spatial-tracking; gyroscope; accelerometer"
+                  allowFullScreen
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full border-0"
+                />
+              </div>
+            </section>
+          )}
+
+          {property.tags.length > 0 && (
+            <section className="mt-8">
+              <h2 className="text-lg font-semibold">{t("featuresTitle")}</h2>
+              <ul className="mt-3 flex flex-wrap gap-2">
+                {property.tags.map((tag) => (
+                  <li
+                    key={tag}
+                    className="rounded-full bg-neutral-100 px-3 py-1 text-sm text-neutral-700"
+                  >
+                    {tag.replace(/_/g, " ").toLowerCase()}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {hasLocation && (
+            <section id="posizione" className="mt-8 scroll-mt-32">
+              <h2 className="text-lg font-semibold">{t("locationTitle")}</h2>
+              <div className="mt-3">
+                <PropertyMap lat={property.lat!} lng={property.lng!} />
+              </div>
+              <p className="mt-2 text-sm text-neutral-500">{t("locationApprox")}</p>
+            </section>
+          )}
+
+          <LeadForm
+            rif={property.id}
+            immobileNome={property.title}
+            url={`${SITE_URL}${locale === "it" ? "" : `/${locale}`}/annuncio/${property.slug}`}
+            sito="triesteimmobiliare.com"
+            lingua={locale}
+          />
+
+          <VisitForm
+            rif={property.id}
+            immobileNome={property.title}
+            url={`${SITE_URL}${locale === "it" ? "" : `/${locale}`}/annuncio/${property.slug}`}
+            sito="triesteimmobiliare.com"
+            lingua={locale}
+          />
+
+          <div className="mt-4 flex flex-wrap gap-4 text-sm text-neutral-500">
+            <a className="hover:text-brand" href="mailto:info@triesteimmobiliare.com">
+              info@triesteimmobiliare.com
+            </a>
+            <a className="hover:text-brand" href="tel:0402473628">
+              040 2473628
+            </a>
+          </div>
+
+          {similar.length > 0 && (
+            <section className="mt-12 border-t border-neutral-200 pt-10">
+              <h2 className="text-2xl font-semibold tracking-tight">
+                {t("similarTitle")}
+              </h2>
+              <div
+                className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+                data-reveal-stagger
+              >
+                {similar.map((p) => (
+                  <PropertyCard
+                    key={p.slug}
+                    view={buildPropertyView(p, locale, t, tZones(zoneKey(p)))}
+                    photosComing={t("photosComing")}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+      </div>
     </article>
   );
 }

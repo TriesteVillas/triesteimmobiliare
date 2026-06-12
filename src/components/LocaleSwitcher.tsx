@@ -29,8 +29,8 @@ export default function LocaleSwitcher() {
           aria-current={loc === locale}
           className={
             loc === locale
-              ? "px-1.5 font-semibold text-neutral-900"
-              : "px-1.5 text-neutral-400 hover:text-neutral-700"
+              ? "px-1.5 font-semibold text-brand-dark"
+              : "px-1.5 text-neutral-400 transition-colors hover:text-brand"
           }
         >
           {LABELS[loc] ?? loc.toUpperCase()}

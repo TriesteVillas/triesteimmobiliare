@@ -11,9 +11,9 @@ const FIELD_IDS = Object.values(F);
 //   1) tsv_com_online (checkbox) = true  — MASTER online/offline switch shared by
 //      every TriesteVillas Group site (if false, the unit is offline everywhere).
 //   2) pubblicato_su contains one of SITE_TARGETS.
-// pubblicato_su is multipleSelects → membership via ARRAYJOIN+FIND.
-// NOTE: the formula references {tsv_com_online} and {pubblicato_su} by NAME — if
-// either field is renamed in Airtable, update this formula (and the TSV site's).
+// pubblicato_su is multipleSelects -> membership via ARRAYJOIN+FIND.
+// NOTE: the formula references {tsv_com_online} and {pubblicato_su} by NAME - if
+// either field is renamed in Airtable, update this formula (and the sibling sites').
 const SITE_TARGETS = ["triesteimmobiliare.com"];
 const FILTER = `AND({tsv_com_online}=TRUE(),OR(${SITE_TARGETS.map(
   (s) => `FIND("${s}",ARRAYJOIN({pubblicato_su}))`,

@@ -17,9 +17,9 @@
       "costiera": "Costiera",
       "barcola": "Barcola",
       "centro": "Centro città",
-      "carso": "Carso e Altopiano",
+      "carso": "Carso e Altipiano",
       "fvg": "Friuli-Venezia Giulia",
-      "viewMore": "Vedi altro"
+      "viewMore": "In evidenza"
     },
     "beyond": {
       "eyebrow": "Come lavoriamo",
@@ -60,10 +60,10 @@
   "property": {
     "forSale": "In vendita",
     "forRent": "In affitto",
-    "priceOnRequest": "Prezzo su richiesta",
-    "priceReserved": "Trattativa riservata",
     "badgePrivate": "Private Collection",
     "badgeNewBuild": "Nuova costruzione",
+    "priceOnRequest": "Prezzo su richiesta",
+    "priceReserved": "Trattativa riservata",
     "yearBuilt": "Anno di costruzione",
     "floorsBuilding": "Piani edificio",
     "galPhotos": "Foto",
@@ -89,6 +89,7 @@
     "reference": "Rif.",
     "virtualTour": "Virtual tour",
     "characteristicsTitle": "Caratteristiche immobile",
+    "similarTitle": "Altri annunci simili",
     "type": "Tipologia",
     "contract": "Contratto",
     "elevator": "Ascensore",
@@ -120,25 +121,64 @@
     "groupTitle": "Cinque brand, un'unica regia",
     "groupSubtitle": "Una sola struttura per coprire ogni esigenza abitativa a Trieste e in tutto il Friuli-Venezia Giulia.",
     "brands": {
-      "tsv": { "name": "TriesteVillas", "desc": "Immobili luxury nel cuore di Trieste e sulla Costiera." },
-      "tsi": { "name": "TriesteImmobiliare", "desc": "La casa di ogni fascia a Trieste e provincia." },
-      "affitti": { "name": "TriesteAffitti", "desc": "Gestione matura degli affitti, da 1 a 18 mesi." },
-      "friuli": { "name": "FriuliVillas", "desc": "Il resto del Friuli-Venezia Giulia." },
-      "lignano": { "name": "LignanoVillas", "desc": "Il verticale locale del lusso a Lignano." }
+      "tsv": {
+        "name": "TriesteVillas",
+        "desc": "Immobili luxury nel cuore di Trieste e sulla Costiera."
+      },
+      "tsi": {
+        "name": "TriesteImmobiliare",
+        "desc": "La casa di ogni fascia a Trieste e provincia."
+      },
+      "affitti": {
+        "name": "TriesteAffitti",
+        "desc": "Gestione matura degli affitti, da 1 a 18 mesi."
+      },
+      "friuli": {
+        "name": "FriuliVillas",
+        "desc": "Il resto del Friuli-Venezia Giulia."
+      },
+      "lignano": {
+        "name": "LignanoVillas",
+        "desc": "Il verticale locale del lusso a Lignano."
+      }
     },
     "valuesTitle": "Cosa ci rende diversi",
     "values": {
-      "local": { "title": "Locali e indipendenti", "text": "Conosciamo Trieste a fondo, perché è casa nostra." },
-      "tailored": { "title": "Soluzioni su misura", "text": "Ogni cliente è unico, come ogni casa." },
-      "journey": { "title": "Dal primo contatto al rogito", "text": "Ti accompagniamo in ogni fase del percorso." },
-      "promo": { "title": "Annuncio fatto bene", "text": "Foto, descrizione e pubblicazione curate, perché ogni casa merita di essere raccontata al meglio." }
+      "local": {
+        "title": "Locali e indipendenti",
+        "text": "Conosciamo Trieste a fondo, perché è casa nostra."
+      },
+      "tailored": {
+        "title": "Soluzioni su misura",
+        "text": "Ogni cliente è unico, come ogni casa."
+      },
+      "journey": {
+        "title": "Dal primo contatto al rogito",
+        "text": "Ti accompagniamo in ogni fase del percorso."
+      },
+      "promo": {
+        "title": "Annuncio fatto bene",
+        "text": "Foto, descrizione e pubblicazione curate, perché ogni casa merita di essere raccontata al meglio."
+      }
     },
     "teamTitle": "Le persone del gruppo",
     "team": {
-      "carlin": { "name": "Davide Carlin", "role": "Agente · Titolare e Amministratore" },
-      "martino": { "name": "Martino Coppola di Canzano", "role": "Socio · Sviluppo del gruppo" },
-      "giada": { "name": "Giada Comelli", "role": "Agente · Affitti" },
-      "cecile": { "name": "Cécile Van der Salm", "role": "Agente · Affitti" }
+      "carlin": {
+        "name": "Davide Carlin",
+        "role": "Agente · Titolare e Amministratore"
+      },
+      "martino": {
+        "name": "Martino Coppola di Canzano",
+        "role": "Socio · Sviluppo del gruppo"
+      },
+      "giada": {
+        "name": "Giada Comelli",
+        "role": "Agente · Affitti"
+      },
+      "cecile": {
+        "name": "Cécile Van der Salm",
+        "role": "Agente · Affitti"
+      }
     },
     "legalTitle": "Dati societari",
     "legal": {
@@ -186,11 +226,140 @@
     "office": "Via Torino 34, secondo piano · Trieste",
     "hours": "Su appuntamento"
   },
+  "lead": {
+    "title": "Richiedi informazioni",
+    "reason": "Motivo del contatto",
+    "motivo": {
+      "info": "Richiedere maggiori informazioni",
+      "foto": "Richiedere più foto",
+      "disp": "Richiedere disponibilità",
+      "altro": "Altro"
+    },
+    "messagePlaceholder": "Scrivi qui il tuo messaggio (opzionale)",
+    "name": "Nome e cognome",
+    "email": "Email",
+    "phone": "Telefono",
+    "privacyPre": "Ho letto e accetto la",
+    "privacyLink": "Privacy Policy",
+    "submit": "Richiedi informazioni",
+    "or": "Oppure",
+    "brochureNote": "Ti rispondiamo via email il prima possibile.",
+    "send": "Invia richiesta",
+    "sending": "Invio…",
+    "thanks": "Grazie! Ti ricontatteremo a breve.",
+    "error": "Qualcosa è andato storto. Riprova.",
+    "friendToggle": "Manda a un amico",
+    "friendTitle": "Manda questo immobile a un amico",
+    "friendNote": "Invieremo al tuo amico il link dell'immobile e la brochure.",
+    "friendEmail": "Email dell'amico",
+    "yourEmail": "La tua email",
+    "friendSend": "Invia",
+    "friendThanks": "Inviato!",
+    "visitTitle": "Prenota una visita",
+    "visitSubtitle": "Scegli quando vorresti visitare l'immobile.",
+    "visitCta": "Prenota una visita",
+    "visitHow": "Come vuoi visitare l'immobile",
+    "visitInPerson": "Di persona",
+    "visitAvail": "Seleziona le tue disponibilità",
+    "visitAsap": "Il prima possibile",
+    "visitSlots": "Seleziona le fasce orarie",
+    "slotAny": "Qualsiasi",
+    "visitDisclaimer": "Questa non è una prenotazione: le tue disponibilità saranno inviate all'agenzia che ti ricontatterà.",
+    "visitNext": "Prosegui",
+    "visitRecapDates": "Disponibilità",
+    "visitRecapSlots": "Fasce orarie",
+    "visitBack": "Indietro",
+    "visitSend": "Conferma e invia",
+    "visitThanks": "Richiesta inviata! Ti ricontatteremo per fissare la visita."
+  },
   "footer": {
     "tagline": "L'agenzia smart per la casa a Trieste.",
     "rights": "Tutti i diritti riservati.",
     "sitemapTitle": "Mappa del sito",
     "contactTitle": "Contatti",
     "followUs": "Seguici"
+  },
+  "buyerForm": {
+    "title": "Diteci cosa cercate",
+    "subtitle": "Due minuti, nessun obbligo: bastano un contatto e le vostre preferenze.",
+    "firstName": "Nome",
+    "lastName": "Cognome",
+    "phone": "Cellulare",
+    "email": "Email",
+    "zones": "Zone di interesse",
+    "budget": "Budget",
+    "size": "Dimensioni",
+    "purpose": "Cosa ci farete?",
+    "purposeOptions": {
+      "0": "Per viverci",
+      "1": "Investimento / rendita",
+      "2": "Casa vacanze"
+    },
+    "condition": "Stato dell'immobile",
+    "conditionOptions": {
+      "0": "Primo ingresso",
+      "1": "Abitabile da subito",
+      "2": "Anche da ristrutturare",
+      "3": "Indifferente"
+    },
+    "privacy": "Acconsento al trattamento dei dati secondo l'informativa privacy.",
+    "submit": "Invia la richiesta",
+    "sending": "Invio…",
+    "okTitle": "Richiesta ricevuta",
+    "okText": "Vi ricontatteremo a breve con una selezione su misura.",
+    "error": "Qualcosa è andato storto: riprova o scrivi a info@triesteimmobiliare.com.",
+    "close": "Chiudi"
+  },
+  "sellerForm": {
+    "eyebrow": "Vendi con TriesteImmobiliare",
+    "title": "Richiedi una valutazione gratuita",
+    "subtitle": "Nessun impegno e nessuna provvigione a tuo carico: solo una valutazione onesta del tuo immobile.",
+    "firstName": "Nome",
+    "lastName": "Cognome",
+    "phone": "Cellulare",
+    "email": "Email",
+    "address": "Dove si trova l'immobile?",
+    "addressPlaceholder": "Via e civico, comune (es. Strada Costiera 28, Trieste)",
+    "type": "Tipologia",
+    "typeOptions": {
+      "0": "Appartamento",
+      "1": "Attico",
+      "2": "Villa",
+      "3": "Casa con giardino",
+      "4": "Terreno",
+      "5": "Altro"
+    },
+    "size": "Dimensioni",
+    "sizeOptions": {
+      "0": "Meno di 80 mq",
+      "1": "80 – 150 mq",
+      "2": "150 – 250 mq",
+      "3": "Oltre 250 mq"
+    },
+    "condition": "Stato dell'immobile",
+    "conditionOptions": {
+      "0": "Ottimo / ristrutturato",
+      "1": "Buono / abitabile",
+      "2": "Da ristrutturare"
+    },
+    "timing": "Tempistiche",
+    "timingOptions": {
+      "0": "Il prima possibile",
+      "1": "Entro 6 mesi",
+      "2": "Solo esplorativo"
+    },
+    "notes": "Note",
+    "notesPlaceholder": "Tutto ciò che ci aiuta a capire l'immobile: vista, terrazze, posto auto…",
+    "privacy": "Acconsento al trattamento dei dati secondo l'informativa privacy.",
+    "submit": "Richiedi la valutazione",
+    "sending": "Invio…",
+    "okTitle": "Richiesta ricevuta",
+    "okText": "Ti ricontatteremo per fissare un sopralluogo.",
+    "error": "Qualcosa è andato storto: riprova o scrivi a info@triesteimmobiliare.com.",
+    "close": "Chiudi"
+  },
+  "meta": {
+    "title": "TriesteImmobiliare — Comprare e vendere casa a Trieste",
+    "description": "L'agenzia smart per comprare e vendere casa a Trieste e provincia: provvigione 0% per chi vende, accompagnamento reale per chi compra. Annunci con foto, planimetrie e tour virtuali."
   }
 }

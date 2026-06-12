@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import Logo from "./Logo";
 
+// TriesteImmobiliare's own channels (the flagship's socials stay on TSV).
 const SOCIALS = [
   {
     name: "Facebook",
@@ -98,7 +99,7 @@ export default async function Footer() {
               </dd>
             </div>
             <div>
-              <dt className="sr-only">{tContact("phoneLabel")}</dt>
+              <dt className="sr-only">{tContact("whatsappLabel")}</dt>
               <dd>
                 <a href={telHref} className="transition-colors hover:text-white">
                   {phone}
@@ -119,7 +120,7 @@ export default async function Footer() {
 
       <div className="border-t border-white/10">
         <div className="mx-auto max-w-6xl px-4 py-5 text-xs text-white/40">
-          © {year} TriesteImmobiliare. {t("rights")}
+          © {year} TriesteImmobiliare · {tLegal("company")}. {t("rights")}
         </div>
       </div>
     </footer>

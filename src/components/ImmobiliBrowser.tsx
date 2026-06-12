@@ -30,6 +30,14 @@ export default function ImmobiliBrowser({
   );
   const visible = active ? groups.filter((g) => g.code === active) : groups;
 
+  if (total === 0) {
+    return (
+      <div className="rounded-2xl border border-neutral-200 bg-paper px-6 py-14 text-center text-neutral-600">
+        {t("empty")}
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="mb-8 flex flex-wrap gap-2">
@@ -54,27 +62,31 @@ export default function ImmobiliBrowser({
         ))}
       </div>
 
-      {visible.map((g) => (
-        <section key={g.code} className="mb-12">
-          <div className="mb-4 flex items-baseline gap-3">
-            <h2 className="text-xl font-semibold tracking-tight">{g.label}</h2>
-            <span className="text-sm text-neutral-400">
-              {t("count", { count: g.items.length })}
-            </span>
-          </div>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {g.items.map((v) => (
-              <PropertyCard key={v.slug} view={v} photosComing={photosComing} />
-            ))}
-          </div>
-        </section>
-      ))}
+      <div key={active ?? "all"} className="filter-pop">
+        {visible.map((g) => (
+          <section key={g.code} className="mb-12">
+            <div className="mb-4 flex items-baseline gap-3">
+              <h2 className="text-xl font-semibold tracking-tight text-brand-dark">
+                {g.label}
+              </h2>
+              <span className="text-sm text-neutral-400">
+                {t("count", { count: g.items.length })}
+              </span>
+            </div>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {g.items.map((v) => (
+                <PropertyCard key={v.slug} view={v} photosComing={photosComing} />
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
     </>
   );
 }
 
 function chip(activeState: boolean): string {
   return activeState
-    ? "rounded-full bg-brand px-3.5 py-1.5 text-sm font-medium text-white"
-    : "rounded-full border border-neutral-300 px-3.5 py-1.5 text-sm font-medium text-neutral-700 transition-colors hover:border-brand-light hover:text-brand";
+    ? "btn-press rounded-full bg-brand px-3.5 py-1.5 text-sm font-semibold text-white shadow-md shadow-brand/30"
+    : "btn-press rounded-full border border-neutral-300 px-3.5 py-1.5 text-sm font-medium text-neutral-600 hover:border-brand hover:text-brand";
 }

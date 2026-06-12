@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
-import ScrollVideo from "@/components/ScrollVideo";
+import SellerCta from "@/components/SellerCta";
 
 export async function generateMetadata({
   params,
@@ -26,34 +25,27 @@ export default async function SellPage({
 
   return (
     <>
-      <ScrollVideo src="/video/terrazzo.mp4" poster="/video/terrazzo-poster.jpg">
-        <div className="mx-auto max-w-4xl px-4 text-white">
-          <p className="text-sm font-medium uppercase tracking-wide text-brand-light drop-shadow">
-            {t("eyebrow")}
-          </p>
-          <h1 className="mt-2 text-4xl font-semibold tracking-tight drop-shadow-lg sm:text-5xl">
+      {/* Plain hero on brand gradient — no film, just the promise. */}
+      <section className="bg-gradient-to-b from-brand to-brand-dark text-white">
+        <div className="mx-auto max-w-4xl px-4 pb-20 pt-40">
+          <p className="eyebrow text-sand">{t("eyebrow")}</p>
+          <h1 className="display-hero mt-3" data-reveal>
             {t("title")}
           </h1>
-          <p className="mt-5 max-w-2xl text-lg text-white/85 drop-shadow">{t("intro")}</p>
+          <p className="mt-5 max-w-2xl text-lg text-white/85" data-reveal>
+            {t("intro")}
+          </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              href="/contatti"
-              className="rounded-full bg-white px-5 py-2.5 text-sm font-medium text-brand transition-colors hover:bg-white/90"
-            >
-              {t("ctaPrimary")}
-            </Link>
-            <Link
-              href="/contatti"
-              className="rounded-full border border-white/40 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/10"
-            >
-              {t("ctaSecondary")}
-            </Link>
+            <SellerCta
+              label={t("ctaPrimary")}
+              className="btn-hero rounded-full bg-white px-6 py-3 text-sm font-semibold text-brand-dark"
+            />
           </div>
         </div>
-      </ScrollVideo>
+      </section>
 
       <section className="mx-auto max-w-4xl px-4 py-16">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-3" data-reveal-stagger>
           {BLOCKS.map((b) => (
             <div key={b}>
               <h2 className="font-semibold text-brand">{t(`${b}.title`)}</h2>
@@ -63,20 +55,18 @@ export default async function SellPage({
         </div>
       </section>
 
-      <section className="border-t border-neutral-200 bg-neutral-50">
+      <section className="border-t border-neutral-200 bg-paper">
         <div className="mx-auto flex max-w-4xl flex-col items-start gap-4 px-4 py-12 sm:flex-row sm:items-center sm:justify-between">
           <div className="max-w-2xl">
-            <h2 className="text-2xl font-semibold tracking-tight">
+            <h2 className="text-2xl font-semibold tracking-tight text-brand-dark">
               {t("closing.title")}
             </h2>
             <p className="mt-2 text-neutral-600">{t("closing.text")}</p>
           </div>
-          <Link
-            href="/contatti"
-            className="shrink-0 rounded-full bg-brand px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
-          >
-            {t("ctaPrimary")}
-          </Link>
+          <SellerCta
+            label={t("ctaPrimary")}
+            className="btn-hero shrink-0 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white"
+          />
         </div>
       </section>
     </>

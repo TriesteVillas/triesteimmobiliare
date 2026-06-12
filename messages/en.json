@@ -19,7 +19,7 @@
       "centro": "City Centre",
       "carso": "Karst & Plateau",
       "fvg": "Friuli-Venezia Giulia",
-      "viewMore": "See more"
+      "viewMore": "Featured"
     },
     "beyond": {
       "eyebrow": "How we work",
@@ -60,10 +60,10 @@
   "property": {
     "forSale": "For sale",
     "forRent": "For rent",
-    "priceOnRequest": "Price on request",
-    "priceReserved": "Price on application",
     "badgePrivate": "Private Collection",
     "badgeNewBuild": "New development",
+    "priceOnRequest": "Price on request",
+    "priceReserved": "Price on application",
     "yearBuilt": "Year built",
     "floorsBuilding": "Building floors",
     "galPhotos": "Photos",
@@ -89,6 +89,7 @@
     "reference": "Ref.",
     "virtualTour": "Virtual tour",
     "characteristicsTitle": "Property features",
+    "similarTitle": "Similar listings",
     "type": "Type",
     "contract": "Contract",
     "elevator": "Lift",
@@ -120,25 +121,64 @@
     "groupTitle": "Five brands, one direction",
     "groupSubtitle": "A single structure covering every housing need across Trieste and the wider Friuli-Venezia Giulia region.",
     "brands": {
-      "tsv": { "name": "TriesteVillas", "desc": "Luxury property in the heart of Trieste and along the coast." },
-      "tsi": { "name": "TriesteImmobiliare", "desc": "Everyday homes in every price range in Trieste and its province." },
-      "affitti": { "name": "TriesteAffitti", "desc": "Considered rental management, from 1 to 18 months." },
-      "friuli": { "name": "FriuliVillas", "desc": "The rest of Friuli-Venezia Giulia." },
-      "lignano": { "name": "LignanoVillas", "desc": "Our local luxury vertical in Lignano." }
+      "tsv": {
+        "name": "TriesteVillas",
+        "desc": "Luxury property in the heart of Trieste and along the coast."
+      },
+      "tsi": {
+        "name": "TriesteImmobiliare",
+        "desc": "Everyday homes in every price range in Trieste and its province."
+      },
+      "affitti": {
+        "name": "TriesteAffitti",
+        "desc": "Considered rental management, from 1 to 18 months."
+      },
+      "friuli": {
+        "name": "FriuliVillas",
+        "desc": "The rest of Friuli-Venezia Giulia."
+      },
+      "lignano": {
+        "name": "LignanoVillas",
+        "desc": "Our local luxury vertical in Lignano."
+      }
     },
     "valuesTitle": "What sets us apart",
     "values": {
-      "local": { "title": "Local and independent", "text": "We know Trieste inside out — it is home." },
-      "tailored": { "title": "Tailored solutions", "text": "Every client is unique, like every home." },
-      "journey": { "title": "From first contact to the deed", "text": "We stay with you at every step of the way." },
-      "promo": { "title": "Listings done right", "text": "Careful photos, descriptions and publishing — every home deserves to be told well." }
+      "local": {
+        "title": "Local and independent",
+        "text": "We know Trieste inside out — it is home."
+      },
+      "tailored": {
+        "title": "Tailored solutions",
+        "text": "Every client is unique, like every home."
+      },
+      "journey": {
+        "title": "From first contact to the deed",
+        "text": "We stay with you at every step of the way."
+      },
+      "promo": {
+        "title": "Listings done right",
+        "text": "Careful photos, descriptions and publishing — every home deserves to be told well."
+      }
     },
     "teamTitle": "The people of the group",
     "team": {
-      "carlin": { "name": "Davide Carlin", "role": "Agent · Owner & Managing Director" },
-      "martino": { "name": "Martino Coppola di Canzano", "role": "Partner · Group development" },
-      "giada": { "name": "Giada Comelli", "role": "Agent · Rentals" },
-      "cecile": { "name": "Cécile Van der Salm", "role": "Agent · Rentals" }
+      "carlin": {
+        "name": "Davide Carlin",
+        "role": "Agent · Owner & Managing Director"
+      },
+      "martino": {
+        "name": "Martino Coppola di Canzano",
+        "role": "Partner · Group development"
+      },
+      "giada": {
+        "name": "Giada Comelli",
+        "role": "Agent · Rentals"
+      },
+      "cecile": {
+        "name": "Cécile Van der Salm",
+        "role": "Agent · Rentals"
+      }
     },
     "legalTitle": "Company details",
     "legal": {
@@ -186,11 +226,140 @@
     "office": "Via Torino 34, second floor · Trieste",
     "hours": "By appointment"
   },
+  "lead": {
+    "title": "Request information",
+    "reason": "Reason for contact",
+    "motivo": {
+      "info": "Request more information",
+      "foto": "Request more photos",
+      "disp": "Check availability",
+      "altro": "Other"
+    },
+    "messagePlaceholder": "Write your message here (optional)",
+    "name": "Full name",
+    "email": "Email",
+    "phone": "Phone",
+    "privacyPre": "I have read and accept the",
+    "privacyLink": "Privacy Policy",
+    "submit": "Request information",
+    "or": "Or",
+    "brochureNote": "We'll reply by email as soon as possible.",
+    "send": "Send request",
+    "sending": "Sending…",
+    "thanks": "Thank you! We'll get back to you shortly.",
+    "error": "Something went wrong. Please try again.",
+    "friendToggle": "Send to a friend",
+    "friendTitle": "Send this property to a friend",
+    "friendNote": "We'll send your friend the listing link and the brochure.",
+    "friendEmail": "Friend's email",
+    "yourEmail": "Your email",
+    "friendSend": "Send",
+    "friendThanks": "Sent!",
+    "visitTitle": "Book a viewing",
+    "visitSubtitle": "Choose when you'd like to visit the property.",
+    "visitCta": "Book a viewing",
+    "visitHow": "How would you like to visit",
+    "visitInPerson": "In person",
+    "visitAvail": "Select your availability",
+    "visitAsap": "As soon as possible",
+    "visitSlots": "Select time slots",
+    "slotAny": "Any",
+    "visitDisclaimer": "This is not a booking: your availability will be sent to the agency, who will contact you.",
+    "visitNext": "Continue",
+    "visitRecapDates": "Availability",
+    "visitRecapSlots": "Time slots",
+    "visitBack": "Back",
+    "visitSend": "Confirm and send",
+    "visitThanks": "Request sent! We'll get back to you to arrange the viewing."
+  },
   "footer": {
     "tagline": "The smart agency for homes in Trieste.",
     "rights": "All rights reserved.",
     "sitemapTitle": "Site map",
     "contactTitle": "Contact",
     "followUs": "Follow us"
+  },
+  "buyerForm": {
+    "title": "Tell us what you're looking for",
+    "subtitle": "Two minutes, no strings attached: one contact detail and your preferences are enough.",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "phone": "Mobile",
+    "email": "Email",
+    "zones": "Areas of interest",
+    "budget": "Budget",
+    "size": "Size",
+    "purpose": "What is it for?",
+    "purposeOptions": {
+      "0": "To live in",
+      "1": "Investment / yield",
+      "2": "Holiday home"
+    },
+    "condition": "Property condition",
+    "conditionOptions": {
+      "0": "Brand new",
+      "1": "Move-in ready",
+      "2": "Open to renovating",
+      "3": "No preference"
+    },
+    "privacy": "I consent to the processing of my data as per the privacy policy.",
+    "submit": "Send request",
+    "sending": "Sending…",
+    "okTitle": "Request received",
+    "okText": "We'll get back to you shortly with a tailored selection.",
+    "error": "Something went wrong: please try again or write to info@triesteimmobiliare.com.",
+    "close": "Close"
+  },
+  "sellerForm": {
+    "eyebrow": "Sell with TriesteImmobiliare",
+    "title": "Request a free valuation",
+    "subtitle": "No obligation and no commission on your side: just an honest valuation of your property.",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "phone": "Mobile",
+    "email": "Email",
+    "address": "Where is the property?",
+    "addressPlaceholder": "Street and number, town (e.g. Strada Costiera 28, Trieste)",
+    "type": "Type",
+    "typeOptions": {
+      "0": "Apartment",
+      "1": "Penthouse",
+      "2": "Villa",
+      "3": "House with garden",
+      "4": "Land",
+      "5": "Other"
+    },
+    "size": "Size",
+    "sizeOptions": {
+      "0": "Under 80 sqm",
+      "1": "80 – 150 sqm",
+      "2": "150 – 250 sqm",
+      "3": "Over 250 sqm"
+    },
+    "condition": "Condition",
+    "conditionOptions": {
+      "0": "Excellent / renovated",
+      "1": "Good / liveable",
+      "2": "Needs renovation"
+    },
+    "timing": "Timing",
+    "timingOptions": {
+      "0": "As soon as possible",
+      "1": "Within 6 months",
+      "2": "Just exploring"
+    },
+    "notes": "Notes",
+    "notesPlaceholder": "Anything that helps us read the property: views, terraces, parking…",
+    "privacy": "I consent to the processing of my data as per the privacy policy.",
+    "submit": "Request the valuation",
+    "sending": "Sending…",
+    "okTitle": "Request received",
+    "okText": "We'll get back to you to arrange a visit.",
+    "error": "Something went wrong: please try again or write to info@triesteimmobiliare.com.",
+    "close": "Close"
+  },
+  "meta": {
+    "title": "TriesteImmobiliare — Buying and selling homes in Trieste",
+    "description": "The smart agency for buying and selling homes in Trieste and its province: 0% commission for sellers, real guidance for buyers. Listings with photos, floor plans and virtual tours."
   }
 }

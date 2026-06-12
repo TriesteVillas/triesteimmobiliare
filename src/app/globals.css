@@ -1,8 +1,24 @@
 @import "tailwindcss";
 
+/* ================================================================
+   TriesteImmobiliare — light & straightforward
+   Sibling of triestevillas-web: the class names mirror that repo so
+   components can move between the group's sites, but the skin here is
+   deliberately plainer — white paper, nautical blues, calm motion.
+   ================================================================ */
+
 :root {
   --background: #ffffff;
   --foreground: #14344a;
+
+  /* Dark surface used by photo heroes, overlays and the lightbox. */
+  --ink: #0f2737;
+  --ink-2: #16384f;
+  --paper: #f5f7f9;
+
+  --ease-lux: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-exit: 160ms;
+  --duration-enter: 280ms;
 }
 
 @theme inline {
@@ -10,14 +26,410 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-poppins);
 
-  /* TriesteImmobiliare brand — derived from the origami-boat logo (blue tones) */
+  /* TriesteImmobiliare brand — blues from the origami-boat logo */
   --color-brand: #2c6b96;
   --color-brand-dark: #1c4a6b;
   --color-brand-light: #6fa1c6;
+  /* Accent on dark surfaces (footer, photo overlays): a paler boat-blue.
+     Kept under the name "sand" for class parity with triestevillas-web. */
+  --color-sand: #a9c8e0;
+  --color-ink: #0f2737;
+  --color-ink-2: #16384f;
+  --color-paper: #f5f7f9;
+
+  --ease-lux: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: #2c6b96;
+  color: #ffffff;
+}
+
+/* Display typography — calmer scale than the flagship site. */
+.display-hero {
+  font-size: clamp(2.3rem, 5.5vw, 4.1rem);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+.display-chapter {
+  font-size: clamp(1.6rem, 3.4vw, 2.5rem);
+  line-height: 1.12;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+.eyebrow {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-brand, #2c6b96);
+}
+
+/* Parallax zoom for the listing-page photo hero (Scene sets --p). */
+.par-zoom {
+  transform: scale(calc(1.1 - var(--p, 0) * 0.1));
+  will-change: transform;
+}
+
+/* Kinetic word reveal (hero title, mobile menu). The bottom padding
+   keeps descenders (g, p, y) inside the mask. */
+.kinetic-line {
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: bottom;
+  padding-bottom: 0.16em;
+  margin-bottom: -0.16em;
+}
+.kinetic-word {
+  display: inline-block;
+  transform: translateY(110%);
+  animation: word-rise 800ms var(--ease-lux) both;
+  animation-delay: var(--word-delay, 0ms);
+}
+@keyframes word-rise {
+  to { transform: translateY(0); }
+}
+
+/* ----------------------------------------------------------------
+   View transitions (same grammar as triestevillas-web)
+   ---------------------------------------------------------------- */
+::view-transition-old(.page-fade) {
+  animation:
+    var(--duration-exit) ease-out both vt-fade reverse,
+    var(--duration-exit) ease-out both vt-rise reverse;
+}
+::view-transition-new(.page-fade) {
+  animation:
+    var(--duration-enter) var(--ease-lux) var(--duration-exit) both vt-fade,
+    420ms var(--ease-lux) both vt-rise;
+}
+::view-transition-old(.nav-forward) {
+  --slide-offset: -48px;
+  animation:
+    var(--duration-exit) ease-in both vt-fade reverse,
+    400ms var(--ease-lux) both vt-slide reverse;
+}
+::view-transition-new(.nav-forward) {
+  --slide-offset: 48px;
+  animation:
+    var(--duration-enter) ease-out var(--duration-exit) both vt-fade,
+    400ms var(--ease-lux) both vt-slide;
+}
+::view-transition-old(.nav-back) {
+  --slide-offset: 48px;
+  animation:
+    var(--duration-exit) ease-in both vt-fade reverse,
+    400ms var(--ease-lux) both vt-slide reverse;
+}
+::view-transition-new(.nav-back) {
+  --slide-offset: -48px;
+  animation:
+    var(--duration-enter) ease-out var(--duration-exit) both vt-fade,
+    400ms var(--ease-lux) both vt-slide;
+}
+::view-transition-group(.morph) {
+  animation-duration: 460ms;
+  animation-timing-function: var(--ease-lux);
+}
+::view-transition-image-pair(.morph) {
+  animation-name: vt-soften;
+}
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+@keyframes vt-fade {
+  from { opacity: 0; filter: blur(4px); }
+  to { opacity: 1; filter: blur(0); }
+}
+@keyframes vt-rise {
+  from { transform: translateY(14px); }
+  to { transform: translateY(0); }
+}
+@keyframes vt-slide {
+  from { translate: var(--slide-offset) 0; }
+  to { translate: 0 0; }
+}
+@keyframes vt-soften {
+  30% { filter: blur(3px); }
+}
+
+/* ----------------------------------------------------------------
+   Scroll reveals (RevealObserver)
+   ---------------------------------------------------------------- */
+html[data-reveal-armed] [data-reveal] {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity 750ms var(--ease-lux),
+    transform 750ms var(--ease-lux);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+html[data-reveal-armed] [data-reveal="left"] {
+  transform: translateX(-36px);
+}
+html[data-reveal-armed] [data-reveal="scale"] {
+  transform: translateY(20px) scale(0.96);
+}
+html[data-reveal-armed] [data-reveal].is-revealed {
+  opacity: 1;
+  transform: none;
+}
+html[data-reveal-armed] [data-reveal-stagger] > * {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity 650ms var(--ease-lux),
+    transform 650ms var(--ease-lux);
+}
+html[data-reveal-armed] [data-reveal-stagger].is-revealed > * {
+  opacity: 1;
+  transform: none;
+}
+html[data-reveal-armed] [data-reveal-stagger].is-revealed > :nth-child(2) { transition-delay: 90ms; }
+html[data-reveal-armed] [data-reveal-stagger].is-revealed > :nth-child(3) { transition-delay: 180ms; }
+html[data-reveal-armed] [data-reveal-stagger].is-revealed > :nth-child(4) { transition-delay: 270ms; }
+html[data-reveal-armed] [data-reveal-stagger].is-revealed > :nth-child(n + 5) { transition-delay: 340ms; }
+
+/* ----------------------------------------------------------------
+   Components
+   ---------------------------------------------------------------- */
+
+/* Floating pill header — light glass. Auto-hides while scrolling down
+   (attribute set by HeaderAutoHide.tsx). */
+header[data-pill] {
+  transition:
+    transform 450ms var(--ease-lux),
+    opacity 350ms var(--ease-lux);
+}
+html[data-header-hidden] header[data-pill] {
+  transform: translateY(-130%);
+  opacity: 0;
+  pointer-events: none;
+}
+.pill-header {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  border: 1px solid rgba(20, 52, 74, 0.1);
+  box-shadow: 0 12px 36px -18px rgba(15, 39, 55, 0.35);
+}
+.nav-underline {
+  position: relative;
+}
+.nav-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 1.5px;
+  border-radius: 9999px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 350ms var(--ease-lux);
+}
+.nav-underline:hover::after {
+  transform: scaleX(1);
+}
+
+/* 3D tilt card (vars set by motion/Tilt.tsx) — toned down. */
+.tilt-card {
+  position: relative;
+  transform-style: preserve-3d;
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 300ms var(--ease-lux);
+}
+.tilt-glare {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: var(--go, 0);
+  background: radial-gradient(
+    420px circle at var(--gx, 50%) var(--gy, 50%),
+    rgba(255, 255, 255, 0.18),
+    transparent 65%
+  );
+  transition: opacity 300ms ease;
+}
+
+/* Listing card — plain white tile (name kept for parity with the
+   flagship repo, the look is intentionally simpler). */
+.card-cine {
+  background: #ffffff;
+  border: 1px solid #e2e8ee;
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: border-color 350ms var(--ease-lux), box-shadow 350ms var(--ease-lux);
+}
+.card-cine:hover {
+  border-color: rgba(44, 107, 150, 0.45);
+  box-shadow: 0 22px 48px -24px rgba(15, 39, 55, 0.35);
+}
+.card-cine .card-photo {
+  transition: transform 700ms var(--ease-lux);
+}
+.card-cine:hover .card-photo {
+  transform: scale(1.04);
+}
+.card-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.14) 50%, transparent 65%);
+  transform: translateX(-110%);
+}
+.card-cine:hover .card-sheen {
+  transition: transform 900ms var(--ease-lux);
+  transform: translateX(110%);
+}
+
+/* CTAs */
+.btn-hero {
+  position: relative;
+  overflow: hidden;
+  transition: transform 250ms var(--ease-lux), box-shadow 250ms var(--ease-lux);
+}
+.btn-hero:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 32px -12px rgba(44, 107, 150, 0.55);
+}
+.btn-hero:active {
+  transform: scale(0.97);
+}
+.btn-press {
+  transition: transform 250ms var(--ease-lux), box-shadow 250ms var(--ease-lux),
+    background-color 250ms var(--ease-lux), border-color 250ms var(--ease-lux),
+    color 250ms var(--ease-lux);
+}
+.btn-press:hover {
+  transform: translateY(-1px);
+}
+.btn-press:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Featured carousel: native horizontal scroll with snap; hidden scrollbar. */
+.reel-scroll {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.reel-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Buyer/seller popup: white sheet + dual-range slider */
+.buyer-panel {
+  background: #ffffff;
+  border: 1px solid #e2e8ee;
+  box-shadow: 0 40px 110px -30px rgba(15, 39, 55, 0.45);
+  animation: lb-zoom 420ms var(--ease-lux) both;
+}
+.range-dual input[type="range"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  pointer-events: none;
+}
+.range-dual input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  pointer-events: auto;
+  height: 18px;
+  width: 18px;
+  border-radius: 9999px;
+  background: #2c6b96;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(15, 39, 55, 0.35);
+  cursor: grab;
+}
+.range-dual input[type="range"]::-moz-range-thumb {
+  pointer-events: auto;
+  height: 18px;
+  width: 18px;
+  border-radius: 9999px;
+  background: #2c6b96;
+  border: 2px solid #ffffff;
+  cursor: grab;
+}
+.range-track {
+  background: #e2e8ee;
+}
+.range-fill {
+  background: linear-gradient(90deg, #6fa1c6, #2c6b96);
+}
+
+/* Lightbox */
+.lightbox-enter {
+  animation: lb-fade 280ms var(--ease-lux) both;
+}
+.lightbox-photo {
+  animation: lb-zoom 420ms var(--ease-lux) both;
+}
+@keyframes lb-fade {
+  from { opacity: 0; }
+}
+@keyframes lb-zoom {
+  from { opacity: 0; transform: scale(0.965); }
+}
+
+/* /immobili filter switch */
+.filter-pop {
+  animation: filter-pop 450ms var(--ease-lux) both;
+}
+@keyframes filter-pop {
+  from { opacity: 0; transform: translateY(16px); }
+}
+
+/* ----------------------------------------------------------------
+   Reduced motion: collapse everything to its resting state.
+   ---------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+  html[data-reveal-armed] [data-reveal],
+  html[data-reveal-armed] [data-reveal-stagger] > * {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .par-zoom {
+    transform: none !important;
+  }
+  .kinetic-word {
+    animation: none;
+    transform: none;
+  }
+  .tilt-card {
+    transform: none !important;
+  }
+  .lightbox-enter, .lightbox-photo, .filter-pop {
+    animation: none;
+  }
 }
