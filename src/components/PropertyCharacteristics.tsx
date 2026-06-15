@@ -1,4 +1,6 @@
-import type { ReactNode } from "react";
+"use client";
+
+import { useState, type ReactNode } from "react";
 
 export type Characteristic = { icon: keyof typeof ICONS; label: string; value: string };
 
@@ -86,21 +88,113 @@ const ICONS = {
       <path d="M9 7h.01M15 7h.01M9 11h.01M15 11h.01M9 15h6" />
     </>
   ),
+  condition: (
+    <>
+      <path d="M17 3l4 4-9 9-4 1 1-4z" />
+      <path d="M14 6l4 4" />
+      <path d="M4 21h7" />
+    </>
+  ),
+  bedroom: (
+    <>
+      <path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6" />
+      <path d="M3 14h18" />
+      <path d="M3 18v2M21 18v2" />
+      <path d="M7 10V8a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v2" />
+    </>
+  ),
+  kitchen: (
+    <>
+      <rect x="4" y="4" width="16" height="16" rx="2" />
+      <circle cx="9" cy="9" r="1.4" />
+      <circle cx="15" cy="9" r="1.4" />
+      <path d="M7 14h10" />
+    </>
+  ),
+  terrace: (
+    <>
+      <path d="M4 21h16" />
+      <path d="M6 21v-7M10 21v-7M14 21v-7M18 21v-7" />
+      <path d="M5 14h14" />
+      <path d="M6 14v-3h12v3" />
+    </>
+  ),
+  heating: (
+    <>
+      <rect x="4" y="6" width="16" height="12" rx="1" />
+      <path d="M8 6v12M12 6v12M16 6v12" />
+      <path d="M6 18v2M18 18v2" />
+    </>
+  ),
+  availability: (
+    <>
+      <circle cx="8" cy="8" r="4" />
+      <path d="M10.8 10.8 20 20" />
+      <path d="M16 16l-2 2M19 19l2-2" />
+    </>
+  ),
+  balcony: (
+    <>
+      <path d="M7 11V7h10v4" />
+      <path d="M4 21h16" />
+      <path d="M5 21v-9h14v9" />
+      <path d="M5 16h14" />
+      <path d="M9 12v4M15 12v4" />
+    </>
+  ),
+  garden: (
+    <>
+      <path d="M12 22v-7" />
+      <path d="M12 15c-3 0-5-2-5-5 3 0 5 2 5 5z" />
+      <path d="M12 13c0-3 2-5 5-5 0 3-2 5-5 5z" />
+    </>
+  ),
+  accessible: (
+    <>
+      <circle cx="13" cy="4.5" r="1.5" />
+      <path d="M13 7v5h5l2 5" />
+      <path d="M13 12a5 5 0 1 0 3 9" />
+    </>
+  ),
+  ownership: (
+    <>
+      <path d="M3 10l9-7 9 7" />
+      <path d="M5 9v11h14V9" />
+      <path d="M9 14l2 2 4-4" />
+    </>
+  ),
+  grade: (
+    <>
+      <path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z" />
+    </>
+  ),
 } satisfies Record<string, ReactNode>;
 
 export default function PropertyCharacteristics({
   title,
   items,
+  primaryCount = 8,
+  moreLabel,
+  lessLabel,
 }: {
   title: string;
   items: Characteristic[];
+  // How many of the most salient characteristics stay visible by default.
+  primaryCount?: number;
+  moreLabel: string;
+  lessLabel: string;
 }) {
+  const [open, setOpen] = useState(false);
   if (items.length === 0) return null;
+
+  const hasMore = items.length > primaryCount;
+  const visible = !hasMore || open ? items : items.slice(0, primaryCount);
+
   return (
     <section className="mt-8">
       <h2 className="text-lg font-semibold">{title}</h2>
       <dl className="mt-4 grid grid-cols-1 gap-x-10 gap-y-1 sm:grid-cols-2">
-        {items.map((it) => (
+        {visible.map((it) => (
           <div
             key={it.label}
             className="flex items-center gap-3 border-b border-neutral-100 py-3"
@@ -124,6 +218,28 @@ export default function PropertyCharacteristics({
           </div>
         ))}
       </dl>
+      {hasMore && (
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+          className="btn-press mt-4 inline-flex items-center gap-2 rounded-full border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:border-brand hover:text-brand"
+        >
+          {open ? lessLabel : moreLabel}
+          <svg
+            viewBox="0 0 24 24"
+            className={`h-4 w-4 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+          >
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </button>
+      )}
     </section>
   );
 }

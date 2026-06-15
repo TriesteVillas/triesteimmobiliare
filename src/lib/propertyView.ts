@@ -71,6 +71,7 @@ export function buildPropertyView(
     badge: contractBadge(p, t),
     clusterBadge: clusterBadge(p, t),
     meta,
-    cover: p.coverPhoto ? { url: p.coverPhoto.url, alt: p.coverPhoto.alt } : null,
+    // Cards use Airtable's lighter "large" rendition, not the full-res original.
+    cover: p.coverPhoto ? { url: p.coverPhoto.thumb, alt: p.coverPhoto.alt } : null,
   };
 }

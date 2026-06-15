@@ -33,7 +33,9 @@ export const F = {
   topPhotos: "flduAPbRd81GwJhlw",
   planimetrie: "fld8kB5lTpuzZ2IB9",
   youtubeVideos: "fldzBgkjk7K8ACVxa",
-  youtubeWalkthrough: "fldfJBFclRBTD4oGs",
+  // NB: youtube_walkthrough (fldfJBFclRBTD4oGs) was removed from Airtable — its
+  // content was folded into youtube_video_urls. Requesting it 422'd the whole
+  // fetch (UNKNOWN_FIELD_NAME), which broke prod builds and ISR revalidation.
   matterport: "fldVT95yZFaGa8yFv",
   arredato: "fldRZiLzqQpZS24n9",
   ascensore: "fld1cWZRm66Pc1pRI",
@@ -41,6 +43,20 @@ export const F = {
   parcheggio: "fldQCABCfjCb1HDYE",
   annoCostruzione: "fldjDrYlFEMxhW2E8",
   pianiEdificio: "fld2Xc2ADuhSU21dv",
+  // immobiliare.it-aligned characteristics (2026-06-15). These Airtable columns
+  // are not yet renamed with the site-facing "_#" suffix — see note to Martino.
+  stato: "fldSczmkeh2wDpTgj", // imm_stato_immobile (singleSelect → string)
+  camere: "fld6JhgbSH4my1nGd", // camere (number) — bedrooms
+  cucina: "fldOaSDiMth24ikzW", // imm_cucina (singleSelect → string)
+  terrazzo: "fldPtlfKgEc0Itoyb", // imm_terrazzo (checkbox → boolean)
+  riscaldamento: "fld3DSckVUdjUxkO3", // imm_riscaldamento (singleSelect → string)
+  // 4 columns created 2026-06-15 to complete the immobiliare.it characteristic set.
+  disponibilita: "fld4OIu1LZznmkoGu", // imm_disponibilita_# (singleSelect → string)
+  balcone: "fldadPY6LLLQ4oUVW", // imm_balcone_# (checkbox → boolean)
+  giardino: "fld56b0y4X7zAZtUS", // imm_giardino_# (singleSelect → string)
+  accessoDisabili: "fldJxCCFqJ7lqi570", // imm_accesso_disabili_# (checkbox → boolean)
+  tipoProprieta: "fldZiREblKauVYoWM", // imm_tipo_proprieta_# (singleSelect → string)
+  classeImmobile: "fldqxd7FwkFMgFfPS", // imm_classe_immobile_# (singleSelect → string)
   trattativaRiservata: "fld6JmapDP4Qi8RT6",
 } as const;
 
@@ -62,7 +78,11 @@ export const ZONE_ORDER = [
 export const ZONE_OTHER = "ALTRE";
 
 export type Photo = {
+  // Full-resolution original. Used for the hero and the lightbox (full view).
   url: string;
+  // Airtable's pre-rendered "large" rendition (~917px wide), used for cards and
+  // thumbnail grids so we never ship a multi-MB original into a small box.
+  thumb: string;
   width: number | null;
   height: number | null;
   alt: string;
@@ -95,7 +115,6 @@ export type Property = {
   topPhotos: Photo[];
   planimetrie: Photo[];
   videos: string[];
-  walkthroughs: string[];
   matterportUrl: string | null;
   arredato: string | null;
   ascensore: string | null;
@@ -103,6 +122,17 @@ export type Property = {
   parcheggio: string | null;
   annoCostruzione: number | null;
   pianiEdificio: number | null;
+  stato: string | null;
+  camere: number | null;
+  cucina: string | null;
+  terrazzo: boolean;
+  riscaldamento: string | null;
+  disponibilita: string | null;
+  balcone: boolean;
+  giardino: string | null;
+  accessoDisabili: boolean;
+  tipoProprieta: string | null;
+  classeImmobile: string | null;
   trattativaRiservata: boolean;
 };
 
@@ -111,6 +141,8 @@ type RawAttachment = {
   width?: number;
   height?: number;
   filename?: string;
+  // Airtable generates these renditions per attachment (small/large/full).
+  thumbnails?: { large?: { url: string } };
 };
 
 type Fields = Record<string, unknown>;
@@ -128,6 +160,7 @@ function attachments(v: unknown, alt: string): Photo[] {
         .filter((a) => typeof a?.url === "string")
         .map((a) => ({
           url: a.url,
+          thumb: a.thumbnails?.large?.url ?? a.url,
           width: a.width ?? null,
           height: a.height ?? null,
           alt,
@@ -151,8 +184,9 @@ export function slugify(input: string): string {
     .slice(0, 60);
 }
 
-// Stable internal name — drives the URL slug, so it must NOT depend on
-// public_tsv_name (which gets edited/refined over time and would churn URLs).
+// Internal name — used only as the title fallback when public_tsv_name is empty.
+// NOTE: must NOT feed the URL slug; the internal name often carries the owner's
+// surname (e.g. "Valta Penthouse Large"), which can't appear in a public URL.
 function buildName(f: Fields): string {
   const named = str(f[F.internalName]);
   if (named) return named;
@@ -161,6 +195,17 @@ function buildName(f: Fields): string {
     .join(" · ");
   if (derived) return derived;
   return str(f[F.id]) ?? "Immobile";
+}
+
+// Source of the public URL slug: the public display name. Falls back to a
+// neutral tipologia + zona, and NEVER to the internal name — so an owner's
+// surname can never leak into /annuncio/<slug>, even when public_tsv_name is
+// not yet filled. The trailing -<id> in the slug keeps URLs unique and stable.
+function slugSource(f: Fields): string {
+  const pub = str(f[F.publicName]);
+  if (pub) return pub;
+  const derived = [str(f[F.tipologia]), str(f[F.zona])].filter(Boolean).join(" ");
+  return derived || "immobile";
 }
 
 function idNumber(tsvId: string | null): string {
@@ -174,7 +219,7 @@ export function mapRecord(recordId: string, f: Fields): Property {
   const priceSale = num(f[F.prezzo]);
   const priceRent = num(f[F.canone]);
   const tags = Array.isArray(f[F.tags]) ? (f[F.tags] as string[]) : [];
-  const name = buildName(f); // stable, slug source
+  const name = buildName(f); // title fallback only (see slugSource for the URL)
   // Public display name: public_tsv_name when set, else the internal name.
   const title = str(f[F.publicName]) ?? name;
 
@@ -186,7 +231,7 @@ export function mapRecord(recordId: string, f: Fields): Property {
 
   return {
     id,
-    slug: `${slugify(name)}-${idNumber(id)}`,
+    slug: `${slugify(slugSource(f))}-${idNumber(id)}`,
     title,
     contratto,
     cluster: str(f[F.cluster]),
@@ -211,7 +256,6 @@ export function mapRecord(recordId: string, f: Fields): Property {
     topPhotos,
     planimetrie,
     videos: lines(f[F.youtubeVideos]),
-    walkthroughs: lines(f[F.youtubeWalkthrough]),
     matterportUrl: str(f[F.matterport]),
     arredato: str(f[F.arredato]),
     ascensore: str(f[F.ascensore]),
@@ -219,6 +263,17 @@ export function mapRecord(recordId: string, f: Fields): Property {
     parcheggio: str(f[F.parcheggio]),
     annoCostruzione: num(f[F.annoCostruzione]),
     pianiEdificio: num(f[F.pianiEdificio]),
+    stato: str(f[F.stato]),
+    camere: num(f[F.camere]),
+    cucina: str(f[F.cucina]),
+    terrazzo: f[F.terrazzo] === true,
+    riscaldamento: str(f[F.riscaldamento]),
+    disponibilita: str(f[F.disponibilita]),
+    balcone: f[F.balcone] === true,
+    giardino: str(f[F.giardino]),
+    accessoDisabili: f[F.accessoDisabili] === true,
+    tipoProprieta: str(f[F.tipoProprieta]),
+    classeImmobile: str(f[F.classeImmobile]),
     trattativaRiservata: f[F.trattativaRiservata] === true,
   };
 }

@@ -46,7 +46,7 @@ export default function PhotoGallery({
                 className="relative aspect-[4/3] overflow-hidden rounded-lg bg-neutral-100"
               >
                 <Image
-                  src={p.url}
+                  src={p.thumb}
                   alt={p.alt}
                   fill
                   sizes="(max-width: 640px) 50vw, 25vw"
@@ -107,7 +107,7 @@ export default function PhotoGallery({
                   className="relative aspect-[4/3] overflow-hidden rounded-lg bg-neutral-100"
                 >
                   <Image
-                    src={p.url}
+                    src={p.thumb}
                     alt={p.alt}
                     fill
                     sizes="(max-width: 640px) 50vw, 25vw"

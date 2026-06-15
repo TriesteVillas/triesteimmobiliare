@@ -97,9 +97,12 @@ export default async function PropertyPage({ params }: { params: Params }) {
     .filter(Boolean)
     .join(", ");
   const hasLocation = property.lat != null && property.lng != null;
-  const ytIds = youtubeIds([...property.videos, ...property.walkthroughs]);
+  const ytIds = youtubeIds(property.videos);
 
   const characteristics = [
+    // Order matters: PropertyCharacteristics keeps the first 8 (the headline
+    // specs) always visible and collapses the rest behind a "show all" toggle.
+    // — Primary: always visible —
     property.tipologia && { icon: "home", label: t("type"), value: property.tipologia },
     {
       icon: "contract",
@@ -108,14 +111,26 @@ export default async function PropertyPage({ params }: { params: Params }) {
     },
     property.mq && { icon: "surface", label: t("surface"), value: t("sqm", { value: property.mq }) },
     property.rooms && { icon: "rooms", label: t("rooms"), value: property.rooms },
+    property.camere && { icon: "bedroom", label: t("bedrooms"), value: String(property.camere) },
     property.baths && { icon: "baths", label: t("baths"), value: String(property.baths) },
     property.floor && { icon: "floor", label: t("floor"), value: property.floor },
+    property.stato && { icon: "condition", label: t("condition"), value: property.stato },
+    // — Secondary: revealed on click —
+    property.tipoProprieta && { icon: "ownership", label: t("propertyType"), value: property.tipoProprieta },
+    property.disponibilita && { icon: "availability", label: t("availability"), value: property.disponibilita },
+    property.cucina && { icon: "kitchen", label: t("kitchen"), value: property.cucina },
+    property.terrazzo && { icon: "terrace", label: t("terrace"), value: t("yes") },
+    property.balcone && { icon: "balcony", label: t("balcony"), value: t("yes") },
+    property.giardino && { icon: "garden", label: t("garden"), value: property.giardino },
     property.pianiEdificio && { icon: "building", label: t("floorsBuilding"), value: String(property.pianiEdificio) },
     property.annoCostruzione && { icon: "year", label: t("yearBuilt"), value: String(property.annoCostruzione) },
     property.ascensore && { icon: "elevator", label: t("elevator"), value: property.ascensore },
+    property.accessoDisabili && { icon: "accessible", label: t("accessibility"), value: t("yes") },
     property.arredato && { icon: "furnished", label: t("furnished"), value: property.arredato },
     property.parcheggio && { icon: "parking", label: t("parking"), value: property.parcheggio },
     property.piscina && { icon: "pool", label: t("pool"), value: property.piscina },
+    property.riscaldamento && { icon: "heating", label: t("heating"), value: property.riscaldamento },
+    property.classeImmobile && { icon: "grade", label: t("propertyClass"), value: property.classeImmobile },
     property.energyClass && { icon: "energy", label: t("energyClass"), value: property.energyClass },
   ].filter((c): c is Characteristic => Boolean(c));
 
@@ -221,6 +236,9 @@ export default async function PropertyPage({ params }: { params: Params }) {
           <PropertyCharacteristics
             title={t("characteristicsTitle")}
             items={characteristics}
+            primaryCount={8}
+            moreLabel={t("showAllFeatures")}
+            lessLabel={t("showLess")}
           />
 
           {property.description && (

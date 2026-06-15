@@ -21,29 +21,60 @@ const FILTER = `AND({tsv_com_online}=TRUE(),OR(${SITE_TARGETS.map(
 
 type RawRecord = { id: string; fields: Record<string, unknown> };
 
+// Pull the offending field id out of an Airtable UNKNOWN_FIELD_NAME 422 body.
+function unknownFieldId(status: number, body: string): string | null {
+  if (status !== 422) return null;
+  try {
+    const err = JSON.parse(body) as { error?: { type?: string; message?: string } };
+    if (err.error?.type !== "UNKNOWN_FIELD_NAME") return null;
+    return err.error.message?.match(/fld[A-Za-z0-9]{14}/)?.[0] ?? null;
+  } catch {
+    return null;
+  }
+}
+
 async function fetchAllRaw(): Promise<RawRecord[]> {
   const out: RawRecord[] = [];
+  // A field id that no longer exists in the table (schema drift, or a stale/typo
+  // id in F) makes Airtable 422 the ENTIRE fetch — which breaks the build and
+  // silently freezes ISR revalidation. So be resilient: drop the offending id
+  // and retry, keeping every other field. `fields` only ever shrinks, and an
+  // empty list means "all fields" (never 422s), so this loop is bounded by
+  // FIELD_IDS.length. Dropped fields just map to null downstream.
+  const fields: string[] = [...FIELD_IDS];
   let offset: string | undefined;
 
-  do {
+  while (true) {
     const url = new URL(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`);
     url.searchParams.set("filterByFormula", FILTER);
     url.searchParams.set("pageSize", "100");
     url.searchParams.set("returnFieldsByFieldId", "true");
-    for (const id of FIELD_IDS) url.searchParams.append("fields[]", id);
+    for (const id of fields) url.searchParams.append("fields[]", id);
     if (offset) url.searchParams.set("offset", offset);
 
     const res = await fetch(url, {
       headers: { Authorization: `Bearer ${TOKEN}` },
       next: { revalidate: REVALIDATE_SECONDS, tags: ["properties"] },
     });
+
     if (!res.ok) {
-      throw new Error(`Airtable ${res.status}: ${await res.text()}`);
+      const body = await res.text();
+      const badField = unknownFieldId(res.status, body);
+      if (badField && fields.includes(badField)) {
+        console.warn(
+          `[airtable] unknown field id "${badField}" — dropping it and retrying (schema drift)`,
+        );
+        fields.splice(fields.indexOf(badField), 1);
+        continue; // retry the SAME page with the reduced field set
+      }
+      throw new Error(`Airtable ${res.status}: ${body}`);
     }
+
     const data = (await res.json()) as { records: RawRecord[]; offset?: string };
     out.push(...data.records);
     offset = data.offset;
-  } while (offset);
+    if (!offset) break;
+  }
 
   return out;
 }

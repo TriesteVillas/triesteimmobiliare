@@ -45,6 +45,13 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
+    // Vercel's Image Optimizer keys its cache on the SOURCE url. Airtable
+    // attachment urls are signed and rotate on every ISR revalidation (600s),
+    // so each cycle is a fresh cache key → a fresh transformation + cache write,
+    // which blows the Hobby free tier and then 402s (alt text instead of photos).
+    // We bypass the optimizer and serve Airtable's own sized renditions instead
+    // (thumbnails.large for cards/grids; original only for hero + lightbox).
+    unoptimized: true,
     remotePatterns: [
       // Airtable attachment CDN (URLs are signed and expire ~2h; refreshed on each ISR revalidation).
       { protocol: "https", hostname: "v5.airtableusercontent.com" },
