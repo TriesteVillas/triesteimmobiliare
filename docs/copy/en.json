@@ -13,44 +13,40 @@
   },
   "seo": {
     "home": {
-      "title": "TriesteImmobiliare — buy & sell homes in Trieste",
-      "description": "TriesteVillas' non-luxury spin-off. Valuation in 48h, online in 7 days, 3-month mandate, 0% seller fee (mandates by Sept 2026). Trieste and province.",
+      "title": "TriesteImmobiliare — Buying and selling homes in Trieste",
+      "description": "The non-luxury spin-off of the TriesteVillas group. Valuation in 24h, online within 7 days, a 3-month mandate, and 0% commission for the seller on mandates signed by September 2026. Residential Trieste and province.",
       "ogTitle": "TriesteImmobiliare — 0% seller commission, flagship-grade marketing",
       "ogDescription": "The same marketing as TriesteVillas, applied to residential Trieste and province up to around €500,000. Valuation in 24h, a simple 3-month mandate."
     },
     "sell": {
-      "title": "Sell your home in Trieste — 0% seller fee",
-      "description": "Sell your home in Trieste: valuation in 48h, 3-month mandate, photos/video/drone/3D tour included, 0% seller fee (mandates by Sept 2026).",
+      "title": "Sell your home in Trieste with 0% seller commission — TriesteImmobiliare",
+      "description": "Sell your home in Trieste with a 24h valuation, a 3-month mandate and no auto-renewal, photos/video/drone/3D tour included, and 0% commission on your side for mandates signed by September 2026.",
       "ogTitle": "Sell your home in Trieste: 0% seller commission, marketing included",
       "ogDescription": "Flagship-grade marketing, a pre-sale check-up, a pre-sale lift, and discreet off-market sales. An orderly process that takes weight off your shoulders rather than adding it."
     },
     "invest": {
-      "title": "Property investment in Trieste — yield & ROI",
-      "description": "Income property in Trieste, already let and central. Tell us budget and target ROI: options ranked by yield, purchase costs included.",
+      "title": "Investing in property in Trieste — Yield and ROI | TriesteImmobiliare",
+      "description": "Already-let units, central and recently renovated, between €200,000 and €400,000. Tell us your budget and target return: we'll send back options ranked by ROI, with all-in acquisition costs.",
       "ogTitle": "Investing in Trieste: income-producing property, ranked by ROI",
       "ogDescription": "Some opportunities aren't advertised — they're shared in person. Half an hour with us to point your search in the right direction."
     },
     "properties": {
-      "title": "Homes for sale in Trieste and province",
-      "description": "Residential homes for sale in Trieste and province: flats, houses with garden, penthouses. Photos, floor plans, video and 3D tours, by area.",
+      "title": "Properties for sale in Trieste and province — TriesteImmobiliare",
+      "description": "Every residential property in Trieste and province: apartments, houses with gardens, penthouses. Photos, floor plans, video and 3D tours. Filter by area, price and size.",
       "ogTitle": "Homes for sale in Trieste and province",
       "ogDescription": "The TriesteImmobiliare residential portfolio, area by area."
     },
     "group": {
-      "title": "The TriesteVillas Group — six brands",
-      "description": "TriesteImmobiliare in the TriesteVillas ecosystem: six brands for luxury, residential, rentals, FVG, business and Lignano. One direction.",
+      "title": "The TriesteVillas Group — Six brands, one direction | TriesteImmobiliare",
+      "description": "TriesteImmobiliare is part of the TriesteVillas ecosystem: six specialised brands for luxury, residential, rentals, the wider FVG region, business and Lignano. Different brands, a single direction.",
       "ogTitle": "The TriesteVillas Group: different brands, a single direction",
       "ogDescription": "A property ecosystem built around specialisation — not a one-size-fits-all container."
     },
     "contact": {
       "title": "Contact — TriesteImmobiliare",
-      "description": "Talk to TriesteImmobiliare: info@triesteimmobiliare.com, 040 2473628, Via Torino 34, Trieste. By appointment only.",
+      "description": "Talk to TriesteImmobiliare: info@triesteimmobiliare.com, 040 2473628, Via Torino 34, second floor, Trieste. By appointment.",
       "ogTitle": "Contact TriesteImmobiliare",
       "ogDescription": "Tell us what you're looking for, or what you'd like to sell. We reply quickly."
-    },
-    "privacy": {
-      "title": "Privacy Policy — TriesteImmobiliare",
-      "description": "TriesteImmobiliare privacy notice: data processed, purposes, your rights and contacts under the GDPR."
     }
   },
   "home": {
@@ -65,7 +61,7 @@
       "scrollHint": "Scroll"
     },
     "promiseStrip": {
-      "valuation": "Valuation in 48h",
+      "valuation": "Valuation in 24h",
       "online": "Online within 7 days",
       "mandate": "3-month mandate",
       "fee": "0% seller commission",
@@ -110,7 +106,7 @@
     "investorTeaser": {
       "eyebrow": "For investors",
       "title": "Buying in Trieste to put it to work.",
-      "body": "We hold already-let units in central, recently renovated buildings. Some are never advertised: we share them in person. Tell us your budget and target return and we'll come back with options ranked by ROI.",
+      "body": "We hold already-let units in central, recently renovated buildings, between €200,000 and €400,000. Some are never advertised — they're shared in person. Tell us your budget and target return, and we'll send back options ranked by ROI.",
       "cta": "Discover the investments"
     },
     "groupRouting": {
@@ -264,25 +260,17 @@
     },
     "ricercaLibera": {
       "title": "Open search",
-      "text": "Tell us what you're after: budget, the works you'd allow, constraints, the make-up of your household, intended use. We send back a list of ideas, not a flyer.",
-      "cta": "Tell us what you're after"
+      "text": "Tell us what you're after: budget, the works you'd allow, constraints, the make-up of your household, intended use. We send back a list of ideas, not a flyer."
     },
     "ricercaROI": {
       "title": "Search by net yield / ROI",
-      "text": "Looking to invest? Tell us your budget and target return. We send back a case study with options ranked by ROI, factoring in all-in acquisition costs.",
-      "cta": "Set budget and ROI"
+      "text": "Looking to invest? Tell us your budget and target return. We send back a case study with options ranked by ROI, factoring in all-in acquisition costs."
     },
     "teaser": {
       "eyebrow": "Off-market",
       "title": "Some opportunities aren't advertised. They're told.",
-      "body": "We hold income-producing, already-let units in central, recently renovated buildings. By their nature they never hit the portals: we share them in person, with people who are genuinely a fit. Leave us a few lines about you and we'll see whether they suit your capital.",
-      "disclaimer": "Properties that can't be advertised, shared privately with on-target buyers.",
-      "ghosts": {
-        "0": "Two-room income unit",
-        "1": "Three-room income unit",
-        "2": "Two-room income unit"
-      },
-      "alreadyLet": "already let"
+      "body": "We hold more than twenty already-let units in central, recently renovated buildings, between €200,000 and €400,000. By their nature they never reach the portals: we share them in person, with genuinely on-target buyers. Leave us a line or two about yourself and we'll work out together whether they suit your capital.",
+      "disclaimer": "Properties that can't be advertised, shared privately with on-target buyers."
     },
     "howItWorks": {
       "eyebrow": "How it works",
@@ -605,8 +593,7 @@
     "okTitle": "Request received",
     "okText": "We'll be in touch shortly with a tailored selection.",
     "error": "Something went wrong: please try again or email info@triesteimmobiliare.com.",
-    "close": "Close",
-    "errorContact": "Leave at least an email or phone so we can reach you."
+    "close": "Close"
   },
   "sellerForm": {
     "eyebrow": "Sell with TriesteImmobiliare",
@@ -660,8 +647,7 @@
     "okTitle": "Request received",
     "okText": "We'll be in touch to arrange a viewing.",
     "error": "Something went wrong: please try again or email info@triesteimmobiliare.com.",
-    "close": "Close",
-    "errorContact": "Leave at least an email or phone so we can reach you."
+    "close": "Close"
   },
   "investorForm": {
     "eyebrow": "Investing in Trieste",
@@ -702,8 +688,7 @@
     "okTitle": "Request received",
     "okText": "We'll work on your case and come back to you with a tailored case study.",
     "error": "Something went wrong: please try again or email info@triesteimmobiliare.com.",
-    "close": "Close",
-    "errorContact": "Leave at least an email or phone so we can reach you."
+    "close": "Close"
   },
   "footer": {
     "tagline": "The non-luxury spin-off of the TriesteVillas group. Residential Trieste and province.",
@@ -714,14 +699,11 @@
     "groupTitle": "The Group",
     "followUs": "Follow us",
     "privacy": "Privacy policy",
+    "cookies": "Cookie policy",
     "appointmentNote": "Via Torino 34, second floor. By appointment only."
   },
   "meta": {
     "title": "TriesteImmobiliare — Buying and selling homes in Trieste",
-    "description": "TriesteVillas' non-luxury spin-off: valuation in 48h, online in 7 days, 0% seller fee (mandates by Sept 2026). Residential Trieste and province."
-  },
-  "ui": {
-    "prev": "Previous",
-    "next": "Next"
+    "description": "The non-luxury spin-off of the TriesteVillas group: valuation in 24h, online within 7 days, a 3-month mandate, and 0% seller commission on mandates signed by September 2026. Residential Trieste and province."
   }
 }

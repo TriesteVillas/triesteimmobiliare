@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import type { Photo } from "@/lib/properties";
+import { useFocusTrap } from "@/lib/useFocusTrap";
 
 export default function Lightbox({
   photos,
@@ -15,6 +17,8 @@ export default function Lightbox({
   onClose: () => void;
   closeLabel: string;
 }) {
+  const t = useTranslations("ui");
+  const panelRef = useFocusTrap<HTMLDivElement>(true);
   const [i, setI] = useState(start);
   const step = useCallback(
     (d: number) => setI((x) => (x + d + photos.length) % photos.length),
@@ -33,7 +37,9 @@ export default function Lightbox({
 
   return (
     <div
-      className="lightbox-enter fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+      ref={panelRef}
+      tabIndex={-1}
+      className="lightbox-enter fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 outline-none backdrop-blur-sm"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -54,10 +60,10 @@ export default function Lightbox({
               e.stopPropagation();
               step(-1);
             }}
-            aria-label="‹"
+            aria-label={t("prev")}
             className="absolute left-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-3xl text-white transition-colors hover:bg-white/20"
           >
-            ‹
+            <span aria-hidden>‹</span>
           </button>
           <button
             type="button"
@@ -65,10 +71,10 @@ export default function Lightbox({
               e.stopPropagation();
               step(1);
             }}
-            aria-label="›"
+            aria-label={t("next")}
             className="absolute right-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-3xl text-white transition-colors hover:bg-white/20"
           >
-            ›
+            <span aria-hidden>›</span>
           </button>
         </>
       )}

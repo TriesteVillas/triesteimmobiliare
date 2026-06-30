@@ -1,10 +1,18 @@
 import type { MetadataRoute } from "next";
+import { SITE_URL } from "@/lib/seo";
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.triesteimmobiliare.com";
+// Until DNS is cut over from the old WordPress (the brand domain still serves it),
+// the relaunch lives on a *.vercel.app preview — keep it out of search to avoid
+// competing/duplicate content. Flip NEXT_PUBLIC_ALLOW_INDEX=true at cutover.
+const ALLOW_INDEX = process.env.NEXT_PUBLIC_ALLOW_INDEX === "true";
 
 export default function robots(): MetadataRoute.Robots {
+  if (!ALLOW_INDEX) {
+    return { rules: { userAgent: "*", disallow: "/" } };
+  }
   return {
     rules: { userAgent: "*", allow: "/", disallow: "/api/" },
-    sitemap: `${SITE}/sitemap.xml`,
+    sitemap: `${SITE_URL}/sitemap.xml`,
+    host: SITE_URL,
   };
 }

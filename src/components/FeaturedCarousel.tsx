@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useTranslations } from "next-intl";
 
 // Featured listings carousel: the page scrolls normally; the cards move
 // sideways by swipe (touch) or with the side arrows (desktop).
 export default function FeaturedCarousel({ children }: { children: ReactNode }) {
+  const t = useTranslations("ui");
   const track = useRef<HTMLDivElement>(null);
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(true);
@@ -45,11 +47,11 @@ export default function FeaturedCarousel({ children }: { children: ReactNode }) 
         {children}
       </div>
       <div className="pointer-events-none absolute inset-y-0 left-2 right-2 hidden items-center justify-between sm:flex">
-        <button type="button" onClick={() => step(-1)} disabled={!canPrev} aria-label="‹" className={arrow}>
-          ‹
+        <button type="button" onClick={() => step(-1)} disabled={!canPrev} aria-label={t("prev")} className={arrow}>
+          <span aria-hidden>‹</span>
         </button>
-        <button type="button" onClick={() => step(1)} disabled={!canNext} aria-label="›" className={arrow}>
-          ›
+        <button type="button" onClick={() => step(1)} disabled={!canNext} aria-label={t("next")} className={arrow}>
+          <span aria-hidden>›</span>
         </button>
       </div>
     </div>

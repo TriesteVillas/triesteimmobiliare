@@ -7,7 +7,14 @@ import { routing } from "@/i18n/routing";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RevealObserver from "@/components/RevealObserver";
+import JsonLd from "@/components/JsonLd";
+import { SITE_URL, orgJsonLd, webSiteJsonLd } from "@/lib/seo";
 import "../globals.css";
+
+// The relaunch lives on a *.vercel.app preview while the brand domain still
+// serves the old WordPress (DNS not cut over). Keep it out of the index until
+// cutover by setting NEXT_PUBLIC_ALLOW_INDEX=true in production env.
+const ALLOW_INDEX = process.env.NEXT_PUBLIC_ALLOW_INDEX === "true";
 
 // Arms scroll reveals before first paint (CSS hides [data-reveal] only under
 // html[data-reveal-armed]) so content stays visible when JS never runs.
@@ -27,8 +34,18 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "meta" });
   return {
+    metadataBase: new URL(SITE_URL),
     title: { default: t("title"), template: "%s · TriesteImmobiliare" },
     description: t("description"),
+    robots: ALLOW_INDEX
+      ? { index: true, follow: true }
+      : { index: false, follow: false },
+    openGraph: {
+      type: "website",
+      siteName: "TriesteImmobiliare",
+      images: [{ url: "/brand/og-default.jpg", width: 1200, height: 630, alt: "TriesteImmobiliare" }],
+    },
+    twitter: { card: "summary_large_image" },
   };
 }
 
@@ -59,6 +76,7 @@ export default async function LocaleLayout({
       </head>
       <body className="flex min-h-full flex-col bg-background text-foreground">
         <NextIntlClientProvider>
+          <JsonLd data={[orgJsonLd(), webSiteJsonLd()]} />
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />

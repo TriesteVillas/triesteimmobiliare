@@ -13,44 +13,40 @@
   },
   "seo": {
     "home": {
-      "title": "TriesteImmobiliare — comprare e vendere a Trieste",
-      "description": "Spin-off non-luxury di TriesteVillas. Valutazione 48h, online in 7 giorni, mandato 3 mesi, 0% al venditore (mandati entro set. 2026). Trieste e Provincia.",
+      "title": "TriesteImmobiliare — Vendere e comprare casa a Trieste",
+      "description": "Lo spin-off non-luxury del gruppo TriesteVillas. Valutazione in 24h, online entro 7 giorni, mandato di 3 mesi, 0% al venditore per i mandati firmati entro settembre 2026. Residenziale a Trieste e Provincia.",
       "ogTitle": "TriesteImmobiliare — 0% al venditore, marketing da capogruppo",
       "ogDescription": "Lo stesso marketing di TriesteVillas, sul residenziale di Trieste e Provincia fino a circa 500.000 €. Valutazione in 24h, mandato semplice di 3 mesi."
     },
     "sell": {
-      "title": "Vendere casa a Trieste — 0% al venditore",
-      "description": "Vendi casa a Trieste: valutazione 48h, mandato 3 mesi senza tacito rinnovo, foto/video/drone/tour 3D inclusi, 0% al venditore (entro set. 2026).",
+      "title": "Vendere casa a Trieste con 0% al venditore — TriesteImmobiliare",
+      "description": "Vendi casa a Trieste con valutazione in 24h, mandato di 3 mesi senza tacito rinnovo, foto/video/drone/tour 3D inclusi e 0% di provvigione a tuo carico per i mandati firmati entro settembre 2026.",
       "ogTitle": "Vendi casa a Trieste: 0% al venditore, materiale incluso",
       "ogDescription": "Marketing da capogruppo, check-up pre-vendita, lifting pre-vendita, vendita riservata. Un percorso ordinato che ti toglie peso, non te ne aggiunge."
     },
     "invest": {
-      "title": "Investire a Trieste — immobili a reddito",
-      "description": "Immobili a reddito a Trieste, già affittati e centrali. Indica budget e ROI: opzioni ordinate per rendimento, costi d'acquisto inclusi.",
+      "title": "Investire in immobili a Trieste — Rendita e ROI | TriesteImmobiliare",
+      "description": "Unità già affittate, in centro e ristrutturate di recente, tra 200.000 e 400.000 €. Indicaci budget e ritorno atteso: ti restituiamo opzioni ordinate per ROI con i costi d'acquisto all-inclusive.",
       "ogTitle": "Investire a Trieste: immobili a reddito, ordinati per ROI",
       "ogDescription": "Alcune opportunità non si pubblicizzano: si raccontano di persona. Mezz'ora con noi per orientare la ricerca."
     },
     "properties": {
-      "title": "Immobili in vendita a Trieste e Provincia",
-      "description": "Immobili residenziali in vendita a Trieste e Provincia: appartamenti, case con giardino, attici. Foto, planimetrie, video e tour 3D, per zona.",
+      "title": "Immobili in vendita a Trieste e Provincia — TriesteImmobiliare",
+      "description": "Tutti gli immobili residenziali a Trieste e Provincia: appartamenti, case con giardino, attici. Foto, planimetrie, video e tour 3D. Filtri per zona, prezzo e dimensioni.",
       "ogTitle": "Case in vendita a Trieste e Provincia",
       "ogDescription": "Il portfolio residenziale di TriesteImmobiliare, zona per zona."
     },
     "group": {
-      "title": "Il Gruppo TriesteVillas — sei brand",
-      "description": "TriesteImmobiliare nell'ecosistema TriesteVillas: sei brand per luxury, residenziale, affitti, FVG, business e Lignano. Una regia sola.",
+      "title": "Il Gruppo TriesteVillas — Sei brand, una regia | TriesteImmobiliare",
+      "description": "TriesteImmobiliare fa parte dell'ecosistema TriesteVillas: sei brand specializzati per il luxury, il residenziale, gli affitti, il FVG, il business e Lignano. Brand diversi, una regia sola.",
       "ogTitle": "Il Gruppo TriesteVillas: brand diversi, una regia sola",
       "ogDescription": "Un ecosistema immobiliare costruito per specializzazione, non un contenitore generico."
     },
     "contact": {
       "title": "Contatti — TriesteImmobiliare",
-      "description": "Parla con TriesteImmobiliare: info@triesteimmobiliare.com, 040 2473628, Via Torino 34, Trieste. Solo su appuntamento.",
+      "description": "Parla con TriesteImmobiliare: info@triesteimmobiliare.com, 040 2473628, Via Torino 34, secondo piano, Trieste. Su appuntamento.",
       "ogTitle": "Contatta TriesteImmobiliare",
       "ogDescription": "Raccontaci cosa cerchi o cosa vuoi vendere. Ti rispondiamo in fretta."
-    },
-    "privacy": {
-      "title": "Privacy Policy — TriesteImmobiliare",
-      "description": "Informativa privacy di TriesteImmobiliare: dati trattati, finalità, diritti dell'interessato e contatti ai sensi del GDPR."
     }
   },
   "home": {
@@ -65,7 +61,7 @@
       "scrollHint": "Scorri"
     },
     "promiseStrip": {
-      "valuation": "Valutazione in 48h",
+      "valuation": "Valutazione in 24h",
       "online": "Online entro 7 giorni",
       "mandate": "Mandato di 3 mesi",
       "fee": "0% al venditore",
@@ -110,7 +106,7 @@
     "investorTeaser": {
       "eyebrow": "Per chi investe",
       "title": "Comprare a Trieste per metterci a reddito.",
-      "body": "Teniamo unità già affittate, in palazzi centrali ristrutturati di recente. Alcune non si pubblicizzano: si raccontano di persona. Indicaci budget e ritorno atteso e ti restituiamo opzioni ordinate per ROI.",
+      "body": "Teniamo unità già affittate, in palazzi centrali ristrutturati di recente, tra 200.000 e 400.000 €. Alcune non si pubblicizzano: si raccontano di persona. Indicaci budget e ritorno atteso e ti restituiamo opzioni ordinate per ROI.",
       "cta": "Scopri gli investimenti"
     },
     "groupRouting": {
@@ -264,25 +260,17 @@
     },
     "ricercaLibera": {
       "title": "Ricerca libera",
-      "text": "Spiegaci cosa cerchi: budget, lavori ammissibili, vincoli, composizione della famiglia, destinazione d'uso. Ti restituiamo una lista di idee, non un volantino.",
-      "cta": "Raccontaci cosa cerchi"
+      "text": "Spiegaci cosa cerchi: budget, lavori ammissibili, vincoli, composizione della famiglia, destinazione d'uso. Ti restituiamo una lista di idee, non un volantino."
     },
     "ricercaROI": {
       "title": "Ricerca per utile netto / ROI",
-      "text": "Vuoi investire? Indicaci budget e ritorno atteso. Ti restituiamo un case study con opzioni ordinate per ROI, considerando i costi d'acquisto all-inclusive.",
-      "cta": "Indica budget e ROI"
+      "text": "Vuoi investire? Indicaci budget e ritorno atteso. Ti restituiamo un case study con opzioni ordinate per ROI, considerando i costi d'acquisto all-inclusive."
     },
     "teaser": {
       "eyebrow": "Off-market",
       "title": "Alcune opportunità non si pubblicizzano. Si raccontano.",
-      "body": "Teniamo immobili a reddito già affittati, in palazzi centrali ristrutturati di recente. Per loro natura non finiscono sui portali: li raccontiamo di persona, a chi è davvero in target. Lasciaci due righe su di te e capiamo insieme se fanno per il tuo capitale.",
-      "disclaimer": "Immobili non pubblicizzabili, raccontati privatamente a chi è in target.",
-      "ghosts": {
-        "0": "Bilocale a reddito",
-        "1": "Trilocale a reddito",
-        "2": "Bilocale a reddito"
-      },
-      "alreadyLet": "già locato"
+      "body": "Teniamo oltre venti unità già affittate, in palazzi centrali ristrutturati di recente, tra 200.000 e 400.000 €. Per loro natura non finiscono sui portali: le raccontiamo di persona, a chi è davvero in target. Lasciaci due righe su di te e capiamo insieme se fanno per il tuo capitale.",
+      "disclaimer": "Immobili non pubblicizzabili, raccontati privatamente a chi è in target."
     },
     "howItWorks": {
       "eyebrow": "Come funziona",
@@ -605,8 +593,7 @@
     "okTitle": "Richiesta ricevuta",
     "okText": "Vi ricontatteremo a breve con una selezione su misura.",
     "error": "Qualcosa è andato storto: riprova o scrivi a info@triesteimmobiliare.com.",
-    "close": "Chiudi",
-    "errorContact": "Lasciaci almeno un'email o un telefono per ricontattarti."
+    "close": "Chiudi"
   },
   "sellerForm": {
     "eyebrow": "Vendi con TriesteImmobiliare",
@@ -660,8 +647,7 @@
     "okTitle": "Richiesta ricevuta",
     "okText": "Ti ricontatteremo per fissare un sopralluogo.",
     "error": "Qualcosa è andato storto: riprova o scrivi a info@triesteimmobiliare.com.",
-    "close": "Chiudi",
-    "errorContact": "Lasciaci almeno un'email o un telefono per ricontattarti."
+    "close": "Chiudi"
   },
   "investorForm": {
     "eyebrow": "Investire a Trieste",
@@ -702,8 +688,7 @@
     "okTitle": "Richiesta ricevuta",
     "okText": "Lavoriamo sul tuo caso e ti ricontattiamo con un case study su misura.",
     "error": "Qualcosa è andato storto: riprova o scrivi a info@triesteimmobiliare.com.",
-    "close": "Chiudi",
-    "errorContact": "Lasciaci almeno un'email o un telefono per ricontattarti."
+    "close": "Chiudi"
   },
   "footer": {
     "tagline": "Lo spin-off non-luxury del gruppo TriesteVillas. Residenziale a Trieste e Provincia.",
@@ -714,14 +699,11 @@
     "groupTitle": "Il Gruppo",
     "followUs": "Seguici",
     "privacy": "Privacy policy",
+    "cookies": "Cookie policy",
     "appointmentNote": "Via Torino 34, secondo piano. Solo su appuntamento."
   },
   "meta": {
     "title": "TriesteImmobiliare — Vendere e comprare casa a Trieste",
-    "description": "Spin-off non-luxury di TriesteVillas: valutazione 48h, online in 7 giorni, 0% al venditore (mandati entro set. 2026). Residenziale a Trieste e Provincia."
-  },
-  "ui": {
-    "prev": "Precedente",
-    "next": "Successivo"
+    "description": "Lo spin-off non-luxury del gruppo TriesteVillas: valutazione in 24h, online entro 7 giorni, mandato di 3 mesi, 0% al venditore per i mandati firmati entro settembre 2026. Residenziale a Trieste e Provincia."
   }
 }

@@ -30,7 +30,7 @@ export default function LocaleSwitcher() {
           className={
             loc === locale
               ? "px-1.5 font-semibold text-brand-dark"
-              : "px-1.5 text-neutral-400 transition-colors hover:text-brand"
+              : "px-1.5 text-neutral-500 transition-colors hover:text-brand"
           }
         >
           {LABELS[loc] ?? loc.toUpperCase()}

@@ -13,44 +13,40 @@
   },
   "seo": {
     "home": {
-      "title": "TriesteImmobiliare — Immobilien in Triest",
-      "description": "Non-Luxury-Spin-off von TriesteVillas. Bewertung in 48 h, online in 7 Tagen, 3-Monats-Mandat, 0 % für Verkäufer (Mandate bis Sept. 2026).",
+      "title": "TriesteImmobiliare — Wohnungen in Triest kaufen und verkaufen",
+      "description": "Der Non-Luxury-Spin-off der TriesteVillas-Gruppe. Bewertung in 24 h, online innerhalb von 7 Tagen, 3-Monats-Mandat, 0 % für Verkäufer bei Mandaten, die bis September 2026 unterzeichnet werden. Wohnimmobilien in Triest und Provinz.",
       "ogTitle": "TriesteImmobiliare — 0 % für Verkäufer, Marketing der Muttergesellschaft",
       "ogDescription": "Dasselbe Marketing wie TriesteVillas, für Wohnimmobilien in Triest und Provinz bis rund 500.000 €. Bewertung in 24 h, einfaches 3-Monats-Mandat."
     },
     "sell": {
-      "title": "Haus verkaufen in Triest — 0 % Provision",
-      "description": "Haus verkaufen in Triest: Bewertung in 48 h, 3-Monats-Mandat, Fotos/Video/Drohne/3D-Tour inklusive, 0 % für Verkäufer (bis Sept. 2026).",
+      "title": "Wohnung in Triest verkaufen mit 0 % für Verkäufer — TriesteImmobiliare",
+      "description": "Verkaufen Sie Ihre Wohnung in Triest mit Bewertung in 24 h, 3-Monats-Mandat ohne stillschweigende Verlängerung, Foto/Video/Drohne/3D-Tour inklusive und 0 % Provision zu Ihren Lasten bei Mandaten, die bis September 2026 unterzeichnet werden.",
       "ogTitle": "Wohnung in Triest verkaufen: 0 % für Verkäufer, Material inklusive",
       "ogDescription": "Marketing der Muttergesellschaft, Vorverkaufs-Check-up, Vorverkaufs-Lifting, diskreter Verkauf. Ein geordneter Ablauf, der Sie entlastet statt belastet."
     },
     "invest": {
-      "title": "Immobilien-Investment in Triest — Rendite",
-      "description": "Renditeobjekte in Triest, vermietet und zentral. Budget und Ziel-ROI angeben: nach Rendite sortierte Optionen, Kaufkosten inklusive.",
+      "title": "In Immobilien in Triest investieren — Rendite und ROI | TriesteImmobiliare",
+      "description": "Bereits vermietete Einheiten, zentral gelegen und kürzlich saniert, zwischen 200.000 und 400.000 €. Nennen Sie uns Budget und erwartete Rendite: Wir liefern nach ROI geordnete Optionen mit den Kaufnebenkosten all-inclusive.",
       "ogTitle": "Investieren in Triest: Renditeobjekte, nach ROI geordnet",
       "ogDescription": "Manche Gelegenheiten werden nicht beworben: Sie werden persönlich erzählt. Eine halbe Stunde mit uns, um Ihre Suche auszurichten."
     },
     "properties": {
-      "title": "Immobilien zum Verkauf in Triest",
-      "description": "Wohnimmobilien zum Verkauf in Triest und Provinz: Wohnungen, Häuser mit Garten, Penthäuser. Fotos, Grundrisse, Video und 3D-Touren, nach Zone.",
+      "title": "Immobilien zum Verkauf in Triest und Provinz — TriesteImmobiliare",
+      "description": "Alle Wohnimmobilien in Triest und Provinz: Wohnungen, Häuser mit Garten, Penthäuser. Fotos, Grundrisse, Videos und 3D-Touren. Filter nach Lage, Preis und Größe.",
       "ogTitle": "Häuser zum Verkauf in Triest und Provinz",
       "ogDescription": "Das Wohnimmobilien-Portfolio von TriesteImmobiliare, Zone für Zone."
     },
     "group": {
-      "title": "Die TriesteVillas-Gruppe — sechs Marken",
-      "description": "TriesteImmobiliare im TriesteVillas-Ökosystem: sechs Marken für Luxus, Wohnen, Vermietung, FVG, Business und Lignano. Eine Regie.",
+      "title": "Die TriesteVillas-Gruppe — Sechs Marken, eine Regie | TriesteImmobiliare",
+      "description": "TriesteImmobiliare gehört zum Ökosystem von TriesteVillas: sechs spezialisierte Marken für Luxus, Wohnen, Vermietung, Friaul-Julisch Venetien, Gewerbe und Lignano. Verschiedene Marken, eine einzige Regie.",
       "ogTitle": "Die TriesteVillas-Gruppe: verschiedene Marken, eine einzige Regie",
       "ogDescription": "Ein Immobilien-Ökosystem, aufgebaut nach Spezialisierung, kein beliebiger Sammelbehälter."
     },
     "contact": {
       "title": "Kontakt — TriesteImmobiliare",
-      "description": "Sprechen Sie mit TriesteImmobiliare: info@triesteimmobiliare.com, 040 2473628, Via Torino 34, Triest. Nur nach Vereinbarung.",
+      "description": "Sprechen Sie mit TriesteImmobiliare: info@triesteimmobiliare.com, 040 2473628, Via Torino 34, zweiter Stock, Triest. Nach Vereinbarung.",
       "ogTitle": "Kontaktieren Sie TriesteImmobiliare",
       "ogDescription": "Erzählen Sie uns, was Sie suchen oder verkaufen möchten. Wir antworten zügig."
-    },
-    "privacy": {
-      "title": "Datenschutz — TriesteImmobiliare",
-      "description": "Datenschutzerklärung von TriesteImmobiliare: verarbeitete Daten, Zwecke, Ihre Rechte und Kontakte gemäß DSGVO."
     }
   },
   "home": {
@@ -65,7 +61,7 @@
       "scrollHint": "Scrollen"
     },
     "promiseStrip": {
-      "valuation": "Bewertung in 48 h",
+      "valuation": "Bewertung in 24 h",
       "online": "Online innerhalb von 7 Tagen",
       "mandate": "3-Monats-Mandat",
       "fee": "0 % für Verkäufer",
@@ -110,7 +106,7 @@
     "investorTeaser": {
       "eyebrow": "Für Investoren",
       "title": "In Triest kaufen, um zu vermieten.",
-      "body": "Wir halten bereits vermietete Einheiten in kürzlich sanierten, zentralen Gebäuden. Manche werden nie beworben: Wir stellen sie persönlich vor. Nennen Sie Budget und Zielrendite — wir liefern nach ROI sortierte Optionen.",
+      "body": "Wir halten bereits vermietete Einheiten in kürzlich sanierten, zentral gelegenen Gebäuden, zwischen 200.000 und 400.000 €. Manche werden nicht beworben: Sie werden persönlich erzählt. Nennen Sie uns Budget und erwartete Rendite, und wir liefern nach ROI geordnete Optionen.",
       "cta": "Investitionen entdecken"
     },
     "groupRouting": {
@@ -186,7 +182,7 @@
         "title": "Spezialisten für ausländische Käufer",
         "text": "Viele unserer Käufer sind keine Triestiner. Wir machen alles einfacher mit orientierenden Zoom-Calls, 3D-Touren, Fernabwicklung und fließendem Englisch. Und wenn es nötig ist, die Immobilie wirklich zu sehen, begleiten wir sie in die Stadt.",
         "quote": "Triest muss man nicht nur zeigen. Man muss es erklären.",
-        "cta": "Eine House-Tour planen"
+        "cta": "Einen House-Tour planen"
       },
       "houseTour": {
         "title": "Geführte House-Touren",
@@ -264,25 +260,17 @@
     },
     "ricercaLibera": {
       "title": "Freie Suche",
-      "text": "Erklären Sie uns, was Sie suchen: Budget, zulässige Arbeiten, Auflagen, Familienzusammensetzung, Nutzungszweck. Sie erhalten eine Liste mit Ideen, kein Werbeblatt.",
-      "cta": "Sagen Sie uns, was Sie suchen"
+      "text": "Erklären Sie uns, was Sie suchen: Budget, zulässige Arbeiten, Auflagen, Familienzusammensetzung, Nutzungszweck. Sie erhalten eine Liste mit Ideen, kein Werbeblatt."
     },
     "ricercaROI": {
       "title": "Suche nach Nettoertrag / ROI",
-      "text": "Sie möchten investieren? Nennen Sie uns Budget und erwartete Rendite. Sie erhalten eine Fallstudie mit nach ROI geordneten Optionen, unter Berücksichtigung der Kaufnebenkosten all-inclusive.",
-      "cta": "Budget und ROI angeben"
+      "text": "Sie möchten investieren? Nennen Sie uns Budget und erwartete Rendite. Sie erhalten eine Fallstudie mit nach ROI geordneten Optionen, unter Berücksichtigung der Kaufnebenkosten all-inclusive."
     },
     "teaser": {
       "eyebrow": "Off-Market",
       "title": "Manche Gelegenheiten werden nicht beworben. Sie werden erzählt.",
-      "body": "Wir halten bereits vermietete Renditeobjekte in kürzlich sanierten, zentral gelegenen Gebäuden. Sie landen naturgemäß nicht auf den Portalen: Wir stellen sie persönlich vor, passenden Interessenten. Hinterlassen Sie uns ein paar Zeilen, und wir prüfen gemeinsam, ob sie zu Ihrem Kapital passen.",
-      "disclaimer": "Nicht bewerbbare Immobilien, privat erzählt an diejenigen, die in Frage kommen.",
-      "ghosts": {
-        "0": "2-Zimmer-Renditeobjekt",
-        "1": "3-Zimmer-Renditeobjekt",
-        "2": "2-Zimmer-Renditeobjekt"
-      },
-      "alreadyLet": "vermietet"
+      "body": "Wir halten über zwanzig bereits vermietete Einheiten in kürzlich sanierten, zentral gelegenen Gebäuden, zwischen 200.000 und 400.000 €. Sie landen ihrer Natur nach nicht auf den Portalen: Wir erzählen sie persönlich, denjenigen, die wirklich in Frage kommen. Schreiben Sie uns ein paar Zeilen über sich, und wir klären gemeinsam, ob sie zu Ihrem Kapital passen.",
+      "disclaimer": "Nicht bewerbbare Immobilien, privat erzählt an diejenigen, die in Frage kommen."
     },
     "howItWorks": {
       "eyebrow": "So funktioniert es",
@@ -605,8 +593,7 @@
     "okTitle": "Anfrage erhalten",
     "okText": "Wir melden uns in Kürze mit einer maßgeschneiderten Auswahl bei Ihnen.",
     "error": "Etwas ist schiefgelaufen: Bitte versuchen Sie es erneut oder schreiben Sie an info@triesteimmobiliare.com.",
-    "close": "Schließen",
-    "errorContact": "Hinterlassen Sie mindestens E-Mail oder Telefon für die Rückmeldung."
+    "close": "Schließen"
   },
   "sellerForm": {
     "eyebrow": "Verkaufen mit TriesteImmobiliare",
@@ -660,8 +647,7 @@
     "okTitle": "Anfrage erhalten",
     "okText": "Wir melden uns bei Ihnen, um eine Besichtigung zu vereinbaren.",
     "error": "Etwas ist schiefgelaufen: Bitte versuchen Sie es erneut oder schreiben Sie an info@triesteimmobiliare.com.",
-    "close": "Schließen",
-    "errorContact": "Hinterlassen Sie mindestens E-Mail oder Telefon für die Rückmeldung."
+    "close": "Schließen"
   },
   "investorForm": {
     "eyebrow": "In Triest investieren",
@@ -702,8 +688,7 @@
     "okTitle": "Anfrage erhalten",
     "okText": "Wir arbeiten an Ihrem Fall und melden uns mit einer maßgeschneiderten Fallstudie bei Ihnen.",
     "error": "Etwas ist schiefgelaufen: Bitte versuchen Sie es erneut oder schreiben Sie an info@triesteimmobiliare.com.",
-    "close": "Schließen",
-    "errorContact": "Hinterlassen Sie mindestens E-Mail oder Telefon für die Rückmeldung."
+    "close": "Schließen"
   },
   "footer": {
     "tagline": "Der Non-Luxury-Spin-off der TriesteVillas-Gruppe. Wohnimmobilien in Triest und Provinz.",
@@ -714,14 +699,11 @@
     "groupTitle": "Die Gruppe",
     "followUs": "Folgen Sie uns",
     "privacy": "Datenschutzerklärung",
+    "cookies": "Cookie-Richtlinie",
     "appointmentNote": "Via Torino 34, zweiter Stock. Nur nach Vereinbarung."
   },
   "meta": {
     "title": "TriesteImmobiliare — Wohnungen in Triest kaufen und verkaufen",
-    "description": "Non-Luxury-Spin-off von TriesteVillas: Bewertung 48 h, online in 7 Tagen, 0 % für Verkäufer (bis Sept. 2026). Wohnimmobilien in Triest und Provinz."
-  },
-  "ui": {
-    "prev": "Zurück",
-    "next": "Weiter"
+    "description": "Der Non-Luxury-Spin-off der TriesteVillas-Gruppe: Bewertung in 24 h, online innerhalb von 7 Tagen, 3-Monats-Mandat, 0 % für Verkäufer bei Mandaten, die bis September 2026 unterzeichnet werden. Wohnimmobilien in Triest und Provinz."
   }
 }

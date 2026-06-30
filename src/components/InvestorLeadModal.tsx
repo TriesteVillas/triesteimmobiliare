@@ -3,41 +3,59 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocale, useTranslations } from "next-intl";
+import RangeDual from "./RangeDual";
 import { useFocusTrap } from "@/lib/useFocusTrap";
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// "Richiedi una valutazione riservata" — seller intake popup on /vendi.
-// Agile like the buyer form: privacy + one contact suffice; everything
-// else is optional. Lands in LEAD_ via /api/lead (tipo: "valutazione").
+// "Profilo investitore" popup behind the /investimenti CTAs. The off-market
+// "portfolio a reddito" is never published — this form profiles the investor so
+// the team can tell those stories 1:1. Lands in the unified Airtable LEADS table
+// via /api/lead (tipo: "investitore"). Agile: privacy + one contact suffice.
 
-// Canonical values stored in Airtable; chip labels come from i18n.
-const TIPOLOGIE = ["Appartamento", "Attico", "Villa", "Casa con giardino", "Terreno", "Altro"] as const;
-const TAGLIE = ["< 80 mq", "80 – 150 mq", "150 – 250 mq", "250+ mq"] as const;
-const STATI = ["Ottimo / ristrutturato", "Buono / abitabile", "Da ristrutturare"] as const;
-const TEMPI = ["Il prima possibile", "Entro 6 mesi", "Solo esplorativo"] as const;
-const HASTOBUY = ["Sì, vendo e ricompro", "No, solo vendita", "Non ancora deciso"] as const;
+const ZONES = [
+  "CENTRO", "SEMICENTRO", "BARCOLA", "MIRAMARE", "COSTIERA",
+  "SISTIANA-DUINO", "MUGGIA", "ALTE", "FVG",
+] as const;
+const ZONE_LABELS: Record<string, string> = {
+  CENTRO: "Centro", SEMICENTRO: "Semicentro", BARCOLA: "Barcola",
+  MIRAMARE: "Miramare", COSTIERA: "Costiera", "SISTIANA-DUINO": "Sistiana-Duino",
+  MUGGIA: "Muggia", ALTE: "Carso", FVG: "FVG",
+};
+// Canonical Airtable values (must match the API's INVEST_* sets); labels via i18n
+// (roiOptions / horizonOptions / purposeOptions), aligned by index.
+const ROI = ["Conservativo (basta che tenga)", "≈ 4–5%", "≈ 5–7%", "Massimizzare"] as const;
+const ORIZZONTI = [
+  "Lungo termine (reddito)", "Medio (3–5 anni)", "Rivendita rapida", "Da valutare",
+] as const;
+const OBIETTIVI = [
+  "Messa a reddito", "Rivalutazione", "Diversificazione", "Uso + reddito",
+] as const;
 
-export default function SellerLeadModal({
+const BUDGET = { min: 100_000, max: 600_000, step: 25_000 };
+const fmtEur = (n: number) =>
+  n >= 1_000_000 ? `${(n / 1_000_000).toLocaleString("it-IT")} M€` : `${n / 1000}k €`;
+
+export default function InvestorLeadModal({
   open,
   onClose,
 }: {
   open: boolean;
   onClose: () => void;
 }) {
-  const t = useTranslations("sellerForm");
+  const t = useTranslations("investorForm");
   const locale = useLocale();
 
   const [nome, setNome] = useState("");
   const [cognome, setCognome] = useState("");
   const [telefono, setTelefono] = useState("");
   const [email, setEmail] = useState("");
-  const [indirizzo, setIndirizzo] = useState("");
-  const [tipologia, setTipologia] = useState("");
-  const [taglia, setTaglia] = useState("");
-  const [stato, setStato] = useState("");
-  const [tempi, setTempi] = useState("");
-  const [hasToBuy, setHasToBuy] = useState("");
+  const [zone, setZone] = useState<string[]>([]);
+  const [budget, setBudget] = useState<[number, number]>([BUDGET.min, BUDGET.max]);
+  const [budgetTouched, setBudgetTouched] = useState(false);
+  const [roi, setRoi] = useState("");
+  const [orizzonte, setOrizzonte] = useState("");
+  const [obiettivo, setObiettivo] = useState("");
   const [note, setNote] = useState("");
   const [privacyOk, setPrivacyOk] = useState(false);
   const [state, setState] = useState<"idle" | "sending" | "ok" | "error">("idle");
@@ -57,6 +75,9 @@ export default function SellerLeadModal({
 
   if (!open || typeof document === "undefined") return null;
 
+  const toggleZone = (z: string) =>
+    setZone((cur) => (cur.includes(z) ? cur.filter((x) => x !== z) : [...cur, z]));
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!emailRe.test(email) && telefono.trim().length < 6) {
@@ -71,19 +92,17 @@ export default function SellerLeadModal({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          tipo: "valutazione",
+          tipo: "investitore",
           nome,
           cognome,
           telefono,
           email,
-          indirizzo,
-          tipologia,
-          taglia,
-          statoImmobile: stato,
-          tempistiche: tempi,
-          messaggio: [note, hasToBuy && `Vendo e ricompro: ${hasToBuy}`]
-            .filter(Boolean)
-            .join(" · "),
+          zone,
+          ...(budgetTouched ? { budgetMin: budget[0], budgetMax: budget[1] } : {}),
+          roi,
+          orizzonte,
+          obiettivo,
+          messaggio: note,
           privacyOk,
           lingua: locale,
         }),
@@ -183,15 +202,26 @@ export default function SellerLeadModal({
                 onChange={(e) => setEmail(e.target.value)} type="email" autoComplete="email" />
             </div>
 
-            <p className="mt-5 text-sm font-medium text-neutral-700">{t("address")}</p>
-            <input className={`${input} mt-2`} placeholder={t("addressPlaceholder")}
-              value={indirizzo} onChange={(e) => setIndirizzo(e.target.value)} />
+            <p className="mt-6 text-sm font-medium text-neutral-700">{t("zones")}</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {ZONES.map((z) => (
+                <button key={z} type="button" onClick={() => toggleZone(z)}
+                  aria-pressed={zone.includes(z)} className={chip(zone.includes(z))}>
+                  {ZONE_LABELS[z]}
+                </button>
+              ))}
+            </div>
 
-            {chipRow(t("type"), TIPOLOGIE, tipologia, setTipologia, "typeOptions")}
-            {chipRow(t("size"), TAGLIE, taglia, setTaglia, "sizeOptions")}
-            {chipRow(t("condition"), STATI, stato, setStato, "conditionOptions")}
-            {chipRow(t("timing"), TEMPI, tempi, setTempi, "timingOptions")}
-            {chipRow(t("hasToBuy"), HASTOBUY, hasToBuy, setHasToBuy, "hasToBuyOptions")}
+            <div className="mt-6">
+              <p className="mb-2 text-sm font-medium text-neutral-700">{t("budget")}</p>
+              <RangeDual {...BUDGET} value={budget} maxLabel="600k €"
+                format={fmtEur}
+                onChange={(v) => { setBudget(v); setBudgetTouched(true); }} />
+            </div>
+
+            {chipRow(t("roi"), ROI, roi, setRoi, "roiOptions")}
+            {chipRow(t("horizon"), ORIZZONTI, orizzonte, setOrizzonte, "horizonOptions")}
+            {chipRow(t("purpose"), OBIETTIVI, obiettivo, setObiettivo, "purposeOptions")}
 
             <p className="mt-5 text-sm font-medium text-neutral-700">{t("notes")}</p>
             <textarea className={`${input} mt-2 min-h-20 resize-y`} value={note}

@@ -64,12 +64,16 @@ body {
   font-weight: 700;
   letter-spacing: -0.015em;
 }
-.eyebrow {
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--color-brand, #2c6b96);
+/* In a component layer so dark-surface overrides (text-white / text-sand)
+   win — utilities sit in a later cascade layer than @layer components. */
+@layer components {
+  .eyebrow {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-brand, #2c6b96);
+  }
 }
 
 /* Parallax zoom for the listing-page photo hero (Scene sets --p). */
@@ -404,6 +408,57 @@ html[data-header-hidden] header[data-pill] {
 }
 
 /* ----------------------------------------------------------------
+   Relaunch utilities (light nautical system)
+   ---------------------------------------------------------------- */
+
+/* Hero wash: paper → white, calm "harbour light". */
+.grad-paper-sea {
+  background:
+    radial-gradient(120% 80% at 80% -10%, rgba(111, 161, 198, 0.16), transparent 60%),
+    radial-gradient(90% 70% at -10% 30%, rgba(44, 107, 150, 0.1), transparent 55%),
+    linear-gradient(180deg, var(--color-paper) 0%, #ffffff 64%);
+}
+
+/* Big ghosted chapter/step numeral. */
+.chapter-num {
+  font-size: clamp(2.4rem, 6vw, 4.6rem);
+  font-weight: 700;
+  line-height: 0.78;
+  letter-spacing: -0.03em;
+  color: var(--color-brand-light);
+  opacity: 0.45;
+}
+
+/* Promise stat — the 4 hero numbers. */
+.stat-num {
+  font-size: clamp(1.05rem, 2.6vw, 1.95rem);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--color-brand-dark);
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Edge-to-edge scrolling ribbon (Marquee). */
+.marquee-track {
+  display: inline-flex;
+  white-space: nowrap;
+  will-change: transform;
+  animation: marquee 30s linear infinite;
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* Hairline gradient rule. */
+.rule-sea {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(44, 107, 150, 0.35), transparent);
+}
+
+/* ----------------------------------------------------------------
    Reduced motion: collapse everything to its resting state.
    ---------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
@@ -430,6 +485,9 @@ html[data-header-hidden] header[data-pill] {
     transform: none !important;
   }
   .lightbox-enter, .lightbox-photo, .filter-pop {
+    animation: none;
+  }
+  .marquee-track {
     animation: none;
   }
 }

@@ -1,8 +1,30 @@
-// Brand lockup: the official origami-boat glyph + "TriesteImmobiliare" wordmark.
-// The boat is drawn with currentColor so the same component works on light
-// (header) and dark (footer / hero) backgrounds.
+import Image from "next/image";
+
+// Brand lockup — the REAL origami paper-boat artwork + "TriesteImmobiliare"
+// wordmark. The boat is the exact logo (same artwork as the favicon + OG card),
+// served transparent for light surfaces and as a clean white silhouette for dark
+// ones. Decorative (alt=""/aria-hidden): the adjacent wordmark conveys the brand.
 
 type Tone = "brand" | "light";
+
+export function BoatMark({
+  tone = "brand",
+  className = "h-7 w-auto",
+}: {
+  tone?: Tone;
+  className?: string;
+}) {
+  return (
+    <Image
+      src={tone === "light" ? "/brand/boat-white.png" : "/brand/boat.png"}
+      alt=""
+      aria-hidden
+      width={531}
+      height={280}
+      className={className}
+    />
+  );
+}
 
 export default function Logo({
   tone = "brand",
@@ -15,25 +37,14 @@ export default function Logo({
   markClassName?: string;
   wordClassName?: string;
 }) {
-  const word = tone === "light" ? "text-white" : "text-neutral-900";
-  const accent = tone === "light" ? "text-white" : "text-brand";
-  const mark = tone === "light" ? "text-white" : "text-brand";
+  const word = tone === "light" ? "text-white" : "text-[#14344a]";
+  const accent = tone === "light" ? "text-white/85" : "text-brand";
 
   return (
-    <span className={`inline-flex items-center gap-2 ${className}`}>
-      <svg
-        viewBox="0 0 120 80"
-        className={`${mark} ${markClassName}`}
-        fill="currentColor"
-        aria-hidden
-      >
-        {/* sail */}
-        <path d="M60 12 98 56 22 56 Z" />
-        {/* hull */}
-        <path d="M16 56 H104 L90 73 H30 Z" />
-      </svg>
-      <span className={`font-semibold tracking-tight ${word} ${wordClassName}`}>
-        Trieste<span className={accent}>Immobiliare</span>
+    <span className={`inline-flex items-center gap-2.5 ${className}`}>
+      <BoatMark tone={tone} className={markClassName} />
+      <span className={`font-bold tracking-tight ${word} ${wordClassName}`}>
+        Trieste<span className={`font-medium ${accent}`}>Immobiliare</span>
       </span>
     </span>
   );

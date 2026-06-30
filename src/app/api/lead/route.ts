@@ -72,7 +72,7 @@ const RECAP = {
     zones: "Zone di interesse", budget: "Budget", size: "Dimensioni",
     purpose: "Scopo", condition: "Stato immobile", listing: "Immobile",
     request: "Richiesta", message: "Messaggio", visit: "Disponibilità per la visita",
-    timing: "Tempistiche",
+    timing: "Tempistiche", roi: "Rendita attesa", horizon: "Orizzonte", objective: "Obiettivo",
     closing: "Per qualsiasi cosa rispondete pure a questa email o chiamateci allo 040 2473628.",
     sign: "TriesteImmobiliare · info@triesteimmobiliare.com",
   },
@@ -84,7 +84,7 @@ const RECAP = {
     zones: "Areas of interest", budget: "Budget", size: "Size",
     purpose: "Purpose", condition: "Property condition", listing: "Property",
     request: "Request", message: "Message", visit: "Availability for the visit",
-    timing: "Timing",
+    timing: "Timing", roi: "Target yield", horizon: "Horizon", objective: "Objective",
     closing: "Feel free to reply to this email or call us on +39 040 2473628.",
     sign: "TriesteImmobiliare · info@triesteimmobiliare.com",
   },
@@ -96,7 +96,7 @@ const RECAP = {
     zones: "Interessensgebiete", budget: "Budget", size: "Größe",
     purpose: "Zweck", condition: "Zustand der Immobilie", listing: "Immobilie",
     request: "Anfrage", message: "Nachricht", visit: "Verfügbarkeit für die Besichtigung",
-    timing: "Zeitrahmen",
+    timing: "Zeitrahmen", roi: "Erwartete Rendite", horizon: "Horizont", objective: "Ziel",
     closing: "Antworten Sie gerne auf diese E-Mail oder rufen Sie uns an unter +39 040 2473628.",
     sign: "TriesteImmobiliare · info@triesteimmobiliare.com",
   },
@@ -257,6 +257,20 @@ const SELLER_TAGLIE = new Set(["< 80 mq", "80 – 150 mq", "150 – 250 mq", "25
 const SELLER_STATI = new Set(["Ottimo / ristrutturato", "Buono / abitabile", "Da ristrutturare"]);
 const SELLER_TEMPI = new Set(["Il prima possibile", "Entro 6 mesi", "Solo esplorativo"]);
 
+// Investor intake from /investimenti (off-market "portfolio a reddito" funnel).
+// Reuses existing LEADS fields only (no schema changes): tipo_richiesta
+// "Investimento" + scopo "Investimento / rendita", with ROI/horizon/objective
+// folded into `motivo` so the CRM stays one shape across every brand site.
+const INVEST_ROI = new Set([
+  "Conservativo (basta che tenga)", "≈ 4–5%", "≈ 5–7%", "Massimizzare",
+]);
+const INVEST_ORIZZONTI = new Set([
+  "Lungo termine (reddito)", "Medio (3–5 anni)", "Rivendita rapida", "Da valutare",
+]);
+const INVEST_OBIETTIVI = new Set([
+  "Messa a reddito", "Rivalutazione", "Diversificazione", "Uso + reddito",
+]);
+
 async function handleValutazione(body: Record<string, unknown>) {
   const nome = clean(body.nome, 120);
   const cognome = clean(body.cognome, 120);
@@ -344,6 +358,109 @@ async function handleValutazione(body: Record<string, unknown>) {
   return NextResponse.json({ ok: true });
 }
 
+async function handleInvestitore(body: Record<string, unknown>) {
+  const nome = clean(body.nome, 120);
+  const cognome = clean(body.cognome, 120);
+  const email = clean(body.email, 160);
+  const telefono = clean(body.telefono, 40);
+  const messaggio = clean(body.messaggio, 4000);
+  const lingua = ["it", "en", "de"].includes(clean(body.lingua)) ? clean(body.lingua) : "it";
+  const zone = (Array.isArray(body.zone) ? body.zone : [])
+    .map((z) => clean(z, 40))
+    .filter((z) => BUYER_ZONES.has(z));
+  const num = (v: unknown) =>
+    typeof v === "number" && Number.isFinite(v) && v > 0 ? Math.round(v) : null;
+  const budgetMin = num(body.budgetMin);
+  const budgetMax = num(body.budgetMax);
+  const roi = INVEST_ROI.has(clean(body.roi)) ? clean(body.roi) : "";
+  const orizzonte = INVEST_ORIZZONTI.has(clean(body.orizzonte)) ? clean(body.orizzonte) : "";
+  const obiettivo = INVEST_OBIETTIVI.has(clean(body.obiettivo)) ? clean(body.obiettivo) : "";
+
+  if (body.privacyOk !== true) {
+    return NextResponse.json({ ok: false, error: "privacy_required" }, { status: 400 });
+  }
+  if (!isEmail(email) && telefono.length < 6) {
+    return NextResponse.json({ ok: false, error: "contact_info" }, { status: 400 });
+  }
+
+  const budgetText =
+    budgetMin || budgetMax
+      ? `${budgetMin ? eur(budgetMin) : "—"} – ${budgetMax ? eur(budgetMax) : "—"}`
+      : "";
+  const motivo = [
+    "Investitore sito",
+    roi && `rendita attesa ${roi}`,
+    orizzonte && `orizzonte ${orizzonte}`,
+    obiettivo && `obiettivo ${obiettivo}`,
+  ].filter(Boolean).join(" · ");
+
+  try {
+    await airtableCreate({
+      nome_completo: [nome, cognome].filter(Boolean).join(" "),
+      nome,
+      cognome,
+      email,
+      telefono,
+      canale: "Sito TriesteImmobiliare",
+      azienda: "TriesteImmobiliare",
+      tipo_richiesta: "Investimento",
+      scopo: "Investimento / rendita",
+      destinatario_interno: "owners@TSV",
+      motivo,
+      messaggio,
+      ...(zone.length ? { zona_interesse_norm: zone, zone_preferite: zone.join(", ") } : {}),
+      ...(budgetMin ? { budget_min_eur: budgetMin } : {}),
+      ...(budgetMax ? { budget_max_eur: budgetMax } : {}),
+      ...(budgetText ? { budget: budgetText } : {}),
+      privacy_ok: true,
+      lingua,
+      stato: "NUOVO",
+      data_contatto: new Date().toISOString(),
+      ...(body.test === true ? { flag_test: "true" } : {}),
+    });
+  } catch (e) {
+    console.error("[lead] investitore airtable write failed:", e);
+    return NextResponse.json({ ok: false, error: "save_failed" }, { status: 502 });
+  }
+
+  await sendEmail(
+    NOTIFY_EMAIL,
+    "Nuovo lead investitore dal sito (portfolio a reddito)",
+    `<p><strong>Nome:</strong> ${esc([nome, cognome].filter(Boolean).join(" ") || "—")}<br>
+     <strong>Email:</strong> ${esc(email) || "—"}<br>
+     <strong>Telefono:</strong> ${esc(telefono) || "—"}</p>
+     <p><strong>Budget:</strong> ${esc(budgetText || "—")}<br>
+     <strong>Zone:</strong> ${esc(zone.join(", ") || "—")}<br>
+     <strong>Rendita attesa:</strong> ${esc(roi || "—")}<br>
+     <strong>Orizzonte:</strong> ${esc(orizzonte || "—")}<br>
+     <strong>Obiettivo:</strong> ${esc(obiettivo || "—")}</p>
+     ${messaggio ? `<p><strong>Messaggio:</strong><br>${esc(messaggio)}</p>` : ""}
+     <p><small>lingua ${esc(lingua)}</small></p>`,
+    isEmail(email) ? email : undefined,
+  );
+
+  if (isEmail(email)) {
+    const lang = lingua as keyof typeof RECAP;
+    const L = RECAP[lang];
+    await sendEmail(
+      email,
+      L.subject,
+      recapHtml(lang, nome, [
+        [L.request, "Investimento a reddito"],
+        [L.zones, zone.join(", ")],
+        [L.budget, budgetText],
+        [L.roi, roi],
+        [L.horizon, orizzonte],
+        [L.objective, obiettivo],
+        [L.message, messaggio],
+      ]),
+      NOTIFY_EMAIL,
+    );
+  }
+
+  return NextResponse.json({ ok: true });
+}
+
 export async function POST(request: Request) {
   if (!LEADS_TOKEN) {
     return NextResponse.json({ ok: false, error: "not_configured" }, { status: 503 });
@@ -358,6 +475,7 @@ export async function POST(request: Request) {
 
   if (body.tipo === "buyer") return handleBuyer(body);
   if (body.tipo === "valutazione") return handleValutazione(body);
+  if (body.tipo === "investitore") return handleInvestitore(body);
 
   const tipo =
     body.tipo === "amico"
@@ -429,12 +547,25 @@ export async function POST(request: Request) {
     : "";
 
   if (tipo === "Invia a un amico") {
+    const fl = (["it", "en", "de"].includes(lingua) ? lingua : "it") as "it" | "en" | "de";
+    const FRIEND = {
+      it: { subj: "Un immobile che potrebbe interessarti — TriesteImmobiliare", intro: "Ti è stato segnalato questo immobile:", sign: "— TriesteImmobiliare" },
+      en: { subj: "A property you might like — TriesteImmobiliare", intro: "Someone wanted you to see this property:", sign: "— TriesteImmobiliare" },
+      de: { subj: "Eine Immobilie für Sie — TriesteImmobiliare", intro: "Diese Immobilie wurde Ihnen empfohlen:", sign: "— TriesteImmobiliare" },
+    }[fl];
     await sendEmail(
       emailAmico,
-      "Un immobile che potrebbe interessarti — TriesteImmobiliare",
-      `<p>Ti è stato segnalato questo immobile:</p>${listingLine}${
+      FRIEND.subj,
+      `<p>${FRIEND.intro}</p>${listingLine}${
         messaggio ? `<p>${esc(messaggio)}</p>` : ""
-      }<p>— TriesteImmobiliare</p>`,
+      }<p>${FRIEND.sign}</p>`,
+      isEmail(email) ? email : undefined,
+    );
+    // Notify the team — otherwise a referral leaves no internal trace beyond Airtable.
+    await sendEmail(
+      NOTIFY_EMAIL,
+      `Segnalazione a un amico dal sito${immobileNome ? `: ${immobileNome}` : ""}`,
+      `<p>Un visitatore ha segnalato un immobile a <strong>${esc(emailAmico)}</strong>.</p>${listingLine}<p><small>${esc(sito)} · lingua ${esc(lingua)}</small></p>`,
       isEmail(email) ? email : undefined,
     );
   } else {

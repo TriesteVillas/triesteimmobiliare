@@ -21,6 +21,7 @@ import Scene from "@/components/motion/Scene";
 import LeadForm from "@/components/LeadForm";
 import VisitForm from "@/components/VisitForm";
 import { buildPropertyView, contractBadge, clusterBadge, priceLabel } from "@/lib/propertyView";
+import { pageAlternates, pageOpenGraph } from "@/lib/seo";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.triesteimmobiliare.com";
 
@@ -38,12 +39,22 @@ export async function generateMetadata({
 }: {
   params: Params;
 }): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const property = await getProperty(slug);
   if (!property) return {};
+  const description =
+    property.oneliner ?? property.description?.slice(0, 150) ?? "TriesteImmobiliare";
   return {
-    title: property.title,
-    description: property.oneliner ?? property.description?.slice(0, 160),
+    title: { absolute: `${property.title} · TriesteImmobiliare` },
+    description,
+    alternates: pageAlternates(locale, `/annuncio/${slug}`),
+    openGraph: pageOpenGraph(
+      locale,
+      `/annuncio/${slug}`,
+      property.title,
+      description,
+      property.coverPhoto?.url,
+    ),
   };
 }
 

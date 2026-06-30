@@ -8,10 +8,17 @@ export default function Timeline({ items }: { items: Item[] }) {
   const containerRef = useRef<HTMLOListElement>(null);
   const [visible, setVisible] = useState<boolean[]>(() => items.map(() => false));
   const [lineProgress, setLineProgress] = useState(0);
+  // Unarmed = everything visible (SSR, JS-off, reduced-motion). Only when armed
+  // does the IntersectionObserver drive the entrance fade.
+  const [armed, setArmed] = useState(false);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // SSR-visible → JS-armed entrance: a single idempotent flip, not a loop.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setArmed(true);
     const liEls = Array.from(container.querySelectorAll("li"));
 
     const io = new IntersectionObserver(
@@ -70,8 +77,8 @@ export default function Timeline({ items }: { items: Item[] }) {
           key={s.year}
           className="relative transition-all duration-700 ease-out"
           style={{
-            opacity: visible[i] ? 1 : 0,
-            transform: visible[i] ? "none" : "translateY(20px)",
+            opacity: armed ? (visible[i] ? 1 : 0) : 1,
+            transform: armed && !visible[i] ? "translateY(20px)" : "none",
           }}
         >
           <span

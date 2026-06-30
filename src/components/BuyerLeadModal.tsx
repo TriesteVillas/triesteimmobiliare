@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocale, useTranslations } from "next-intl";
 import RangeDual from "./RangeDual";
+import { useFocusTrap } from "@/lib/useFocusTrap";
+
+const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Buyer-profile popup behind the three buyer CTAs. Every field except
 // privacy + one contact is optional (agile by design); data lands in the
@@ -57,6 +60,8 @@ export default function BuyerLeadModal({
   const [condizioni, setCondizioni] = useState("");
   const [privacyOk, setPrivacyOk] = useState(false);
   const [state, setState] = useState<"idle" | "sending" | "ok" | "error">("idle");
+  const [errKey, setErrKey] = useState<"error" | "errorContact">("error");
+  const panelRef = useFocusTrap<HTMLDivElement>(open);
 
   useEffect(() => {
     if (!open) return;
@@ -78,6 +83,12 @@ export default function BuyerLeadModal({
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!emailRe.test(email) && telefono.trim().length < 6) {
+      setErrKey("errorContact");
+      setState("error");
+      return;
+    }
+    setErrKey("error");
     setState("sending");
     try {
       const res = await fetch("/api/lead", {
@@ -127,7 +138,9 @@ export default function BuyerLeadModal({
           top on mobile. dvh tracks the real visible height under mobile
           browser bars; extra bottom padding covers the iOS home indicator. */}
       <div
-        className="buyer-panel relative max-h-[94dvh] w-full max-w-2xl overflow-y-auto overscroll-contain rounded-t-[2rem] p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:max-h-[92dvh] sm:rounded-[2rem] sm:p-8"
+        ref={panelRef}
+        tabIndex={-1}
+        className="buyer-panel relative max-h-[94dvh] w-full max-w-2xl overflow-y-auto overscroll-contain rounded-t-[2rem] p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] outline-none sm:max-h-[92dvh] sm:rounded-[2rem] sm:p-8"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -225,7 +238,7 @@ export default function BuyerLeadModal({
             </label>
 
             {state === "error" && (
-              <p className="mt-3 text-sm text-red-600">{t("error")}</p>
+              <p className="mt-3 text-sm text-red-600">{t(errKey)}</p>
             )}
 
             <button type="submit" disabled={state === "sending"}
