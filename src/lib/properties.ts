@@ -26,7 +26,11 @@ export const F = {
   piano: "fldIk6RfMe410Bj2q",
   ape: "fldKDtf6sKM6vmDRH",
   descrizione: "fldz7K3GScs9chlvy",
+  // Varianti anti-duplicate-content per TSI (stessi fatti, wording diverso da triestevillas.com).
+  // Il sito le preferisce; fallback sul testo TSV solo se vuote.
+  descrizioneTsi: "fldG2oaACx19tI4Gm",
   oneliner: "fldIMsfxvOW95HV90",
+  onelinerTsi: "fldeva3OriJioMOmS",
   tags: "fldVdulUcA3uTtx5v",
   foto: "fldUS4uDvqXibknNL",
   coverPhoto: "fldvlnrfE1zdXFOsF",
@@ -248,8 +252,8 @@ export function mapRecord(recordId: string, f: Fields): Property {
     baths: num(f[F.bagni]),
     floor: str(f[F.piano]),
     energyClass: str(f[F.ape]),
-    description: str(f[F.descrizione]),
-    oneliner: str(f[F.oneliner]),
+    description: str(f[F.descrizioneTsi]) || str(f[F.descrizione]),
+    oneliner: str(f[F.onelinerTsi]) || str(f[F.oneliner]),
     tags,
     photos,
     coverPhoto,
