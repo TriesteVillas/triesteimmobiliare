@@ -5,7 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { verifySession, PC_COOKIE } from "@/lib/private/session";
 import { findGrantById, isActive } from "@/lib/private/store";
 import { getPrivateProperty } from "@/lib/airtable";
-import { priceLabel } from "@/lib/propertyView";
+import { localizedDescription, localizedTitle, priceLabel } from "@/lib/propertyView";
 import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import ProtectedImage from "@/components/private/ProtectedImage";
@@ -43,6 +43,13 @@ export default async function PrivateDetail({
   const p = await getPrivateProperty(slug);
   if (!p) notFound();
 
+  // Titolo e descrizione nella lingua del visitatore, dagli stessi campi Airtable
+  // che usa la scheda pubblica, con ritorno all'italiano quando la traduzione non
+  // c'è ancora: meglio una scheda in italiano che una scheda vuota. La collezione
+  // riservata ha lo stesso pubblico internazionale del sito pubblico.
+  const title = localizedTitle(p, locale);
+  const description = localizedDescription(p, locale);
+
   const wm = `${email} · ${new Date().toISOString().slice(0, 10)}`;
   const facts = [
     p.mq ? tProp("sqm", { value: p.mq }) : null,
@@ -54,6 +61,10 @@ export default async function PrivateDetail({
 
   return (
     <div className="pc-root min-h-screen px-4 py-20 sm:py-24">
+      {/* Titolo ITALIANO di proposito: è quello che finisce nel log visite del CRM,
+          dove un immobile deve avere un nome solo qualunque sia la lingua del
+          visitatore. (/api/private/track lo ri-risolve comunque server-side e
+          ignora quello che arriva dal client: qui restiamo coerenti con quel dato.) */}
       <TrackView slug={slug} title={p.title} />
       <div className="mx-auto max-w-5xl">
         <Link href="/private" className="text-sm text-[#93a1ae] transition-colors hover:text-[#a9c8e0]">
@@ -61,14 +72,14 @@ export default async function PrivateDetail({
         </Link>
 
         <div className="relative mt-5 aspect-[16/9] overflow-hidden rounded-2xl bg-black">
-          {p.coverPhoto && <ProtectedImage src={p.coverPhoto.url} alt={p.title} watermark={wm} />}
+          {p.coverPhoto && <ProtectedImage src={p.coverPhoto.url} alt={title} watermark={wm} />}
           <span className="absolute left-4 top-4 z-[2] rounded-full border border-[#a9c8e0]/40 bg-black/45 px-3 py-1 text-[11px] uppercase tracking-wider text-[#a9c8e0] backdrop-blur">
             {t("badge")}
           </span>
         </div>
 
         <header className="mt-8">
-          <h1 className="pc-title text-3xl sm:text-4xl">{p.title}</h1>
+          <h1 className="pc-title text-3xl sm:text-4xl">{title}</h1>
           <p className="mt-2 text-[#93a1ae]">{[p.zona, p.comune].filter(Boolean).join(" · ")}</p>
           <p className="mt-4 text-2xl font-semibold text-[#dfe9f3]">
             {priceLabel(p, locale, tProp)}
@@ -89,9 +100,9 @@ export default async function PrivateDetail({
             così lo Specialist calibra le prossime proposte. */}
         <VoteWidget slug={slug} variant="detail" />
 
-        {p.description && (
+        {description && (
           <p className="mt-8 max-w-3xl whitespace-pre-line leading-relaxed text-[#aebcc9]">
-            {p.description}
+            {description}
           </p>
         )}
 
