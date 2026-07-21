@@ -48,7 +48,7 @@ export const BRAND = {
 export const SITE_URL = (
   (process.env.NEXT_PUBLIC_SITE_URL || "").trim() ||
   (process.env.SITE_URL || "").trim() ||
-  "https://triesteimmobiliare.com"
+  "https://www.triesteimmobiliare.com"
 ).replace(/\/$/, "");
 
 /**
