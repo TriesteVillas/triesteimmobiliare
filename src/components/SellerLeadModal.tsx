@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocale, useTranslations } from "next-intl";
 import { useFocusTrap } from "@/lib/useFocusTrap";
+import { CITY_LIST_ID, citySuggestions } from "@/lib/cities";
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -32,6 +33,7 @@ export default function SellerLeadModal({
   const [cognome, setCognome] = useState("");
   const [telefono, setTelefono] = useState("");
   const [email, setEmail] = useState("");
+  const [citta, setCitta] = useState("");
   const [indirizzo, setIndirizzo] = useState("");
   const [tipologia, setTipologia] = useState("");
   const [taglia, setTaglia] = useState("");
@@ -75,6 +77,7 @@ export default function SellerLeadModal({
           nome,
           cognome,
           telefono,
+          citta,
           email,
           indirizzo,
           tipologia,
@@ -181,6 +184,17 @@ export default function SellerLeadModal({
                 onChange={(e) => setTelefono(e.target.value)} type="tel" autoComplete="tel" />
               <input className={input} placeholder={t("email")} value={email}
                 onChange={(e) => setEmail(e.target.value)} type="email" autoComplete="email" />
+              {/* Città di residenza, FACOLTATIVA: qui non si chiede a nessuno di
+                  presentarsi, si raccoglie un contatto — un campo obbligatorio in più
+                  su un form di conversione costa richieste. Stessi suggerimenti del
+                  form della Private Collection, e il browser propone da sé la città
+                  che l'utente ha già salvato. */}
+              <input className={`${input} sm:col-span-2`} placeholder={t("city")} value={citta}
+                onChange={(e) => setCitta(e.target.value)} autoComplete="address-level2"
+                list={CITY_LIST_ID} />
+              <datalist id={CITY_LIST_ID}>
+                {citySuggestions(locale).map((c) => <option key={c} value={c} />)}
+              </datalist>
             </div>
 
             <p className="mt-5 text-sm font-medium text-neutral-700">{t("address")}</p>

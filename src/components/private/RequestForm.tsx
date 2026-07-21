@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { BUDGET_BANDS, bandLabel, type BudgetBand } from "@/lib/private/bands";
-import { CITY_LIST_ID, citySuggestions } from "@/lib/private/cities";
+import { CITY_LIST_ID, citySuggestions } from "@/lib/cities";
 import { introIsRich } from "@/lib/private/intro";
 
 // Credential-request form for the Private Collection. Posts to

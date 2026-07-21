@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { normCity } from "@/lib/citynorm";
 
 // Lead intake for the property forms (richiesta info / prenota visita / invia a
 // un amico). Writes to the unified Airtable LEADS table (by field name +
@@ -151,6 +152,9 @@ async function handleBuyer(body: Record<string, unknown>) {
   const cognome = clean(body.cognome, 120);
   const email = clean(body.email, 160);
   const telefono = clean(body.telefono, 40);
+  // Normalizzata QUI e non a valle: su questo campo ci gira un filtro, e
+  // "wien"/"Wien"/"Vienna" devono essere una voce sola, non tre.
+  const citta = normCity(clean(body.citta, 80));
   const messaggio = clean(body.messaggio, 4000);
   const fonteCta = clean(body.fonteCta, 120);
   const lingua = ["it", "en", "de"].includes(clean(body.lingua)) ? clean(body.lingua) : "it";
@@ -190,6 +194,11 @@ async function handleBuyer(body: Record<string, unknown>) {
       canale: "Sito TriesteImmobiliare",
       azienda: "TriesteImmobiliare",
       tipo_richiesta: "Cerco casa",
+      // Città di residenza: FACOLTATIVA qui (obbligatoria solo sul form della
+      // Private Collection, dove la persona si presenta). Sta su questo form
+      // perché è qui che c'è il volume: se la città arrivasse solo dalla PC, il
+      // filtro per città nel CRM resterebbe inutile anche fra un anno.
+      ...(citta ? { citta_residenza: citta } : {}),
       motivo: fonteCta ? `CTA sito: ${fonteCta}` : "Popup buyer sito",
       messaggio,
       ...(zone.length ? { zona_interesse_norm: zone, zone_preferite: zone.join(", ") } : {}),
@@ -276,6 +285,9 @@ async function handleValutazione(body: Record<string, unknown>) {
   const cognome = clean(body.cognome, 120);
   const email = clean(body.email, 160);
   const telefono = clean(body.telefono, 40);
+  // Normalizzata QUI e non a valle: su questo campo ci gira un filtro, e
+  // "wien"/"Wien"/"Vienna" devono essere una voce sola, non tre.
+  const citta = normCity(clean(body.citta, 80));
   const indirizzo = clean(body.indirizzo, 300);
   const tipologia = SELLER_TIPOLOGIE.has(clean(body.tipologia)) ? clean(body.tipologia) : "";
   const taglia = SELLER_TAGLIE.has(clean(body.taglia)) ? clean(body.taglia) : "";
@@ -308,6 +320,9 @@ async function handleValutazione(body: Record<string, unknown>) {
       canale: "Sito TriesteImmobiliare",
       azienda: "TriesteImmobiliare",
       tipo_richiesta: "Valutazione",
+      // Su un lead venditore la residenza pesa il doppio: dice se il proprietario
+      // è in città o fuori, cioè come si organizzano sopralluogo e firma.
+      ...(citta ? { citta_residenza: citta } : {}),
       destinatario_interno: "owners@TSV",
       motivo: "CTA sito: Valutazione riservata",
       ...(daVendere ? { ha_da_vendere: daVendere } : {}),

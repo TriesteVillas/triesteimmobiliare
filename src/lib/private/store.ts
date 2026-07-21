@@ -1,6 +1,7 @@
 import "server-only";
 import { type Lang } from "./mail";
 import { BRAND, brandClause } from "./brand";
+import { normCity } from "../citynorm";
 
 // Airtable data access for the Private Collection: PC_RICHIESTE (requests +
 // credential lifecycle), PC_ACCESS_LOG (audit) and the existing LEAD_ table.
@@ -154,11 +155,12 @@ const BAND_HIGH: Record<string, number> = { "<100k": 100_000, "100-200k": 200_00
 // La riga in prosa dentro note_modulo resta — è leggibile a colpo d'occhio e non
 // costa nulla — ma ora accanto c'è anche il LINK vero, che è ciò che il CRM sa usare.
 function leadFieldsFrom(input: RequestInput, propRecId?: string | null): Record<string, unknown> {
+  const citta = normCity(input.citta);
   const leadZones = [...new Set(input.zone.flatMap((z) => ZONE_LEAD_MAP[z] ?? []))];
   const lows = input.bands.map((b) => BAND_LOW[b]).filter((n) => typeof n === "number");
   const highs = input.bands.map((b) => BAND_HIGH[b]).filter((n) => typeof n === "number");
   const noteParts = [
-    input.citta ? `Città di residenza: ${input.citta}` : "",
+    citta ? `Città di residenza: ${citta}` : "",
     input.immobileTrigger ? `Immobile di partenza: ${input.immobileTrigger}` : "",
   ].filter(Boolean);
   return {
@@ -180,6 +182,11 @@ function leadFieldsFrom(input: RequestInput, propRecId?: string | null): Record<
     ...(highs.length ? { budget_max_eur: Math.max(...highs) } : {}),
     ...(input.bands.length ? { budget: input.bands.join(" / ") } : {}),
     ...(input.intro ? { messaggio: input.intro } : {}),
+    // Campo STRUTTURATO, accanto alla prosa in note_modulo qui sotto (che resta:
+    // è leggibile a colpo d'occhio e non costa nulla). La prosa non la legge
+    // nessuna riga del CRM — verificato — quindi finché la città viveva solo lì
+    // i lead non erano filtrabili per provenienza.
+    ...(citta ? { citta_residenza: citta } : {}),
     ...(noteParts.length ? { note_modulo: noteParts.join(" · ") } : {}),
     ...(propRecId ? { immobile: [propRecId] } : {}),
     privacy_ok: true,
@@ -206,7 +213,7 @@ export async function createLeadAndRequest(input: RequestInput): Promise<string 
       // FIND è un test di SOTTOSTRINGA: pre-filtra soltanto, NON mettere un cap (un
       // maxRecords rischia di escludere proprio la riga esatta se molte email la
       // contengono come sottostringa) → l'uguaglianza vera si fa in JS qui sotto.
-      const cands = await aList(T_LEAD, { filter: `FIND("${esc}", LOWER({email}&""))`, fields: ["email", "sintesi_intel", "immobile", "zone_preferite", "budget", "messaggio"] });
+      const cands = await aList(T_LEAD, { filter: `FIND("${esc}", LOWER({email}&""))`, fields: ["email", "sintesi_intel", "immobile", "zone_preferite", "budget", "messaggio", "citta_residenza"] });
       const exacts = cands.filter((c) => String(c.fields.email ?? "").split(/[\n,;]+/).map((x) => x.trim().toLowerCase()).includes(email));
       // Fra doppioni con la stessa email preferisci la scheda "vera" (con storia), non lo stub.
       const rich = (c: AirRecord) => (String(c.fields.sintesi_intel ?? "").trim() ? 100 : 0) + (Array.isArray(c.fields.immobile) ? (c.fields.immobile as unknown[]).length : 0);
@@ -220,6 +227,9 @@ export async function createLeadAndRequest(input: RequestInput): Promise<string 
         if (!String(best.fields.zone_preferite ?? "").trim() && lf.zone_preferite) { patch.zone_preferite = lf.zone_preferite; if (lf.zona_interesse_norm) patch.zona_interesse_norm = lf.zona_interesse_norm; }
         if (!String(best.fields.budget ?? "").trim() && lf.budget) patch.budget = lf.budget;
         if (!String(best.fields.messaggio ?? "").trim() && lf.messaggio) patch.messaggio = lf.messaggio;
+        // Stessa regola degli altri: si COLMA un campo vuoto, non si sovrascrive.
+        // Se un operatore ha già corretto a mano la residenza, il form non gliela tocca.
+        if (!String(best.fields.citta_residenza ?? "").trim() && lf.citta_residenza) patch.citta_residenza = lf.citta_residenza;
         // L'immobile si AGGIUNGE, non sostituisce: una scheda con storia può già averne
         // altri collegati, e una richiesta PC non è motivo per cancellarli.
         if (propRecId) {
@@ -251,7 +261,7 @@ export async function createLeadAndRequest(input: RequestInput): Promise<string 
     // `citta` (fld8SLwGa2pKWeQzK) SOSTITUISCE `nazionalita`: quel campo resta sulla
     // tabella per non perdere lo storico pre-21/07/2026, ma da qui non lo scrive più
     // nessuno. Chi legge deve fare fallback — vedi digestRowFrom.
-    citta: input.citta,
+    citta: normCity(input.citta) || input.citta,
     intro: input.intro,
     ...(input.zone.length ? { zone: input.zone } : {}),
     ...(input.bands.length ? { budget_bands: input.bands } : {}),

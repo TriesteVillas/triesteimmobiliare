@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { useLocale, useTranslations } from "next-intl";
 import RangeDual from "./RangeDual";
 import { useFocusTrap } from "@/lib/useFocusTrap";
+import { CITY_LIST_ID, citySuggestions } from "@/lib/cities";
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -51,6 +52,7 @@ export default function BuyerLeadModal({
   const [cognome, setCognome] = useState("");
   const [telefono, setTelefono] = useState("");
   const [email, setEmail] = useState("");
+  const [citta, setCitta] = useState("");
   const [zone, setZone] = useState<string[]>([]);
   const [budget, setBudget] = useState<[number, number]>([BUDGET.min, BUDGET.max]);
   const [budgetTouched, setBudgetTouched] = useState(false);
@@ -100,6 +102,7 @@ export default function BuyerLeadModal({
           nome,
           cognome,
           telefono,
+          citta,
           email,
           zone,
           ...(budgetTouched ? { budgetMin: budget[0], budgetMax: budget[1] } : {}),
@@ -182,6 +185,17 @@ export default function BuyerLeadModal({
                 onChange={(e) => setTelefono(e.target.value)} type="tel" autoComplete="tel" />
               <input className={input} placeholder={t("email")} value={email}
                 onChange={(e) => setEmail(e.target.value)} type="email" autoComplete="email" />
+              {/* Città di residenza, FACOLTATIVA: qui non si chiede a nessuno di
+                  presentarsi, si raccoglie un contatto — un campo obbligatorio in più
+                  su un form di conversione costa richieste. Stessi suggerimenti del
+                  form della Private Collection, e il browser propone da sé la città
+                  che l'utente ha già salvato. */}
+              <input className={`${input} sm:col-span-2`} placeholder={t("city")} value={citta}
+                onChange={(e) => setCitta(e.target.value)} autoComplete="address-level2"
+                list={CITY_LIST_ID} />
+              <datalist id={CITY_LIST_ID}>
+                {citySuggestions(locale).map((c) => <option key={c} value={c} />)}
+              </datalist>
             </div>
 
             <p className="mt-6 text-sm font-medium text-neutral-700">{t("zones")}</p>
