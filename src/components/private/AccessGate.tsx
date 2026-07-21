@@ -106,6 +106,13 @@ export default function AccessGate({
 
       {formEl}
 
+      {/* Novità pollici: spiegata QUI nel login (richiesta esplicita), così chi
+          entra sa subito cosa può fare dentro. Niente Concierge AI su questo
+          brand: il bridge TSI non ha il segreto, risponderebbe 503. */}
+      <p className="mt-6 rounded-xl border border-[#a9c8e0]/20 bg-[#a9c8e0]/5 px-4 py-3 text-center text-sm leading-relaxed text-[#a9c8e0]">
+        {t("newsThumbs")}
+      </p>
+
       <p className="mt-6 text-center text-sm text-[#93a1ae]">
         {t("noAccess")}{" "}
         <Link href="/private/richiedi" className="text-[#a9c8e0] underline-offset-2 hover:underline">

@@ -76,6 +76,11 @@ export default async function PrivatePage({
           <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-[#aebcc9] sm:text-base">
             {t("welcomeBody")}
           </p>
+          {/* Novità pollici: chi entra via link email non passa dal gate,
+              quindi la spiegazione va ripetuta anche qui. */}
+          <p className="mx-auto mt-5 max-w-2xl rounded-xl border border-[#a9c8e0]/20 bg-[#a9c8e0]/5 px-5 py-3 text-sm leading-relaxed text-[#a9c8e0]">
+            {t("newsThumbs")}
+          </p>
           <a
             href={zoomUrl || `mailto:${MAIL_REPLY_TO}`}
             target={zoomUrl ? "_blank" : undefined}
