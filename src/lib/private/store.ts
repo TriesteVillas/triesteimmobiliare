@@ -336,7 +336,16 @@ export async function registerLogin(g: Grant): Promise<void> {
 
 // ---- Access log ------------------------------------------------------------
 
-export type AccessEvent = "login_ok" | "login_fail" | "view" | "blocked" | "expired";
+export type AccessEvent =
+  | "login_ok"
+  | "login_fail"
+  | "view"
+  | "blocked"
+  | "expired"
+  // Feedback dell'utente sui singoli immobili (pollici 👍/👎 + ritiro del voto).
+  | "thumb_up"
+  | "thumb_down"
+  | "thumb_removed";
 
 export async function logAccess(e: {
   evento: AccessEvent;
@@ -346,6 +355,10 @@ export async function logAccess(e: {
   ua?: string;
   dettaglio?: string;
   requestId?: string;
+  // Lo slug dell'immobile, quando l'evento ne riguarda uno (view, pollici).
+  // `dettaglio` resta il titolo leggibile; `slug_immobile` è la chiave STABILE
+  // su cui il CRM aggrega — un titolo si riscrive, uno slug no.
+  slug?: string;
 }): Promise<void> {
   try {
     await aPost(T_LOG, {
@@ -358,10 +371,35 @@ export async function logAccess(e: {
       ...(e.ip ? { ip: e.ip } : {}),
       ...(e.ua ? { user_agent: e.ua } : {}),
       ...(e.dettaglio ? { dettaglio: e.dettaglio } : {}),
+      ...(e.slug ? { slug_immobile: e.slug } : {}),
       ...(e.requestId ? { richiesta: [e.requestId] } : {}),
     });
   } catch (err) {
     console.error("[pc] access log failed:", err);
+  }
+}
+
+// Vero se una "view" identica (stesso codice + stesso titolo immobile) è già
+// stata loggata dopo `sinceIso`. De-dupe durevole e indipendente dall'istanza,
+// così un refresh / una seconda tab / un retry non gonfiano i conteggi per
+// immobile del CRM. Best-effort: a qualunque errore risponde false (meglio un
+// doppione che perdere la view legittima).
+//
+// brandClause() NON è opzionale qui: PC_ACCESS_LOG è condivisa coi due brand,
+// e senza filtro la view di un cliente TriesteImmobiliare su un immobile con lo
+// stesso titolo farebbe scartare come "duplicato" la view di un cliente
+// TriesteVillas — cioè una view vera che sparisce dal CRM.
+export async function recentViewExists(codice: string, dettaglio: string, sinceIso: string): Promise<boolean> {
+  if (!codice || !dettaglio) return false;
+  try {
+    const recs = await aList(T_LOG, {
+      filter: `AND({evento}='view',{codice}='${escFormula(codice)}',{dettaglio}='${escFormula(dettaglio)}',IS_AFTER({quando},'${escFormula(sinceIso)}'),${brandClause()})`,
+      fields: ["quando"],
+      max: 1,
+    });
+    return recs.length > 0;
+  } catch {
+    return false;
   }
 }
 

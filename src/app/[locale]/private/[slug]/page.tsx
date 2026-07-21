@@ -9,6 +9,7 @@ import { priceLabel } from "@/lib/propertyView";
 import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import ProtectedImage from "@/components/private/ProtectedImage";
+import TrackView from "@/components/private/TrackView";
 import { MAIL_REPLY_TO } from "@/lib/private/brand";
 
 export const metadata: Metadata = {
@@ -52,6 +53,7 @@ export default async function PrivateDetail({
 
   return (
     <div className="pc-root min-h-screen px-4 py-20 sm:py-24">
+      <TrackView slug={slug} title={p.title} />
       <div className="mx-auto max-w-5xl">
         <Link href="/private" className="text-sm text-[#93a1ae] transition-colors hover:text-[#a9c8e0]">
           ← {t("backToCollection")}
