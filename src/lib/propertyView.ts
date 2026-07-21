@@ -35,9 +35,30 @@ export function localizedTitle(p: Property, locale: string): string {
 //   IT →                        descrizione_TSI_# → descrizione
 // (gli ultimi due gradini sono già risolti in `p.description` da mapRecord).
 export function localizedDescription(p: Property, locale: string): string | null {
-  if (locale === "de") return p.descriptionDe ?? p.description;
-  if (locale === "en") return p.descriptionEn ?? p.description;
-  return p.description;
+  return translatedDescription(p, locale) ?? p.description;
+}
+
+// SOLO la traduzione vera, senza ripiego sull'italiano: null quando in questa
+// lingua non abbiamo ancora scritto niente. Serve a chi deve DISTINGUERE i due
+// casi — la meta description, che con una traduzione assente preferisce
+// l'one-liner curato (italiano ma corto e scritto per la SERP) al primo pezzo
+// della descrizione italiana tagliato a metà. Vedi generateMetadata.
+export function translatedDescription(p: Property, locale: string): string | null {
+  if (locale === "de") return p.descriptionDe;
+  if (locale === "en") return p.descriptionEn;
+  return null;
+}
+
+// Taglio per la meta description: mai a metà parola e con l'ellissi, perché
+// quel testo finisce nello snippet Google e nell'OpenGraph. Le descrizioni sono
+// lunghe 800-1500 caratteri: senza questo, `slice(0, 150)` tronca dove capita.
+export function metaClamp(s: string | null | undefined, max = 160): string | null {
+  const t = s?.replace(/\s+/g, " ").trim();
+  if (!t) return null;
+  if (t.length <= max) return t;
+  const cut = t.slice(0, max - 1);
+  const sp = cut.lastIndexOf(" ");
+  return (sp > max * 0.6 ? cut.slice(0, sp) : cut).replace(/[ ,;:.\-–—]+$/, "") + "…";
 }
 
 // Contract badge (always shown): In vendita / In affitto.

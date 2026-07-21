@@ -26,7 +26,9 @@ import {
   clusterBadge,
   localizedDescription,
   localizedTitle,
+  metaClamp,
   priceLabel,
+  translatedDescription,
 } from "@/lib/propertyView";
 import { pageAlternates, pageOpenGraph } from "@/lib/seo";
 
@@ -49,16 +51,23 @@ export async function generateMetadata({
   const { locale, slug } = await params;
   const property = await getProperty(slug);
   if (!property) return {};
-  // Titolo e meta description nella lingua della pagina. L'one-liner esiste solo
-  // in italiano: su /en e /de la descrizione tradotta viene prima, così la SERP
-  // non mostra italiano a chi cerca in inglese o tedesco.
+  // Titolo e meta description nella lingua della pagina.
+  //
+  // ORDINE, e conta: su /en e /de viene prima la descrizione TRADOTTA (così la
+  // SERP non mostra italiano a chi cerca in inglese o tedesco), ma solo se
+  // esiste DAVVERO — `translatedDescription`, non `localizedDescription`, che
+  // ripiegherebbe sull'italiano e ce lo farebbe preferire all'one-liner.
+  // Quando la traduzione manca il gradino giusto è l'one-liner: è italiano come
+  // il ripiego, ma è corto, scritto a mano e pensato per lo snippet, invece del
+  // primo pezzo di una descrizione da 1000 caratteri tagliata a metà frase.
+  //   en/de → descrizione tradotta → one-liner → descrizione italiana
+  //   it    →                        one-liner → descrizione italiana
   const title = localizedTitle(property, locale);
   const description =
-    locale === "it"
-      ? (property.oneliner ?? property.description?.slice(0, 150) ?? "TriesteImmobiliare")
-      : (localizedDescription(property, locale)?.slice(0, 150) ??
-        property.oneliner ??
-        "TriesteImmobiliare");
+    metaClamp(translatedDescription(property, locale)) ??
+    property.oneliner ??
+    metaClamp(property.description) ??
+    "TriesteImmobiliare";
   return {
     title: { absolute: `${title} · TriesteImmobiliare` },
     description,
