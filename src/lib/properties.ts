@@ -29,8 +29,17 @@ export const F = {
   // Varianti anti-duplicate-content per TSI (stessi fatti, wording diverso da triestevillas.com).
   // Il sito le preferisce; fallback sul testo TSV solo se vuote.
   descrizioneTsi: "fldG2oaACx19tI4Gm",
+  // Traduzioni TSI (multilineText, quindi SCRIVIBILI via API: le riempie il
+  // generatore testi del CRM, non un bottone AI di Airtable). Tono TSI —
+  // concreto e accessibile, non luxury. Fallback: vedi localizedDescription().
+  descrizioneTsiEn: "fldQNanhc34DHilid", // descrizione_TSI_EN_#
+  descrizioneTsiDe: "fldkXX2gDgO03Lw88", // descrizione_TSI_DE_#
   oneliner: "fldIMsfxvOW95HV90",
   onelinerTsi: "fldeva3OriJioMOmS",
+  // Titoli pubblici tradotti, condivisi con triestevillas.com: il nome pubblico
+  // dell'immobile è lo stesso su entrambi i siti (è public_tsv_name).
+  titleEn: "fldrTJMbSO4nNW32W", // public_tsv_name_EN_#
+  titleDe: "fldXYXscxt7V8EueO", // public_tsv_name_DE_#
   tags: "fldVdulUcA3uTtx5v",
   foto: "fldUS4uDvqXibknNL",
   coverPhoto: "fldvlnrfE1zdXFOsF",
@@ -96,6 +105,9 @@ export type Property = {
   id: string;
   slug: string;
   title: string;
+  // Titolo pubblico tradotto; null quando la traduzione non c'è ancora.
+  titleEn: string | null;
+  titleDe: string | null;
   contratto: "VENDITA" | "AFFITTO" | null;
   cluster: string | null;
   tipologia: string | null;
@@ -111,7 +123,12 @@ export type Property = {
   baths: number | null;
   floor: string | null;
   energyClass: string | null;
+  // Descrizione italiana già risolta (descrizione_TSI_# → descrizione).
   description: string | null;
+  // Traduzioni grezze: null quando mancano. Non usarle direttamente in pagina —
+  // passa da localizedDescription(), che garantisce il ritorno all'italiano.
+  descriptionEn: string | null;
+  descriptionDe: string | null;
   oneliner: string | null;
   tags: string[];
   photos: Photo[];
@@ -237,6 +254,8 @@ export function mapRecord(recordId: string, f: Fields): Property {
     id,
     slug: `${slugify(slugSource(f))}-${idNumber(id)}`,
     title,
+    titleEn: str(f[F.titleEn]),
+    titleDe: str(f[F.titleDe]),
     contratto,
     cluster: str(f[F.cluster]),
     tipologia: str(f[F.tipologia]),
@@ -253,6 +272,8 @@ export function mapRecord(recordId: string, f: Fields): Property {
     floor: str(f[F.piano]),
     energyClass: str(f[F.ape]),
     description: str(f[F.descrizioneTsi]) || str(f[F.descrizione]),
+    descriptionEn: str(f[F.descrizioneTsiEn]),
+    descriptionDe: str(f[F.descrizioneTsiDe]),
     oneliner: str(f[F.onelinerTsi]) || str(f[F.oneliner]),
     tags,
     photos,

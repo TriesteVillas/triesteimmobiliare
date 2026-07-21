@@ -20,6 +20,26 @@ export type PropertyView = {
 
 type Translate = (key: string, values?: Record<string, string | number>) => string;
 
+// Titolo pubblico nella lingua del visitatore: il nome EN/DE quando c'è, altrimenti
+// quello italiano. Mai una stringa vuota: `title` è sempre valorizzato (mapRecord).
+export function localizedTitle(p: Property, locale: string): string {
+  if (locale === "de") return p.titleDe ?? p.title;
+  if (locale === "en") return p.titleEn ?? p.title;
+  return p.title;
+}
+
+// Descrizione nella lingua del visitatore. La catena di fallback è esplicita e
+// finisce SEMPRE sull'italiano — meglio una scheda in italiano che una vuota:
+//   EN → descrizione_TSI_EN_# → descrizione_TSI_# → descrizione
+//   DE → descrizione_TSI_DE_# → descrizione_TSI_# → descrizione
+//   IT →                        descrizione_TSI_# → descrizione
+// (gli ultimi due gradini sono già risolti in `p.description` da mapRecord).
+export function localizedDescription(p: Property, locale: string): string | null {
+  if (locale === "de") return p.descriptionDe ?? p.description;
+  if (locale === "en") return p.descriptionEn ?? p.description;
+  return p.description;
+}
+
 // Contract badge (always shown): In vendita / In affitto.
 export function contractBadge(p: Property, t: Translate): Badge {
   return {
@@ -64,7 +84,7 @@ export function buildPropertyView(
 
   return {
     slug: p.slug,
-    title: p.title,
+    title: localizedTitle(p, locale),
     zona: p.zona,
     place: [zonaLabel, p.comune].filter(Boolean).join(" · "),
     priceLabel: priceLabel(p, locale, t),
@@ -72,6 +92,10 @@ export function buildPropertyView(
     clusterBadge: clusterBadge(p, t),
     meta,
     // Cards use Airtable's lighter "large" rendition, not the full-res original.
-    cover: p.coverPhoto ? { url: p.coverPhoto.thumb, alt: p.coverPhoto.alt } : null,
+    // L'alt segue il titolo localizzato: `coverPhoto.alt` nasce dal titolo italiano
+    // in mapRecord (che non conosce il locale), e su /en o /de sarebbe fuori lingua.
+    cover: p.coverPhoto
+      ? { url: p.coverPhoto.thumb, alt: localizedTitle(p, locale) }
+      : null,
   };
 }
