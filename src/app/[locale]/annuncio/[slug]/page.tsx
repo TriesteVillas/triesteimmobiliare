@@ -20,7 +20,14 @@ import StickyNav from "@/components/StickyNav";
 import Scene from "@/components/motion/Scene";
 import LeadForm from "@/components/LeadForm";
 import VisitForm from "@/components/VisitForm";
-import { buildPropertyView, contractBadge, clusterBadge, priceLabel } from "@/lib/propertyView";
+import {
+  buildPropertyView,
+  contractBadge,
+  clusterBadge,
+  localizedDescription,
+  localizedTitle,
+  priceLabel,
+} from "@/lib/propertyView";
 import { pageAlternates, pageOpenGraph } from "@/lib/seo";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.triesteimmobiliare.com";
@@ -42,16 +49,24 @@ export async function generateMetadata({
   const { locale, slug } = await params;
   const property = await getProperty(slug);
   if (!property) return {};
+  // Titolo e meta description nella lingua della pagina. L'one-liner esiste solo
+  // in italiano: su /en e /de la descrizione tradotta viene prima, così la SERP
+  // non mostra italiano a chi cerca in inglese o tedesco.
+  const title = localizedTitle(property, locale);
   const description =
-    property.oneliner ?? property.description?.slice(0, 150) ?? "TriesteImmobiliare";
+    locale === "it"
+      ? (property.oneliner ?? property.description?.slice(0, 150) ?? "TriesteImmobiliare")
+      : (localizedDescription(property, locale)?.slice(0, 150) ??
+        property.oneliner ??
+        "TriesteImmobiliare");
   return {
-    title: { absolute: `${property.title} · TriesteImmobiliare` },
+    title: { absolute: `${title} · TriesteImmobiliare` },
     description,
     alternates: pageAlternates(locale, `/annuncio/${slug}`),
     openGraph: pageOpenGraph(
       locale,
       `/annuncio/${slug}`,
-      property.title,
+      title,
       description,
       property.coverPhoto?.url,
     ),
@@ -110,6 +125,11 @@ export default async function PropertyPage({ params }: { params: Params }) {
   const hasLocation = property.lat != null && property.lng != null;
   const ytIds = youtubeIds(property.videos);
 
+  // Titolo e descrizione nella lingua del visitatore, con ritorno all'italiano
+  // quando la traduzione non è ancora stata scritta (vedi localizedDescription).
+  const title = localizedTitle(property, locale);
+  const description = localizedDescription(property, locale);
+
   const characteristics = [
     // Order matters: PropertyCharacteristics keeps the first 8 (the headline
     // specs) always visible and collapses the rest behind a "show all" toggle.
@@ -148,7 +168,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
   // Sticky anchor nav (immobiliare.it style) — only sections that exist.
   const nav = [
     (property.coverPhoto || property.photos.length) && { id: "foto", label: t("galPhotos") },
-    property.description && { id: "descrizione", label: t("descriptionTitle") },
+    description && { id: "descrizione", label: t("descriptionTitle") },
     property.planimetrie.length && { id: "planimetrie", label: t("galPlans") },
     ytIds.length && { id: "video", label: t("galVideo") },
     property.matterportUrl && { id: "tour", label: t("galTour") },
@@ -159,11 +179,14 @@ export default async function PropertyPage({ params }: { params: Params }) {
     <article>
       {/* Cinematic hero — parallax cover, shared-element morph target */}
       <Scene as="header" mode="cover" smooth={0.14} className="relative h-[82vh] min-h-[520px] overflow-hidden bg-ink-2">
+        {/* L'alt delle foto nasce dal titolo italiano in mapRecord (che non conosce
+            il locale): sull'immagine principale usiamo il titolo localizzato. Le foto
+            della galleria restano con l'alt costruito in mapRecord. */}
         {(property.coverPhoto ?? property.photos[0]) ? (
           <ViewTransition name={`prop-${property.slug}`} share="morph">
             <Image
               src={(property.coverPhoto ?? property.photos[0])!.url}
-              alt={(property.coverPhoto ?? property.photos[0])!.alt}
+              alt={title}
               fill
               sizes="100vw"
               priority
@@ -196,7 +219,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
             )}
           </div>
           <h1 className="display-chapter mt-4 max-w-3xl text-white [text-shadow:0_4px_30px_rgba(0,0,0,0.5)]">
-            {property.title}
+            {title}
           </h1>
           <p className="mt-2 text-sm text-white/65">
             {t("reference")} {property.id}
@@ -224,7 +247,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
         <div className="mx-auto max-w-5xl px-4 pb-20 pt-8">
           {nav.length > 1 && (
             <StickyNav
-              title={property.title}
+              title={title}
               reference={`${t("reference")} ${property.id}`}
               items={nav}
             />
@@ -252,11 +275,11 @@ export default async function PropertyPage({ params }: { params: Params }) {
             lessLabel={t("showLess")}
           />
 
-          {property.description && (
+          {description && (
             <section id="descrizione" className="mt-8 scroll-mt-32" data-reveal>
               <h2 className="text-lg font-semibold">{t("descriptionTitle")}</h2>
               <div className="mt-3 space-y-4 leading-relaxed text-neutral-700">
-                {toParagraphs(property.description).map((p, i) => (
+                {toParagraphs(description).map((p, i) => (
                   <p key={i}>{p}</p>
                 ))}
               </div>
@@ -280,7 +303,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
                   >
                     <iframe
                       src={`https://www.youtube-nocookie.com/embed/${id}`}
-                      title={property.title}
+                      title={title}
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
                       loading="lazy"
@@ -334,6 +357,10 @@ export default async function PropertyPage({ params }: { params: Params }) {
             </section>
           )}
 
+          {/* immobileNome resta il titolo ITALIANO in tutti e tre i locali: finisce
+              nel CRM come identità del record, e un immobile deve avere un nome solo
+              qualunque sia la lingua del visitatore (la lingua viaggia già in `lingua`).
+              Stessa regola del log visite della Private Collection. */}
           <LeadForm
             rif={property.id}
             immobileNome={property.title}
@@ -342,6 +369,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
             lingua={locale}
           />
 
+          {/* Anche qui il nome italiano: vedi la nota su LeadForm. */}
           <VisitForm
             rif={property.id}
             immobileNome={property.title}
