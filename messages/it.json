@@ -769,6 +769,13 @@
     "backToCollection": "Torna alla collezione",
     "detailCtaText": "Ti interessa questo immobile? Sentiamoci, così ti diciamo tutto quello che non c'è scritto.",
     "haveCredentials": "Dispongo già delle credenziali",
+    "voteHint": "Dicci cosa ne pensi: ci aiuta a proporti solo ciò che conta.",
+    "voteUp": "Mi interessa",
+    "voteDown": "Non fa per me",
+    "votePlaceholder": "Aggiungi una nota (facoltativa)…",
+    "voteSend": "Invia",
+    "voteThanks": "Grazie, ricevuto.",
+    "newsThumbs": "Novità: su ogni immobile puoi lasciare 👍/👎 e una nota — ci aiuta a proporti solo ciò che conta.",
     "brandWordmark": "TriesteImmobiliare"
   }
 }

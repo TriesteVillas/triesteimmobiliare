@@ -769,6 +769,13 @@
     "backToCollection": "Zurück zur Collection",
     "detailCtaText": "Interesse an diesem Objekt? Sprechen wir darüber — es gibt immer mehr zu sagen, als hier steht.",
     "haveCredentials": "Ich habe bereits Zugangsdaten",
+    "voteHint": "Sagen Sie uns Ihre Meinung: So zeigen wir Ihnen nur, was wirklich zählt.",
+    "voteUp": "Interessiert mich",
+    "voteDown": "Nichts für mich",
+    "votePlaceholder": "Eine Notiz hinzufügen (optional)…",
+    "voteSend": "Senden",
+    "voteThanks": "Danke, notiert.",
+    "newsThumbs": "Neu: Bei jeder Immobilie können Sie 👍/👎 und eine Notiz hinterlassen — so schlagen wir Ihnen nur vor, was wirklich zählt.",
     "brandWordmark": "TriesteImmobiliare"
   }
 }

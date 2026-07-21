@@ -10,6 +10,7 @@ import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import ProtectedImage from "@/components/private/ProtectedImage";
 import TrackView from "@/components/private/TrackView";
+import VoteWidget from "@/components/private/VoteWidget";
 import { MAIL_REPLY_TO } from "@/lib/private/brand";
 
 export const metadata: Metadata = {
@@ -83,6 +84,10 @@ export default async function PrivateDetail({
             ))}
           </div>
         )}
+
+        {/* Feedback dell'utente PC: alimenta PC_ACCESS_LOG (thumb_up/down),
+            così lo Specialist calibra le prossime proposte. */}
+        <VoteWidget slug={slug} variant="detail" />
 
         {p.description && (
           <p className="mt-8 max-w-3xl whitespace-pre-line leading-relaxed text-[#aebcc9]">

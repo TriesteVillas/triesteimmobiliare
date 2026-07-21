@@ -769,6 +769,13 @@
     "backToCollection": "Back to the collection",
     "detailCtaText": "Interested in this one? Let's talk — there's always more than what's written here.",
     "haveCredentials": "I already have credentials",
+    "voteHint": "Tell us what you think: it helps us show you only what truly matters.",
+    "voteUp": "I'm interested",
+    "voteDown": "Not for me",
+    "votePlaceholder": "Add a note (optional)…",
+    "voteSend": "Send",
+    "voteThanks": "Thank you — noted.",
+    "newsThumbs": "New: on every property you can leave a 👍/👎 and a note — it helps us propose only what truly matters to you.",
     "brandWordmark": "TriesteImmobiliare"
   }
 }

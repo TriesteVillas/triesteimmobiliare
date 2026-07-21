@@ -2,6 +2,7 @@
 
 import { Link } from "@/i18n/navigation";
 import ProtectedImage from "./ProtectedImage";
+import VoteWidget from "./VoteWidget";
 import type { PropertyView } from "@/lib/propertyView";
 
 // Minimal card for the logged-in Private Collection: protected cover, price,
@@ -25,6 +26,11 @@ export default function PrivatePropertyCard({
             {photosComing}
           </div>
         )}
+        {/* Feedback in overlay: il widget blocca la propagazione dei click,
+            quindi votare NON naviga verso la pagina di dettaglio. */}
+        <div className="absolute bottom-3 right-3 z-[3]">
+          <VoteWidget slug={view.slug} variant="card" />
+        </div>
       </div>
       <div className="p-5">
         <p className="text-lg font-semibold tracking-tight text-[#dfe9f3]">{view.priceLabel}</p>
