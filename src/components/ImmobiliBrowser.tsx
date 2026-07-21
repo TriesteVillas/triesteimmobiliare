@@ -3,9 +3,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import PropertyCard from "./PropertyCard";
+import GhostCard from "./private/GhostCard";
 import type { PropertyView } from "@/lib/propertyView";
 
-type Group = { code: string; label: string; items: PropertyView[] };
+// `ghosts` sono i teaser della Private Collection: immobili riservati che nella
+// griglia pubblica esistono ma non si mostrano. Al browser arrivano soltanto id,
+// zona e forbice di prezzo — niente titolo, niente foto, niente indirizzo — quindi
+// nemmeno chi legge l'HTML della pagina ricava qualcosa dell'immobile.
+type Ghost = { id: string; band: string | null };
+type Group = { code: string; label: string; items: PropertyView[]; ghosts?: Ghost[] };
 
 export default function ImmobiliBrowser({
   groups,
@@ -24,8 +30,12 @@ export default function ImmobiliBrowser({
     if (code && groups.some((g) => g.code === code)) setActive(code);
   }, [groups]);
 
+  // I riservati contano nei totali: sono immobili veri, e una zona che ha SOLO
+  // ghost card deve comunque comparire fra i chip, altrimenti l'unica cosa che
+  // abbiamo in quella zona resta invisibile.
+  const count = (g: Group) => g.items.length + (g.ghosts?.length ?? 0);
   const total = useMemo(
-    () => groups.reduce((n, g) => n + g.items.length, 0),
+    () => groups.reduce((n, g) => n + count(g), 0),
     [groups],
   );
   const visible = active ? groups.filter((g) => g.code === active) : groups;
@@ -57,7 +67,7 @@ export default function ImmobiliBrowser({
             aria-pressed={active === g.code}
             className={chip(active === g.code)}
           >
-            {g.label} ({g.items.length})
+            {g.label} ({count(g)})
           </button>
         ))}
       </div>
@@ -70,12 +80,15 @@ export default function ImmobiliBrowser({
                 {g.label}
               </h2>
               <span className="text-sm text-neutral-400">
-                {t("count", { count: g.items.length })}
+                {t("count", { count: count(g) })}
               </span>
             </div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {g.items.map((v) => (
                 <PropertyCard key={v.slug} view={v} photosComing={photosComing} />
+              ))}
+              {(g.ghosts ?? []).map((gh) => (
+                <GhostCard key={`ghost-${gh.id}`} id={gh.id} band={gh.band} zonaLabel={g.label} />
               ))}
             </div>
           </section>

@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import ImmobiliBrowser from "@/components/ImmobiliBrowser";
 import BuyerCta from "@/components/BuyerCta";
-import { getProperties } from "@/lib/airtable";
-import { groupByZone } from "@/lib/properties";
+import { getProperties, getPrivateTeasers } from "@/lib/airtable";
+import { groupByZone, ZONE_ORDER, ZONE_OTHER } from "@/lib/properties";
 import { buildPropertyView } from "@/lib/propertyView";
 import { pageAlternates, pageOpenGraph } from "@/lib/seo";
 
@@ -35,15 +35,35 @@ export default async function ImmobiliPage({
   const tZones = await getTranslations("zones");
   const tHelp = await getTranslations("immobili.buyerHelp");
 
-  const properties = await getProperties();
+  // Immobili pubblici (i cluster PRIVATE sono esclusi alla fonte) + i teaser
+  // senza dettaglio della Private Collection, raggruppati per zona insieme.
+  const [properties, teasers] = await Promise.all([getProperties(), getPrivateTeasers()]);
+  // ZONE_ORDER è `as const`, quindi il suo `includes` accetta solo i codici noti:
+  // il confronto va fatto su una copia widened, non su una zona già ristretta.
+  const ZONE_CODES: readonly string[] = ZONE_ORDER;
+  const zoneOfTeaser = (zona: string | null): string => {
+    const code = (zona ?? "").toUpperCase().trim();
+    return ZONE_CODES.includes(code) ? code : ZONE_OTHER;
+  };
   const groups = groupByZone(properties).map((g) => {
     const label = tZones(g.code);
     return {
       code: g.code,
       label,
       items: g.items.map((p) => buildPropertyView(p, locale, tProp, label)),
+      ghosts: teasers.filter((t2) => zoneOfTeaser(t2.zona) === g.code).map((t2) => ({ id: t2.id, band: t2.band })),
     };
   });
+  // Una zona che ha SOLO immobili riservati non esiste in groupByZone (che parte
+  // dai pubblici): va aggiunta a mano, altrimenti quei teaser non comparirebbero
+  // da nessuna parte e la curazione sembrerebbe non aver fatto effetto.
+  const zoneGiaPresenti = new Set(groups.map((g) => g.code));
+  for (const code of [...ZONE_ORDER, ZONE_OTHER]) {
+    if (zoneGiaPresenti.has(code)) continue;
+    const soli = teasers.filter((t2) => zoneOfTeaser(t2.zona) === code);
+    if (!soli.length) continue;
+    groups.push({ code, label: tZones(code), items: [], ghosts: soli.map((t2) => ({ id: t2.id, band: t2.band })) });
+  }
 
   return (
     <>

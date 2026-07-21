@@ -11,7 +11,11 @@ export default function robots(): MetadataRoute.Robots {
     return { rules: { userAgent: "*", disallow: "/" } };
   }
   return {
-    rules: { userAgent: "*", allow: "/", disallow: "/api/" },
+    // /private resta fuori dall'indice ANCHE nel ramo indicizzato: al cutover DNS
+    // l'area riservata diventerebbe altrimenti crawlabile insieme al resto. Le
+    // pagine hanno gia' il loro noindex, ma un disallow esplicito evita perfino la
+    // richiesta — e le ghost card in griglia non portano indizi ai crawler.
+    rules: { userAgent: "*", allow: "/", disallow: ["/api/", "/private", "/private/"] },
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: SITE_URL,
   };

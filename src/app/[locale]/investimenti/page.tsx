@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import InvestorCta from "@/components/InvestorCta";
 import BuyerCta from "@/components/BuyerCta";
+import GhostCard from "@/components/private/GhostCard";
+import { Link } from "@/i18n/navigation";
+import { getPrivateTeasers } from "@/lib/airtable";
+import { ZONE_ORDER, ZONE_OTHER } from "@/lib/properties";
 import { pageAlternates, pageOpenGraph } from "@/lib/seo";
 
 export async function generateMetadata({
@@ -25,6 +29,14 @@ const STEPS = ["brief", "shortlist", "call", "close"] as const;
 // Typology labels are localized (invest.teaser.ghosts); zones are proper nouns.
 const GHOST_ZONES = ["Centro", "Semicentro", "Barcola"] as const;
 
+// I teaser reali arrivano con il codice zona di Airtable; qui serve la label
+// tradotta, con lo stesso fallback ALTRE usato dalla griglia /immobili.
+const ZONE_CODES: readonly string[] = ZONE_ORDER;
+function zoneLabelCode(zona: string | null): string {
+  const code = (zona ?? "").toUpperCase().trim();
+  return ZONE_CODES.includes(code) ? code : ZONE_OTHER;
+}
+
 export default async function InvestPage({
   params,
 }: {
@@ -33,6 +45,9 @@ export default async function InvestPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("invest");
+  const tZones = await getTranslations("zones");
+  const tPc = await getTranslations("pc");
+  const teasers = await getPrivateTeasers();
 
   return (
     <>
@@ -98,6 +113,17 @@ export default async function InvestPage({
         <h2 className="display-chapter mt-2 max-w-2xl text-brand-dark">{t("teaser.title")}</h2>
         <p className="mt-4 max-w-2xl text-neutral-600">{t("teaser.body")}</p>
 
+        {/* Da quando esiste la Private Collection, questa sezione mostra i teaser
+            VERI quando ce ne sono. Il mockup a tre card resta come fallback: e' la
+            promessa narrativa della pagina, e sparire del tutto nei periodi in cui
+            il portafoglio riservato e' vuoto la renderebbe incomprensibile. */}
+        {teasers.length > 0 ? (
+          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {teasers.slice(0, 6).map((tz) => (
+              <GhostCard key={tz.id} id={tz.id} band={tz.band} zonaLabel={tZones(zoneLabelCode(tz.zona))} />
+            ))}
+          </div>
+        ) : (
         <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
           {GHOST_ZONES.map((zone, i) => (
             <div
@@ -119,13 +145,22 @@ export default async function InvestPage({
             </div>
           ))}
         </div>
+        )}
         <p className="mt-4 text-xs text-neutral-500">{t("teaser.disclaimer")}</p>
 
-        <div className="mt-8">
+        <div className="mt-8 flex flex-wrap items-center gap-4">
           <InvestorCta
             label={t("cta.ctaPrimary")}
             className="btn-hero rounded-full bg-brand px-7 py-3 text-sm font-semibold text-white"
           />
+          {/* La sezione parla di immobili off-market da anni: adesso dietro c'e'
+              davvero un'area riservata, e questo e' l'unico ingresso dalla pagina. */}
+          <Link
+            href="/private/richiedi"
+            className="btn-press rounded-full border border-brand px-6 py-3 text-sm font-semibold text-brand hover:bg-brand hover:text-white"
+          >
+            {tPc("requestCta")}
+          </Link>
         </div>
       </section>
 

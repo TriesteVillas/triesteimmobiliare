@@ -491,3 +491,83 @@ html[data-header-hidden] header[data-pill] {
     animation: none;
   }
 }
+
+/* ----------------------------------------------------------------
+   Private Collection — takeover blu notte, scoped to .pc-root.
+   Quando una pagina riservata è a schermo togliamo il chrome pubblico
+   (header a pillola + footer) e andiamo su fondo scuro: l'area gated
+   deve sembrare un altro mondo, non una pagina del sito con un login.
+
+   Perché blu e non nero+oro come su triestevillas.com: header e footer
+   spariscono, quindi la palette resta l'UNICO elemento in pagina che dice
+   all'ospite su quale dei due portali del gruppo si trova. Due aree
+   riservate identiche sarebbero indistinguibili, e un cliente mid-market
+   crederebbe di essere su TriesteVillas.
+   ---------------------------------------------------------------- */
+body:has(.pc-root) {
+  background: #05070c;
+}
+body:has(.pc-root) header[data-pill],
+body:has(.pc-root) footer {
+  display: none !important;
+}
+
+.pc-root {
+  color: #c3d0dd;
+}
+.pc-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: #a9c8e0;
+}
+.pc-title {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  color: #dfe9f3;
+}
+.pc-card {
+  background: linear-gradient(165deg, rgba(16, 34, 56, 0.55), rgba(5, 7, 12, 0.94));
+  border: 1px solid rgba(169, 200, 224, 0.18);
+  border-radius: 1.1rem;
+  transition:
+    border-color 400ms var(--ease-lux),
+    box-shadow 400ms var(--ease-lux);
+}
+.pc-card:hover {
+  border-color: rgba(169, 200, 224, 0.42);
+  box-shadow: 0 30px 70px -34px rgba(0, 0, 0, 0.9);
+}
+.pc-btn {
+  display: inline-block;
+  background: #a9c8e0;
+  color: #05070c;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  padding: 0.72rem 1.6rem;
+  border-radius: 9999px;
+  transition:
+    transform 250ms var(--ease-lux),
+    box-shadow 250ms var(--ease-lux),
+    background-color 250ms var(--ease-lux);
+}
+.pc-btn:hover {
+  transform: translateY(-1px);
+  background: #c2d8ec;
+  box-shadow: 0 14px 40px -14px rgba(169, 200, 224, 0.5);
+}
+.pc-btn:active {
+  transform: scale(0.98);
+}
+.pc-btn:disabled {
+  opacity: 0.5;
+}
+/* Deterrente contro il prelievo casuale dentro l'area gated (NON è DRM: gli
+   screenshot restano possibili; la tracciabilità vera è il watermark per-utente). */
+.pc-root img {
+  -webkit-user-drag: none;
+  user-select: none;
+}

@@ -2,8 +2,12 @@
 // (it at the root, en/de prefixed) and JSON-LD builders. The site is read by
 // many German-speaking buyers, so hreflang is not cosmetic.
 
+// `?? ` da solo non basta: una variabile d'ambiente definita ma VUOTA (è ciò che
+// restituisce `vercel env pull` per le variabili marcate Sensitive) non è null,
+// quindi passerebbe indenne e `new URL("")` in layout.tsx farebbe schiantare OGNI
+// pagina del sito con "Invalid URL". Serve il fallback anche sulla stringa vuota.
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.triesteimmobiliare.com";
+  (process.env.NEXT_PUBLIC_SITE_URL || "").trim() || "https://www.triesteimmobiliare.com";
 
 export const LOCALES = ["it", "en", "de"] as const;
 // hreflang region codes (en-GB: British-leaning copy; de-DE: the key market).
