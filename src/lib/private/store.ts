@@ -122,7 +122,7 @@ export type RequestInput = {
   cognome: string;
   email: string;
   telefono: string;
-  nazionalita: string;
+  citta: string; // città di residenza — obbligatoria dal 2026-07-21 (sostituisce nazionalita)
   intro: string;
   zone: string[]; // 9-zone taxonomy (zona_Section_TSV)
   bands: string[]; // "<1M" | "1-2M" | "2-3M" | "3M+"
@@ -158,7 +158,7 @@ function leadFieldsFrom(input: RequestInput, propRecId?: string | null): Record<
   const lows = input.bands.map((b) => BAND_LOW[b]).filter((n) => typeof n === "number");
   const highs = input.bands.map((b) => BAND_HIGH[b]).filter((n) => typeof n === "number");
   const noteParts = [
-    input.nazionalita ? `Nazionalità: ${input.nazionalita}` : "",
+    input.citta ? `Città di residenza: ${input.citta}` : "",
     input.immobileTrigger ? `Immobile di partenza: ${input.immobileTrigger}` : "",
   ].filter(Boolean);
   return {
@@ -248,7 +248,10 @@ export async function createLeadAndRequest(input: RequestInput): Promise<string 
     cognome: input.cognome,
     email: input.email,
     ...(input.telefono ? { telefono: input.telefono } : {}),
-    nazionalita: input.nazionalita,
+    // `citta` (fld8SLwGa2pKWeQzK) SOSTITUISCE `nazionalita`: quel campo resta sulla
+    // tabella per non perdere lo storico pre-21/07/2026, ma da qui non lo scrive più
+    // nessuno. Chi legge deve fare fallback — vedi digestRowFrom.
+    citta: input.citta,
     intro: input.intro,
     ...(input.zone.length ? { zone: input.zone } : {}),
     ...(input.bands.length ? { budget_bands: input.bands } : {}),
@@ -529,7 +532,9 @@ export function digestRowFrom(r: AirRecord) {
     cognome: str(f.cognome),
     email: str(f.email),
     telefono: str(f.telefono),
-    nazionalita: str(f.nazionalita),
+    // Fallback sullo storico: le richieste precedenti al 21/07/2026 hanno solo
+    // `nazionalita`. Toglierlo significa mostrare una riga muta su quelle.
+    citta: str(f.citta) || str(f.nazionalita),
     intro: str(f.intro),
     zone: arr(f.zone),
     bands: arr(f.budget_bands),

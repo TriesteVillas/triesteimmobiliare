@@ -76,7 +76,7 @@ function goldButton(href: string, label: string): string {
 
 const CRED: Record<Lang, {
   subject: string; hi: string; body: string; codeLabel: string;
-  validity: (d: string) => string; enter: string; zoomLine: string;
+  validity: (d: string, n: number) => string; enter: string; zoomLine: string;
   zoomCta: string; contacts: string; closing: string;
 }> = {
   it: {
@@ -84,7 +84,7 @@ const CRED: Record<Lang, {
     hi: "Gentile",
     body: "il suo accesso riservato alla nostra Private Collection è stato approvato. Qui sotto la sua password temporanea.",
     codeLabel: "Password temporanea",
-    validity: (d) => `Valida fino al ${d} — 15 giorni. Allo scadere potrà richiederne il rinnovo.`,
+    validity: (d, n) => `Valida fino al ${d} — ${n} ${n === 1 ? "giorno" : "giorni"}. Allo scadere potrà richiederne il rinnovo.`,
     enter: "Entra nella Private Collection",
     zoomLine: "C'è molto altro che possiamo condividere solo di persona: terreni, palazzi, progetti non ancora pubblici.",
     zoomCta: "Prenota una call di 30 minuti con uno Specialist",
@@ -96,7 +96,7 @@ const CRED: Record<Lang, {
     hi: "Dear",
     body: "your private access to our Private Collection has been approved. Below is your temporary password.",
     codeLabel: "Temporary password",
-    validity: (d) => `Valid until ${d} — 15 days. You can request a renewal once it expires.`,
+    validity: (d, n) => `Valid until ${d} — ${n} ${n === 1 ? "day" : "days"}. You can request a renewal once it expires.`,
     enter: "Enter the Private Collection",
     zoomLine: "There is much more we can only share in person: land, buildings, projects not yet public.",
     zoomCta: "Book a 30-minute call with a Specialist",
@@ -108,7 +108,7 @@ const CRED: Record<Lang, {
     hi: "Sehr geehrte/r",
     body: "Ihr privater Zugang zu unserer Private Collection wurde freigegeben. Unten finden Sie Ihr temporäres Passwort.",
     codeLabel: "Temporäres Passwort",
-    validity: (d) => `Gültig bis ${d} — 15 Tage. Nach Ablauf können Sie eine Verlängerung anfordern.`,
+    validity: (d, n) => `Gültig bis ${d} — ${n} ${n === 1 ? "Tag" : "Tage"}. Nach Ablauf können Sie eine Verlängerung anfordern.`,
     enter: "Zur Private Collection",
     zoomLine: "Vieles können wir nur persönlich teilen: Grundstücke, Palazzi, noch nicht öffentliche Projekte.",
     zoomCta: "Buchen Sie ein 30-minütiges Gespräch mit einem Specialist",
@@ -117,7 +117,13 @@ const CRED: Record<Lang, {
   },
 };
 
-export function credentialEmail(lang: Lang, name: string, code: string, expiresLabel: string) {
+// `validityDays` NON è una costante: è la durata reale del grant, calcolata dalle
+// date sul record. Era cablata a "15 giorni" in tutte e tre le lingue, ma dal
+// protocollo 2026-07 il CRM approva a 30 giorni (e fino a 3 mesi): un cliente
+// approvato dal CRM e servito da questo cron riceveva un codice buono 30 giorni
+// con accanto scritto "15 giorni". La data di scadenza era giusta, la durata no —
+// e la contraddizione la vedeva solo il cliente.
+export function credentialEmail(lang: Lang, name: string, code: string, expiresLabel: string, validityDays: number) {
   const L = CRED[lang] ?? CRED.en;
   const enterUrl = `${SITE_URL}/${lang}/private?c=${encodeURIComponent(code)}`;
   const inner = `
@@ -127,7 +133,7 @@ export function credentialEmail(lang: Lang, name: string, code: string, expiresL
       <div style="color:#8a97a6;font-size:11px;letter-spacing:2px;text-transform:uppercase;">${L.codeLabel}</div>
       <div style="display:inline-block;margin-top:8px;border:1px solid #a9c8e0;color:#dfe9f3;font-size:24px;letter-spacing:4px;font-weight:700;padding:12px 22px;font-family:'Courier New',monospace;">${esc(code)}</div>
     </div>
-    <p style="text-align:center;color:#8a97a6;font-size:13px;margin:4px 0 22px;">${L.validity(expiresLabel)}</p>
+    <p style="text-align:center;color:#8a97a6;font-size:13px;margin:4px 0 22px;">${L.validity(expiresLabel, validityDays)}</p>
     <div style="text-align:center;margin:0 0 26px;">${goldButton(enterUrl, L.enter)}</div>
     <p style="margin:0 0 14px;color:#aebcc9;">${L.zoomLine}</p>
     ${ZOOM_URL ? `<div style="text-align:center;margin:0 0 22px;"><a href="${esc(ZOOM_URL)}" style="color:#a9c8e0;font-size:14px;">${esc(L.zoomCta)} →</a></div>` : ""}
@@ -181,21 +187,21 @@ const ACK: Record<Lang, { subject: string; hi: string; body: string; note: strin
     subject: "Abbiamo ricevuto la sua richiesta — Private Collection",
     hi: "Gentile",
     body: "grazie, abbiamo ricevuto la sua richiesta di accesso alla TriesteImmobiliare Private Collection.",
-    note: "Le richieste vengono verificate manualmente, generalmente entro 48 ore. Una volta concesso, l'accesso avrà validità di 15 giorni.",
+    note: "Le richieste vengono verificate manualmente, generalmente entro 48 ore. Una volta concesso, l'accesso avrà validità di almeno 15 giorni.",
     closing: "A presto,",
   },
   en: {
     subject: "We've received your request — Private Collection",
     hi: "Dear",
     body: "thank you, we've received your request to access the TriesteImmobiliare Private Collection.",
-    note: "Requests are reviewed manually, usually within 48 hours. Once granted, your access is valid for 15 days.",
+    note: "Requests are reviewed manually, usually within 48 hours. Once granted, your access is valid for at least 15 days.",
     closing: "Speak soon,",
   },
   de: {
     subject: "Wir haben Ihre Anfrage erhalten — Private Collection",
     hi: "Sehr geehrte/r",
     body: "vielen Dank, wir haben Ihre Anfrage für den Zugang zur TriesteImmobiliare Private Collection erhalten.",
-    note: "Anfragen werden manuell geprüft, in der Regel innerhalb von 48 Stunden. Nach Freigabe ist der Zugang 15 Tage gültig.",
+    note: "Anfragen werden manuell geprüft, in der Regel innerhalb von 48 Stunden. Nach Freigabe ist der Zugang mindestens 15 Tage gültig.",
     closing: "Bis bald,",
   },
 };
@@ -214,7 +220,7 @@ export function ackEmail(lang: Lang, name: string) {
 // ---- Daily digest to Martino (internal, IT) --------------------------------
 
 export type DigestRow = {
-  nome: string; cognome: string; email: string; telefono: string; nazionalita: string;
+  nome: string; cognome: string; email: string; telefono: string; citta: string;
   intro: string; zone: string[]; bands: string[]; immobile: string; quando: string;
 };
 
@@ -224,7 +230,7 @@ export function digestEmail(rows: DigestRow[], airtableUrl: string) {
     .map(
       (r) => `<div style="border:1px solid #1b2b42;border-radius:6px;padding:14px 16px;margin:0 0 12px;">
       <div style="color:#dfe9f3;font-size:15px;font-weight:700;">${esc(`${r.cognome} ${r.nome}`.trim() || "—")}</div>
-      <div style="color:#a9c8e0;font-size:13px;margin-top:2px;">${esc(r.email)}${r.telefono ? ` · ${esc(r.telefono)}` : ""}${r.nazionalita ? ` · ${esc(r.nazionalita)}` : ""}</div>
+      <div style="color:#a9c8e0;font-size:13px;margin-top:2px;">${esc(r.email)}${r.telefono ? ` · ${esc(r.telefono)}` : ""}${r.citta ? ` · ${esc(r.citta)}` : ""}</div>
       ${r.intro ? `<div style="color:#c3d0dd;font-size:13px;margin-top:8px;font-style:italic;">“${esc(r.intro)}”</div>` : ""}
       <div style="color:#93a1ae;font-size:12px;margin-top:8px;">${esc([r.zone.join(", "), r.bands.join(" / "), r.immobile].filter(Boolean).join(" · "))}</div>
       <div style="color:#6d7c8a;font-size:11px;margin-top:6px;">${esc(r.quando)}</div>

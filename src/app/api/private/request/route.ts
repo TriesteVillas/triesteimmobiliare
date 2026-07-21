@@ -53,7 +53,7 @@ export async function POST(request: Request) {
   const cognome = clean(body.cognome, 120);
   const email = clean(body.email, 160);
   const telefono = clean(body.telefono, 40);
-  const nazionalita = clean(body.nazionalita, 80);
+  const citta = clean(body.citta, 80);
   const intro = clean(body.intro, 500);
   const zone = (Array.isArray(body.zone) ? body.zone : [])
     .map((z) => clean(z, 40))
@@ -73,10 +73,17 @@ export async function POST(request: Request) {
   if (telefono.length < 6) {
     return NextResponse.json({ ok: false, error: "phone_required" }, { status: 400 });
   }
+  // Città di residenza: obbligatoria dal 2026-07-21 (prima era "nazionalità",
+  // facoltativa). Il controllo sta anche qui e non solo sul `required` del form,
+  // perché il `required` HTML lo salta chiunque chiami la rotta direttamente —
+  // ed è esattamente ciò che fa un bot che raccoglie accessi.
+  if (citta.length < 2) {
+    return NextResponse.json({ ok: false, error: "city_required" }, { status: 400 });
+  }
 
   try {
     await createLeadAndRequest({
-      nome, cognome, email, telefono, nazionalita, intro, zone, bands, immobileTrigger, lingua,
+      nome, cognome, email, telefono, citta, intro, zone, bands, immobileTrigger, lingua,
     });
   } catch (e) {
     console.error("[pc] request save failed:", e);

@@ -10,7 +10,11 @@ import { MAIL_REPLY_TO } from "@/lib/private/brand";
 // (which sends `Authorization: Bearer ${CRON_SECRET}`) or manually with
 // `?key=${CRON_SECRET}`. Idempotent: guarded by the credenziali_inviate /
 // cortesia_inviata checkboxes, so re-runs are safe.
-//   1) Approved + no credential yet → generate 15-day code, email it (luxury@).
+//   1) Approved + no credential yet → issue a code and email it (luxury@). The
+//      duration is NOT fixed at 15 days: 15 is the floor this cron applies when it
+//      has to mint the code itself (row flipped to Approved by hand on Airtable).
+//      When the CRM approved it, code and expiry are already on the record and this
+//      cron only delivers them — which is why the email must state the REAL span.
 //   2) Past expiry → courtesy email + mark Expired.
 //   3) Abuse heuristic → flag Under review.
 
@@ -24,6 +28,12 @@ function authorized(request: Request): boolean {
     request.headers.get("authorization") === `Bearer ${secret}` ||
     url.searchParams.get("key") === secret
   );
+}
+
+// Giorni residui, arrotondati e mai sotto 1: è il numero che finisce nella mail,
+// quindi deve descrivere il codice che il cliente ha in mano, non un default.
+function daysUntil(ms: number): number {
+  return Math.max(1, Math.round((ms - Date.now()) / 86_400_000));
 }
 
 function fmtDate(ms: number, lang: string): string {
@@ -40,7 +50,7 @@ export async function GET(request: Request) {
   for (const g of await listApprovedNeedingCredential()) {
     try {
       const { code, expiresAtMs } = await ensureCredential(g);
-      const mail = credentialEmail(g.lingua, g.nome, code, fmtDate(expiresAtMs, g.lingua));
+      const mail = credentialEmail(g.lingua, g.nome, code, fmtDate(expiresAtMs, g.lingua), daysUntil(expiresAtMs));
       const sent = await sendMail(g.email, mail.subject, mail.html, MAIL_REPLY_TO);
       if (sent) {
         await markCredentialSent(g.id);

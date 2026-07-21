@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { BUDGET_BANDS, bandLabel, type BudgetBand } from "@/lib/private/bands";
+import { CITY_LIST_ID, citySuggestions } from "@/lib/private/cities";
+import { introIsRich } from "@/lib/private/intro";
 
 // Credential-request form for the Private Collection. Posts to
 // /api/private/request, which creates a tagged LEAD_ + a PC_RICHIESTE row.
@@ -20,12 +22,13 @@ export default function RequestForm({ triggerId }: { triggerId: string }) {
   const [cognome, setCognome] = useState("");
   const [email, setEmail] = useState("");
   const [telefono, setTelefono] = useState("");
-  const [nazionalita, setNazionalita] = useState("");
+  const [citta, setCitta] = useState("");
   const [intro, setIntro] = useState("");
   const [zone, setZone] = useState<string[]>([]);
   const [bands, setBands] = useState<string[]>([]);
   const [privacyOk, setPrivacyOk] = useState(false);
   const [state, setState] = useState<"idle" | "sending" | "ok" | "error">("idle");
+  const [err, setErr] = useState("");
 
   const toggle = (list: string[], set: (v: string[]) => void, v: string) =>
     set(list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
@@ -38,12 +41,19 @@ export default function RequestForm({ triggerId }: { triggerId: string }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          nome, cognome, email, telefono, nazionalita, intro,
+          nome, cognome, email, telefono, citta, intro,
           zone, bands, immobileTrigger: triggerId, privacyOk, lingua: locale,
         }),
       });
-      setState(res.ok ? "ok" : "error");
+      if (res.ok) { setState("ok"); return; }
+      // Il `required` del browser copre il campo vuoto, non un valore di una sola
+      // lettera che il server rifiuta: senza questo ramo l'utente leggeva
+      // "qualcosa è andato storto" e non aveva modo di capire cosa correggere.
+      const why = await res.json().catch(() => ({}));
+      setErr(why?.error === "city_required" ? t("err_city") : t("error"));
+      setState("error");
     } catch {
+      setErr(t("error"));
       setState("error");
     }
   };
@@ -69,12 +79,29 @@ export default function RequestForm({ triggerId }: { triggerId: string }) {
           onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
         <input className={INPUT} placeholder={t("phone")} value={telefono} type="tel"
           onChange={(e) => setTelefono(e.target.value)} autoComplete="tel" required />
-        <input className={INPUT} placeholder={t("nationality")} value={nazionalita}
-          onChange={(e) => setNazionalita(e.target.value)} autoComplete="country-name" />
+        {/* Città di residenza: campo LIBERO con suggerimenti. La datalist aiuta a
+            digitare e riduce la spazzatura ("qui", "-"), ma non chiude la scelta:
+            chi vive fuori dall'elenco scrive e passa. `address-level2` fa proporre
+            al browser la città che l'utente ha già salvato — l'autocompletamento
+            più affidabile che ci sia, senza API né consensi. Occupa entrambe le
+            colonne perché la domanda è più lunga delle altre etichette. */}
+        <input className={`${INPUT} sm:col-span-2`} placeholder={t("city")} value={citta}
+          onChange={(e) => setCitta(e.target.value)} autoComplete="address-level2"
+          list={CITY_LIST_ID} required minLength={2} />
+        <datalist id={CITY_LIST_ID}>
+          {citySuggestions(locale).map((c) => <option key={c} value={c} />)}
+        </datalist>
       </div>
 
-      <textarea className={`${INPUT} mt-3 resize-none`} rows={2} placeholder={t("intro")}
+      <textarea className={`${INPUT} mt-3 resize-none`} rows={3} placeholder={t("intro")}
         value={intro} onChange={(e) => setIntro(e.target.value)} maxLength={500} />
+      {/* L'incentivo sta SOTTO il campo, non dentro come placeholder: un placeholder
+          sparisce appena si inizia a scrivere, cioè nel momento esatto in cui la
+          promessa dovrebbe restare visibile. Superata la soglia il testo conferma
+          che il bonus è acquisito — vedi lib/private/intro.ts per la soglia. */}
+      <p className={`mt-1.5 text-xs ${introIsRich(intro) ? "text-[#a9c8e0]" : "text-[#7c8b99]"}`}>
+        {introIsRich(intro) ? t("introBonusOk") : t("introBonus")}
+      </p>
 
       <p className="mt-6 text-sm font-medium text-[#c3d0dd]">{t("zonesLabel")}</p>
       <div className="mt-2 flex flex-wrap gap-2">
@@ -102,7 +129,7 @@ export default function RequestForm({ triggerId }: { triggerId: string }) {
         <span>{t("privacy")}</span>
       </label>
 
-      {state === "error" && <p className="mt-3 text-sm text-red-300">{t("error")}</p>}
+      {state === "error" && <p className="mt-3 text-sm text-red-300">{err || t("error")}</p>}
 
       <button type="submit" disabled={state === "sending"} className="pc-btn mt-6 w-full">
         {state === "sending" ? t("sending") : t("requestCta")}
