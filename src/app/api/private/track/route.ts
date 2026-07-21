@@ -28,6 +28,27 @@ function isRecentLocal(key: string): boolean {
   return last !== undefined && now - last < DEDUP_MS;
 }
 
+// Rate-limit per sessione, IDENTICO a quello di /api/private/vote (40 eventi/ora).
+// Il de-dupe locale non basta come freno: copre lo stesso slug, quindi un ciclo con
+// slug sempre DIVERSI passa dritto e costa a ogni colpo una findGrantById + una
+// getPrivateProperty + una recentViewExists su Airtable. Il tetto di 5 req/s per base
+// è condiviso con la ISR del sito pubblico e col CRM: un ospite che lo satura non
+// rompe solo il tracking, rompe tutto ciò che legge quella base. In più il CRM
+// aggrega le visite sulle ultime 1000 righe view/thumb_ senza finestra temporale,
+// quindi allagare il log di "view" spinge fuori finestra le visite degli ALTRI
+// clienti — cioè riproduce esattamente il guasto che questa feature deve chiudere.
+const MAX_PER_HOUR = 40;
+const WINDOW_MS = 60 * 60 * 1000;
+const hits = new Map<string, number[]>();
+function limited(rid: string): boolean {
+  const now = Date.now();
+  if (hits.size > 500) for (const [k, arr] of hits) if (!arr.some((t) => now - t < WINDOW_MS)) hits.delete(k);
+  const arr = (hits.get(rid) ?? []).filter((t) => now - t < WINDOW_MS);
+  arr.push(now);
+  hits.set(rid, arr);
+  return arr.length > MAX_PER_HOUR;
+}
+
 export async function POST(request: Request) {
   const jar = await cookies();
   const session = await verifySession(jar.get(PC_COOKIE)?.value);
@@ -42,6 +63,12 @@ export async function POST(request: Request) {
   const slug = String(body.slug ?? "").slice(0, 200);
   if (!slug) return NextResponse.json({ ok: false });
 
+  // Ordine deliberato: prima i due freni che NON costano I/O (fast-path locale e
+  // rate-limit), poi il grant. Prima il grant check stava sopra, quindi anche una
+  // richiesta poi scartata come duplicato pagava comunque una lista Airtable.
+  if (isRecentLocal(`${session.rid}:${slug}`)) return NextResponse.json({ ok: true, deduped: true });
+  if (limited(session.rid)) return NextResponse.json({ ok: false, error: "rate" });
+
   // Re-check the grant is live (same guarantee as the pages).
   const g = await findGrantById(session.rid);
   if (!g || !isActive(g)) return NextResponse.json({ ok: false });
@@ -51,9 +78,11 @@ export async function POST(request: Request) {
   if (!p) return NextResponse.json({ ok: false });
   const title = p.title;
 
-  if (isRecentLocal(`${session.rid}:${slug}`)) return NextResponse.json({ ok: true, deduped: true });
+  // De-dupe durevole sullo SLUG, non sul titolo: è la chiave stabile (e quella su
+  // cui il CRM aggrega). Sul titolo due immobili omonimi si annullavano a vicenda e
+  // una rinomina dentro la finestra faceva contare due volte la stessa view.
   const sinceIso = new Date(Date.now() - DEDUP_MS).toISOString();
-  if (await recentViewExists(g.codice, title, sinceIso)) return NextResponse.json({ ok: true, deduped: true });
+  if (await recentViewExists(g.codice, slug, sinceIso)) return NextResponse.json({ ok: true, deduped: true });
 
   const h = await headers();
   const ip = (h.get("x-forwarded-for")?.split(",")[0] ?? h.get("x-real-ip") ?? "").trim();

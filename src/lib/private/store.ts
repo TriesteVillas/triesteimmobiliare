@@ -379,21 +379,29 @@ export async function logAccess(e: {
   }
 }
 
-// Vero se una "view" identica (stesso codice + stesso titolo immobile) è già
+// Vero se una "view" dello STESSO immobile (stesso codice + stesso slug) è già
 // stata loggata dopo `sinceIso`. De-dupe durevole e indipendente dall'istanza,
 // così un refresh / una seconda tab / un retry non gonfiano i conteggi per
 // immobile del CRM. Best-effort: a qualunque errore risponde false (meglio un
 // doppione che perdere la view legittima).
 //
+// La chiave è lo SLUG, non il titolo, per la stessa ragione per cui il CRM
+// aggrega per slug: un titolo si riscrive, uno slug no. Sul titolo questo
+// confronto sbagliava in DUE modi opposti, ed è l'unico punto in cui una chiave
+// sbagliata DISTRUGGE un dato invece di renderlo solo brutto da leggere:
+//  - due immobili omonimi ("Villa con vista mare") aperti dallo stesso codice
+//    entro la finestra → la seconda view scartata come duplicato, mai scritta;
+//  - titolo rinominato dentro la finestra → la stessa view scritta due volte.
+//
 // brandClause() NON è opzionale qui: PC_ACCESS_LOG è condivisa coi due brand,
 // e senza filtro la view di un cliente TriesteImmobiliare su un immobile con lo
-// stesso titolo farebbe scartare come "duplicato" la view di un cliente
+// stesso slug farebbe scartare come "duplicato" la view di un cliente
 // TriesteVillas — cioè una view vera che sparisce dal CRM.
-export async function recentViewExists(codice: string, dettaglio: string, sinceIso: string): Promise<boolean> {
-  if (!codice || !dettaglio) return false;
+export async function recentViewExists(codice: string, slug: string, sinceIso: string): Promise<boolean> {
+  if (!codice || !slug) return false;
   try {
     const recs = await aList(T_LOG, {
-      filter: `AND({evento}='view',{codice}='${escFormula(codice)}',{dettaglio}='${escFormula(dettaglio)}',IS_AFTER({quando},'${escFormula(sinceIso)}'),${brandClause()})`,
+      filter: `AND({evento}='view',{codice}='${escFormula(codice)}',{slug_immobile}='${escFormula(slug)}',IS_AFTER({quando},'${escFormula(sinceIso)}'),${brandClause()})`,
       fields: ["quando"],
       max: 1,
     });
