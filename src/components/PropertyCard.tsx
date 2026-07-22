@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import type { PropertyView } from "@/lib/propertyView";
 import PropertyBadge from "./PropertyBadge";
 import Tilt from "./motion/Tilt";
+import FavHeart from "./account/FavHeart";
 
 export default function PropertyCard({
   view,
@@ -43,6 +44,9 @@ export default function PropertyCard({
               className="absolute right-3 top-3 z-[2] shadow-sm"
             />
           )}
+          {/* Cuore preferiti: la card è tutta un <Link>, il componente fa
+              preventDefault/stopPropagation su ogni click al suo interno. */}
+          <FavHeart slug={view.slug} variant="card" />
         </div>
         <div className="space-y-1 p-5">
           <p className="text-xl font-semibold tracking-tight text-brand-dark">

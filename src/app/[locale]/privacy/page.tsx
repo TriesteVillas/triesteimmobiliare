@@ -50,7 +50,11 @@ const CONTENT: Record<string, Content> = {
         p: "Il sito utilizza cookie tecnici necessari al funzionamento. Eventuali servizi di terze parti (es. mappe, video) possono impostare cookie propri quando ne attivi i contenuti.",
       },
       {
-        h: "10. Modifiche",
+        h: "10. Area riservata e personalizzazione",
+        p: "Se crei un account, trattiamo i dati del profilo (nome, email, telefono, preferenze dichiarate) e registriamo la tua attività sul sito da utente autenticato — immobili aperti, tempo di permanenza sulle schede, preferiti, valutazioni e ricerche — per fornirti il servizio (salvataggio preferiti, area personale) e, sulla base del nostro legittimo interesse, per organizzare internamente il follow-up delle richieste. Le proposte personalizzate e le comunicazioni commerciali via email avvengono solo con i consensi facoltativi che puoi dare e revocare in ogni momento dalla tua area account. Gli eventi di navigazione grezzi sono conservati per 18 mesi, poi cancellati o aggregati. Puoi chiedere la cancellazione dell'account direttamente dall'area personale.",
+      },
+      {
+        h: "11. Modifiche",
         p: "Possiamo aggiornare questa informativa; la versione vigente è sempre pubblicata su questa pagina.",
       },
     ],
@@ -95,7 +99,11 @@ const CONTENT: Record<string, Content> = {
         p: "The site uses technical cookies required for operation. Third-party services (e.g. maps, video) may set their own cookies when you activate their content.",
       },
       {
-        h: "10. Changes",
+        h: "10. Account area and personalisation",
+        p: "If you create an account, we process your profile data (name, email, phone, stated preferences) and log your on-site activity as an authenticated user — properties opened, time spent on listings, favourites, ratings and searches — to provide the service (saved favourites, personal area) and, on the basis of our legitimate interest, to organise the follow-up of enquiries internally. Personalised proposals and commercial emails only happen with the optional consents you can give and withdraw at any time from your account area. Raw browsing events are kept for 18 months, then deleted or aggregated. You can request the deletion of your account directly from your personal area.",
+      },
+      {
+        h: "11. Changes",
         p: "We may update this policy; the current version is always published on this page.",
       },
     ],
@@ -140,7 +148,11 @@ const CONTENT: Record<string, Content> = {
         p: "Die Website verwendet technisch notwendige Cookies. Dienste Dritter (z. B. Karten, Videos) können eigene Cookies setzen, wenn Sie deren Inhalte aktivieren.",
       },
       {
-        h: "10. Änderungen",
+        h: "10. Kontobereich und Personalisierung",
+        p: "Wenn Sie ein Konto erstellen, verarbeiten wir Ihre Profildaten (Name, E-Mail, Telefon, erklärte Präferenzen) und protokollieren Ihre Aktivität als angemeldeter Nutzer — geöffnete Objekte, Verweildauer auf Exposés, Favoriten, Bewertungen und Suchen —, um den Dienst zu erbringen (gespeicherte Favoriten, persönlicher Bereich) und, auf Grundlage unseres berechtigten Interesses, die interne Bearbeitung von Anfragen zu organisieren. Personalisierte Vorschläge und werbliche E-Mails erfolgen nur mit den optionalen Einwilligungen, die Sie jederzeit in Ihrem Kontobereich erteilen und widerrufen können. Roh-Navigationsdaten werden 18 Monate aufbewahrt, danach gelöscht oder aggregiert. Die Löschung des Kontos können Sie direkt im persönlichen Bereich beantragen.",
+      },
+      {
+        h: "11. Änderungen",
         p: "Wir können diese Erklärung aktualisieren; die jeweils gültige Fassung ist stets auf dieser Seite veröffentlicht.",
       },
     ],

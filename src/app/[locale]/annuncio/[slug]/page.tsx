@@ -31,6 +31,9 @@ import {
   translatedDescription,
 } from "@/lib/propertyView";
 import { pageAlternates, pageOpenGraph } from "@/lib/seo";
+import FavHeart from "@/components/account/FavHeart";
+import AccountVote from "@/components/account/AccountVote";
+import DwellTracker from "@/components/account/DwellTracker";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.triesteimmobiliare.com";
 
@@ -245,11 +248,16 @@ export default async function PropertyPage({ params }: { params: Params }) {
               </>
             )}
           </p>
-          <p className="mt-5 text-3xl font-semibold tracking-tight text-white">
-            {priceLabel(property, locale, t)}
-          </p>
+          <div className="mt-5 flex flex-wrap items-center gap-4">
+            <p className="text-3xl font-semibold tracking-tight text-white">
+              {priceLabel(property, locale, t)}
+            </p>
+            <FavHeart slug={property.slug} variant="detail" />
+          </div>
         </div>
       </Scene>
+      {/* Tracker view+dwell: attivo solo per utenti loggati, renderizza nulla. */}
+      <DwellTracker slug={property.slug} />
 
       {/* Paper sheet — the dossier */}
       <div className="relative z-10 -mt-5 rounded-t-[2.25rem] bg-paper text-neutral-900 shadow-[0_-24px_60px_rgba(15,39,55,0.16)]">
@@ -365,6 +373,8 @@ export default async function PropertyPage({ params }: { params: Params }) {
               <p className="mt-2 text-sm text-neutral-500">{t("locationApprox")}</p>
             </section>
           )}
+
+          <AccountVote slug={property.slug} />
 
           {/* immobileNome resta il titolo ITALIANO in tutti e tre i locali: finisce
               nel CRM come identità del record, e un immobile deve avere un nome solo

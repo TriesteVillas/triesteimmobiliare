@@ -103,6 +103,9 @@ export type Photo = {
 
 export type Property = {
   id: string;
+  // Airtable record id (recXXX): serve alle scritture che linkano l'immobile
+  // (WEB_EVENTS/WEB_PREFERITI/WEB_MATCHES). `id` resta il tsv_prop_id pubblico.
+  recId: string;
   slug: string;
   title: string;
   // Titolo pubblico tradotto; null quando la traduzione non c'è ancora.
@@ -265,6 +268,7 @@ export function mapRecord(recordId: string, f: Fields): Property {
 
   return {
     id,
+    recId: recordId,
     slug: `${slugify(slugSource(f))}-${idNumber(id)}`,
     title,
     titleEn: str(f[F.titleEn]),

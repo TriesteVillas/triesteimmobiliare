@@ -5,6 +5,7 @@ import LocaleSwitcher from "./LocaleSwitcher";
 import HeaderAutoHide from "./HeaderAutoHide";
 import MobileNav from "./MobileNav";
 import SellerCta from "./SellerCta";
+import AccountLink from "./account/AccountLink";
 
 // Floating light-glass pill — fixed above every page, anchored during view
 // transitions (site-header). Carries the always-visible "Richiedi valutazione"
@@ -47,6 +48,9 @@ export default async function Header() {
             label={t("ctaValuation")}
             className="btn-press hidden rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark sm:inline-block"
           />
+          {/* Client-only: lo stato di login NON si legge server-side qui — l'header
+              vive su pagine statiche e i cookie le renderebbero tutte dinamiche. */}
+          <AccountLink />
           <LocaleSwitcher />
           <MobileNav
             links={links}

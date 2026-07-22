@@ -3,6 +3,10 @@
     {
       "path": "/api/private/cron",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/account/cron",
+      "schedule": "52 2 * * *"
     }
   ]
 }

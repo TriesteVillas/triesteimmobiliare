@@ -488,6 +488,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
   }
 
+  // Se chi invia il form è un utente registrato loggato, la richiesta diventa
+  // anche un evento contact_request nel suo profilo comportamentale (è il
+  // segnale d'intento più pesante del motore). Best-effort: mai bloccare un lead.
+  try {
+    const { currentWebAccount } = await import("@/lib/account/auth");
+    const acc = await currentWebAccount();
+    if (acc) {
+      const { logEvent } = await import("@/lib/account/store");
+      await logEvent({
+        evento: "contact_request",
+        accountId: acc.id,
+        email: acc.email,
+        dettaglio: `form ${String(body.tipo ?? "info")}${body.rif ? ` · ${String(body.rif)}` : ""}${body.immobileNome ? ` · ${String(body.immobileNome)}` : ""}`,
+      });
+    }
+  } catch (e) {
+    console.error("[lead] account event failed:", e);
+  }
+
   if (body.tipo === "buyer") return handleBuyer(body);
   if (body.tipo === "valutazione") return handleValutazione(body);
   if (body.tipo === "investitore") return handleInvestitore(body);
