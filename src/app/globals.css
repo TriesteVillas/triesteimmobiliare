@@ -512,6 +512,45 @@ body:has(.pc-root) footer {
   display: none !important;
 }
 
+/* Selettore lingua dell'area riservata — l'altra faccia della regola qui sopra:
+   nascondendo l'header si nascondeva l'unico comando per cambiare lingua, e chi
+   entra dal link in mail non attraversa mai una pagina che ce l'abbia. */
+.pc-lang {
+  display: none;
+}
+body:has(.pc-root) .pc-lang {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 50;
+  display: flex;
+  gap: 0.125rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  border: 1px solid rgb(169 200 224 / 0.22);
+  border-radius: 999px;
+  background: rgb(5 7 12 / 0.72);
+  backdrop-filter: blur(6px);
+}
+body:has(.pc-root) .pc-lang button {
+  padding: 0 0.3rem;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.pc-lang-on {
+  color: #a9c8e0;
+  font-weight: 600;
+}
+.pc-lang-off {
+  color: rgb(169 200 224 / 0.42);
+}
+body:has(.pc-root) .pc-lang button.pc-lang-off:hover {
+  color: rgb(169 200 224 / 0.85);
+}
+
 .pc-root {
   color: #c3d0dd;
 }

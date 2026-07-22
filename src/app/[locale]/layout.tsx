@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Poppins } from "next/font/google";
 import { routing } from "@/i18n/routing";
 import Header from "@/components/Header";
+import PcLocaleSwitcher from "@/components/private/PcLocaleSwitcher";
 import Footer from "@/components/Footer";
 import RevealObserver from "@/components/RevealObserver";
 import JsonLd from "@/components/JsonLd";
@@ -78,6 +79,9 @@ export default async function LocaleLayout({
         <NextIntlClientProvider>
           <JsonLd data={[orgJsonLd(), webSiteJsonLd()]} />
           <Header />
+          {/* Visibile SOLO nell'area riservata: la stessa regola CSS che nasconde
+              header e footer sulle pagine .pc-root accende questo. */}
+          <PcLocaleSwitcher />
           <main className="flex-1">{children}</main>
           <Footer />
           <RevealObserver />

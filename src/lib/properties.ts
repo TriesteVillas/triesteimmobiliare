@@ -205,17 +205,27 @@ export function slugify(input: string): string {
     .slice(0, 60);
 }
 
-// Internal name — used only as the title fallback when public_tsv_name is empty.
-// NOTE: must NOT feed the URL slug; the internal name often carries the owner's
-// surname (e.g. "Valta Penthouse Large"), which can't appear in a public URL.
+// Title fallback when public_tsv_name is empty.
+//
+// The internal name is NOT used here any more, and the reason is the same one
+// already written for the slug: it very often carries the owner's surname —
+// "BANNE ORLANDO", "MIRAMARE ZINI", "COSTIERA ARTIOLI" are real values in the
+// live base. Keeping it as the title fallback meant that the day someone published
+// a listing before filling public_tsv_name, that surname would appear in the <h1>,
+// in <title>, in the OpenGraph card and in every photo alt text. Protecting the
+// URL and leaving the headline exposed protects nothing: the same string was one
+// empty field away from the top of the page.
+//
+// The neutral fallback (type · area) is worse copy and infinitely safer. It also
+// makes the omission visible to whoever publishes, instead of silently producing
+// a page titled with a private surname. The internal id is the last resort — but
+// see the comment on `title` in mapRecord: that too can be a speaking code.
 function buildName(f: Fields): string {
-  const named = str(f[F.internalName]);
-  if (named) return named;
   const derived = [str(f[F.tipologia]), str(f[F.zona])]
     .filter(Boolean)
     .join(" · ");
   if (derived) return derived;
-  return str(f[F.id]) ?? "Immobile";
+  return "Immobile";
 }
 
 // Source of the public URL slug: the public display name. Falls back to a
@@ -241,7 +251,10 @@ export function mapRecord(recordId: string, f: Fields): Property {
   const priceRent = num(f[F.canone]);
   const tags = Array.isArray(f[F.tags]) ? (f[F.tags] as string[]) : [];
   const name = buildName(f); // title fallback only (see slugSource for the URL)
-  // Public display name: public_tsv_name when set, else the internal name.
+  // Public display name: public_tsv_name when set, else a NEUTRAL fallback.
+  // Never the internal name and never the internal id: `tsv_prop_id` is a free
+  // text field and 38 of the 765 records carry a speaking code (TSV-PROP-DUINO-
+  // LEVIGNE, PUCINO-CORSI, SAPPADA-BACH…) rather than a progressive number.
   const title = str(f[F.publicName]) ?? name;
 
   const photos = attachments(f[F.foto], title); // full gallery
