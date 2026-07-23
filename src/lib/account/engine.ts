@@ -9,6 +9,7 @@ import {
   listMatchChiavi,
   createMatch,
   patchAccount,
+  logEvent,
   type WebAccount,
   type EngineEvent,
   type Pref,
@@ -195,7 +196,44 @@ export type EngineResult = {
   scored: number;
   matchesCreated: number;
   skippedLowActivity: number;
+  suspended: number;
 };
+
+// Anti-abuso, stessa euristica della PC (detectAbuse): login VALIDI dallo
+// stesso account da più di 4 IP distinti in 24h = credenziale condivisa →
+// stato Sospeso + nota. I login falliti NON sospendono (sarebbe un lockout
+// pilotabile da un attaccante): restano visibili in WEB_EVENTS per il CRM.
+const ABUSE_IP_THRESHOLD = 4;
+
+async function detectAcctAbuse(accounts: WebAccount[], events: EngineEvent[], now: number): Promise<number> {
+  const dayAgo = now - DAY_MS;
+  const ipsByEmail = new Map<string, Set<string>>();
+  for (const e of events) {
+    if (e.evento !== "login_ok" || !e.ip || e.quandoMs < dayAgo) continue;
+    (ipsByEmail.get(e.email) ?? ipsByEmail.set(e.email, new Set()).get(e.email)!).add(e.ip);
+  }
+  let suspended = 0;
+  for (const acc of accounts) {
+    const ips = ipsByEmail.get(acc.email);
+    if (!ips || ips.size <= ABUSE_IP_THRESHOLD || acc.stato !== "Attivo") continue;
+    try {
+      await patchAccount(acc.id, {
+        stato: "Sospeso",
+        sospeso_note: `Auto: ${ips.size} IP distinti in 24h (${[...ips].slice(0, 6).join(", ")}).`,
+      });
+      await logEvent({
+        evento: "blocked",
+        accountId: acc.id,
+        email: acc.email,
+        dettaglio: `${ips.size} distinct IPs/24h`,
+      });
+      suspended++;
+    } catch (e) {
+      console.error(`[acct-engine] suspend failed for ${acc.email}:`, e);
+    }
+  }
+  return suspended;
+}
 
 export async function runEngine(): Promise<EngineResult> {
   const [accounts, events, prefsAll, pubProps, pcProps, existingMatches] = await Promise.all([
@@ -269,7 +307,9 @@ export async function runEngine(): Promise<EngineResult> {
     }
   }
 
-  return { accounts: accounts.length, scored, matchesCreated, skippedLowActivity };
+  const suspended = await detectAcctAbuse(accounts, events, now);
+
+  return { accounts: accounts.length, scored, matchesCreated, skippedLowActivity, suspended };
 }
 
 // Deve combaciare con la chiave scritta da createMatch.

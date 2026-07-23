@@ -312,7 +312,8 @@ export type AcctEvent =
   | "chat"
   | "contact_request"
   | "verify_email"
-  | "delete_request";
+  | "delete_request"
+  | "blocked";
 
 export async function logEvent(e: {
   evento: AcctEvent;
@@ -440,12 +441,13 @@ export type EngineEvent = {
   slug: string;
   dwellSec: number;
   quandoMs: number;
+  ip: string;
 };
 
 export async function listEventsSince(days: number): Promise<EngineEvent[]> {
   const recs = await aList(T_EVT, {
     filter: `AND(IS_AFTER({quando},DATEADD(NOW(),-${Math.max(1, Math.floor(days))},'days')),${acctBrandClause()})`,
-    fields: ["email", "evento", "slug_immobile", "dwell_sec", "quando"],
+    fields: ["email", "evento", "slug_immobile", "dwell_sec", "quando", "ip"],
   });
   return recs
     .map((r) => ({
@@ -454,6 +456,7 @@ export async function listEventsSince(days: number): Promise<EngineEvent[]> {
       slug: str(r.fields.slug_immobile),
       dwellSec: typeof r.fields.dwell_sec === "number" ? (r.fields.dwell_sec as number) : 0,
       quandoMs: r.fields.quando ? new Date(str(r.fields.quando)).getTime() : 0,
+      ip: str(r.fields.ip),
     }))
     .filter((e) => e.email && e.quandoMs > 0);
 }
