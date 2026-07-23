@@ -192,8 +192,8 @@ export default function BuyerConcierge({
             if (msgs.length > 0) setOpen(true);
           }}
           maxLength={2000}
-          placeholder={t("barPlaceholder")}
-          aria-label={t("barPlaceholder")}
+          placeholder={barPlaceholder}
+          aria-label={barPlaceholder}
           className="w-full rounded-full border border-white/15 bg-white/[0.05] py-4 pl-13 pr-32 text-base text-white placeholder:text-white/40 shadow-[0_18px_50px_-20px_rgba(207,183,149,0.25)] outline-none backdrop-blur transition-colors focus:border-sand/60 sm:pl-14"
         />
         <button
@@ -204,7 +204,7 @@ export default function BuyerConcierge({
         </button>
       </form>
       <p className="mx-auto mt-3 max-w-2xl text-center text-xs text-white/40" data-reveal>
-        {t("barHint")}
+        {barHint}
       </p>
 
       {open && (
@@ -239,7 +239,7 @@ export default function BuyerConcierge({
             <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-5 py-4">
               {msgs.length === 0 && !typing && (
                 <div className="mt-4">
-                  <p className="text-center text-sm text-white/45">{t("empty")}</p>
+                  <p className="text-center text-sm text-white/45">{emptyLine}</p>
                   <div className="mt-5 flex flex-col items-stretch gap-2">
                     {starters.map((s) => (
                       <button
