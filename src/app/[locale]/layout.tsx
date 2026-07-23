@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -26,6 +26,11 @@ const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
   variable: "--font-poppins",
 });
+
+// Match the mobile browser chrome to the favicon's exact ink background.
+export const viewport: Viewport = {
+  themeColor: "#0f2737",
+};
 
 export async function generateMetadata({
   params,
