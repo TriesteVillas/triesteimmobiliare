@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import Logo from "./Logo";
 
@@ -20,16 +20,39 @@ const NAV = [
   { href: "/contatti", key: "contact" },
 ] as const;
 
-// Sibling brands (the group ecosystem). Live sites linked; the rest route to /gruppo.
+type GroupSiteLocale = "it" | "en" | "de";
+const GROUP_SITES = {
+  it: {
+    tsv: "https://www.triestevillas.com/",
+    affitti: "https://www.triesteaffitti.com/",
+    friuli: "https://friulivillas.com/",
+    lignano: "https://www.lignanovillas.com/it/",
+  },
+  en: {
+    tsv: "https://www.triestevillas.com/en",
+    affitti: "https://www.triesteaffitti.com/",
+    friuli: "https://friulivillas.com/en/",
+    lignano: "https://www.lignanovillas.com/",
+  },
+  de: {
+    tsv: "https://www.triestevillas.com/de",
+    affitti: "https://www.triesteaffitti.com/",
+    friuli: "https://friulivillas.com/de/",
+    lignano: "https://www.lignanovillas.com/de/",
+  },
+} as const satisfies Record<GroupSiteLocale, Record<string, string>>;
+
+// Sibling brands (the group ecosystem). TriesteBusiness routes to /gruppo because it has no website.
 const GROUP = [
-  { label: "TriesteVillas", href: "https://www.triestevillas.com", external: true },
-  { label: "TriesteAffitti", href: "https://www.triesteaffitti.com", external: true },
-  { label: "FriuliVillas", href: "/gruppo", external: false },
-  { label: "LignanoVillas", href: "/gruppo", external: false },
+  { label: "TriesteVillas", site: "tsv", external: true },
+  { label: "TriesteAffitti", site: "affitti", external: true },
+  { label: "FriuliVillas", site: "friuli", external: true },
+  { label: "LignanoVillas", site: "lignano", external: true },
   { label: "TriesteBusiness", href: "/gruppo", external: false },
 ] as const;
 
 export default async function Footer() {
+  const locale = await getLocale();
   const t = await getTranslations("footer");
   const tNav = await getTranslations("nav");
   const tContact = await getTranslations("contact");
@@ -37,6 +60,7 @@ export default async function Footer() {
   const year = new Date().getFullYear();
   const phone = tContact("phone");
   const telHref = `tel:+39${phone.replace(/\s+/g, "")}`;
+  const groupSites = GROUP_SITES[locale as GroupSiteLocale] ?? GROUP_SITES.it;
 
   return (
     <footer className="mt-16 bg-brand-dark text-white">
@@ -82,26 +106,30 @@ export default async function Footer() {
             {t("groupTitle")}
           </h2>
           <ul className="space-y-2 text-white/70">
-            {GROUP.map((b) =>
-              b.external ? (
-                <li key={b.label}>
-                  <a
-                    href={b.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="transition-colors hover:text-white"
-                  >
-                    {b.label} ↗
-                  </a>
-                </li>
-              ) : (
+            {GROUP.map((b) => {
+              if (b.external) {
+                return (
+                  <li key={b.label}>
+                    <a
+                      href={groupSites[b.site]}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="transition-colors hover:text-white"
+                    >
+                      {b.label} ↗
+                    </a>
+                  </li>
+                );
+              }
+
+              return (
                 <li key={b.label}>
                   <Link href={b.href} className="transition-colors hover:text-white">
                     {b.label}
                   </Link>
                 </li>
-              ),
-            )}
+              );
+            })}
           </ul>
         </nav>
 

@@ -24,9 +24,28 @@ export async function generateMetadata({
 }
 
 const BRANDS = ["tsv", "tsi", "affitti", "friuli", "business", "lignano"] as const;
-const BRAND_SITES: Partial<Record<(typeof BRANDS)[number], string>> = {
-  tsv: "https://www.triestevillas.com",
-  affitti: "https://www.triesteaffitti.com",
+type BrandSiteLocale = "it" | "en" | "de";
+type BrandSites = Partial<Record<(typeof BRANDS)[number], string>>;
+// URLs verified live on 2026-07-23. TriesteBusiness stays unlinked because it has no website.
+const BRAND_SITES: Record<BrandSiteLocale, BrandSites> = {
+  it: {
+    tsv: "https://www.triestevillas.com/",
+    affitti: "https://www.triesteaffitti.com/",
+    friuli: "https://friulivillas.com/",
+    lignano: "https://www.lignanovillas.com/it/",
+  },
+  en: {
+    tsv: "https://www.triestevillas.com/en",
+    affitti: "https://www.triesteaffitti.com/",
+    friuli: "https://friulivillas.com/en/",
+    lignano: "https://www.lignanovillas.com/",
+  },
+  de: {
+    tsv: "https://www.triestevillas.com/de",
+    affitti: "https://www.triesteaffitti.com/",
+    friuli: "https://friulivillas.com/de/",
+    lignano: "https://www.lignanovillas.com/de/",
+  },
 };
 const STORY = [
   { year: "2013", key: "start" },
@@ -49,6 +68,7 @@ export default async function GroupPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("group");
+  const brandSites = BRAND_SITES[locale as BrandSiteLocale] ?? BRAND_SITES.it;
 
   return (
     <>
@@ -80,7 +100,7 @@ export default async function GroupPage({
           <p className="mt-2 max-w-2xl text-lg text-brand">{t("brandsSubtitle")}</p>
           <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3" data-reveal-stagger>
             {BRANDS.map((b) => {
-              const site = BRAND_SITES[b];
+              const site = brandSites[b];
               const isSelf = b === "tsi";
               return (
                 <div
