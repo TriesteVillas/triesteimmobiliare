@@ -197,6 +197,19 @@ function lines(v: unknown): string[] {
     ? v.split(/\r?\n/).map((s) => s.trim()).filter(Boolean)
     : [];
 }
+// Normalize a Matterport link into an embeddable showcase URL (/show/?m=<id>).
+// The dashboard URL (/models/<id>) — often pasted from the logged-in Matterport
+// backend — refuses iframe embedding (X-Frame-Options) and renders as
+// "connection refused". Handles /models/, /show/?m= and a bare model id.
+function matterportEmbed(v: unknown): string | null {
+  const raw = str(v);
+  if (!raw) return null;
+  if (/matterport\.com\/show\/\?/i.test(raw)) return raw; // already embeddable
+  const id =
+    raw.match(/matterport\.com\/(?:models|show)\/(?:\?m=)?([A-Za-z0-9]+)/i)?.[1] ??
+    raw.match(/^([A-Za-z0-9]{6,})$/)?.[1];
+  return id ? `https://my.matterport.com/show/?m=${id}` : raw;
+}
 
 export function slugify(input: string): string {
   return input
@@ -298,7 +311,7 @@ export function mapRecord(recordId: string, f: Fields): Property {
     topPhotos,
     planimetrie,
     videos: lines(f[F.youtubeVideos]),
-    matterportUrl: str(f[F.matterport]),
+    matterportUrl: matterportEmbed(f[F.matterport]),
     arredato: str(f[F.arredato]),
     ascensore: str(f[F.ascensore]),
     piscina: str(f[F.piscina]),
