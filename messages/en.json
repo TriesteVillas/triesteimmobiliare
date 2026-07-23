@@ -862,5 +862,25 @@
     "resetNoToken": "Invalid link: open the link you received by email.",
     "resetBadToken": "Link expired or already used. Request a new reset.",
     "resetDone": "Password updated. Taking you to your account…"
+  },
+  "concierge": {
+    "title": "Concierge AI",
+    "barPlaceholder": "Ask anything about buying in Italy…",
+    "barCta": "Ask",
+    "barHint": "Answers by Claude, TriesteImmobiliare' AI concierge. It can be wrong — and says so. Conversations are recorded and reviewed by our team.",
+    "disclaimer": "I'm Claude, TriesteImmobiliare' AI assistant — not infallible, and not a lawyer or tax adviser. For anything binding, the team takes over. Conversations are recorded so a human can pick up where I leave off.",
+    "empty": "Ask how buying works, what it costs, mortgages as a non-resident — anything.",
+    "starters": [
+      "What does buying a €800k home in Trieste really cost?",
+      "Can I get an Italian mortgage with a foreign income?",
+      "I'm not an EU citizen — can I even buy?",
+      "What is the Private Collection?"
+    ],
+    "placeholder": "Write your question…",
+    "send": "Send",
+    "close": "Close",
+    "error": "Something hiccuped. Try again.",
+    "closed": "This conversation is closed. For anything else: info@triesteimmobiliare.com",
+    "humanLine": "Prefer a human?"
   }
 }

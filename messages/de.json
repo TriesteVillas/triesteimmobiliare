@@ -862,5 +862,25 @@
     "resetNoToken": "Ungültiger Link: Öffnen Sie den per E-Mail erhaltenen Link.",
     "resetBadToken": "Link abgelaufen oder bereits verwendet. Fordern Sie einen neuen an.",
     "resetDone": "Passwort aktualisiert. Wir bringen Sie zu Ihrem Konto…"
+  },
+  "concierge": {
+    "title": "Concierge AI",
+    "barPlaceholder": "Fragen Sie alles zum Hauskauf in Italien…",
+    "barCta": "Fragen",
+    "barHint": "Es antwortet Claude, der KI-Concierge von TriesteImmobiliare. Er kann sich irren — und sagt es. Gespräche werden aufgezeichnet und von unserem Team gelesen.",
+    "disclaimer": "Ich bin Claude, der KI-Assistent von TriesteImmobiliare — nicht unfehlbar, und weder Anwalt noch Steuerberater. Für alles Verbindliche übernimmt das Team. Gespräche werden aufgezeichnet, damit ein Mensch dort weitermachen kann, wo ich aufhöre.",
+    "empty": "Fragen Sie, wie der Kauf abläuft, was er kostet, Hypothek als Nicht-Resident — was immer Sie möchten.",
+    "starters": [
+      "Was kostet ein Haus um 800.000 € in Triest wirklich?",
+      "Bekomme ich eine italienische Hypothek mit ausländischem Einkommen?",
+      "Ich bin kein EU-Bürger — darf ich überhaupt kaufen?",
+      "Was ist die Private Collection?"
+    ],
+    "placeholder": "Ihre Frage…",
+    "send": "Senden",
+    "close": "Schließen",
+    "error": "Da ist etwas schiefgegangen. Bitte erneut versuchen.",
+    "closed": "Dieses Gespräch ist beendet. Für alles Weitere: info@triesteimmobiliare.com",
+    "humanLine": "Lieber ein Mensch?"
   }
 }

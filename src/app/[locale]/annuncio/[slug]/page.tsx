@@ -34,6 +34,7 @@ import { pageAlternates, pageOpenGraph } from "@/lib/seo";
 import FavHeart from "@/components/account/FavHeart";
 import AccountVote from "@/components/account/AccountVote";
 import DwellTracker from "@/components/account/DwellTracker";
+import BuyerConcierge from "@/components/compra/BuyerConcierge";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.triesteimmobiliare.com";
 
@@ -375,6 +376,11 @@ export default async function PropertyPage({ params }: { params: Params }) {
           )}
 
           <AccountVote slug={property.slug} />
+
+          {/* Concierge AI sulla scheda: card scura nella zona paper. */}
+          <div className="mt-8 rounded-2xl bg-ink p-4">
+            <BuyerConcierge />
+          </div>
 
           {/* immobileNome resta il titolo ITALIANO in tutti e tre i locali: finisce
               nel CRM come identità del record, e un immobile deve avere un nome solo

@@ -10,6 +10,7 @@ import { buildPropertyView } from "@/lib/propertyView";
 import PropertyCard from "@/components/PropertyCard";
 import AuthPanel from "@/components/account/AuthPanel";
 import PrefsForm from "@/components/account/PrefsForm";
+import BuyerConcierge from "@/components/compra/BuyerConcierge";
 
 // L'area clienti: da anonimi è la pagina-valore con accesso/registrazione, da
 // loggati il salotto personale (preferiti, proposte del motore, preferenze,
@@ -163,6 +164,12 @@ export default async function AccountPage({
           consMarketing={acc.consMarketing}
           consProfilazione={acc.consProfilazione}
         />
+      </section>
+
+      {/* Concierge AI: stesso cervello del bridge CRM, brand TSI; widget dark-themed
+          → card scura sul tema chiaro. Da loggati la chat si aggancia all'account. */}
+      <section className="mt-14 rounded-2xl bg-ink p-4">
+        <BuyerConcierge />
       </section>
 
       <section className="mt-14 max-w-2xl rounded-2xl border border-neutral-200 bg-white p-6">

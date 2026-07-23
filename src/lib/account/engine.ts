@@ -7,12 +7,15 @@ import {
   listEventsSince,
   listAllPrefs,
   listMatchChiavi,
+  listChatQuestionsSince,
   createMatch,
   patchAccount,
+  patchLeadWebIntel,
   logEvent,
   type WebAccount,
   type EngineEvent,
   type Pref,
+  type ChatQuestion,
 } from "./store";
 
 // Il motore di intelligenza dell'area clienti. Gira nel cron notturno e fa tre
@@ -167,6 +170,90 @@ function buildProfiloAi(acc: WebAccount, profile: Profile, score: number, nEvent
   return rows.join("\n");
 }
 
+// ---- web_intel: il riepilogo web stampato sulla scheda lead ---------------------
+// Campo macchina su LEAD_ (si sovrascrive sempre, l'intestazione lo dichiara).
+// Fonti: WEB_ACCOUNTS (login), WEB_PREFERITI (cuori/voti), WEB_EVENTS
+// (articoli salvati e ricerche, finestra 60gg del motore) e WEB_CHAT_LOG
+// (domande concierge, UNA fetch per giro raggruppata per email a monte).
+
+const fmtRome = (d: Date, opts: Intl.DateTimeFormatOptions) =>
+  new Intl.DateTimeFormat("it-IT", { timeZone: "Europe/Rome", ...opts }).format(d);
+
+function truncate(s: string, n: number): string {
+  const t = s.replace(/\s+/g, " ").trim();
+  return t.length <= n ? t : `${t.slice(0, n - 1)}…`;
+}
+
+function buildWebIntel(
+  acc: WebAccount,
+  events: EngineEvent[],
+  prefs: Pref[],
+  bySlug: Map<string, Property>,
+  articleTitleBySlug: Map<string, string>,
+  chat: ChatQuestion[],
+): string {
+  const now = new Date();
+  const stamp = `${fmtRome(now, { day: "2-digit", month: "2-digit", year: "numeric" })} ${fmtRome(now, { hour: "2-digit", minute: "2-digit", hour12: false })}`;
+  const rows: string[] = [`[Aggiornato ${stamp} · automatico, non editare]`];
+
+  const lastLogin = acc.ultimoLogin ? new Date(acc.ultimoLogin) : null;
+  const lastTxt =
+    lastLogin && !Number.isNaN(lastLogin.getTime())
+      ? `, ultimo ${fmtRome(lastLogin, { day: "2-digit", month: "2-digit" })}`
+      : "";
+  rows.push(`Accessi area riservata: ${acc.loginCount} login${lastTxt}.`);
+
+  const hearted = prefs.filter((p) => p.cuore);
+  const heartTitles = hearted.slice(0, 5).map((p) => `«${bySlug.get(p.slug)?.title ?? p.slug}»`);
+  rows.push(
+    `Wishlist immobili: ${hearted.length}${heartTitles.length ? ` — ${heartTitles.join(", ")}` : ""}.`,
+  );
+
+  const likes = prefs.filter((p) => p.voto === "Like").length;
+  const dislikes = prefs.filter((p) => p.voto === "Dislike").length;
+  rows.push(`Like: ${likes} · Dislike: ${dislikes}.`);
+
+  // Articoli salvati: stato ricostruito dal registro (per slug vince il più recente).
+  const artLatest = new Map<string, { on: boolean; ts: number }>();
+  for (const e of events) {
+    if ((e.evento !== "article_fav" && e.evento !== "article_unfav") || !e.dettaglio) continue;
+    const prev = artLatest.get(e.dettaglio);
+    if (!prev || e.quandoMs >= prev.ts)
+      artLatest.set(e.dettaglio, { on: e.evento === "article_fav", ts: e.quandoMs });
+  }
+  const artTitles = [...artLatest.entries()]
+    .filter(([, v]) => v.on)
+    .map(([slug]) => `«${articleTitleBySlug.get(slug) ?? slug}»`);
+  rows.push(`Articoli Biblioteca salvati: ${artTitles.length ? artTitles.join(", ") : "nessuno"}.`);
+
+  if (chat.length) {
+    const ultime = [...chat]
+      .sort((a, b) => b.quandoMs - a.quandoMs)
+      .slice(0, 5)
+      .map((q) => `«${truncate(q.domanda, 80)}»`);
+    rows.push(
+      `Concierge AI: ${chat.length} ${chat.length === 1 ? "domanda" : "domande"} — ultime: ${ultime.join(" ")}.`,
+    );
+  } else {
+    rows.push("Concierge AI: nessuna domanda.");
+  }
+
+  // Ricerche: ultimi termini distinti, riga presente solo se ce ne sono.
+  const seen = new Set<string>();
+  const terms: string[] = [];
+  for (const e of [...events].sort((a, b) => b.quandoMs - a.quandoMs)) {
+    if (e.evento !== "search" || !e.dettaglio) continue;
+    const t = truncate(e.dettaglio, 60);
+    if (seen.has(t.toLowerCase())) continue;
+    seen.add(t.toLowerCase());
+    terms.push(t);
+    if (terms.length >= 5) break;
+  }
+  if (terms.length) rows.push(`Ricerche: ${terms.join(" · ")}.`);
+
+  return rows.join("\n");
+}
+
 // Punteggio contenutistico 0–100 di un immobile contro un profilo.
 function matchScore(p: Property, profile: Profile): { score: number; motivi: string[] } {
   const motivi: string[] = [];
@@ -196,6 +283,7 @@ export type EngineResult = {
   scored: number;
   matchesCreated: number;
   skippedLowActivity: number;
+  intelWritten: number;
   suspended: number;
 };
 
@@ -236,14 +324,19 @@ async function detectAcctAbuse(accounts: WebAccount[], events: EngineEvent[], no
 }
 
 export async function runEngine(): Promise<EngineResult> {
-  const [accounts, events, prefsAll, pubProps, pcProps, existingMatches] = await Promise.all([
-    listActiveAccounts(),
-    listEventsSince(60),
-    listAllPrefs(),
-    getProperties(),
-    getPrivateProperties().catch(() => [] as Property[]),
-    listMatchChiavi(),
-  ]);
+  const [accounts, events, prefsAll, pubProps, pcProps, existingMatches, articles, chatAll] =
+    await Promise.all([
+      listActiveAccounts(),
+      listEventsSince(60),
+      listAllPrefs(),
+      getProperties(),
+      getPrivateProperties().catch(() => [] as Property[]),
+      listMatchChiavi(),
+      // Best-effort entrambe: se Biblioteca o registro chat non rispondono, il
+      // giro di scoring/matching non si ferma.
+      Promise.resolve([] as { slug: string; title: unknown }[]), // TSI: nessuna Biblioteca — niente articoli
+      listChatQuestionsSince(60).catch(() => [] as ChatQuestion[]),
+    ]);
   // Le PC servono solo a risolvere slug interagiti (un utente PC può avere
   // eventi su immobili riservati): i CANDIDATI al match restano i pubblici.
   const bySlug = new Map<string, Property>();
@@ -253,11 +346,17 @@ export async function runEngine(): Promise<EngineResult> {
   for (const e of events) (evByEmail.get(e.email) ?? evByEmail.set(e.email, []).get(e.email)!).push(e);
   const prefsByEmail = new Map<string, Pref[]>();
   for (const pr of prefsAll) (prefsByEmail.get(pr.email) ?? prefsByEmail.set(pr.email, []).get(pr.email)!).push(pr);
+  const chatByEmail = new Map<string, ChatQuestion[]>();
+  for (const q of chatAll) (chatByEmail.get(q.email) ?? chatByEmail.set(q.email, []).get(q.email)!).push(q);
+  // Titoli articolo in italiano: il web_intel è per l'operatore, non per il cliente.
+  const artTitleBySlug = new Map<string, string>();
+  for (const a of articles) artTitleBySlug.set(a.slug, String(a.title ?? a.slug)); // TSI: lista sempre vuota
 
   const now = Date.now();
   let scored = 0;
   let matchesCreated = 0;
   let skippedLowActivity = 0;
+  let intelWritten = 0;
 
   for (const acc of accounts) {
     const ev = evByEmail.get(acc.email) ?? [];
@@ -272,6 +371,20 @@ export async function runEngine(): Promise<EngineResult> {
       scored++;
     } catch (e) {
       console.error(`[acct-engine] score patch failed for ${acc.email}:`, e);
+    }
+
+    // web_intel sulla scheda lead collegata: best-effort, un lead rotto non
+    // ferma il giro. Campo macchina: si scrive sempre, senza confronto.
+    if (acc.leadIds.length) {
+      try {
+        await patchLeadWebIntel(
+          acc.leadIds[0],
+          buildWebIntel(acc, ev, prefs, bySlug, artTitleBySlug, chatByEmail.get(acc.email) ?? []),
+        );
+        intelWritten++;
+      } catch (e) {
+        console.error(`[acct-engine] web_intel patch failed for ${acc.email}:`, e);
+      }
     }
 
     // Matching: serve un minimo di storia, altrimenti si propone a caso.
@@ -309,7 +422,7 @@ export async function runEngine(): Promise<EngineResult> {
 
   const suspended = await detectAcctAbuse(accounts, events, now);
 
-  return { accounts: accounts.length, scored, matchesCreated, skippedLowActivity, suspended };
+  return { accounts: accounts.length, scored, matchesCreated, skippedLowActivity, intelWritten, suspended };
 }
 
 // Deve combaciare con la chiave scritta da createMatch.

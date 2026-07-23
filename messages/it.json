@@ -862,5 +862,25 @@
     "resetNoToken": "Link non valido: apri il link ricevuto via email.",
     "resetBadToken": "Link scaduto o già usato. Richiedi un nuovo reset.",
     "resetDone": "Password aggiornata. Ti stiamo portando al tuo account…"
+  },
+  "concierge": {
+    "title": "Concierge AI",
+    "barPlaceholder": "Chiedi qualsiasi cosa sul comprare in Italia…",
+    "barCta": "Chiedi",
+    "barHint": "Risponde Claude, il concierge AI di TriesteImmobiliare. Può sbagliare — e lo dice. Le conversazioni sono registrate e riviste dal nostro team.",
+    "disclaimer": "Sono Claude, l'assistente AI di TriesteImmobiliare — non infallibile, e non un avvocato né un fiscalista. Per tutto ciò che è vincolante subentra il team. Le conversazioni sono registrate perché un umano possa riprendere da dove mi fermo.",
+    "empty": "Chiedimi come funziona l'acquisto, cosa costa, il mutuo da non residente — qualsiasi cosa.",
+    "starters": [
+      "Quanto costa davvero comprare una casa da 800mila euro a Trieste?",
+      "Posso avere un mutuo italiano con redditi esteri?",
+      "Non sono cittadino UE — posso comprare?",
+      "Cos'è la Private Collection?"
+    ],
+    "placeholder": "Scrivi la tua domanda…",
+    "send": "Invia",
+    "close": "Chiudi",
+    "error": "Qualcosa è andato storto. Riprova.",
+    "closed": "Questa conversazione è chiusa. Per tutto il resto: info@triesteimmobiliare.com",
+    "humanLine": "Preferisci un umano?"
   }
 }

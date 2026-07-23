@@ -19,6 +19,7 @@ const T_EVT = "tbli8lWAciSGBhI4v"; // WEB_EVENTS
 const T_PREF = "tbl7ral88bbcBBhep"; // WEB_PREFERITI
 const T_MATCH = "tblKiZVrqJtzUJQRv"; // WEB_MATCHES
 const T_LEAD = "tbl1RolmcvI7WxDdr"; // LEAD_
+const T_CHAT = "tblC0SweZRdCrhLHO"; // WEB_CHAT_LOG (scritta dal CRM, qui solo lettura)
 
 type AirRecord = { id: string; fields: Record<string, unknown> };
 
@@ -97,6 +98,7 @@ export type WebAccount = {
   digest: string;
   criteri: string;
   loginCount: number;
+  ultimoLogin: string; // ISO o "" — serve al riepilogo web_intel sul lead
   emailVerificata: boolean;
 };
 
@@ -117,6 +119,7 @@ function toAccount(r: AirRecord): WebAccount {
     digest: str(f.digest_freq),
     criteri: str(f.criteri),
     loginCount: typeof f.login_count === "number" ? f.login_count : 0,
+    ultimoLogin: str(f.ultimo_login),
     emailVerificata: f.email_verificata === true,
   };
 }
@@ -306,6 +309,8 @@ export type AcctEvent =
   | "dislike"
   | "vote_removed"
   | "search"
+  | "article_fav"
+  | "article_unfav"
   | "prefs_update"
   | "digest_optin"
   | "digest_optout"
@@ -344,6 +349,58 @@ export async function logEvent(e: {
   } catch (err) {
     console.error("[acct] event log failed:", err);
   }
+}
+
+// ---- Articoli salvati (Biblioteca) ---------------------------------------------
+// Nessuna tabella di stato: lo stato corrente si RICOSTRUISCE dal registro
+// eventi (per slug vince l'evento più recente). A volumi account è banale, e
+// tiene WEB_EVENTS come unica fonte — la stessa che legge il motore notturno.
+// Lo slug dell'articolo viaggia in `dettaglio`: `slug_immobile` resta riservato
+// agli immobili, così i conteggi del motore non si sporcano.
+
+export async function listSavedArticleSlugs(email: string): Promise<string[]> {
+  const em = normEmail(email);
+  if (!em) return [];
+  const recs = await aList(T_EVT, {
+    filter: `AND(OR({evento}='article_fav',{evento}='article_unfav'),LOWER({email})="${escFormula(em)}",${acctBrandClause()})`,
+    fields: ["evento", "dettaglio", "quando"],
+  });
+  const latest = new Map<string, { on: boolean; ts: number }>();
+  for (const r of recs) {
+    const slug = str(r.fields.dettaglio);
+    if (!slug) continue;
+    const ts = r.fields.quando ? new Date(str(r.fields.quando)).getTime() : 0;
+    const prev = latest.get(slug);
+    if (!prev || ts >= prev.ts) latest.set(slug, { on: str(r.fields.evento) === "article_fav", ts });
+  }
+  return [...latest.entries()].filter(([, v]) => v.on).map(([slug]) => slug);
+}
+
+// ---- WEB_CHAT_LOG (sola lettura, per il web_intel) ------------------------------
+// La tabella la scrive il CRM (bridge concierge); qui si legge per NOME campo.
+// UNA fetch per giro del motore — tutte le righe TSV della finestra — poi si
+// raggruppa per email in memoria: mai una query per account (rate limit Airtable).
+
+export type ChatQuestion = { email: string; domanda: string; quandoMs: number };
+
+export async function listChatQuestionsSince(days: number): Promise<ChatQuestion[]> {
+  const recs = await aList(T_CHAT, {
+    filter: `AND(IS_AFTER({quando},DATEADD(NOW(),-${Math.max(1, Math.floor(days))},'days')),${acctBrandClause()})`,
+    fields: ["email", "domanda", "quando"],
+  });
+  return recs
+    .map((r) => ({
+      email: normEmail(str(r.fields.email)),
+      domanda: str(r.fields.domanda),
+      quandoMs: r.fields.quando ? new Date(str(r.fields.quando)).getTime() : 0,
+    }))
+    .filter((q) => q.email && q.domanda);
+}
+
+// Il riepilogo web-intel stampato sulla scheda lead (campo macchina, si
+// sovrascrive sempre). Scrittura per NOME campo + typecast, come tutto qui.
+export async function patchLeadWebIntel(leadId: string, text: string): Promise<void> {
+  await aPatch(T_LEAD, leadId, { web_intel: text });
 }
 
 // De-dupe durevole delle view, chiave email+slug (stessa filosofia della PC:
@@ -439,6 +496,7 @@ export type EngineEvent = {
   email: string;
   evento: string;
   slug: string;
+  dettaglio: string; // slug articolo per article_fav/unfav, termini per search
   dwellSec: number;
   quandoMs: number;
   ip: string;
@@ -447,13 +505,14 @@ export type EngineEvent = {
 export async function listEventsSince(days: number): Promise<EngineEvent[]> {
   const recs = await aList(T_EVT, {
     filter: `AND(IS_AFTER({quando},DATEADD(NOW(),-${Math.max(1, Math.floor(days))},'days')),${acctBrandClause()})`,
-    fields: ["email", "evento", "slug_immobile", "dwell_sec", "quando", "ip"],
+    fields: ["email", "evento", "slug_immobile", "dettaglio", "dwell_sec", "quando", "ip"],
   });
   return recs
     .map((r) => ({
       email: normEmail(str(r.fields.email)),
       evento: str(r.fields.evento),
       slug: str(r.fields.slug_immobile),
+      dettaglio: str(r.fields.dettaglio),
       dwellSec: typeof r.fields.dwell_sec === "number" ? (r.fields.dwell_sec as number) : 0,
       quandoMs: r.fields.quando ? new Date(str(r.fields.quando)).getTime() : 0,
       ip: str(r.fields.ip),
