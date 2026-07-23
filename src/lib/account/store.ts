@@ -520,6 +520,30 @@ export async function listEventsSince(days: number): Promise<EngineEvent[]> {
     .filter((e) => e.email && e.quandoMs > 0);
 }
 
+// TUTTI gli eventi articolo, senza finestra temporale: lo stato "salvati" del
+// web_intel deve essere cumulativo a vita (disposizione Martino 2026-07-23 —
+// un salvataggio di otto mesi fa vale quanto uno di ieri). Gli eventi su
+// Airtable non scadono; era solo la finestra di lettura a tagliarli fuori.
+// Una fetch per giro del motore, filtrata sui soli due eventi articolo.
+export async function listArticleEventsAll(): Promise<EngineEvent[]> {
+  const recs = await aList(T_EVT, {
+    filter: `AND(OR({evento}='article_fav',{evento}='article_unfav'),${acctBrandClause()})`,
+    fields: ["email", "evento", "dettaglio", "quando"],
+  });
+  return recs
+    .map((r) => ({
+      email: normEmail(str(r.fields.email)),
+      evento: str(r.fields.evento),
+      slug: "",
+      dettaglio: str(r.fields.dettaglio),
+      dwellSec: 0,
+      quandoMs: r.fields.quando ? new Date(str(r.fields.quando)).getTime() : 0,
+      // EngineEvent richiede l'ip (anti-abuso); qui non serve né viene letto.
+      ip: "",
+    }))
+    .filter((e) => e.email && e.quandoMs > 0);
+}
+
 export async function listActiveAccounts(): Promise<WebAccount[]> {
   const recs = await aList(T_ACC, {
     filter: `AND({stato}='Attivo',${acctBrandClause()})`,
