@@ -145,9 +145,17 @@ export async function getPrivateProperties(): Promise<Property[]> {
       (r) => String(r.fields[F.cluster] ?? "").toUpperCase().trim() === "PRIVATE",
     );
   }
+  // Newest entry first (pc_data_ingresso, written by the CRM toggle). Records
+  // without a date sink to the bottom; price desc breaks ties, so a same-day
+  // batch keeps a stable, sensible order.
   return raw
     .map((r) => mapRecord(r.id, r.fields))
-    .sort((a, b) => (b.priceSale ?? 0) - (a.priceSale ?? 0));
+    .sort((a, b) => {
+      const ta = a.pcSince ? Date.parse(a.pcSince) || 0 : 0;
+      const tb = b.pcSince ? Date.parse(b.pcSince) || 0 : 0;
+      if (tb !== ta) return tb - ta;
+      return (b.priceSale ?? 0) - (a.priceSale ?? 0);
+    });
 }
 
 export async function getPrivateProperty(slug: string): Promise<Property | null> {

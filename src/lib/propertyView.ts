@@ -16,6 +16,8 @@ export type PropertyView = {
   clusterBadge: Badge | null;
   meta: string;
   cover: { url: string; alt: string } | null;
+  // Cover + up to 8 top photos (9 total), for the in-card photo slider.
+  gallery: { url: string; alt: string }[];
 };
 
 type Translate = (key: string, values?: Record<string, string | number>) => string;
@@ -103,9 +105,24 @@ export function buildPropertyView(
     .filter(Boolean)
     .join(" · ");
 
+  // Cover + top photos (deduped by filename), max 9 (cover + top 8), for the
+  // card slider.
+  const cardTitle = localizedTitle(p, locale);
+  const gallerySeen = new Set<string>();
+  const gallery: { url: string; alt: string }[] = [];
+  for (const ph of [p.coverPhoto, ...p.topPhotos]) {
+    if (!ph) continue;
+    const key = ph.filename ?? ph.url;
+    if (gallerySeen.has(key)) continue;
+    gallerySeen.add(key);
+    gallery.push({ url: ph.thumb, alt: cardTitle });
+    if (gallery.length >= 9) break;
+  }
+
   return {
     slug: p.slug,
     title: localizedTitle(p, locale),
+    gallery,
     zona: p.zona,
     place: [zonaLabel, p.comune].filter(Boolean).join(" · "),
     priceLabel: priceLabel(p, locale, t),
@@ -116,7 +133,7 @@ export function buildPropertyView(
     // L'alt segue il titolo localizzato: `coverPhoto.alt` nasce dal titolo italiano
     // in mapRecord (che non conosce il locale), e su /en o /de sarebbe fuori lingua.
     cover: p.coverPhoto
-      ? { url: p.coverPhoto.thumb, alt: localizedTitle(p, locale) }
+      ? { url: p.coverPhoto.thumb, alt: cardTitle }
       : null,
   };
 }

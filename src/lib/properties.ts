@@ -80,6 +80,10 @@ export const F = {
   catastoRendita: "fldI7xrGEursVgodv", // catasto_rendita (currency)
   iliaAnnua: "fldulZHH7o8dIKGAN", // ilia_annua_stima_eur (formula → number, AI estimate)
   tariAnnua: "fld4JmLypFkLqN341", // tari_annua_stima_eur (formula → number, AI estimate)
+  // 2026-07-23: data di ingresso in Private Collection (la scrive il CRM quando
+  // pc_visibile_su passa da vuoto a valorizzato). Ordina la collezione riservata
+  // (più recente prima) e alimenta la bubble "Nuovo"/"N mesi" sulle card PC.
+  pcSince: "fldN79XrZJkd4uEIe", // pc_data_ingresso (date ISO yyyy-mm-dd → string|null)
 } as const;
 
 // Display order of the zona codes (Airtable singleSelect). Codes not listed here
@@ -108,6 +112,10 @@ export type Photo = {
   width: number | null;
   height: number | null;
   alt: string;
+  // Original Airtable filename. Stable across attachment fields for the same
+  // upload, so the gallery can de-dupe a photo that appears in more than one
+  // field (cover / topPhotos / foto) even though each field's signed url differs.
+  filename: string | null;
 };
 
 export type Property = {
@@ -176,6 +184,7 @@ export type Property = {
   condoMensile: number | null;
   iliaAnnua: number | null;
   tariAnnua: number | null;
+  pcSince: string | null;
 };
 
 type RawAttachment = {
@@ -206,6 +215,7 @@ function attachments(v: unknown, alt: string): Photo[] {
           width: a.width ?? null,
           height: a.height ?? null,
           alt,
+          filename: a.filename ?? null,
         }))
     : [];
 }
@@ -355,6 +365,7 @@ export function mapRecord(recordId: string, f: Fields): Property {
     condoMensile: num(f[F.speseCondoMensili]),
     iliaAnnua: num(f[F.iliaAnnua]),
     tariAnnua: num(f[F.tariAnnua]),
+    pcSince: typeof f[F.pcSince] === "string" ? (f[F.pcSince] as string) : null,
   };
 }
 

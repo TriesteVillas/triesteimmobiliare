@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { verifySession, PC_COOKIE } from "@/lib/private/session";
 import { findGrantById, isActive } from "@/lib/private/store";
+import { pcMonthsIn } from "@/lib/private/fresh";
 import { getPrivateProperties } from "@/lib/airtable";
 import { buildPropertyView } from "@/lib/propertyView";
 import { ZONE_ORDER, ZONE_OTHER } from "@/lib/properties";
@@ -59,9 +60,18 @@ export default async function PrivatePage({
   const tProp = await getTranslations("property");
   const tZones = await getTranslations("zones");
   const properties = await getPrivateProperties();
-  const views = properties.map((p) =>
-    buildPropertyView(p, locale, tProp, tZones(zoneCode(p.zona))),
-  );
+  // Bubble "da quanto è in collezione": Nuovo (<1 mese), N mesi (1..11),
+  // niente da 12 mesi in su o senza data. Calcolata qui, lato server, così la
+  // card resta un componente di puro display.
+  const freshOf = (pcSince: string | null): string | null => {
+    const months = pcMonthsIn(pcSince);
+    if (months == null || months >= 12) return null;
+    return months === 0 ? t("freshNew") : t("freshMonths", { count: months });
+  };
+  const cards = properties.map((p) => ({
+    view: buildPropertyView(p, locale, tProp, tZones(zoneCode(p.zona))),
+    fresh: freshOf(p.pcSince),
+  }));
   const watermark = `${email} · ${new Date().toISOString().slice(0, 10)}`;
   const zoomUrl = process.env.PC_ZOOM_URL ?? "";
 
@@ -96,16 +106,17 @@ export default async function PrivatePage({
           </div>
         </header>
 
-        {views.length === 0 ? (
+        {cards.length === 0 ? (
           <p className="mt-16 text-center text-sm text-[#93a1ae]">{t("emptyState")}</p>
         ) : (
           <section className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {views.map((v) => (
+            {cards.map(({ view: v, fresh }) => (
               <PrivatePropertyCard
                 key={v.slug}
                 view={v}
                 watermark={watermark}
                 photosComing={tProp("photosComing")}
+                freshLabel={fresh}
               />
             ))}
           </section>

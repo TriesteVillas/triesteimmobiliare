@@ -57,7 +57,19 @@ export default async function PrivateDetail({
     p.floor ? `${tProp("floor")} ${p.floor}` : null,
     p.energyClass ? `APE ${p.energyClass}` : null,
   ].filter(Boolean) as string[];
-  const photos = (p.topPhotos.length ? p.topPhotos : p.photos).slice(0, 6);
+  // Galleria COMPLETA (2026-07-23, richiesta di Martino): prima le top curate,
+  // poi tutto il resto, senza tagli. Dedup per filename — la stessa foto caricata
+  // in cover/top/foto ha URL firmati diversi ma filename identico — e mai la
+  // cover, che è già l'hero qui sopra.
+  const seen = new Set<string>();
+  const keyOf = (ph: { filename: string | null; url: string }) => ph.filename ?? ph.url;
+  if (p.coverPhoto) seen.add(keyOf(p.coverPhoto));
+  const photos = [...p.topPhotos, ...p.photos].filter((ph) => {
+    const k = keyOf(ph);
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
 
   return (
     <div className="pc-root min-h-screen px-4 py-20 sm:py-24">
@@ -106,14 +118,37 @@ export default async function PrivateDetail({
           </p>
         )}
 
+        {/* Tour 3D: nell'area riservata l'immersione vale più di tutto — sta
+            prima della galleria. Stesso embed della scheda pubblica. */}
+        {p.matterportUrl && (
+          <section className="mt-10">
+            <h2 className="pc-title text-xl sm:text-2xl">{t("tour3d")}</h2>
+            <div className="relative mt-4 aspect-video overflow-hidden rounded-2xl border border-[#a9c8e0]/20 bg-black">
+              <iframe
+                src={p.matterportUrl}
+                title={t("tour3d")}
+                allow="fullscreen; xr-spatial-tracking; gyroscope; accelerometer"
+                allowFullScreen
+                loading="lazy"
+                className="absolute inset-0 h-full w-full border-0"
+              />
+            </div>
+          </section>
+        )}
+
         {photos.length > 0 && (
-          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {photos.map((ph, i) => (
-              <div key={i} className="relative aspect-[4/3] overflow-hidden rounded-xl bg-black">
-                <ProtectedImage src={ph.url} alt={ph.alt} watermark={wm} />
-              </div>
-            ))}
-          </div>
+          <section className="mt-10">
+            <h2 className="pc-title text-xl sm:text-2xl">{t("gallery")}</h2>
+            {/* Rendition "large" (~917px), non l'originale multi-MB: qui sotto
+                possono esserci decine di scatti, e sono comunque lazy. */}
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {photos.map((ph, i) => (
+                <div key={i} className="relative aspect-[4/3] overflow-hidden rounded-xl bg-black">
+                  <ProtectedImage src={ph.thumb} alt={ph.alt} watermark={wm} />
+                </div>
+              ))}
+            </div>
+          </section>
         )}
 
         <div className="mt-12 rounded-2xl border border-[#a9c8e0]/20 p-6 text-center">
