@@ -76,7 +76,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "not_configured" }, { status: 503 });
   }
 
-  let body: { sid?: unknown; messages?: unknown; locale?: unknown; origin?: unknown };
+  let body: { sid?: unknown; messages?: unknown; locale?: unknown; origin?: unknown; slug?: unknown };
   try {
     body = (await request.json()) as typeof body;
   } catch {
@@ -95,6 +95,11 @@ export async function POST(request: Request) {
   const locale = typeof body.locale === "string" ? body.locale.slice(0, 5) : "it";
   // Pagina di provenienza: contesto per l'operatore nel registro, non un dato fidato.
   const origin = typeof body.origin === "string" ? body.origin.slice(0, 120) : "";
+  // Scheda immobile su cui vive il widget: il bridge la risolve e la inietta
+  // nel prompt, così "questa casa" smette di essere ambiguo. Formato stretto;
+  // se non combacia con un annuncio reale il bridge la ignora.
+  const slug =
+    typeof body.slug === "string" && /^[a-z0-9][a-z0-9-]{1,118}$/.test(body.slug) ? body.slug : "";
 
   // Se l'utente è loggato all'area clienti, l'email viaggia col turno e il CRM
   // aggancia account e scheda lead. Solo firma verificata, niente body.
@@ -112,6 +117,7 @@ export async function POST(request: Request) {
         sid,
         locale,
         origin,
+        ...(slug ? { slug } : {}),
         email: acct?.em ?? "",
         brand: "TSI",
         ip,

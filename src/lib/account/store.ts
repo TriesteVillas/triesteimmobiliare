@@ -97,6 +97,7 @@ export type WebAccount = {
   consProfilazione: boolean;
   digest: string;
   criteri: string;
+  criteriJsonRaw: string;
   loginCount: number;
   ultimoLogin: string; // ISO o "" — serve al riepilogo web_intel sul lead
   emailVerificata: boolean;
@@ -118,6 +119,7 @@ function toAccount(r: AirRecord): WebAccount {
     consProfilazione: f.consenso_profilazione === true,
     digest: str(f.digest_freq),
     criteri: str(f.criteri),
+    criteriJsonRaw: str(f.criteri_json),
     loginCount: typeof f.login_count === "number" ? f.login_count : 0,
     ultimoLogin: str(f.ultimo_login),
     emailVerificata: f.email_verificata === true,
@@ -318,6 +320,9 @@ export type AcctEvent =
   | "contact_request"
   | "verify_email"
   | "delete_request"
+  | "alert_on"
+  | "alert_off"
+  | "note_update"
   | "blocked";
 
 export async function logEvent(e: {
@@ -427,6 +432,10 @@ export type Pref = {
   cuore: boolean;
   voto: "Like" | "Dislike" | "";
   votoMotivo: string;
+  nota: string;
+  avvisoPrezzo: boolean;
+  prezzoRiferimento: number | null;
+  budgetLavori: number | null;
 };
 
 function toPref(r: AirRecord): Pref {
@@ -438,6 +447,10 @@ function toPref(r: AirRecord): Pref {
     cuore: f.cuore === true,
     voto: voto === "Like" || voto === "Dislike" ? voto : "",
     votoMotivo: str(f.voto_motivo),
+    nota: str(f.nota),
+    avvisoPrezzo: f.avviso_prezzo === true,
+    prezzoRiferimento: typeof f.prezzo_riferimento === "number" ? f.prezzo_riferimento : null,
+    budgetLavori: typeof f.budget_lavori === "number" ? f.budget_lavori : null,
   };
 }
 
@@ -459,7 +472,15 @@ export async function upsertPref(
   acc: { id: string; email: string },
   slug: string,
   propRecId: string | null,
-  patch: { cuore?: boolean; voto?: "Like" | "Dislike" | ""; votoMotivo?: string },
+  patch: {
+    cuore?: boolean;
+    voto?: "Like" | "Dislike" | "";
+    votoMotivo?: string;
+    nota?: string;
+    avvisoPrezzo?: boolean;
+    prezzoRiferimento?: number | null;
+    budgetLavori?: number | null;
+  },
 ): Promise<void> {
   const chiave = prefChiave(acc.email, slug);
   const now = new Date().toISOString();
@@ -474,6 +495,10 @@ export async function upsertPref(
   }
   if (patch.voto !== undefined) fields.voto = patch.voto || null;
   if (patch.votoMotivo !== undefined) fields.voto_motivo = patch.votoMotivo;
+  if (patch.nota !== undefined) fields.nota = patch.nota;
+  if (typeof patch.avvisoPrezzo === "boolean") fields.avviso_prezzo = patch.avvisoPrezzo;
+  if (patch.prezzoRiferimento !== undefined) fields.prezzo_riferimento = patch.prezzoRiferimento;
+  if (patch.budgetLavori !== undefined) fields.budget_lavori = patch.budgetLavori;
   if (existing[0]) {
     await aPatch(T_PREF, existing[0].id, fields);
     return;
@@ -601,4 +626,64 @@ export async function createMatch(m: {
     stato: "Nuovo",
     creato: new Date().toISOString(),
   });
+}
+
+// ---- Visite (appuntamenti dell'area riservata) ----------------------------------
+// L'account aggancia una o più schede LEAD_ (lead_link); da lì il reverse-link
+// VISITE dà gli id degli appuntamenti. Si mostrano SOLO le visite future non
+// annullate — mai feedback/esiti, che sono materiale interno dell'agenzia.
+
+const T_VISITE = "tbl1xbk9IaZ0D7Vin"; // VISITE
+const LEAD_VISITE_FIELD = "VISITE"; // reverse-link su LEAD_ (fldVsbx1gfvZcl63Y)
+
+export type UpcomingVisit = {
+  id: string;
+  dataIso: string;
+  stato: "Programmata" | "Da confermare";
+  operatore: string;
+  tipoIncontro: string;
+  durataMin: number | null;
+  propRecIds: string[];
+  confermata: boolean; // conferma_il valorizzato
+};
+
+export async function listUpcomingVisits(leadIds: string[]): Promise<UpcomingVisit[]> {
+  if (!leadIds.length) return [];
+  // 1. id visite dal reverse-link dei lead (niente formula su campi link:
+  //    ARRAYJOIN esporrebbe i nomi primari, non i recId).
+  const leadFilter = `OR(${leadIds.map((id) => `RECORD_ID()="${escFormula(id)}"`).join(",")})`;
+  const leads = await aList(T_LEAD, { filter: leadFilter, fields: [LEAD_VISITE_FIELD] });
+  const visitIds = [
+    ...new Set(
+      leads.flatMap((r) => (Array.isArray(r.fields[LEAD_VISITE_FIELD]) ? (r.fields[LEAD_VISITE_FIELD] as string[]) : [])),
+    ),
+  ];
+  if (!visitIds.length) return [];
+  // 2. le visite, solo future e solo stati "vivi".
+  const out: UpcomingVisit[] = [];
+  for (let i = 0; i < visitIds.length; i += 40) {
+    const chunk = visitIds.slice(i, i + 40);
+    const filter = `AND(OR(${chunk.map((id) => `RECORD_ID()="${escFormula(id)}"`).join(",")}),{data}!="",IS_AFTER({data},NOW()),OR({stato}="Programmata",{stato}="Da confermare"))`;
+    const recs = await aList(T_VISITE, {
+      filter,
+      fields: ["data", "stato", "operatore", "tipo_incontro", "durata_min", "proprieta", "conferma_il"],
+    });
+    for (const r of recs) {
+      const f = r.fields;
+      const stato = str(f.stato);
+      if (stato !== "Programmata" && stato !== "Da confermare") continue;
+      out.push({
+        id: r.id,
+        dataIso: str(f.data),
+        stato,
+        operatore: str(f.operatore),
+        tipoIncontro: str(f.tipo_incontro),
+        durataMin: typeof f.durata_min === "number" ? f.durata_min : null,
+        propRecIds: Array.isArray(f.proprieta) ? (f.proprieta as string[]) : [],
+        confermata: Boolean(str(f.conferma_il)),
+      });
+    }
+  }
+  out.sort((a, b) => a.dataIso.localeCompare(b.dataIso));
+  return out;
 }

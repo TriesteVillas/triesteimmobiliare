@@ -31,8 +31,10 @@ import {
   translatedDescription,
 } from "@/lib/propertyView";
 import { pageAlternates, pageOpenGraph } from "@/lib/seo";
-import FavHeart from "@/components/account/FavHeart";
-import AccountVote from "@/components/account/AccountVote";
+import { formatPrice } from "@/lib/format";
+import TaxBox from "@/components/TaxBox";
+import PropertyActions from "@/components/account/PropertyActions";
+import AccountPerks from "@/components/account/AccountPerks";
 import DwellTracker from "@/components/account/DwellTracker";
 import BuyerConcierge from "@/components/compra/BuyerConcierge";
 
@@ -142,6 +144,67 @@ export default async function PropertyPage({ params }: { params: Params }) {
   // quando la traduzione non è ancora stata scritta (vedi localizedDescription).
   const title = localizedTitle(property, locale);
   const description = localizedDescription(property, locale);
+
+  // Box costi indicativi (solo vendita), col toggle prima/seconda casa —
+  // stesso impianto del gemello TriesteVillas: imposta dallo scenario, fee 4%
+  // netta con tag "+ IVA", condominio ordinario, ILIA (esente prima casa),
+  // TARI viva col selettore occupanti. Ogni cifra è preceduta da ≈.
+  const isSale = property.contratto !== "AFFITTO";
+  const ca = (n: number) => `≈ ${formatPrice(n, locale)}`;
+  const feeNet = isSale && property.priceSale ? property.priceSale * 0.04 : null;
+  const condoAnnuo = property.condoMensile != null ? property.condoMensile * 12 : null;
+  const taxData = isSale
+    ? {
+        primaImposta: property.impostePrima != null ? ca(property.impostePrima) : null,
+        secondaImposta: property.imposteSeconda != null ? ca(property.imposteSeconda) : null,
+        commission: feeNet != null ? ca(feeNet) : null,
+        condo: condoAnnuo != null ? ca(condoAnnuo) : null,
+        ilia: property.iliaAnnua != null ? ca(property.iliaAnnua) : null,
+        mqCalp: property.mq != null ? Math.round(property.mq * 0.8) : null,
+      }
+    : null;
+  const hasCosts =
+    taxData != null &&
+    Boolean(
+      taxData.primaImposta ||
+        taxData.secondaImposta ||
+        taxData.commission ||
+        taxData.condo ||
+        taxData.ilia ||
+        taxData.mqCalp != null,
+    );
+  const taxLabels = {
+    title: t("taxTitle"),
+    groupAcquisto: t("taxGroupAcquisto"),
+    groupGestione: t("taxGroupGestione"),
+    primaCasa: t("taxPrimaCasa"),
+    secondaCasa: t("taxSecondaCasa"),
+    firstHome: t("taxFirstHome"),
+    secondHome: t("taxSecondHome"),
+    commission: t("taxCommission"),
+    plusVat: t("taxPlusVat"),
+    condo: t("taxCondo"),
+    ilia: t("taxIlia"),
+    tari: t("taxTari"),
+    iliaEsente: t("taxIliaEsente"),
+    perYear: t("taxPerYear"),
+    occupants: t("taxOccupants"),
+    footnote: t("taxEstimateFootnote"),
+    infoAria: t("taxInfoAria"),
+    acquistoPop: {
+      title: t("taxInfoTitle"),
+      body: [t("taxAiDisclaimer")],
+      criteria: property.noteImposte,
+      criteriaLabel: t("taxCriteria"),
+    },
+    condoPop: { title: t("taxCondoInfoTitle"), body: [t("taxCondoInfoBody")] },
+    iliaPop: { title: t("taxIliaInfoTitle"), body: [t("taxIliaInfoBody")] },
+    tariPop: {
+      title: t("taxTariInfoTitle"),
+      body: [t("taxTariInfoBody")],
+      link: { href: "https://esattospa.it/tributo/tari/", label: t("taxTariInfoLink") },
+    },
+  };
 
   const characteristics = [
     // Order matters: PropertyCharacteristics keeps the first 8 (the headline
@@ -253,7 +316,11 @@ export default async function PropertyPage({ params }: { params: Params }) {
             <p className="text-3xl font-semibold tracking-tight text-white">
               {priceLabel(property, locale, t)}
             </p>
-            <FavHeart slug={property.slug} variant="detail" />
+          </div>
+          {/* Un solo linguaggio di feedback: cuore + avviso prezzo + "non fa
+              per me" — i pollici in fondo pagina non esistono più. */}
+          <div className="mt-4">
+            <PropertyActions slug={property.slug} />
           </div>
         </div>
       </Scene>
@@ -271,6 +338,14 @@ export default async function PropertyPage({ params }: { params: Params }) {
             />
           )}
 
+          {/* Concierge AI subito sotto il hero, ben visibile — non più sepolto
+              in fondo. Col contesto della scheda: "questa casa" per lui È
+              questa casa. Widget dark → card scura nella zona paper. */}
+          <div className="mt-6 rounded-2xl bg-ink px-4 pb-4 pt-5" data-reveal>
+            <BuyerConcierge context={{ slug: property.slug, title }} />
+          </div>
+          <AccountPerks />
+
           <div className="mt-6">
             <PhotoGallery
               cover={property.coverPhoto}
@@ -281,6 +356,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
                 viewAll: t("galViewAll", { count: property.photos.length }),
                 close: t("galClose"),
                 photosComing: t("photosComing"),
+                grid: t("galGrid"),
               }}
             />
           </div>
@@ -303,6 +379,8 @@ export default async function PropertyPage({ params }: { params: Params }) {
               </div>
             </section>
           )}
+
+          {hasCosts && taxData && <TaxBox data={taxData} labels={taxLabels} locale={locale} />}
 
           <Planimetrie
             items={property.planimetrie}
@@ -374,13 +452,6 @@ export default async function PropertyPage({ params }: { params: Params }) {
               <p className="mt-2 text-sm text-neutral-500">{t("locationApprox")}</p>
             </section>
           )}
-
-          <AccountVote slug={property.slug} />
-
-          {/* Concierge AI sulla scheda: card scura nella zona paper. */}
-          <div className="mt-8 rounded-2xl bg-ink p-4">
-            <BuyerConcierge />
-          </div>
 
           {/* immobileNome resta il titolo ITALIANO in tutti e tre i locali: finisce
               nel CRM come identità del record, e un immobile deve avere un nome solo

@@ -4,6 +4,7 @@ import { currentWebAccount } from "@/lib/account/auth";
 import { ACCT_COOKIE } from "@/lib/account/session";
 import { logEvent, patchAccount } from "@/lib/account/store";
 import { PRIVACY_VERSION } from "@/lib/account/brand";
+import { sanitizeCriteri, criteriSummary, type CriteriJson } from "@/lib/account/prefopts";
 
 export const runtime = "nodejs";
 
@@ -50,6 +51,15 @@ export async function POST(request: Request) {
   }
   if (typeof body.criteri === "string") {
     patch.criteri = body.criteri.trim().slice(0, 1000);
+    changes.push("criteri");
+  }
+  // Preferenze strutturate (chips): si validano contro le liste canoniche,
+  // si salvano come JSON e si RIASSUMONO in `criteri` — che resta il testo
+  // che leggono operatore CRM e motore (profilo_ai).
+  if (body.criteriJson && typeof body.criteriJson === "object") {
+    const c = sanitizeCriteri(body.criteriJson as Partial<CriteriJson>);
+    patch.criteri_json = JSON.stringify(c);
+    patch.criteri = criteriSummary(c).slice(0, 1000);
     changes.push("criteri");
   }
   if (typeof body.digest === "string" && DIGESTS.has(body.digest)) {

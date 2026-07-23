@@ -56,7 +56,15 @@ function saveStored(s: Stored): void {
   }
 }
 
-export default function BuyerConcierge() {
+export default function BuyerConcierge({
+  context,
+}: {
+  // Quando il widget vive su una scheda immobile, il contesto dice al CRM QUALE
+  // casa l'utente sta guardando: "questa casa" nelle domande smette di essere
+  // ambiguo (era il bug: "quanto pagherei di imposte su questa casa?" riceveva
+  // la richiesta generica di prezzo e dati). slug → dossier immobile nel prompt.
+  context?: { slug: string; title: string };
+} = {}) {
   const t = useTranslations("concierge");
   const locale = useLocale();
   const [open, setOpen] = useState(false);
@@ -125,6 +133,7 @@ export default function BuyerConcierge() {
           messages: history,
           locale,
           origin: window.location.pathname,
+          ...(context ? { slug: context.slug } : {}),
         }),
       });
       const d = (await res.json().catch(() => ({}))) as {
@@ -157,7 +166,12 @@ export default function BuyerConcierge() {
     }
   };
 
-  const starters = t.raw("starters") as string[];
+  // Sulla scheda immobile la CTA si allarga: questa casa, altre case, il
+  // processo d'acquisto. Altrove restano i testi del Buyer Hub.
+  const starters = t.raw(context ? "listingStarters" : "starters") as string[];
+  const barPlaceholder = context ? t("listingPlaceholder") : t("barPlaceholder");
+  const barHint = context ? t("listingHint") : t("barHint");
+  const emptyLine = context ? t("listingEmpty", { title: context.title }) : t("empty");
 
   return (
     <>

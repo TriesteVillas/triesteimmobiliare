@@ -21,9 +21,12 @@ export type FavSnapshot = {
   nome: string;
   favs: ReadonlySet<string>;
   votes: Readonly<Record<string, "up" | "down">>;
+  // Avvisi di prezzo attivi (slug). Solo loggati: un avviso senza email non
+  // può avvisare nessuno, quindi niente ramo localStorage.
+  alerts: ReadonlySet<string>;
 };
 
-const EMPTY: FavSnapshot = { ready: false, authed: false, nome: "", favs: new Set(), votes: {} };
+const EMPTY: FavSnapshot = { ready: false, authed: false, nome: "", favs: new Set(), votes: {}, alerts: new Set() };
 
 let snapshot: FavSnapshot = EMPTY;
 const listeners = new Set<() => void>();
@@ -84,6 +87,7 @@ export function ensureInit(): void {
       const me = (await res.json()) as {
         nome?: string;
         favs?: string[];
+        alerts?: string[];
         votes?: Record<string, "up" | "down">;
       };
       const serverFavs = new Set((me.favs ?? []).map(String));
@@ -94,6 +98,7 @@ export function ensureInit(): void {
         nome: me.nome ?? "",
         favs: new Set([...serverFavs, ...local]),
         votes: me.votes ?? {},
+        alerts: new Set((me.alerts ?? []).map(String)),
       });
       if (local.length) {
         Promise.allSettled(
@@ -129,6 +134,23 @@ export function toggleFav(slug: string): boolean {
   } else {
     writeLocalFavs(favs);
   }
+  return on;
+}
+
+// Avviso di prezzo (solo loggati — il chiamante mostra il prompt anonimo).
+// Ritorna il nuovo stato. Ottimistico.
+export function toggleAlert(slug: string): boolean {
+  const on = !snapshot.alerts.has(slug);
+  const alerts = new Set(snapshot.alerts);
+  if (on) alerts.add(slug);
+  else alerts.delete(slug);
+  emit({ alerts });
+  fetch("/api/account/alert", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ slug, on }),
+    keepalive: true,
+  }).catch(() => {});
   return on;
 }
 

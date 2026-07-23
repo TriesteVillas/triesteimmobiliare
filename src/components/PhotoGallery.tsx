@@ -16,21 +16,24 @@ export default function PhotoGallery({
   cover: Photo | null;
   topPhotos: Photo[];
   allPhotos: Photo[];
-  labels: { viewAll: string; close: string; photosComing: string };
+  labels: { viewAll: string; close: string; photosComing: string; grid?: string };
   // Shared-element identity with the listing card cover (PropertyCard).
   morphName?: string;
   // The 4.0 listing page shows the cover in its cinematic hero, so the
   // gallery skips the big lead image and renders thumbnails only.
   compact?: boolean;
 }) {
-  const [open, setOpen] = useState<number | null>(null);
+  // idx = foto di partenza; grid = apri sulla griglia di tutte le miniature
+  // ("vedi tutte le N foto" deve far SCEGLIERE da dove partire, non imporre
+  // lo scroll dalla foto 1).
+  const [open, setOpen] = useState<{ idx: number; grid: boolean } | null>(null);
   const hero = cover ?? allPhotos[0] ?? null;
   const thumbs = topPhotos.length ? topPhotos : allPhotos;
   const fullSet = allPhotos.length ? allPhotos : hero ? [hero] : [];
 
   const openAt = (photo: Photo) => {
     const i = fullSet.findIndex((x) => x.url === photo.url);
-    setOpen(i >= 0 ? i : 0);
+    setOpen({ idx: i >= 0 ? i : 0, grid: false });
   };
 
   if (compact) {
@@ -59,7 +62,7 @@ export default function PhotoGallery({
         {fullSet.length > 1 && (
           <button
             type="button"
-            onClick={() => setOpen(0)}
+            onClick={() => setOpen({ idx: 0, grid: true })}
             className="btn-press mt-3 rounded-full border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:border-brand hover:text-brand"
           >
             {labels.viewAll}
@@ -68,7 +71,9 @@ export default function PhotoGallery({
         {open !== null && fullSet.length > 0 && (
           <Lightbox
             photos={fullSet}
-            start={open}
+            start={open.idx}
+            startInGrid={open.grid}
+            gridLabel={labels.grid}
             onClose={() => setOpen(null)}
             closeLabel={labels.close}
           />
@@ -83,7 +88,7 @@ export default function PhotoGallery({
         <div>
           <button
             type="button"
-            onClick={() => setOpen(0)}
+            onClick={() => setOpen({ idx: 0, grid: false })}
             className="group relative block aspect-video w-full overflow-hidden rounded-xl bg-neutral-100"
           >
             <ViewTransition name={morphName} share="morph">
@@ -120,7 +125,7 @@ export default function PhotoGallery({
           {fullSet.length > 1 && (
             <button
               type="button"
-              onClick={() => setOpen(0)}
+              onClick={() => setOpen({ idx: 0, grid: true })}
               className="mt-3 rounded-full border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:border-brand hover:text-brand"
             >
               {labels.viewAll}
@@ -136,7 +141,9 @@ export default function PhotoGallery({
       {open !== null && fullSet.length > 0 && (
         <Lightbox
           photos={fullSet}
-          start={open}
+          start={open.idx}
+          startInGrid={open.grid}
+          gridLabel={labels.grid}
           onClose={() => setOpen(null)}
           closeLabel={labels.close}
         />

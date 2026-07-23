@@ -20,6 +20,7 @@ export async function GET() {
     nome: acc.nome.split(" ")[0] || acc.nome,
     email: acc.email,
     favs: prefs.filter((p) => p.cuore).map((p) => p.slug),
+    alerts: prefs.filter((p) => p.avvisoPrezzo).map((p) => p.slug),
     votes,
     consMarketing: acc.consMarketing,
     consProfilazione: acc.consProfilazione,

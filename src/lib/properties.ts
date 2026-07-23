@@ -71,6 +71,15 @@ export const F = {
   tipoProprieta: "fldZiREblKauVYoWM", // imm_tipo_proprieta_# (singleSelect → string)
   classeImmobile: "fldqxd7FwkFMgFfPS", // imm_classe_immobile_# (singleSelect → string)
   trattativaRiservata: "fld6JmapDP4Qi8RT6",
+  // 2026-07-23: tax box + tabella costi area riservata (stessi campi del gemello TSV).
+  impostePrima: "fld8SMr41gceLNOiN", // imposte_prima (currency)
+  imposteSeconda: "fldFQIfYqL0m48QWu", // imposte_seconda (currency)
+  noteImposte: "fldwP6YyY7LdKdWoi", // note_imposte (text)
+  soggettoIva: "fldKMwdnvCGCSXqzx", // soggetto_iva (checkbox)
+  speseCondoMensili: "fldHEZbfTOw0g0Wlj", // spese_condo_mensili (currency, monthly)
+  catastoRendita: "fldI7xrGEursVgodv", // catasto_rendita (currency)
+  iliaAnnua: "fldulZHH7o8dIKGAN", // ilia_annua_stima_eur (formula → number, AI estimate)
+  tariAnnua: "fld4JmLypFkLqN341", // tari_annua_stima_eur (formula → number, AI estimate)
 } as const;
 
 // Display order of the zona codes (Airtable singleSelect). Codes not listed here
@@ -158,6 +167,15 @@ export type Property = {
   tipoProprieta: string | null;
   classeImmobile: string | null;
   trattativaRiservata: boolean;
+  impostePrima: number | null;
+  imposteSeconda: number | null;
+  noteImposte: string | null;
+  soggettoIva: boolean;
+  // Annual ownership costs. condoMensile is the raw monthly condo fee (×12 for
+  // the year); ilia/tari are AI-estimated annual figures (Airtable formulas).
+  condoMensile: number | null;
+  iliaAnnua: number | null;
+  tariAnnua: number | null;
 };
 
 type RawAttachment = {
@@ -330,6 +348,13 @@ export function mapRecord(recordId: string, f: Fields): Property {
     tipoProprieta: str(f[F.tipoProprieta]),
     classeImmobile: str(f[F.classeImmobile]),
     trattativaRiservata: f[F.trattativaRiservata] === true,
+    impostePrima: num(f[F.impostePrima]),
+    imposteSeconda: num(f[F.imposteSeconda]),
+    noteImposte: str(f[F.noteImposte]),
+    soggettoIva: f[F.soggettoIva] === true,
+    condoMensile: num(f[F.speseCondoMensili]),
+    iliaAnnua: num(f[F.iliaAnnua]),
+    tariAnnua: num(f[F.tariAnnua]),
   };
 }
 
