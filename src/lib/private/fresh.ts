@@ -5,7 +5,8 @@
 // contano i MESI DI CALENDARIO compiuti da quella data:
 //   0        → "Nuovo"
 //   1..11    → "N mesi"
-//   >= 12    → null (oltre l'anno la bubble sparisce — regola di Martino)
+//   >= 12    → la funzione ritorna il numero, ma la PAGINA non mostra la bubble
+//              (oltre l'anno sparisce — regola di Martino; il cutoff sta lì)
 //   no data  → null (nessuna bubble: meglio niente che un'età inventata)
 //
 // ⚠️ Copiato identico in triestevillas-web e triesteimmobiliare (modello
