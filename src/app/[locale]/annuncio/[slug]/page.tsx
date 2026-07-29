@@ -133,6 +133,8 @@ export default async function PropertyPage({ params }: { params: Params }) {
 
   const t = await getTranslations("property");
   const tZones = await getTranslations("zones");
+  // "Prenota una visita" vive nel namespace lead (usato da VisitForm), non property.
+  const tLead = await getTranslations("lead");
   const similar = similarProperties(property, all);
   const place = [property.via, property.zona, property.comune]
     .filter(Boolean)
@@ -334,7 +336,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
                     <rect x="3" y="4" width="18" height="18" rx="2" />
                     <path d="M16 2v4M8 2v4M3 10h18" />
                   </svg>
-                  {t("visitCta")}
+                  {tLead("visitCta")}
                 </a>
               )}
               {property.matterportUrl && (
