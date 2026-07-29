@@ -1,4 +1,12 @@
 {
+  "closure": {
+    "eyebrow": "Chiusura estiva",
+    "title": "Uffici chiusi dall'8 al 24 agosto",
+    "body": "Le nostre sedi resteranno chiuse per ferie dall'8 al 24 agosto compresi. Vi ringraziamo per la comprensione. Per qualsiasi necessità potete scriverci via email o su WhatsApp: entrambi i recapiti saranno monitorati, pur senza la consueta tempestività nelle risposte.",
+    "phone": "331 8940822",
+    "mailSubject": "Richiesta durante la chiusura estiva",
+    "waText": "Salve, vi scrivo durante la chiusura estiva."
+  },
   "nav": {
     "home": "Home",
     "properties": "Immobili",

@@ -8,6 +8,7 @@ import { buildPropertyView } from "@/lib/propertyView";
 import PropertyCard from "@/components/PropertyCard";
 import FeaturedCarousel from "@/components/FeaturedCarousel";
 import Marquee from "@/components/Marquee";
+import ClosureBanner from "@/components/ClosureBanner";
 import { BoatMark } from "@/components/Logo";
 import BuyerCta from "@/components/BuyerCta";
 import SellerCta from "@/components/SellerCta";
@@ -111,6 +112,8 @@ export default async function Home({
           </p>
         </div>
       </section>
+
+      <ClosureBanner />
 
       <div className="bg-brand-dark py-6 text-white/85">
         <Marquee

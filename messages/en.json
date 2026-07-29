@@ -1,4 +1,12 @@
 {
+  "closure": {
+    "eyebrow": "Summer closure",
+    "title": "Offices closed from 8 to 24 August",
+    "body": "Our offices will be closed for the summer holidays from 8 to 24 August inclusive. Thank you for your understanding. For anything you may need, reach us by email or on WhatsApp: both channels will be monitored, though replies may not be as prompt as usual.",
+    "phone": "+39 331 8940822",
+    "mailSubject": "Enquiry during the summer closure",
+    "waText": "Hello, I'm writing during your summer closure."
+  },
   "nav": {
     "home": "Home",
     "properties": "Properties",

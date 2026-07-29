@@ -1,4 +1,12 @@
 {
+  "closure": {
+    "eyebrow": "Sommerpause",
+    "title": "Büro vom 8. bis 24. August geschlossen",
+    "body": "Unsere Büros sind wegen Betriebsferien vom 8. bis 24. August einschließlich geschlossen. Wir danken Ihnen für Ihr Verständnis. Für alle Anliegen erreichen Sie uns per E-Mail oder über WhatsApp: Beide Kontakte werden betreut, Antworten können jedoch etwas länger dauern als gewohnt.",
+    "phone": "+39 331 8940822",
+    "mailSubject": "Anfrage während der Sommerpause",
+    "waText": "Guten Tag, ich schreibe Ihnen während Ihrer Sommerpause."
+  },
   "nav": {
     "home": "Home",
     "properties": "Immobilien",
