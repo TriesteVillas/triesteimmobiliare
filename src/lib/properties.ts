@@ -50,6 +50,9 @@ export const F = {
   // content was folded into youtube_video_urls. Requesting it 422'd the whole
   // fetch (UNKNOWN_FIELD_NAME), which broke prod builds and ISR revalidation.
   matterport: "fldVT95yZFaGa8yFv",
+  // URL esterno di prenotazione visita (es. modulo Google Open Day). Quando c'è,
+  // la scheda mostra una CTA "Prenota una visita" in evidenza nell'hero.
+  bookingUrl: "fldWQVYnv8kqxfiN1", // link_prenota_visita
   arredato: "fldRZiLzqQpZS24n9",
   ascensore: "fld1cWZRm66Pc1pRI",
   piscina: "fldUsLdpcMqlSPUG2",
@@ -157,6 +160,7 @@ export type Property = {
   planimetrie: Photo[];
   videos: string[];
   matterportUrl: string | null;
+  bookingUrl: string | null;
   arredato: string | null;
   ascensore: string | null;
   piscina: string | null;
@@ -340,6 +344,7 @@ export function mapRecord(recordId: string, f: Fields): Property {
     planimetrie,
     videos: lines(f[F.youtubeVideos]),
     matterportUrl: matterportEmbed(f[F.matterport]),
+    bookingUrl: str(f[F.bookingUrl]),
     arredato: str(f[F.arredato]),
     ascensore: str(f[F.ascensore]),
     piscina: str(f[F.piscina]),

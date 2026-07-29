@@ -317,6 +317,42 @@ export default async function PropertyPage({ params }: { params: Params }) {
               {priceLabel(property, locale, t)}
             </p>
           </div>
+          {/* CTA in evidenza: prenotazione visita (link esterno, es. Open Day) e
+              tour 3D immersivo. Guidate dai dati — compaiono solo se valorizzati.
+              Il tour è ANCHE embeddato più in basso (sezione #tour); questo è
+              l'accesso rapido a schermo intero. */}
+          {(property.bookingUrl || property.matterportUrl) && (
+            <div className="mt-5 flex flex-wrap items-center gap-3" data-reveal>
+              {property.bookingUrl && (
+                <a
+                  href={property.bookingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-black/25 transition hover:bg-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                >
+                  <svg aria-hidden viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" />
+                    <path d="M16 2v4M8 2v4M3 10h18" />
+                  </svg>
+                  {t("visitCta")}
+                </a>
+              )}
+              {property.matterportUrl && (
+                <a
+                  href={property.matterportUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/50 bg-white/10 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-black/25 backdrop-blur transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                >
+                  <svg aria-hidden viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                    <path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12" />
+                  </svg>
+                  {t("galTour")}
+                </a>
+              )}
+            </div>
+          )}
           {/* Un solo linguaggio di feedback: cuore + avviso prezzo + "non fa
               per me" — i pollici in fondo pagina non esistono più. */}
           <div className="mt-4">
