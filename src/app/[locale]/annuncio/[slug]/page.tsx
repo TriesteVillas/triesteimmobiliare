@@ -20,6 +20,7 @@ import StickyNav from "@/components/StickyNav";
 import Scene from "@/components/motion/Scene";
 import LeadForm from "@/components/LeadForm";
 import VisitForm from "@/components/VisitForm";
+import TourFrame from "@/components/TourFrame";
 import {
   buildPropertyView,
   contractBadge,
@@ -135,6 +136,11 @@ export default async function PropertyPage({ params }: { params: Params }) {
   const tZones = await getTranslations("zones");
   // "Prenota una visita" vive nel namespace lead (usato da VisitForm), non property.
   const tLead = await getTranslations("lead");
+  const fsLabel =
+    ({ it: "Schermo intero", en: "Fullscreen", de: "Vollbild" } as Record<
+      string,
+      string
+    >)[locale] ?? "Fullscreen";
   const similar = similarProperties(property, all);
   const place = [property.via, property.zona, property.comune]
     .filter(Boolean)
@@ -452,16 +458,11 @@ export default async function PropertyPage({ params }: { params: Params }) {
           {property.matterportUrl && (
             <section id="tour" className="mt-8 scroll-mt-32">
               <h2 className="text-lg font-semibold">{t("galTour")}</h2>
-              <div className="relative mt-3 aspect-video overflow-hidden rounded-xl bg-neutral-100">
-                <iframe
-                  src={property.matterportUrl}
-                  title={t("galTour")}
-                  allow="fullscreen; xr-spatial-tracking; gyroscope; accelerometer"
-                  allowFullScreen
-                  loading="lazy"
-                  className="absolute inset-0 h-full w-full border-0"
-                />
-              </div>
+              <TourFrame
+                src={property.matterportUrl}
+                title={t("galTour")}
+                fsLabel={fsLabel}
+              />
             </section>
           )}
 
