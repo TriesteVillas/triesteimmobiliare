@@ -68,6 +68,7 @@
       "titleKinetic": "richtig gemacht.",
       "titleLine2": "Ohne den Preis des Luxussegments.",
       "subtitle": "Der Spin-off der TriesteVillas-Gruppe für alles, was nicht Luxus ist: dasselbe Marketing, dieselbe Sorgfalt, ohne astronomische Budgets. Wohnimmobilien in Triest und Provinz bis rund 500.000 €.",
+      "videoAlt": "Luftaufnahme von Triest: ein Altbau an einer baumbestandenen Allee.",
       "ctaPrimary": "Bewertung anfordern",
       "ctaSecondary": "Immobilien ansehen",
       "scrollHint": "Scrollen"
@@ -85,6 +86,11 @@
       "body": "TriesteImmobiliare ist der Spin-off der TriesteVillas-Gruppe für alles, was nicht Luxus ist. Wir arbeiten schnell und effizient und richten die Qualität der Vermarktung an unseren höchsten Standards aus: dieselbe Methode, dasselbe Marketing, ein anderer Rahmen. Wohnimmobilien in Triest und Provinz bis rund 500.000 €.",
       "routingNote": "Handelt es sich um eine Luxusimmobilie, übernimmt die Muttergesellschaft TriesteVillas. Für das übrige Friaul-Julisch Venetien sind FriuliVillas oder LignanoVillas zuständig. Für Vermietungen TriesteAffitti.",
       "cta": "Die Gruppe entdecken"
+    },
+    "videoBreak": {
+      "eyebrow": "Unser Marketing",
+      "title": "Wir zeigen das Potenzial, nicht nur die Räume.",
+      "alt": "Virtuelles Home Staging: ein leeres Dachgeschoss, das sich nach und nach einrichtet."
     },
     "featured": {
       "eyebrow": "Jetzt zum Verkauf",

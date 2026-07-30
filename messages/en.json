@@ -68,6 +68,7 @@
       "titleKinetic": "done properly.",
       "titleLine2": "Without the luxury price tag.",
       "subtitle": "The TriesteVillas spin-off for everything that isn't luxury: same marketing, same care, budgets that aren't stratospheric. Residential Trieste and province up to around €500,000.",
+      "videoAlt": "Aerial footage of Trieste: a period building on a tree-lined avenue.",
       "ctaPrimary": "Request a valuation",
       "ctaSecondary": "Browse the properties",
       "scrollHint": "Scroll"
@@ -85,6 +86,11 @@
       "body": "TriesteImmobiliare is the TriesteVillas spin-off built for everything that isn't luxury. We're fast and efficient, and we hold the quality of our promotion to our highest standards: same method, same marketing, a different remit. Residential Trieste and province, up to around €500,000.",
       "routingNote": "If the property is luxury, our parent company TriesteVillas handles it. For the rest of FVG, FriuliVillas or LignanoVillas. For rentals, TriesteAffitti.",
       "cta": "Discover the Group"
+    },
+    "videoBreak": {
+      "eyebrow": "Our marketing",
+      "title": "We show the potential, not just the rooms.",
+      "alt": "Virtual home staging: an empty attic gradually filling with furniture."
     },
     "featured": {
       "eyebrow": "On the market now",

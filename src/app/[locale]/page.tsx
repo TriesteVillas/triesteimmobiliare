@@ -9,6 +9,7 @@ import PropertyCard from "@/components/PropertyCard";
 import FeaturedCarousel from "@/components/FeaturedCarousel";
 import Marquee from "@/components/Marquee";
 import ClosureBanner from "@/components/ClosureBanner";
+import AutoVideo from "@/components/AutoVideo";
 import { BoatMark } from "@/components/Logo";
 import BuyerCta from "@/components/BuyerCta";
 import SellerCta from "@/components/SellerCta";
@@ -56,7 +57,7 @@ export default async function Home({
     <>
       {/* ── Hero — calm harbour light ─────────────────────────────── */}
       <section className="grad-paper-sea relative overflow-hidden">
-        <div className="relative mx-auto max-w-5xl px-6 pb-16 pt-36 sm:pb-24 sm:pt-44">
+        <div className="relative mx-auto max-w-5xl px-6 pb-12 pt-36 sm:pb-16 sm:pt-44">
           <div data-reveal>
             <BoatMark className="h-12 w-auto sm:h-14" />
           </div>
@@ -94,6 +95,17 @@ export default async function Home({
             >
               {t("hero.ctaSecondary")}
             </Link>
+          </div>
+          <div
+            className="mt-14 aspect-[16/9] overflow-hidden rounded-3xl border border-brand/15 shadow-[0_24px_70px_-30px_rgba(28,74,107,0.45)] sm:mt-16"
+            data-reveal
+          >
+            <AutoVideo
+              src="/video/trieste-aerea.mp4"
+              poster="/video/trieste-aerea.jpg"
+              ariaLabel={t("hero.videoAlt")}
+              className="h-full w-full object-cover"
+            />
           </div>
         </div>
 
@@ -179,6 +191,26 @@ export default async function Home({
         >
           {t("positioning.cta")} →
         </Link>
+      </section>
+
+      {/* ── Marketing video break ─────────────────────────────────── */}
+      <section className="relative h-[62vh] min-h-[420px] max-h-[680px] overflow-hidden bg-brand-dark">
+        <AutoVideo
+          src="/video/staging-mansarda.mp4"
+          poster="/video/staging-mansarda.jpg"
+          ariaLabel={t("videoBreak.alt")}
+          className="h-full w-full object-cover object-[center_58%]"
+          lazy
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-dark from-8% via-brand-dark/85 via-25% to-transparent to-46% sm:from-10% sm:via-20% sm:to-36%" />
+        <div className="absolute inset-x-0 bottom-0">
+          <div className="mx-auto max-w-6xl px-6 pb-10 sm:pb-14" data-reveal>
+            <p className="eyebrow text-sand">{t("videoBreak.eyebrow")}</p>
+            <p className="mt-2 max-w-4xl text-balance text-2xl font-semibold leading-tight text-white sm:text-3xl">
+              {t("videoBreak.title")}
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* ── Seller value (job #1) ─────────────────────────────────── */}

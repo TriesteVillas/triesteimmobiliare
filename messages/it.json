@@ -68,6 +68,7 @@
       "titleKinetic": "fatto sul serio.",
       "titleLine2": "Senza il prezzo del luxury.",
       "subtitle": "Lo spin-off del gruppo TriesteVillas dedicato a tutto ciò che non è luxury: stesso marketing, stessa cura, budget non stratosferici. Residenziale a Trieste e Provincia fino a circa 500.000 €.",
+      "videoAlt": "Ripresa aerea di Trieste: un palazzo d'epoca su un viale alberato.",
       "ctaPrimary": "Richiedi valutazione",
       "ctaSecondary": "Sfoglia gli immobili",
       "scrollHint": "Scorri"
@@ -85,6 +86,11 @@
       "body": "TriesteImmobiliare è lo spin-off del gruppo TriesteVillas dedicato a ciò che non è luxury. Siamo rapidi ed efficienti e allineiamo la qualità della promozione ai nostri standard più alti: stesso metodo, stesso marketing, perimetro diverso. Il residenziale di Trieste e Provincia fino a circa 500.000 €.",
       "routingNote": "Se l'immobile è di lusso, se ne occupa la capogruppo TriesteVillas. Per il resto del FVG, FriuliVillas o LignanoVillas. Per gli affitti, TriesteAffitti.",
       "cta": "Scopri il Gruppo"
+    },
+    "videoBreak": {
+      "eyebrow": "Il nostro marketing",
+      "title": "Facciamo vedere il potenziale, non solo le stanze.",
+      "alt": "Home staging virtuale: una mansarda vuota che si arreda progressivamente."
     },
     "featured": {
       "eyebrow": "In vendita ora",
