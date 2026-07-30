@@ -150,6 +150,7 @@
       "eyebrow": "Vendi con TriesteImmobiliare",
       "title": "Vendi casa a Trieste con più strategia, meno attrito e 0% al venditore.",
       "intro": "Primo contatto entro 24h, valutazione entro 48h, online anche in 7 giorni se la casa è pronta a partire bene. Mettiamo insieme velocità, controllo documentale, marketing forte e un percorso pensato per disturbare il meno possibile chi vende.",
+      "videoAlt": "Soggiorno luminoso che si apre sulla terrazza.",
       "ctaPrimary": "Richiedi una valutazione strategica",
       "ctaSecondary": "Prenota una videocall"
     },
@@ -273,6 +274,7 @@
       "eyebrow": "Perché Trieste",
       "title": "Una città che si legge, non si indovina.",
       "body": "Centro storico compatto, domanda di affitto stabile tra università, sanità e porto, prezzi al metro ancora ragionevoli rispetto ad altre città del Nord. È un mercato dove un immobile giusto, comprato bene, lavora. Ma va letto: zona per zona cambiano resa, vincoli e potenziale.",
+      "videoAlt": "Terrazza di un attico a Trieste, con vista sui tetti e sul mare.",
       "incomeTitle": "Reddito, non scommessa",
       "incomeBody": "Non vendiamo l'affare del secolo. Ragioniamo su unità che producono un reddito sensato, con conti che tengono anche quando li guardi dopo i costi."
     },
@@ -562,6 +564,7 @@
     "eyebrow": "Parla con noi",
     "title": "Contatti",
     "intro": "Raccontaci cosa cerchi o cosa vuoi vendere: ti rispondiamo in fretta.",
+    "videoAlt": "Angolo studio con affaccio sul verde.",
     "emailLabel": "Email",
     "phoneLabel": "Telefono",
     "officeLabel": "Sede",

@@ -150,6 +150,7 @@
       "eyebrow": "Sell with TriesteImmobiliare",
       "title": "Sell your home in Trieste with more strategy, less friction, and 0% seller commission.",
       "intro": "First contact within 24h, valuation within 48h, online in as little as 7 days if the home is ready to launch well. We bring together speed, document control, strong marketing, and a process designed to disturb the seller as little as possible.",
+      "videoAlt": "A bright living room opening onto the terrace.",
       "ctaPrimary": "Request a strategic valuation",
       "ctaSecondary": "Book a video call"
     },
@@ -273,6 +274,7 @@
       "eyebrow": "Why Trieste",
       "title": "A city you can read, not one you have to guess at.",
       "body": "A compact historic centre, steady rental demand from the university, healthcare and the port, and prices per square metre still reasonable against other cities in the North. It's a market where the right property, bought well, works for you. But it has to be read: yield, constraints and potential shift from one area to the next.",
+      "videoAlt": "A rooftop terrace in Trieste, overlooking the rooftops and the sea.",
       "incomeTitle": "Income, not a gamble",
       "incomeBody": "We don't sell the deal of the century. We work on units that produce sensible income, with numbers that hold up even once you look at them net of costs."
     },
@@ -562,6 +564,7 @@
     "eyebrow": "Talk to us",
     "title": "Contact",
     "intro": "Tell us what you're looking for, or what you'd like to sell: we reply quickly.",
+    "videoAlt": "A study corner looking out over the greenery.",
     "emailLabel": "Email",
     "phoneLabel": "Phone",
     "officeLabel": "Office",

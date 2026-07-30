@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import InvestorCta from "@/components/InvestorCta";
 import BuyerCta from "@/components/BuyerCta";
+import AutoVideo from "@/components/AutoVideo";
 import GhostCard from "@/components/private/GhostCard";
 import { Link } from "@/i18n/navigation";
 import { getPrivateTeasers } from "@/lib/airtable";
@@ -73,13 +74,29 @@ export default async function InvestPage({
       </section>
 
       {/* Narrative — why Trieste + income, not a bet */}
-      <section className="mx-auto max-w-4xl px-6 py-20">
-        <p className="eyebrow">{t("narrative.eyebrow")}</p>
-        <h2 className="display-chapter mt-2 max-w-2xl text-brand-dark">{t("narrative.title")}</h2>
-        <p className="mt-5 max-w-2xl text-lg text-neutral-600">{t("narrative.body")}</p>
-        <div className="mt-8 rounded-2xl border border-brand/20 bg-paper p-6">
-          <h3 className="text-lg font-semibold text-brand-dark">{t("narrative.incomeTitle")}</h3>
-          <p className="mt-2 text-neutral-600">{t("narrative.incomeBody")}</p>
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-2 lg:gap-14">
+          <div>
+            <p className="eyebrow">{t("narrative.eyebrow")}</p>
+            <h2 className="display-chapter mt-2 max-w-2xl text-brand-dark">{t("narrative.title")}</h2>
+            <p className="mt-5 max-w-2xl text-lg text-neutral-600">{t("narrative.body")}</p>
+            <div className="mt-8 rounded-2xl border border-brand/20 bg-paper p-6">
+              <h3 className="text-lg font-semibold text-brand-dark">{t("narrative.incomeTitle")}</h3>
+              <p className="mt-2 text-neutral-600">{t("narrative.incomeBody")}</p>
+            </div>
+          </div>
+          <div
+            className="aspect-[5/4] overflow-hidden rounded-3xl border border-brand/15 shadow-[0_24px_70px_-30px_rgba(28,74,107,0.45)]"
+            data-reveal
+          >
+            <AutoVideo
+              src="/video/terrazza-vista-mare.mp4"
+              poster="/video/terrazza-vista-mare.jpg"
+              ariaLabel={t("narrative.videoAlt")}
+              className="h-full w-full object-cover"
+              lazy
+            />
+          </div>
         </div>
       </section>
 
