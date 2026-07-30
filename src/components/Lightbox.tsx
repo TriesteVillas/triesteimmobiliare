@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { photoSrc, photoSrcSet } from "@/lib/photoSrc";
+import { useSwipe } from "@/lib/useSwipe";
 import PhotoImg from "./PhotoImg";
 
 // Vedi PhotoGallery per il perché delle ladder. Qui la foto grande occupa 92vw:
@@ -38,6 +39,13 @@ export default function Lightbox({
     (d: number) => setI((x) => (x + d + photos.length) % photos.length),
     [photos.length],
   );
+
+  // Trascinamento col dito: sul telefono è il gesto naturale, e le frecce sono
+  // comunque lì per chi le cerca. Gli handler stanno sull'intero pannello, non
+  // solo sulla foto: con object-contain una foto orizzontale su uno schermo
+  // verticale occupa una fascia sottile al centro, e chiedere di partire da lì
+  // vorrebbe dire farlo fallire quasi sempre.
+  const swipe = useSwipe((d) => step(d));
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -131,7 +139,12 @@ export default function Lightbox({
       ref={panelRef}
       tabIndex={-1}
       className="lightbox-enter fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 outline-none backdrop-blur-sm"
-      onClick={onClose}
+      // Uno swipe che finisce sullo sfondo non deve chiudere la galleria.
+      onClick={() => {
+        if (swipe.eraUnTrascinamento()) return;
+        onClose();
+      }}
+      {...swipe.handlers}
       role="dialog"
       aria-modal="true"
     >
@@ -139,7 +152,7 @@ export default function Lightbox({
         type="button"
         onClick={onClose}
         aria-label={closeLabel}
-        className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-2xl text-white transition-colors hover:bg-white/20"
+        className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-2xl text-white transition-colors hover:bg-white/20"
       >
         ×
       </button>
@@ -151,7 +164,7 @@ export default function Lightbox({
         }}
         aria-label={gridLabel ?? "Grid"}
         title={gridLabel}
-        className="absolute left-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+        className="absolute left-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4.5 w-4.5" aria-hidden="true">
           <rect x="3" y="3" width="7" height="7" rx="1" />
@@ -169,7 +182,7 @@ export default function Lightbox({
               step(-1);
             }}
             aria-label={t("prev")}
-            className="absolute left-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-3xl text-white transition-colors hover:bg-white/20"
+            className="absolute left-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-3xl text-white transition-colors hover:bg-white/20"
           >
             <span aria-hidden>‹</span>
           </button>
@@ -180,7 +193,7 @@ export default function Lightbox({
               step(1);
             }}
             aria-label={t("next")}
-            className="absolute right-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-3xl text-white transition-colors hover:bg-white/20"
+            className="absolute right-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-3xl text-white transition-colors hover:bg-white/20"
           >
             <span aria-hidden>›</span>
           </button>
@@ -188,7 +201,13 @@ export default function Lightbox({
       )}
       <div
         className="relative h-[85vh] w-[92vw] max-w-6xl"
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          // Qui il click si ferma comunque (toccare la foto non chiude), ma il
+          // flag va consumato lo stesso: altrimenti uno swipe finito sulla foto
+          // lo lascerebbe alzato e si mangerebbe il click successivo.
+          swipe.eraUnTrascinamento();
+          e.stopPropagation();
+        }}
       >
         <PhotoImg
           key={photos[i].url}
