@@ -295,7 +295,7 @@ export default function BuyerConcierge({
               >
                 WhatsApp
               </a>
-              <a href="mailto:richieste@triestevillas.com" className="font-medium text-sand/90 transition-colors hover:text-sand">
+              <a href="mailto:info@triesteimmobiliare.com" className="font-medium text-sand/90 transition-colors hover:text-sand">
                 Email
               </a>
             </div>

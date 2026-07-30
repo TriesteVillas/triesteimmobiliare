@@ -15,7 +15,7 @@ const LEADS_BASE_ID = process.env.LEADS_BASE_ID ?? "app1ZDay9vQNU5V2u";
 const LEADS_TABLE = process.env.LEADS_TABLE ?? "tbl1RolmcvI7WxDdr";
 const LEADS_TOKEN = process.env.LEADS_AIRTABLE_TOKEN ?? process.env.AIRTABLE_TOKEN;
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const RESEND_FROM = process.env.RESEND_FROM; // e.g. "TriesteVillas <noreply@triestevillas.com>"
+const RESEND_FROM = process.env.RESEND_FROM; // e.g. "TriesteImmobiliare <noreply@triesteimmobiliare.com>"
 const NOTIFY_EMAIL = process.env.LEAD_NOTIFY_EMAIL ?? "info@triesteimmobiliare.com";
 
 const MOTIVI = new Set([

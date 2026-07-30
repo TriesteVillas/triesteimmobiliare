@@ -18,7 +18,6 @@ export default async function Header() {
     { href: "/investimenti", label: t("invest") },
     { href: "/vendi", label: t("sell") },
     { href: "/gruppo", label: t("group") },
-    { href: "/contatti", label: t("contact") },
   ] as const;
 
   return (
