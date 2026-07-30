@@ -1,6 +1,13 @@
 import { NextResponse } from "next/server";
 import { normCity } from "@/lib/citynorm";
 import { splitNomeCerta } from "@/lib/nomesplit";
+import {
+  brandMailShell,
+  mailContact,
+  mailCta,
+  mailRecapCard,
+  mailText,
+} from "@/lib/brandMail";
 
 // Lead intake for the property forms (richiesta info / prenota visita / invia a
 // un amico). Writes to the unified Airtable LEADS table (by field name +
@@ -82,8 +89,8 @@ const RECAP = {
     purpose: "Scopo", condition: "Stato immobile", listing: "Immobile",
     request: "Richiesta", message: "Messaggio", visit: "Disponibilità per la visita",
     timing: "Tempistiche", roi: "Rendita attesa", horizon: "Orizzonte", objective: "Obiettivo",
-    closing: "Per qualsiasi cosa rispondete pure a questa email o chiamateci allo 040 2473628.",
-    sign: "TriesteImmobiliare · info@triesteimmobiliare.com",
+    closing: `Per qualsiasi cosa rispondete pure a questa email o chiamateci allo ${mailContact.phone}.`,
+    sign: `TriesteImmobiliare · ${mailContact.email}`,
   },
   en: {
     subject: "We received your request — TriesteImmobiliare",
@@ -94,8 +101,8 @@ const RECAP = {
     purpose: "Purpose", condition: "Property condition", listing: "Property",
     request: "Request", message: "Message", visit: "Availability for the visit",
     timing: "Timing", roi: "Target yield", horizon: "Horizon", objective: "Objective",
-    closing: "Feel free to reply to this email or call us on +39 040 2473628.",
-    sign: "TriesteImmobiliare · info@triesteimmobiliare.com",
+    closing: `Feel free to reply to this email or call us on ${mailContact.phone}.`,
+    sign: `TriesteImmobiliare · ${mailContact.email}`,
   },
   de: {
     subject: "Wir haben Ihre Anfrage erhalten — TriesteImmobiliare",
@@ -106,12 +113,13 @@ const RECAP = {
     purpose: "Zweck", condition: "Zustand der Immobilie", listing: "Immobilie",
     request: "Anfrage", message: "Nachricht", visit: "Verfügbarkeit für die Besichtigung",
     timing: "Zeitrahmen", roi: "Erwartete Rendite", horizon: "Horizont", objective: "Ziel",
-    closing: "Antworten Sie gerne auf diese E-Mail oder rufen Sie uns an unter +39 040 2473628.",
-    sign: "TriesteImmobiliare · info@triesteimmobiliare.com",
+    closing: `Antworten Sie gerne auf diese E-Mail oder rufen Sie uns an unter ${mailContact.phone}.`,
+    sign: `TriesteImmobiliare · ${mailContact.email}`,
   },
 } as const;
 
-// Branded recap wrapper: dark header + clean rows, renders everywhere.
+// Customer recap on the shared brand shell: greeting, summary card, optional
+// listing CTA, closing and signature. The shell owns logo and footer contacts.
 function recapHtml(
   lang: keyof typeof RECAP,
   name: string,
@@ -119,26 +127,14 @@ function recapHtml(
   extra = "",
 ) {
   const L = RECAP[lang];
-  const tr = rows
-    .filter(([, v]) => v)
-    .map(
-      ([k, v]) =>
-        `<tr><td style="padding:6px 14px 6px 0;color:#6b7a82;white-space:nowrap;vertical-align:top">${esc(k)}</td><td style="padding:6px 0;color:#0e2a36;font-weight:600">${esc(v)}</td></tr>`,
-    )
-    .join("");
-  return `<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto">
-    <div style="background:#1c4a6b;border-radius:12px 12px 0 0;padding:18px 24px">
-      <span style="color:#fff;font-size:18px;font-weight:700;letter-spacing:.5px">triesteimmobiliare</span>
-    </div>
-    <div style="border:1px solid #e5e7eb;border-top:0;border-radius:0 0 12px 12px;padding:24px">
-      <p style="color:#0e2a36">${L.hello}${name ? ` ${esc(name)}` : ""}, ${L.received}</p>
-      <p style="margin-top:18px;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8a9aa3">${L.recapTitle}</p>
-      <table style="border-collapse:collapse;font-size:14px">${tr}</table>
-      ${extra}
-      <p style="margin-top:20px;color:#475560;font-size:14px">${L.closing}</p>
-      <p style="margin-top:16px;color:#8a9aa3;font-size:12px">${L.sign}</p>
-    </div>
-  </div>`;
+  const received = L.received.charAt(0).toUpperCase() + L.received.slice(1);
+  const body = `<p style="${mailText.title}">${L.hello}${name ? ` ${esc(name)}` : ""},</p>
+    <p style="${mailText.p}">${received}</p>
+    ${mailRecapCard(L.recapTitle, rows.map(([label, value]) => [esc(label), esc(value)] as [string, string]))}
+    ${extra}
+    <p style="${mailText.p}">${L.closing}</p>
+    <p style="${mailText.small}">${L.sign}</p>`;
+  return brandMailShell({ lang, body });
 }
 
 // Canonical values for the buyer popup (typecast creates missing select
@@ -613,17 +609,23 @@ export async function POST(request: Request) {
 
   if (tipo === "Invia a un amico") {
     const fl = (["it", "en", "de"].includes(lingua) ? lingua : "it") as "it" | "en" | "de";
+    const L = RECAP[fl];
     const FRIEND = {
-      it: { subj: "Un immobile che potrebbe interessarti — TriesteImmobiliare", intro: "Ti è stato segnalato questo immobile:", sign: "— TriesteImmobiliare" },
-      en: { subj: "A property you might like — TriesteImmobiliare", intro: "Someone wanted you to see this property:", sign: "— TriesteImmobiliare" },
-      de: { subj: "Eine Immobilie für Sie — TriesteImmobiliare", intro: "Diese Immobilie wurde Ihnen empfohlen:", sign: "— TriesteImmobiliare" },
+      it: { subj: "Un immobile che potrebbe interessarti — TriesteImmobiliare", intro: "Ti è stato segnalato questo immobile:", card: "Immobile segnalato", cta: "Vedi l'immobile", sign: "— TriesteImmobiliare" },
+      en: { subj: "A property you might like — TriesteImmobiliare", intro: "Someone wanted you to see this property:", card: "Shared property", cta: "View the property", sign: "— TriesteImmobiliare" },
+      de: { subj: "Eine Immobilie für Sie — TriesteImmobiliare", intro: "Diese Immobilie wurde Ihnen empfohlen:", card: "Empfohlene Immobilie", cta: "Zur Immobilie", sign: "— TriesteImmobiliare" },
     }[fl];
+    const friendBody = `<p style="${mailText.title}">${FRIEND.intro}</p>
+      ${mailRecapCard(FRIEND.card, [
+        [L.listing, esc(immobileNome + (rif ? ` (${rif})` : ""))],
+        [L.message, esc(messaggio)],
+      ])}
+      ${url ? mailCta(esc(url), FRIEND.cta) : ""}
+      <p style="${mailText.small}">${FRIEND.sign}</p>`;
     await sendEmail(
       emailAmico,
       FRIEND.subj,
-      `<p>${FRIEND.intro}</p>${listingLine}${
-        messaggio ? `<p>${esc(messaggio)}</p>` : ""
-      }<p>${FRIEND.sign}</p>`,
+      brandMailShell({ lang: fl, body: friendBody }),
       isEmail(email) ? email : undefined,
     );
     // Notify the team — otherwise a referral leaves no internal trace beyond Airtable.
@@ -665,7 +667,7 @@ export async function POST(request: Request) {
             [L.visit, disponibilita],
           ],
           url
-            ? `<p style="margin-top:14px;font-size:14px"><a href="${esc(url)}" style="color:#2c6b96">${esc(url)}</a></p>`
+            ? mailCta(esc(url), lingua === "en" ? "View the property" : lingua === "de" ? "Zur Immobilie" : "Vedi l'immobile")
             : "",
         ),
         NOTIFY_EMAIL,

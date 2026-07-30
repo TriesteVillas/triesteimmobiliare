@@ -1,5 +1,6 @@
 import "server-only";
-import { ACCT_BRAND, ACCT_SITE_URL } from "./brand";
+import { ACCT_SITE_URL } from "./brand";
+import { brandMailShell, mailCta, mailText, type MailLang } from "@/lib/brandMail";
 
 // Email transazionali dell'area clienti, via Resend, fail-closed: se
 // RESEND_API_KEY manca (stato attuale della produzione) non parte nulla e il
@@ -30,13 +31,9 @@ export async function sendAcctMail(to: string, subject: string, html: string): P
 const esc = (s: string) =>
   String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
-function shell(body: string): string {
-  return `<div style="font-family:Georgia,'Times New Roman',serif;max-width:560px;margin:0 auto;color:#1a1a1a">
-  <div style="border-bottom:2px solid #2c6b96;padding:18px 0 10px"><span style="font-size:19px;letter-spacing:.5px;color:#2c6b96;font-weight:bold">${esc(ACCT_BRAND.displayName)}</span></div>
-  <div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;padding:18px 0">${body}</div>
-  <div style="border-top:1px solid #ddd;padding:12px 0;font-family:Arial,sans-serif;font-size:12px;color:#777">
-    ${esc(ACCT_BRAND.displayName)} · info@triesteimmobiliare.com · 331 8940822<br/>Claude · Assistente AI TriesteVillas
-  </div></div>`;
+// Shared site shell (logo and dark footer): one look for every account email.
+function shell(body: string, lang: MailLang = "it"): string {
+  return brandMailShell({ lang, body: `<div style="${mailText.p};margin:0">${body}</div>` });
 }
 
 const RESET_COPY: Record<Lang, { subject: string; hi: (n: string) => string; body: string; cta: string; ignore: string }> = {
@@ -70,8 +67,9 @@ export function resetEmail(lang: Lang, nome: string, token: string): { subject: 
     subject: c.subject,
     html: shell(
       `<p>${c.hi(nome)}</p><p>${c.body}</p>
-       <p style="margin:22px 0"><a href="${url}" style="background:#2c6b96;color:#fff;padding:11px 22px;border-radius:8px;text-decoration:none">${c.cta}</a></p>
-       <p style="color:#777;font-size:13px">${c.ignore}</p>`,
+       ${mailCta(url, c.cta)}
+       <p style="${mailText.small}">${c.ignore}</p>`,
+      lang,
     ),
   };
 }

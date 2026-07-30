@@ -1,5 +1,6 @@
 import "server-only";
-import { MAIL_CONTACT, MAIL_FROM, SITE_URL } from "./brand";
+import { MAIL_FROM, SITE_URL } from "./brand";
+import { brandMailShell, mailContact, mailCta, mailText } from "@/lib/brandMail";
 
 // Transactional email for the Private Collection, via Resend (the same provider
 // the lead route already uses). Every send is best-effort: the Airtable record
@@ -12,7 +13,7 @@ import { MAIL_CONTACT, MAIL_FROM, SITE_URL } from "./brand";
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM = MAIL_FROM;
 const ZOOM_URL = process.env.PC_ZOOM_URL ?? "";
-const CONTACT = MAIL_CONTACT;
+const CONTACT = `${mailContact.email} · WhatsApp ${mailContact.whatsapp}`;
 
 export type Lang = "it" | "en" | "de";
 
@@ -66,6 +67,10 @@ function shell(inner: string): string {
     </table>
   </td></tr>
 </table>`;
+}
+
+function clientShell(inner: string, lang: Lang): string {
+  return brandMailShell({ lang, body: inner });
 }
 
 function goldButton(href: string, label: string): string {
@@ -127,19 +132,17 @@ export function credentialEmail(lang: Lang, name: string, code: string, expiresL
   const L = CRED[lang] ?? CRED.en;
   const enterUrl = `${SITE_URL}/${lang}/private?c=${encodeURIComponent(code)}`;
   const inner = `
-    <p style="margin:0 0 16px;">${L.hi} ${esc(name) || "—"},</p>
-    <p style="margin:0 0 22px;">${L.body}</p>
-    <div style="text-align:center;margin:6px 0 8px;">
-      <div style="color:#8a97a6;font-size:11px;letter-spacing:2px;text-transform:uppercase;">${L.codeLabel}</div>
-      <div style="display:inline-block;margin-top:8px;border:1px solid #a9c8e0;color:#dfe9f3;font-size:24px;letter-spacing:4px;font-weight:700;padding:12px 22px;font-family:'Courier New',monospace;">${esc(code)}</div>
-    </div>
-    <p style="text-align:center;color:#8a97a6;font-size:13px;margin:4px 0 22px;">${L.validity(expiresLabel, validityDays)}</p>
-    <div style="text-align:center;margin:0 0 26px;">${goldButton(enterUrl, L.enter)}</div>
-    <p style="margin:0 0 14px;color:#aebcc9;">${L.zoomLine}</p>
-    ${ZOOM_URL ? `<div style="text-align:center;margin:0 0 22px;"><a href="${esc(ZOOM_URL)}" style="color:#a9c8e0;font-size:14px;">${esc(L.zoomCta)} →</a></div>` : ""}
-    <p style="margin:18px 0 0;color:#8a97a6;font-size:13px;">${L.contacts}</p>
-    <p style="margin:18px 0 0;color:#c3d0dd;">${L.closing}<br><span style="color:#a9c8e0;">TriesteImmobiliare Private Collection</span></p>`;
-  return { subject: L.subject, html: shell(inner) };
+    <p style="${mailText.title}">${L.hi} ${esc(name) || "—"},</p>
+    <p style="${mailText.p}">${L.body}</p>
+    <p style="${mailText.small};margin:22px 0 0;text-align:center;letter-spacing:2px;text-transform:uppercase">${L.codeLabel}</p>
+    <p style="${mailText.title};margin:8px 0 0;text-align:center;font-family:'Courier New',monospace;font-size:24px;letter-spacing:4px">${esc(code)}</p>
+    <p style="${mailText.small};margin:8px 0 22px;text-align:center">${L.validity(expiresLabel, validityDays)}</p>
+    ${mailCta(enterUrl, L.enter)}
+    <p style="${mailText.p}">${L.zoomLine}</p>
+    ${ZOOM_URL ? mailCta(esc(ZOOM_URL), `${esc(L.zoomCta)} →`) : ""}
+    <p style="${mailText.small}">${L.contacts}</p>
+    <p style="${mailText.p}">${L.closing}<br><strong>TriesteImmobiliare Private Collection</strong></p>`;
+  return { subject: L.subject, html: clientShell(inner, lang) };
 }
 
 // ---- Expiry courtesy --------------------------------------------------------
@@ -172,12 +175,12 @@ export function expiryEmail(lang: Lang, name: string) {
   const L = EXP[lang] ?? EXP.en;
   const renewUrl = `${SITE_URL}/${lang}/private/richiedi?renew=1`;
   const inner = `
-    <p style="margin:0 0 16px;">${L.hi} ${esc(name) || "—"},</p>
-    <p style="margin:0 0 24px;">${L.body}</p>
-    <div style="text-align:center;margin:0 0 24px;">${goldButton(renewUrl, L.cta)}</div>
-    <p style="margin:0;color:#8a97a6;font-size:13px;">${CONTACT}</p>
-    <p style="margin:18px 0 0;color:#c3d0dd;">${L.closing}<br><span style="color:#a9c8e0;">TriesteImmobiliare Private Collection</span></p>`;
-  return { subject: L.subject, html: shell(inner) };
+    <p style="${mailText.title}">${L.hi} ${esc(name) || "—"},</p>
+    <p style="${mailText.p}">${L.body}</p>
+    ${mailCta(renewUrl, L.cta)}
+    <p style="${mailText.small}">${CONTACT}</p>
+    <p style="${mailText.p}">${L.closing}<br><strong>TriesteImmobiliare Private Collection</strong></p>`;
+  return { subject: L.subject, html: clientShell(inner, lang) };
 }
 
 // ---- Request acknowledgement ------------------------------------------------
@@ -209,12 +212,12 @@ const ACK: Record<Lang, { subject: string; hi: string; body: string; note: strin
 export function ackEmail(lang: Lang, name: string) {
   const L = ACK[lang] ?? ACK.en;
   const inner = `
-    <p style="margin:0 0 16px;">${L.hi} ${esc(name) || "—"},</p>
-    <p style="margin:0 0 18px;">${L.body}</p>
-    <p style="margin:0 0 22px;color:#aebcc9;">${L.note}</p>
-    <p style="margin:0;color:#8a97a6;font-size:13px;">${CONTACT}</p>
-    <p style="margin:18px 0 0;color:#c3d0dd;">${L.closing}<br><span style="color:#a9c8e0;">TriesteImmobiliare Private Collection</span></p>`;
-  return { subject: L.subject, html: shell(inner) };
+    <p style="${mailText.title}">${L.hi} ${esc(name) || "—"},</p>
+    <p style="${mailText.p}">${L.body}</p>
+    <p style="${mailText.p}">${L.note}</p>
+    <p style="${mailText.small}">${CONTACT}</p>
+    <p style="${mailText.p}">${L.closing}<br><strong>TriesteImmobiliare Private Collection</strong></p>`;
+  return { subject: L.subject, html: clientShell(inner, lang) };
 }
 
 // ---- Daily digest to Martino (internal, IT) --------------------------------
