@@ -13,6 +13,7 @@ import PropertyCharacteristics, {
 import PropertyMap from "@/components/PropertyMap";
 import PhotoGallery from "@/components/PhotoGallery";
 import PhotoImg from "@/components/PhotoImg";
+import RicordaScheda from "@/components/RicordaScheda";
 import { photoSrc, photoSrcSet } from "@/lib/photoSrc";
 import Planimetrie from "@/components/Planimetrie";
 import PropertyBadge from "@/components/PropertyBadge";
@@ -284,6 +285,8 @@ export default async function PropertyPage({ params }: { params: Params }) {
 
   return (
     <article>
+      {/* Annota questa scheda: al ritorno /immobili ci si riapre sopra. */}
+      <RicordaScheda slug={property.slug} />
       <JsonLd
         data={[
           listingJsonLd({

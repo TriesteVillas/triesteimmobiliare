@@ -26,6 +26,7 @@ export default function PropertyCard({
         href={`/annuncio/${view.slug}`}
         transitionTypes={["nav-forward"]}
         className="card-cine group block"
+        data-slug={view.slug}
       >
         <div className="relative aspect-[4/3] overflow-hidden bg-paper">
           {view.cover ? (

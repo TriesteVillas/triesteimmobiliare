@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import PropertyCard from "./PropertyCard";
 import GhostCard from "./private/GhostCard";
+import { ripristinaPosizione } from "@/lib/listPosition";
 import type { PropertyView } from "@/lib/propertyView";
 
 // `ghosts` sono i teaser della Private Collection: immobili riservati che nella
@@ -23,6 +24,12 @@ export default function ImmobiliBrowser({
   const t = useTranslations("listing");
   const tImmobili = useTranslations("immobili");
   const [active, setActive] = useState<string | null>(null);
+
+  // Ritorno dalla scheda: la lista riparte dalla card che era stata aperta,
+  // non dall'alto. Vedi src/lib/listPosition.ts.
+  useEffect(() => {
+    ripristinaPosizione();
+  }, []);
 
   // Preselect a zona filter from a /immobili#CODE deep-link (homepage "view more").
   useEffect(() => {
