@@ -120,6 +120,115 @@ export function faqJsonLd(items: Array<{ q: string; a: string }>) {
   };
 }
 
+// Sotto-tipo di Accommodation dal vocabolario tipologia di Airtable (Villa,
+// Appartamento, Attico, Mansarda, …). Si scende sotto "Residence" solo quando la
+// tipologia lo dice davvero: un tipo specifico e sbagliato è peggio di uno
+// generico e vero.
+function accommodationType(tipologia: string | null): string {
+  const t = (tipologia ?? "").toLowerCase();
+  if (t.includes("villa") || t.includes("casa")) return "SingleFamilyResidence";
+  if (t.includes("appartamento") || t.includes("attico") || t.includes("mansarda"))
+    return "Apartment";
+  return "Residence";
+}
+
+type ListingSchemaInput = {
+  locale: string;
+  path: string;
+  title: string;
+  description: string | null;
+  tipologia: string | null;
+  contratto: "VENDITA" | "AFFITTO" | null;
+  via: string | null;
+  comune: string | null;
+  mq: number | null;
+  camere: number | null;
+  baths: number | null;
+  floor: string | null;
+  annoCostruzione: number | null;
+  priceSale: number | null;
+  priceRent: number | null;
+  trattativaRiservata: boolean;
+  onlineDa: string | null;
+  amenities: string[];
+};
+
+// Scheda immobile: RealEstateListing (che è una WebPage) + l'immobile stesso in
+// mainEntity. Non esiste un rich result Google per gli annunci immobiliari — il
+// ritorno è la comprensione dell'entità (e la citabilità nelle risposte AI), non
+// una stellina in SERP.
+//
+// `image` è omesso di proposito: le URL Airtable sono firmate e scadono in ~2h,
+// in JSON-LD diventerebbero riferimenti rotti al momento del crawl. Torna appena
+// le foto hanno un URL stabile.
+export function listingJsonLd(p: ListingSchemaInput) {
+  const url = absUrl(p.locale, p.path);
+  const isRent = p.contratto === "AFFITTO";
+  const price = isRent ? p.priceRent : p.priceSale;
+  const hasPrice = !p.trattativaRiservata && price != null && price > 0;
+  // Qui la descrizione NON è uno snippet SERP: il testo intero vale più di 155
+  // caratteri tagliati. Si normalizzano solo gli spazi — i newline della
+  // descrizione Airtable in un attributo JSON sono solo sporcizia.
+  const description = p.description?.replace(/\s+/g, " ").trim() || null;
+
+  const accommodation: Record<string, unknown> = {
+    "@type": accommodationType(p.tipologia),
+    name: p.title,
+    ...(description ? { description } : {}),
+    address: {
+      "@type": "PostalAddress",
+      ...(p.via ? { streetAddress: p.via } : {}),
+      addressLocality: p.comune ?? "Trieste",
+      addressRegion: "Friuli-Venezia Giulia",
+      addressCountry: "IT",
+    },
+    ...(p.mq
+      ? { floorSize: { "@type": "QuantitativeValue", value: p.mq, unitCode: "MTK" } }
+      : {}),
+    ...(p.camere ? { numberOfRooms: p.camere } : {}),
+    ...(p.baths ? { numberOfBathroomsTotal: p.baths } : {}),
+    ...(p.floor ? { floorLevel: p.floor } : {}),
+    ...(p.annoCostruzione ? { yearBuilt: p.annoCostruzione } : {}),
+    ...(p.amenities.length
+      ? {
+          amenityFeature: p.amenities.map((name) => ({
+            "@type": "LocationFeatureSpecification",
+            name,
+            value: true,
+          })),
+        }
+      : {}),
+  };
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "RealEstateListing",
+    "@id": `${url}#listing`,
+    url,
+    name: p.title,
+    ...(description ? { description } : {}),
+    inLanguage: p.locale,
+    ...(p.onlineDa ? { datePosted: p.onlineDa } : {}),
+    provider: { "@id": `${SITE_URL}/#agency` },
+    mainEntity: accommodation,
+    ...(hasPrice
+      ? {
+          offers: {
+            "@type": "Offer",
+            price,
+            priceCurrency: "EUR",
+            availability: "https://schema.org/InStock",
+            businessFunction: isRent
+              ? "http://purl.org/goodrelations/v1#LeaseOut"
+              : "http://purl.org/goodrelations/v1#Sell",
+            url,
+            seller: { "@id": `${SITE_URL}/#agency` },
+          },
+        }
+      : {}),
+  };
+}
+
 export function breadcrumbJsonLd(locale: string, trail: Array<{ name: string; path: string }>) {
   return {
     "@context": "https://schema.org",

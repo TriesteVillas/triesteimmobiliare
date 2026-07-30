@@ -31,7 +31,8 @@ import {
   priceLabel,
   translatedDescription,
 } from "@/lib/propertyView";
-import { pageAlternates, pageOpenGraph } from "@/lib/seo";
+import { pageAlternates, pageOpenGraph, listingJsonLd, breadcrumbJsonLd } from "@/lib/seo";
+import JsonLd from "@/components/JsonLd";
 import { formatPrice } from "@/lib/format";
 import TaxBox from "@/components/TaxBox";
 import PropertyActions from "@/components/account/PropertyActions";
@@ -133,6 +134,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
   }
 
   const t = await getTranslations("property");
+  const tNav = await getTranslations("nav");
   const tZones = await getTranslations("zones");
   // "Prenota una visita" vive nel namespace lead (usato da VisitForm), non property.
   const tLead = await getTranslations("lead");
@@ -259,8 +261,52 @@ export default async function PropertyPage({ params }: { params: Params }) {
     hasLocation && { id: "posizione", label: t("locationTitle") },
   ].filter((x): x is { id: string; label: string } => Boolean(x));
 
+  // Dati strutturati della scheda. Le dotazioni seguono la stessa lettura che fa
+  // la pagina qui sopra: il campo Airtable è popolato SOLO quando la dotazione
+  // c'è, quindi la presenza vale "sì".
+  const amenities = [
+    property.terrazzo && t("terrace"),
+    property.balcone && t("balcony"),
+    property.giardino && t("garden"),
+    property.piscina && t("pool"),
+    property.ascensore && t("elevator"),
+    property.parcheggio && t("parking"),
+    property.accessoDisabili && t("accessibility"),
+  ].filter((x): x is string => Boolean(x));
+
+  const path = `/annuncio/${property.slug}`;
+
   return (
     <article>
+      <JsonLd
+        data={[
+          listingJsonLd({
+            locale,
+            path,
+            title,
+            description: property.oneliner ?? description ?? null,
+            tipologia: property.tipologia,
+            contratto: property.contratto,
+            via: property.via,
+            comune: property.comune,
+            mq: property.mq,
+            camere: property.camere,
+            baths: property.baths,
+            floor: property.floor,
+            annoCostruzione: property.annoCostruzione,
+            priceSale: property.priceSale,
+            priceRent: property.priceRent,
+            trattativaRiservata: property.trattativaRiservata,
+            onlineDa: property.onlineDa,
+            amenities,
+          }),
+          breadcrumbJsonLd(locale, [
+            { name: "TriesteImmobiliare", path: "/" },
+            { name: tNav("properties"), path: "/immobili" },
+            { name: title, path },
+          ]),
+        ]}
+      />
       {/* Cinematic hero — parallax cover, shared-element morph target */}
       <Scene as="header" mode="cover" smooth={0.14} className="relative h-[82vh] min-h-[520px] overflow-hidden bg-ink-2">
         {/* L'alt delle foto nasce dal titolo italiano in mapRecord (che non conosce
