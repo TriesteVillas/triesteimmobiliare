@@ -2,16 +2,18 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import ChatRichText from "./ChatRichText";
 
 // Concierge AI pubblico del Buyer Hub — la barra "semplice quanto Google" che
 // apre una conversazione vera. Stessa filosofia del Concierge Private
 // Collection: il widget è stupido di proposito, tutta l'intelligenza (prompt,
 // tool su articoli e immobili, guardrail, registro conversazioni) vive nel CRM
-// dietro /api/concierge/chat. Qui: UI, storia locale, stato blocked.
+// dietro /api/concierge/chat. Qui: UI, storia locale, gate identità, stato
+// blocked.
 //
 // Differenze deliberate rispetto al widget PC:
-//  - nessun gate: chiunque può chiedere, da /compra e /risorse;
+//  - il gate identità compare solo quando lo chiede il CRM;
 //  - l'ingresso è una search bar, non un bottone flottante — la domanda scritta
 //    lì diventa il primo turno della conversazione;
 //  - su "blocked" non c'è nessun logout da eseguire: si chiude la sessione di
@@ -20,7 +22,15 @@ import ChatRichText from "./ChatRichText";
 //    id sessione nel registro CRM. Ruotarlo non compra nulla (vedi proxy).
 
 type Msg = { role: "user" | "assistant"; content: string; sig?: string };
-type Stored = { sid: string; msgs: Msg[]; blocked: boolean };
+type Stored = {
+  sid: string;
+  msgs: Msg[];
+  blocked: boolean;
+  gate: boolean;
+  identificato: boolean;
+  gateMessages: Msg[] | null;
+};
+type GateErrors = { name: boolean; contact: boolean; consent: boolean };
 
 const STORAGE_KEY = "tsi_web_chat";
 
@@ -36,17 +46,30 @@ function loadStored(): Stored {
     if (raw) {
       const d = JSON.parse(raw) as Partial<Stored>;
       if (typeof d.sid === "string" && /^web_[a-z0-9]{10,32}$/.test(d.sid)) {
+        const identificato = d.identificato === true;
+        // Senza i messaggi esatti da rimandare il gate sarebbe una porta murata: si autoripara chiudendosi.
+        const gate = d.gate === true && !identificato && Array.isArray(d.gateMessages);
         return {
           sid: d.sid,
           msgs: Array.isArray(d.msgs) ? (d.msgs as Msg[]) : [],
           blocked: d.blocked === true,
+          gate,
+          identificato,
+          gateMessages: gate ? (d.gateMessages as Msg[]) : null,
         };
       }
     }
   } catch {
     /* storage bloccato: chat effimera */
   }
-  return { sid: freshSid(), msgs: [], blocked: false };
+  return {
+    sid: freshSid(),
+    msgs: [],
+    blocked: false,
+    gate: false,
+    identificato: false,
+    gateMessages: null,
+  };
 }
 
 function saveStored(s: Stored): void {
@@ -74,28 +97,46 @@ export default function BuyerConcierge({
   const [sid, setSid] = useState("");
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [blocked, setBlocked] = useState(false);
+  const [gate, setGate] = useState(false);
+  const [identificato, setIdentificato] = useState(false);
+  const [gateMessages, setGateMessages] = useState<Msg[] | null>(null);
   const [bar, setBar] = useState("");
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
   const [error, setError] = useState(false);
+  const [gateName, setGateName] = useState("");
+  const [gateEmail, setGateEmail] = useState("");
+  const [gatePhone, setGatePhone] = useState("");
+  const [gateConsent, setGateConsent] = useState(false);
+  const [gateSending, setGateSending] = useState(false);
+  const [gateFailed, setGateFailed] = useState(false);
+  const [gateErrors, setGateErrors] = useState<GateErrors>({
+    name: false,
+    contact: false,
+    consent: false,
+  });
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Idratazione solo al mount (sessionStorage non esiste sul server).
   useEffect(() => {
     const s = loadStored();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- idratazione client da sessionStorage
     setSid(s.sid);
     setMsgs(s.msgs);
     setBlocked(s.blocked);
+    setGate(s.gate);
+    setIdentificato(s.identificato);
+    setGateMessages(s.gateMessages);
   }, []);
 
   useEffect(() => {
     if (open && scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [open, msgs, typing]);
+  }, [open, msgs, typing, gate]);
 
   useEffect(() => {
-    if (open && !blocked) inputRef.current?.focus();
-  }, [open, blocked]);
+    if (open && !blocked && !gate) inputRef.current?.focus();
+  }, [open, blocked, gate]);
 
   useEffect(() => {
     if (!open) return;
@@ -106,26 +147,13 @@ export default function BuyerConcierge({
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  // Altri pezzi della pagina (es. il percorso "Your route") possono aprire il
-  // Concierge senza conoscerlo: window event, con eventuale domanda di apertura.
-  useEffect(() => {
-    const onOpen = (e: Event) => {
-      const q = (e as CustomEvent<string>).detail;
-      setOpen(true);
-      if (typeof q === "string" && q.trim()) void send(q);
-    };
-    window.addEventListener("tsv:concierge", onOpen);
-    return () => window.removeEventListener("tsv:concierge", onOpen);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sid, msgs, blocked, typing]);
-
   const send = async (text: string) => {
     const q = text.trim();
-    if (!q || typing || blocked || !sid) return;
+    if (!q || typing || blocked || gate || !sid) return;
     setError(false);
     const history: Msg[] = [...msgs, { role: "user", content: q }];
     setMsgs(history);
-    saveStored({ sid, msgs: history, blocked });
+    saveStored({ sid, msgs: history, blocked, gate, identificato, gateMessages });
     setTyping(true);
     try {
       const res = await fetch("/api/concierge/chat", {
@@ -144,6 +172,8 @@ export default function BuyerConcierge({
         text?: string;
         blocked?: boolean;
         sig?: string;
+        gate?: boolean;
+        identificato?: boolean;
       };
       if (!res.ok || !d.ok) {
         setError(true);
@@ -151,13 +181,105 @@ export default function BuyerConcierge({
       }
       const next: Msg[] = d.text ? [...history, { role: "assistant", content: d.text, sig: d.sig }] : history;
       const isBlocked = d.blocked === true;
+      const isIdentificato = identificato || d.identificato === true;
+      const isGate = d.gate === true && !isIdentificato;
+      const nextGateMessages = isGate ? history : null;
       setMsgs(next);
       setBlocked(isBlocked);
-      saveStored({ sid, msgs: next, blocked: isBlocked });
+      setGate(isGate);
+      setIdentificato(isIdentificato);
+      setGateMessages(nextGateMessages);
+      saveStored({
+        sid,
+        msgs: next,
+        blocked: isBlocked,
+        gate: isGate,
+        identificato: isIdentificato,
+        gateMessages: nextGateMessages,
+      });
     } catch {
       setError(true);
     } finally {
       setTyping(false);
+    }
+  };
+
+  // Altri pezzi della pagina (es. il percorso "Your route") possono aprire il
+  // Concierge senza conoscerlo: window event, con eventuale domanda di apertura.
+  useEffect(() => {
+    const onOpen = (e: Event) => {
+      const q = (e as CustomEvent<string>).detail;
+      setOpen(true);
+      if (typeof q === "string" && q.trim()) void send(q);
+    };
+    window.addEventListener("tsv:concierge", onOpen);
+    return () => window.removeEventListener("tsv:concierge", onOpen);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sid, msgs, blocked, typing, gate, identificato, gateMessages]);
+
+  const submitGate = async () => {
+    const nome = gateName.trim();
+    const email = gateEmail.trim();
+    const telefono = gatePhone.trim();
+    const nextErrors: GateErrors = {
+      name: nome.length < 2,
+      contact: !email && !telefono,
+      consent: !gateConsent,
+    };
+    setGateErrors(nextErrors);
+    if (nextErrors.name || nextErrors.contact || nextErrors.consent) return;
+    if (!gateMessages || gateSending || !sid) {
+      setGateFailed(true);
+      return;
+    }
+
+    setGateFailed(false);
+    setGateSending(true);
+    try {
+      const res = await fetch("/api/concierge/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sid,
+          messages: gateMessages,
+          locale,
+          origin: window.location.pathname,
+          ...(context ? { slug: context.slug } : {}),
+          identita: { nome, email, telefono, consenso: true },
+        }),
+      });
+      const d = (await res.json().catch(() => ({}))) as {
+        ok?: boolean;
+        text?: string;
+        blocked?: boolean;
+        sig?: string;
+        gate?: boolean;
+        identificato?: boolean;
+      };
+      if (!res.ok || !d.ok || d.gate === true || d.identificato !== true || !d.text) {
+        setGateFailed(true);
+        return;
+      }
+
+      const next: Msg[] = [...msgs, { role: "assistant", content: d.text, sig: d.sig }];
+      const isBlocked = d.blocked === true;
+      setMsgs(next);
+      setBlocked(isBlocked);
+      setGate(false);
+      setIdentificato(true);
+      setGateMessages(null);
+      saveStored({
+        sid,
+        msgs: next,
+        blocked: isBlocked,
+        gate: false,
+        identificato: true,
+        gateMessages: null,
+      });
+    } catch {
+      setGateFailed(true);
+    } finally {
+      setGateSending(false);
     }
   };
 
@@ -175,6 +297,8 @@ export default function BuyerConcierge({
   const barPlaceholder = context ? t("listingPlaceholder") : t("barPlaceholder");
   const barHint = context ? t("listingHint") : t("barHint");
   const emptyLine = context ? t("listingEmpty", { title: context.title }) : t("empty");
+  const gateField =
+    "w-full rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-white/35 outline-none transition-colors focus:border-sand/60";
 
   return (
     <>
@@ -291,6 +415,119 @@ export default function BuyerConcierge({
                   {t("closed")}
                 </p>
               )}
+              {gate && (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    void submitGate();
+                  }}
+                  noValidate
+                  className="rounded-xl border border-white/15 bg-white/[0.04] p-3.5"
+                >
+                  <p className="text-sm font-semibold text-white">{t("gateTitle")}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-white/55">{t("gateIntro")}</p>
+
+                  <div className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                    <label className="sm:col-span-2">
+                      <span className="mb-1 block text-[11px] font-medium text-white/65">{t("gateName")}</span>
+                      <input
+                        value={gateName}
+                        onChange={(e) => {
+                          setGateName(e.target.value);
+                          setGateErrors((current) => ({ ...current, name: false }));
+                        }}
+                        autoComplete="name"
+                        required
+                        minLength={2}
+                        maxLength={120}
+                        aria-invalid={gateErrors.name}
+                        className={gateField}
+                      />
+                      {gateErrors.name && (
+                        <span className="mt-1 block text-[11px] text-red-300">{t("gateErrName")}</span>
+                      )}
+                    </label>
+
+                    <label>
+                      <span className="mb-1 block text-[11px] font-medium text-white/65">{t("gateEmail")}</span>
+                      <input
+                        type="email"
+                        value={gateEmail}
+                        onChange={(e) => {
+                          setGateEmail(e.target.value);
+                          setGateErrors((current) => ({ ...current, contact: false }));
+                        }}
+                        autoComplete="email"
+                        maxLength={320}
+                        aria-invalid={gateErrors.contact}
+                        className={gateField}
+                      />
+                    </label>
+
+                    <label>
+                      <span className="mb-1 block text-[11px] font-medium text-white/65">{t("gatePhone")}</span>
+                      <input
+                        type="tel"
+                        value={gatePhone}
+                        onChange={(e) => {
+                          setGatePhone(e.target.value);
+                          setGateErrors((current) => ({ ...current, contact: false }));
+                        }}
+                        autoComplete="tel"
+                        maxLength={50}
+                        aria-invalid={gateErrors.contact}
+                        className={gateField}
+                      />
+                    </label>
+                  </div>
+                  <p className={`mt-1.5 text-[11px] ${gateErrors.contact ? "text-red-300" : "text-white/40"}`}>
+                    {gateErrors.contact ? t("gateErrContact") : t("gateEitherHint")}
+                  </p>
+
+                  <label className="mt-3 flex items-start gap-2 text-xs leading-relaxed text-white/60">
+                    <input
+                      type="checkbox"
+                      checked={gateConsent}
+                      onChange={(e) => {
+                        setGateConsent(e.target.checked);
+                        setGateErrors((current) => ({ ...current, consent: false }));
+                      }}
+                      required
+                      aria-invalid={gateErrors.consent}
+                      className="mt-0.5 h-4 w-4 shrink-0 accent-[#cfb795]"
+                    />
+                    <span>
+                      {t("gateConsentPre")}{" "}
+                      <Link href="/privacy" className="font-medium text-sand underline underline-offset-2 hover:text-white">
+                        {t("gateConsentLink")}
+                      </Link>
+                    </span>
+                  </label>
+                  {gateErrors.consent && (
+                    <p className="mt-1 text-[11px] text-red-300">{t("gateErrConsent")}</p>
+                  )}
+                  <p className="mt-2 text-[11px] leading-relaxed text-white/40">{t("gatePrivacyNote")}</p>
+
+                  {gateFailed && (
+                    <p role="alert" className="mt-2 text-xs text-red-300">
+                      {t("gateError")}
+                    </p>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={gateSending}
+                    className="btn-press mt-3 w-full rounded-xl bg-sand px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-[#e0cba8] disabled:opacity-50"
+                  >
+                    {gateSending ? t("gateSending") : t("gateSubmit")}
+                  </button>
+                  <p className="mt-2 text-center text-[11px] text-white/45">
+                    {t("gateAccountPre")}{" "}
+                    <Link href="/account" className="font-medium text-sand hover:text-white">
+                      {t("gateAccountLink")}
+                    </Link>
+                  </p>
+                </form>
+              )}
             </div>
 
             {/* Handoff umano: sempre a un tap, mai nascosto dietro la chat. */}
@@ -322,14 +559,14 @@ export default function BuyerConcierge({
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                disabled={blocked}
+                disabled={blocked || gate}
                 maxLength={2000}
-                placeholder={blocked ? t("closed") : t("placeholder")}
+                placeholder={gate ? t("gatePlaceholder") : blocked ? t("closed") : t("placeholder")}
                 className="w-full rounded-xl border border-white/15 bg-white/[0.04] px-4 py-2.5 text-sm text-white placeholder:text-white/35 outline-none transition-colors focus:border-sand/60 disabled:opacity-50"
               />
               <button
                 type="submit"
-                disabled={blocked || typing || !input.trim()}
+                disabled={blocked || gate || typing || !input.trim()}
                 aria-label={t("send")}
                 className="btn-press flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sand text-ink transition-colors hover:bg-[#e0cba8] disabled:opacity-40"
               >

@@ -41,6 +41,23 @@ function validSid(v: unknown): v is string {
   return typeof v === "string" && /^web_[a-z0-9]{10,32}$/.test(v);
 }
 
+// Modulo del cancello, normalizzato prima di uscire dal sito. La validazione che
+// CONTA (nome minimo, recapito valido, consenso) la rifà il CRM: questa taglia le
+// stringhe e scarta la roba palesemente fuori forma, così un body storto non
+// diventa una chiamata inutile al bridge.
+type IdentitaBody = { nome: string; email: string; telefono: string; consenso: true };
+function leggiIdentitaBody(raw: unknown): IdentitaBody | null {
+  if (!raw || typeof raw !== "object") return null;
+  const o = raw as Record<string, unknown>;
+  if (o.consenso !== true) return null;
+  const str = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
+  const nome = str(o.nome, 80);
+  const email = str(o.email, 120).toLowerCase();
+  const telefono = str(o.telefono, 40);
+  if (nome.length < 2 || (!email && !telefono)) return null;
+  return { nome, email, telefono, consenso: true };
+}
+
 async function sanitizeMessages(raw: unknown, sid: string): Promise<ChatMessage[] | null> {
   if (!Array.isArray(raw) || raw.length === 0 || raw.length > MAX_MESSAGES) return null;
   const kept: ChatMessage[] = [];
@@ -76,7 +93,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "not_configured" }, { status: 503 });
   }
 
-  let body: { sid?: unknown; messages?: unknown; locale?: unknown; origin?: unknown; slug?: unknown };
+  let body: {
+    sid?: unknown; messages?: unknown; locale?: unknown; origin?: unknown; slug?: unknown;
+    identita?: unknown;
+  };
   try {
     body = (await request.json()) as typeof body;
   } catch {
@@ -105,6 +125,13 @@ export async function POST(request: Request) {
   // aggancia account e scheda lead. Solo firma verificata, niente body.
   const acct = await currentAcctSession();
 
+  // CANCELLO (2026-07-30): dopo qualche domanda il CRM chiede nome + recapito
+  // per continuare. Qui si normalizza soltanto la forma del modulo — chi decide
+  // se basta, e cosa farne, è il CRM: la politica non si duplica su due lati.
+  // Senza `consenso` non si inoltra nulla: è il gesto che rende il dato nostro
+  // da trattare, e vale la pena che sia esplicito anche in questo passaggio.
+  const identita = leggiIdentitaBody(body.identita);
+
   try {
     const res = await fetch(bridgeUrl, {
       method: "POST",
@@ -118,6 +145,7 @@ export async function POST(request: Request) {
         locale,
         origin,
         ...(slug ? { slug } : {}),
+        ...(identita ? { identita } : {}),
         email: acct?.em ?? "",
         brand: "TSI",
         ip,
@@ -126,12 +154,18 @@ export async function POST(request: Request) {
       cache: "no-store",
     });
     if (!res.ok) return NextResponse.json({ ok: false, error: "bridge_error" }, { status: 502 });
-    const data = (await res.json()) as { ok?: boolean; text?: string; blocked?: boolean };
+    const data = (await res.json()) as {
+      ok?: boolean; text?: string; blocked?: boolean; gate?: boolean; identificato?: boolean;
+    };
     const text = typeof data.text === "string" ? data.text : "";
     return NextResponse.json({
       ok: data.ok === true,
       text,
       blocked: data.blocked === true,
+      // `gate`: il CRM non ha risposto, chiede identità. `identificato`: l'ha
+      // avuta, il modulo si può spegnere. Passano di qui senza interpretazione.
+      ...(data.gate === true ? { gate: true } : {}),
+      ...(data.identificato === true ? { identificato: true } : {}),
       sig: text ? await signWebTurn(sid, text) : "",
     });
   } catch {
