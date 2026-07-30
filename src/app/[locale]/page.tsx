@@ -44,10 +44,9 @@ export default async function Home({
 
   const properties = await getProperties();
 
-  // Featured strip: every published listing with a cover, priciest first.
+  // La strip conserva l'ordine di vetrina deciso nel CRM.
   const reelItems = properties
     .filter((p) => p.coverPhoto)
-    .sort((a, b) => (b.priceSale ?? b.priceRent ?? 0) - (a.priceSale ?? a.priceRent ?? 0))
     .slice(0, 8)
     .map((p) => buildPropertyView(p, locale, tProp, tZones(zoneKey(p))));
 

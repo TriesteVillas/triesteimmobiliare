@@ -13,6 +13,9 @@ export default function PropertyCard({
   view: PropertyView;
   photosComing: string;
 }) {
+  const leftBadge = view.recentBadge ?? view.badge;
+  const rightBadge = view.clusterBadge ?? view.featuredBadge;
+
   return (
     <Tilt className="rounded-2xl">
       <Link
@@ -37,10 +40,10 @@ export default function PropertyCard({
             </div>
           )}
           <span className="card-sheen" aria-hidden />
-          <PropertyBadge {...view.badge} className="absolute left-3 top-3 z-[2] shadow-sm" />
-          {view.clusterBadge && (
+          <PropertyBadge {...leftBadge} className="absolute left-3 top-3 z-[2] shadow-sm" />
+          {rightBadge && (
             <PropertyBadge
-              {...view.clusterBadge}
+              {...rightBadge}
               className="absolute right-3 top-3 z-[2] shadow-sm"
             />
           )}

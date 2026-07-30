@@ -1,7 +1,7 @@
 import { formatPrice } from "./format";
 import type { Property } from "./properties";
 
-export type BadgeVariant = "default" | "private" | "cantiere";
+export type BadgeVariant = "default" | "private" | "cantiere" | "recent" | "featured";
 export type Badge = { label: string; variant: BadgeVariant };
 
 // Plain, serializable display model for a property card. Built on the server
@@ -14,6 +14,8 @@ export type PropertyView = {
   priceLabel: string;
   badge: Badge;
   clusterBadge: Badge | null;
+  recentBadge?: Badge | null;
+  featuredBadge?: Badge | null;
   meta: string;
   cover: { url: string; alt: string } | null;
   // Cover + up to 8 top photos (9 total), for the in-card photo slider.
@@ -97,6 +99,9 @@ export function buildPropertyView(
   t: Translate,
   zonaLabel: string | null,
 ): PropertyView {
+  const onlineDays = p.onlineDa
+    ? Math.max(0, Math.floor((Date.now() - Date.parse(p.onlineDa)) / 86400000))
+    : null;
   const meta = [
     p.tipologia,
     p.mq ? t("sqm", { value: p.mq }) : null,
@@ -128,6 +133,13 @@ export function buildPropertyView(
     priceLabel: priceLabel(p, locale, t),
     badge: contractBadge(p, t),
     clusterBadge: clusterBadge(p, t),
+    recentBadge:
+      onlineDays !== null && onlineDays <= 30
+        ? { label: t("onlineDays", { count: onlineDays }), variant: "recent" }
+        : null,
+    featuredBadge: p.inEvidenza
+      ? { label: t("badgeFeatured"), variant: "featured" }
+      : null,
     meta,
     // Cards use Airtable's lighter "large" rendition, not the full-res original.
     // L'alt segue il titolo localizzato: `coverPhoto.alt` nasce dal titolo italiano

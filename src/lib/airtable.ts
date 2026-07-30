@@ -92,6 +92,25 @@ async function fetchAllRaw(filter: string): Promise<RawRecord[]> {
   return out;
 }
 
+// L'ordine di vetrina è una decisione editoriale del CRM: prima l'evidenza,
+// poi la data di pubblicazione. Le date assenti o non valide vanno in fondo;
+// il prezzo interviene soltanto come spareggio.
+export function compareShowcase(a: Property, b: Property): number {
+  const featuredOrder = Number(b.inEvidenza) - Number(a.inEvidenza);
+  if (featuredOrder !== 0) return featuredOrder;
+
+  const aOnline = a.onlineDa ? Date.parse(a.onlineDa) : Number.NaN;
+  const bOnline = b.onlineDa ? Date.parse(b.onlineDa) : Number.NaN;
+  const aHasOnline = Number.isFinite(aOnline);
+  const bHasOnline = Number.isFinite(bOnline);
+  if (aHasOnline !== bHasOnline) return aHasOnline ? -1 : 1;
+  if (aHasOnline && bHasOnline && aOnline !== bOnline) return bOnline - aOnline;
+
+  const aPrice = a.priceSale ?? a.priceRent ?? 0;
+  const bPrice = b.priceSale ?? b.priceRent ?? 0;
+  return bPrice - aPrice;
+}
+
 export async function getProperties(): Promise<Property[]> {
   let raw: RawRecord[];
   if (TOKEN) {
@@ -108,7 +127,7 @@ export async function getProperties(): Promise<Property[]> {
   }
   return raw
     .map((r) => mapRecord(r.id, r.fields))
-    .sort((a, b) => (b.priceSale ?? 0) - (a.priceSale ?? 0));
+    .sort(compareShowcase);
 }
 
 export async function getProperty(slug: string): Promise<Property | null> {

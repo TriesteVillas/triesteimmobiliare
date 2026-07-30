@@ -40,6 +40,8 @@ export const F = {
   // dell'immobile è lo stesso su entrambi i siti (è public_tsv_name).
   titleEn: "fldrTJMbSO4nNW32W", // public_tsv_name_EN_#
   titleDe: "fldXYXscxt7V8EueO", // public_tsv_name_DE_#
+  inEvidenza: "fld3bgYTqcgnYLADd", // in_evidenza (checkbox → boolean)
+  onlineDa: "fldk27y6rT8xUZ7XQ", // online_da (date ISO yyyy-mm-dd → string|null)
   tags: "fldVdulUcA3uTtx5v",
   foto: "fldUS4uDvqXibknNL",
   coverPhoto: "fldvlnrfE1zdXFOsF",
@@ -131,6 +133,8 @@ export type Property = {
   // Titolo pubblico tradotto; null quando la traduzione non c'è ancora.
   titleEn: string | null;
   titleDe: string | null;
+  inEvidenza: boolean;
+  onlineDa: string | null;
   contratto: "VENDITA" | "AFFITTO" | null;
   cluster: string | null;
   tipologia: string | null;
@@ -318,6 +322,8 @@ export function mapRecord(recordId: string, f: Fields): Property {
     title,
     titleEn: str(f[F.titleEn]),
     titleDe: str(f[F.titleDe]),
+    inEvidenza: f[F.inEvidenza] === true,
+    onlineDa: typeof f[F.onlineDa] === "string" ? (f[F.onlineDa] as string) : null,
     contratto,
     cluster: str(f[F.cluster]),
     tipologia: str(f[F.tipologia]),
