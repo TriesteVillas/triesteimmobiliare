@@ -436,8 +436,9 @@ html[data-header-hidden] header[data-pill] {
   line-height: 1.12;
   letter-spacing: -0.02em;
   color: var(--color-brand-dark);
+  /* No automatic hyphenation; break only as a last defense against future strings wider than the cell. */
   overflow-wrap: break-word;
-  hyphens: auto;
+  hyphens: manual;
 }
 
 /* Edge-to-edge scrolling ribbon (Marquee). */

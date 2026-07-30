@@ -92,7 +92,7 @@ export default async function SellPage({
       </section>
 
       {/* Promise strip */}
-      <section className="mx-auto -mt-8 max-w-4xl px-6">
+      <section className="mx-auto -mt-8 max-w-5xl px-6">
         <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-brand/15 bg-brand/15 shadow-lg sm:grid-cols-4">
           {(["valuation", "online", "mandate", "fee"] as const).map((k) => (
             <div key={k} className="bg-white px-3 py-5 text-center sm:px-5 sm:py-6">
