@@ -2,10 +2,12 @@ import { getTranslations } from "next-intl/server";
 
 // Summer-2026 closure notice. It shows in advance and through the last closed
 // day (24 Aug, Rome time), then removes itself — no manual take-down needed.
-// During the holidays every enquiry funnels to the two monitored channels
-// (group email + WhatsApp), so the contacts here are the group's, by design
-// (not the site's usual info@ / landline).
-const EMAIL = "richieste@triestevillas.com";
+// During the holidays every enquiry funnels to two monitored channels: the
+// site's own mailbox and the group's WhatsApp. La mail è info@ come ovunque
+// sul sito — mandare i clienti di TriesteImmobiliare su richieste@triestevillas.com
+// proprio nelle tre settimane in cui nessuno è in ufficio era l'unico momento
+// in cui il salto di brand poteva costare una richiesta (Martino, 2026-07-30).
+const EMAIL = "info@triesteimmobiliare.com";
 const WA_NUMBER = "393318940822";
 const HIDE_AFTER = Date.parse("2026-08-25T00:00:00+02:00");
 
