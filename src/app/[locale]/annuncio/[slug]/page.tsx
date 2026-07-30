@@ -432,7 +432,13 @@ export default async function PropertyPage({ params }: { params: Params }) {
               in fondo. Col contesto della scheda: "questa casa" per lui È
               questa casa. Widget dark → card scura nella zona paper. */}
           <div className="mt-6 rounded-2xl bg-ink px-4 pb-4 pt-5" data-reveal>
-            <BuyerConcierge context={{ slug: property.slug, title }} />
+            {/* `city` non esce da qui: disambigua la ricerca su Google Maps quando
+                il concierge cita la via senza ripetere il comune. Il ripiego su
+                "Trieste" è la stessa convenzione dei dati strutturati (lib/seo)
+                — comune vuoto in scheda non è un immobile altrove. */}
+            <BuyerConcierge
+              context={{ slug: property.slug, title, city: property.comune ?? "Trieste" }}
+            />
           </div>
           <AccountPerks />
 

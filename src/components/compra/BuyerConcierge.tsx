@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import ChatRichText from "./ChatRichText";
 
 // Concierge AI pubblico del Buyer Hub — la barra "semplice quanto Google" che
 // apre una conversazione vera. Stessa filosofia del Concierge Private
@@ -63,7 +64,9 @@ export default function BuyerConcierge({
   // casa l'utente sta guardando: "questa casa" nelle domande smette di essere
   // ambiguo (era il bug: "quanto pagherei di imposte su questa casa?" riceveva
   // la richiesta generica di prezzo e dati). slug → dossier immobile nel prompt.
-  context?: { slug: string; title: string };
+  // `city` non viaggia mai al CRM: serve solo qui, per disambiguare la ricerca su
+  // Google Maps quando il bot cita la via senza ripetere il comune.
+  context?: { slug: string; title: string; city?: string };
 } = {}) {
   const t = useTranslations("concierge");
   const locale = useLocale();
@@ -263,7 +266,13 @@ export default function BuyerConcierge({
                         : "rounded-bl-md border border-white/10 bg-white/[0.05] text-white/85"
                     }`}
                   >
-                    {m.content}
+                    {/* Solo i turni del BOT passano dal renderer: il testo dell'ospite
+                        si mostra com'è, senza interpretarne i simboli. */}
+                    {m.role === "assistant" ? (
+                      <ChatRichText text={m.content} city={context?.city} />
+                    ) : (
+                      m.content
+                    )}
                   </div>
                 </div>
               ))}
