@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { normCity } from "@/lib/citynorm";
+import { splitNomeCerta } from "@/lib/nomesplit";
 
 // Lead intake for the property forms (richiesta info / prenota visita / invia a
 // un amico). Writes to the unified Airtable LEADS table (by field name +
@@ -545,10 +546,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "contact_info" }, { status: 400 });
   }
 
+  // Il campo del form è UNO: chi scrive "Mario Rossi" finiva tutto in `nome` e
+  // il cognome non esisteva mai (fix 30/07 — è da qui che il portale proprietari
+  // pescava cognomi interi). Split solo nei casi certi; nome_completo conserva
+  // comunque la stringa intera, quindi non si perde niente.
+  const spNome = splitNomeCerta(nome);
   try {
     await airtableCreate({
       nome_completo: nome,
-      nome,
+      nome: spNome ? spNome.nome : nome,
+      ...(spNome ? { cognome: spNome.cognome } : {}),
       email,
       telefono,
       canale,
