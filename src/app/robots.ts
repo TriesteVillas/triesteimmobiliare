@@ -1,9 +1,11 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/seo";
 
-// Until DNS is cut over from the old WordPress (the brand domain still serves it),
-// the relaunch lives on a *.vercel.app preview — keep it out of search to avoid
-// competing/duplicate content. Flip NEXT_PUBLIC_ALLOW_INDEX=true at cutover.
+// Stesso interruttore del layout: senza NEXT_PUBLIC_ALLOW_INDEX=true questo
+// robots.txt dice `Disallow: /`. Serviva prima del cutover DNS, quando il
+// rilancio viveva su un preview *.vercel.app; messo a `true` in produzione il
+// 2026-07-30. Continua a valere per i deploy di preview, dove la variabile non
+// esiste e il sito deve restare fuori dall'indice.
 const ALLOW_INDEX = process.env.NEXT_PUBLIC_ALLOW_INDEX === "true";
 
 export default function robots(): MetadataRoute.Robots {

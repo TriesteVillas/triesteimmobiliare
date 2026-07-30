@@ -12,9 +12,13 @@ import JsonLd from "@/components/JsonLd";
 import { SITE_URL, orgJsonLd, webSiteJsonLd } from "@/lib/seo";
 import "../globals.css";
 
-// The relaunch lives on a *.vercel.app preview while the brand domain still
-// serves the old WordPress (DNS not cut over). Keep it out of the index until
-// cutover by setting NEXT_PUBLIC_ALLOW_INDEX=true in production env.
+// Interruttore dell'indicizzazione. Nato per tenere il rilancio fuori
+// dall'indice mentre il dominio del brand serviva ancora il vecchio WordPress;
+// il cutover DNS è avvenuto e la variabile è stata messa a `true` in produzione
+// il 2026-07-30 — fino a quel giorno il sito era in noindex+nofollow e con
+// robots.txt `Disallow: /`, cioè invisibile a Google, per un flag mai girato.
+// L'interruttore resta perché è ciò che tiene fuori dall'indice le PREVIEW
+// (dove la variabile non c'è): non toglierlo.
 const ALLOW_INDEX = process.env.NEXT_PUBLIC_ALLOW_INDEX === "true";
 
 // Arms scroll reveals before first paint (CSS hides [data-reveal] only under
