@@ -6,6 +6,7 @@ import {
   mailContact,
   mailCta,
   mailRecapCard,
+  mailSafeUrl,
   mailText,
 } from "@/lib/brandMail";
 
@@ -617,7 +618,7 @@ export async function POST(request: Request) {
   // Best-effort notifications.
   const listingLine = immobileNome
     ? `<p><strong>${esc(immobileNome)}</strong>${rif ? ` (${esc(rif)})` : ""}${
-        url ? `<br><a href="${esc(url)}">${esc(url)}</a>` : ""
+        url ? `<br><a href="${mailSafeUrl(esc(url))}">${esc(url)}</a>` : ""
       }</p>`
     : "";
 

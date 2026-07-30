@@ -39,10 +39,13 @@ export const mailContact = {
   whatsapp: WHATSAPP,
 } as const;
 
+// Forma canonica con l'id nel percorso, non `profile.php?id=…`: è quella su cui
+// Facebook stesso reindirizza, e soprattutto non contiene `=` — quindi non ha
+// bisogno di mailSafeUrl e non può rompersi in consegna (vedi lì il perché).
 const SOCIAL: Array<{ label: string; href: string }> = [
   {
     label: "Facebook",
-    href: "https://www.facebook.com/profile.php?id=61576375390569",
+    href: "https://www.facebook.com/people/TriesteImmobiliare/61576375390569/",
   },
 ];
 
@@ -52,11 +55,38 @@ const ADDRESS: Record<MailLang, string> = {
   de: "Via Torino 34, 34123 Triest, Italien",
 };
 
+/**
+ * Mette un URL al riparo dal quoted-printable.
+ *
+ * Le email partono codificate quoted-printable, dove `=` è il carattere di
+ * escape e `=XY` (X e Y cifre esadecimali) significa "il byte 0xXY". Un `=`
+ * letterale andrebbe scritto `=3D`, ma non tutti i mittenti lo fanno: risultato,
+ * `?token=3458e6…` arriva al destinatario come `?token458e6…` perché `=34` è
+ * stato interpretato come il carattere `4`.
+ *
+ * Non è teoria: verificato il 2026-07-30 su email realmente consegnate — il link
+ * di reset password era rotto SEMPRE (il token è esadecimale, quindi comincia
+ * sempre con due cifre esadecimali) e lo era anche il codice d'accesso della
+ * Private Collection. `?family=Poppins` invece sopravviveva, perché `P` non è
+ * una cifra esadecimale: è esattamente la firma del problema.
+ *
+ * Rimedio: percent-encoding della prima delle due cifre. Dopo l'`=` finisce un
+ * `%`, che non è una cifra esadecimale, quindi la sequenza non viene più
+ * interpretata; il valore resta identico perché il parser dell'URL fa la
+ * decodifica inversa. Nessuna modifica a chi legge il parametro.
+ */
+export function mailSafeUrl(url: string): string {
+  return url.replace(
+    /=([0-9A-Fa-f])(?=[0-9A-Fa-f])/g,
+    (_, digit: string) => `=%${digit.charCodeAt(0).toString(16).toUpperCase()}`,
+  );
+}
+
 /** Centered CTA button for email bodies. */
 export function mailCta(href: string, label: string): string {
   return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:26px auto 6px">
     <tr><td style="background:${BRAND};border-radius:8px">
-      <a href="${href}" target="_blank" style="display:inline-block;padding:13px 30px;font-family:${FONT};font-size:14px;font-weight:600;letter-spacing:.3px;color:#ffffff;text-decoration:none">${label}</a>
+      <a href="${mailSafeUrl(href)}" target="_blank" style="display:inline-block;padding:13px 30px;font-family:${FONT};font-size:14px;font-weight:600;letter-spacing:.3px;color:#ffffff;text-decoration:none">${label}</a>
     </td></tr>
   </table>`;
 }

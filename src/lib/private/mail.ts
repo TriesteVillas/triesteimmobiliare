@@ -1,6 +1,6 @@
 import "server-only";
 import { MAIL_FROM, SITE_URL } from "./brand";
-import { brandMailShell, mailContact, mailCta, mailText } from "@/lib/brandMail";
+import { brandMailShell, mailContact, mailCta, mailSafeUrl, mailText } from "@/lib/brandMail";
 
 // Transactional email for the Private Collection, via Resend (the same provider
 // the lead route already uses). Every send is best-effort: the Airtable record
@@ -73,8 +73,11 @@ function clientShell(inner: string, lang: Lang): string {
   return brandMailShell({ lang, body: inner });
 }
 
+// Bottone del digest interno, che ha un guscio suo e non passa da mailCta.
+// L'URL di Airtable porta `?...=` con id esadecimali: senza mailSafeUrl il
+// quoted-printable se lo mangia esattamente come faceva col link di reset.
 function goldButton(href: string, label: string): string {
-  return `<a href="${esc(href)}" style="display:inline-block;background:#a9c8e0;color:#0a0f18;text-decoration:none;font-weight:700;font-size:14px;letter-spacing:.5px;padding:12px 26px;border-radius:2px;">${esc(label)}</a>`;
+  return `<a href="${mailSafeUrl(esc(href))}" style="display:inline-block;background:#a9c8e0;color:#0a0f18;text-decoration:none;font-weight:700;font-size:14px;letter-spacing:.5px;padding:12px 26px;border-radius:2px;">${esc(label)}</a>`;
 }
 
 // ---- Credential grant -------------------------------------------------------
