@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { ViewTransition } from "react";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { redirect } from "@/i18n/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -13,6 +12,8 @@ import PropertyCharacteristics, {
 } from "@/components/PropertyCharacteristics";
 import PropertyMap from "@/components/PropertyMap";
 import PhotoGallery from "@/components/PhotoGallery";
+import PhotoImg from "@/components/PhotoImg";
+import { photoSrc, photoSrcSet } from "@/lib/photoSrc";
 import Planimetrie from "@/components/Planimetrie";
 import PropertyBadge from "@/components/PropertyBadge";
 import PropertyCard from "@/components/PropertyCard";
@@ -41,6 +42,11 @@ import DwellTracker from "@/components/account/DwellTracker";
 import BuyerConcierge from "@/components/compra/BuyerConcierge";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.triesteimmobiliare.com";
+
+// Ladder dell'hero a tutto schermo. Il fallback resta 2000 px per i desktop
+// larghi; il ladder esiste perché con sizes="100vw" un telefono ne serve 780 e
+// senza si portava a casa comunque i 2000.
+const HERO_WIDTHS = [800, 1200, 1600, 2000] as const;
 
 type Params = Promise<{ locale: string; slug: string }>;
 
@@ -312,13 +318,19 @@ export default async function PropertyPage({ params }: { params: Params }) {
         {/* L'alt delle foto nasce dal titolo italiano in mapRecord (che non conosce
             il locale): sull'immagine principale usiamo il titolo localizzato. Le foto
             della galleria restano con l'alt costruito in mapRecord. */}
+        {/* Qui stava il buco più grosso del sito: `.url` è l'ORIGINALE Airtable,
+            e con images.unoptimized arrivava intero al browser. Il 2026-07-30 in
+            produzione era un PNG da 6,49 MB su una scheda da 12,46 MB di sole
+            immagini. Ora passa dal proxy, in WebP; e il srcSet è quello che
+            salva il telefono, perché con sizes="100vw" su un 390 a DPR 2 ne
+            servono 780 px e senza ladder si scaricavano comunque i 2000. */}
         {(property.coverPhoto ?? property.photos[0]) ? (
           <ViewTransition name={`prop-${property.slug}`} share="morph">
-            <Image
-              src={(property.coverPhoto ?? property.photos[0])!.url}
-              alt={title}
-              fill
+            <PhotoImg
+              src={photoSrc((property.coverPhoto ?? property.photos[0])!, 2000)}
+              srcSet={photoSrcSet((property.coverPhoto ?? property.photos[0])!, HERO_WIDTHS)}
               sizes="100vw"
+              alt={title}
               priority
               className="par-zoom object-cover"
             />

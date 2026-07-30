@@ -1,9 +1,18 @@
 "use client";
 
 import { useState, ViewTransition } from "react";
-import Image from "next/image";
+import { photoSrc, photoSrcSet } from "@/lib/photoSrc";
+import PhotoImg from "./PhotoImg";
 import type { Photo } from "@/lib/properties";
 import Lightbox from "./Lightbox";
+
+// Ladder delle miniature. Serve soprattutto al telefono: il riquadro è 50vw,
+// cioè ~195 px CSS su un 390, che a DPR 2 fa 390 px reali — chiedere 600 fissi
+// voleva dire scaricare metà in più su otto miniature.
+const THUMB_WIDTHS = [400, 600, 800] as const;
+// L'immagine grande della galleria è larga quanto lo schermo fino a 1024 px:
+// senza ladder un telefono si portava a casa la versione più larga.
+const HERO_WIDTHS = [600, 800, 1200, 1600] as const;
 
 export default function PhotoGallery({
   cover,
@@ -48,11 +57,11 @@ export default function PhotoGallery({
                 onClick={() => openAt(p)}
                 className="relative aspect-[4/3] overflow-hidden rounded-lg bg-neutral-100"
               >
-                <Image
-                  src={p.thumb}
-                  alt={p.alt}
-                  fill
+                <PhotoImg
+                  src={photoSrc(p, 600)}
+                  srcSet={photoSrcSet(p, THUMB_WIDTHS)}
                   sizes="(max-width: 640px) 50vw, 25vw"
+                  alt={p.alt}
                   className="object-cover transition-transform duration-300 hover:scale-105"
                 />
               </button>
@@ -92,11 +101,11 @@ export default function PhotoGallery({
             className="group relative block aspect-video w-full overflow-hidden rounded-xl bg-neutral-100"
           >
             <ViewTransition name={morphName} share="morph">
-              <Image
-                src={hero.url}
-                alt={hero.alt}
-                fill
+              <PhotoImg
+                src={photoSrc(hero, 1600)}
+                srcSet={photoSrcSet(hero, HERO_WIDTHS)}
                 sizes="(max-width: 1024px) 100vw, 1024px"
+                alt={hero.alt}
                 className="object-cover transition-transform duration-700 ease-[var(--ease-lux)] group-hover:scale-[1.03]"
                 priority
               />
@@ -111,11 +120,11 @@ export default function PhotoGallery({
                   onClick={() => openAt(p)}
                   className="relative aspect-[4/3] overflow-hidden rounded-lg bg-neutral-100"
                 >
-                  <Image
-                    src={p.thumb}
-                    alt={p.alt}
-                    fill
+                  <PhotoImg
+                    src={photoSrc(p, 600)}
+                    srcSet={photoSrcSet(p, THUMB_WIDTHS)}
                     sizes="(max-width: 640px) 50vw, 25vw"
+                    alt={p.alt}
                     className="object-cover transition-transform duration-300 hover:scale-105"
                   />
                 </button>

@@ -109,6 +109,9 @@ export const ZONE_ORDER = [
 export const ZONE_OTHER = "ALTRE";
 
 export type Photo = {
+  // Id attachment Airtable, quando c'è: la chiave stabile con cui
+  // /foto/<attId>/<w>.webp indirizza questa foto. Vedi src/lib/photoSrc.ts.
+  id: string | null;
   // Full-resolution original. Used for the hero and the lightbox (full view).
   url: string;
   // Airtable's pre-rendered "large" rendition (~917px wide), used for cards and
@@ -196,6 +199,10 @@ export type Property = {
 };
 
 type RawAttachment = {
+  // Airtable attachment id ("attXXXXXXXXXXXXXX"): l'UNICO identificatore stabile
+  // di una foto. Le url firmate ruotano a ogni revalidation, il filename può
+  // ripetersi fra immobili — l'id no. È la chiave di /foto/<attId>/<w>.webp.
+  id?: string;
   url: string;
   width?: number;
   height?: number;
@@ -218,6 +225,7 @@ function attachments(v: unknown, alt: string): Photo[] {
     ? (v as RawAttachment[])
         .filter((a) => typeof a?.url === "string")
         .map((a) => ({
+          id: a.id ?? null,
           url: a.url,
           thumb: a.thumbnails?.large?.url ?? a.url,
           width: a.width ?? null,

@@ -46,7 +46,7 @@ function unknownFieldId(status: number, body: string): string | null {
   }
 }
 
-async function fetchAllRaw(filter: string): Promise<RawRecord[]> {
+async function fetchAllRaw(filter: string, fieldIds: string[] = FIELD_IDS): Promise<RawRecord[]> {
   const out: RawRecord[] = [];
   // A field id that no longer exists in the table (schema drift, or a stale/typo
   // id in F) makes Airtable 422 the ENTIRE fetch — which breaks the build and
@@ -54,7 +54,7 @@ async function fetchAllRaw(filter: string): Promise<RawRecord[]> {
   // and retry, keeping every other field. `fields` only ever shrinks, and an
   // empty list means "all fields" (never 422s), so this loop is bounded by
   // FIELD_IDS.length. Dropped fields just map to null downstream.
-  const fields: string[] = [...FIELD_IDS];
+  const fields: string[] = [...fieldIds];
   let offset: string | undefined;
 
   while (true) {
@@ -133,6 +133,51 @@ export async function getProperties(): Promise<Property[]> {
 export async function getProperty(slug: string): Promise<Property | null> {
   const all = await getProperties();
   return all.find((p) => p.slug === slug) ?? null;
+}
+
+// ---- Indice foto per il proxy /foto ----------------------------------------
+
+// Il proxy /foto/<attId>/<w>.webp deve solo tradurre un id attachment nella url
+// sorgente da ricodificare. Passare da getProperties() si paga: quella chiede ad
+// Airtable tutti i ~150 campi di ogni immobile, descrizioni comprese, e ne
+// ricostruisce ogni record. Misurato sul gemello triestevillas.com il
+// 2026-07-30, una foto NON in cache CDN rispondeva in ~0,9 s, di cui ~0,65 s
+// spesi lì dentro. Per sapere dove sta una foto servono QUATTRO campi.
+//
+// Il filtro è lo stesso FILTER di getProperties(), quindi il confine di
+// riservatezza non si sposta: un attachment di un immobile PRIVATE non entra in
+// questo indice e dal proxy continua a dare 404.
+const PHOTO_FIELDS = [F.coverPhoto, F.topPhotos, F.foto, F.planimetrie];
+
+// url = originale (per le larghezze grandi), thumb = rendition `large` di
+// Airtable, ~917 px (basta per le piccole ed evita di scaricare un PNG da 6 MB
+// per farne una miniatura).
+export type PhotoSource = { url: string; thumb: string };
+
+type RawAttachmentCell = { id?: string; url?: string; thumbnails?: { large?: { url: string } } };
+
+export async function getPhotoSources(): Promise<Map<string, PhotoSource>> {
+  let raw: RawRecord[];
+  if (TOKEN) {
+    raw = await fetchAllRaw(FILTER, PHOTO_FIELDS);
+  } else {
+    raw = ((await import("./seed.json")).default as RawRecord[]).filter(
+      (r) => String(r.fields[F.cluster] ?? "").toUpperCase().trim() !== "PRIVATE",
+    );
+  }
+
+  const index = new Map<string, PhotoSource>();
+  for (const r of raw) {
+    for (const field of PHOTO_FIELDS) {
+      const cell = r.fields[field];
+      if (!Array.isArray(cell)) continue;
+      for (const a of cell as RawAttachmentCell[]) {
+        if (!a?.id || typeof a.url !== "string") continue;
+        index.set(a.id, { url: a.url, thumb: a.thumbnails?.large?.url ?? a.url });
+      }
+    }
+  }
+  return index;
 }
 
 // ---- Private Collection ----------------------------------------------------

@@ -1,4 +1,5 @@
 import { formatPrice } from "./format";
+import { photoSrc } from "./photoSrc";
 import type { Property } from "./properties";
 
 export type BadgeVariant = "default" | "private" | "cantiere" | "recent" | "featured";
@@ -114,13 +115,18 @@ export function buildPropertyView(
   // card slider.
   const cardTitle = localizedTitle(p, locale);
   const gallerySeen = new Set<string>();
+  // La Private Collection passa da qui (src/app/[locale]/private/page.tsx), e il
+  // proxy /foto risolve SOLO gli immobili pubblici: un id privato là dentro dà
+  // 404. Quindi i record PRIVATE restano sulla url firmata di Airtable — la
+  // guardia non è teorica, senza si romperebbero le foto della collezione.
+  const isPrivate = p.cluster?.toUpperCase().trim() === "PRIVATE";
   const gallery: { url: string; alt: string }[] = [];
   for (const ph of [p.coverPhoto, ...p.topPhotos]) {
     if (!ph) continue;
     const key = ph.filename ?? ph.url;
     if (gallerySeen.has(key)) continue;
     gallerySeen.add(key);
-    gallery.push({ url: ph.thumb, alt: cardTitle });
+    gallery.push({ url: isPrivate ? ph.thumb : photoSrc(ph, 800), alt: cardTitle });
     if (gallery.length >= 9) break;
   }
 
@@ -141,11 +147,12 @@ export function buildPropertyView(
       ? { label: t("badgeFeatured"), variant: "featured" }
       : null,
     meta,
-    // Cards use Airtable's lighter "large" rendition, not the full-res original.
+    // Le card passano dal proxy /foto (WebP alla larghezza giusta, url stabile);
+    // solo i record privati restano sulla rendition firmata di Airtable.
     // L'alt segue il titolo localizzato: `coverPhoto.alt` nasce dal titolo italiano
     // in mapRecord (che non conosce il locale), e su /en o /de sarebbe fuori lingua.
     cover: p.coverPhoto
-      ? { url: p.coverPhoto.thumb, alt: cardTitle }
+      ? { url: isPrivate ? p.coverPhoto.thumb : photoSrc(p.coverPhoto, 800), alt: cardTitle }
       : null,
   };
 }

@@ -73,7 +73,7 @@ export default function ImmobiliBrowser({
       </div>
 
       <div key={active ?? "all"} className="filter-pop">
-        {visible.map((g) => (
+        {visible.map((g, gi) => (
           <section key={g.code} className="mb-12">
             <div className="mb-4 flex items-baseline gap-3">
               <h2 className="text-xl font-semibold tracking-tight text-brand-dark">
@@ -84,8 +84,16 @@ export default function ImmobiliBrowser({
               </span>
             </div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {g.items.map((v) => (
-                <PropertyCard key={v.slug} view={v} photosComing={photosComing} />
+              {g.items.map((v, i) => (
+                <PropertyCard
+                  key={v.slug}
+                  view={v}
+                  photosComing={photosComing}
+                  // Prima riga del primo gruppo: le uniche copertine sopra la
+                  // piega. Lazy anche su quelle voleva dire aspettare il layout
+                  // prima ancora di chiedere la foto.
+                  priority={gi === 0 && i < 3}
+                />
               ))}
               {(g.ghosts ?? []).map((gh) => (
                 <GhostCard key={`ghost-${gh.id}`} id={gh.id} band={gh.band} zonaLabel={g.label} />

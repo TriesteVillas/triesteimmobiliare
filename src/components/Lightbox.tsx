@@ -1,7 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Image from "next/image";
+import { photoSrc, photoSrcSet } from "@/lib/photoSrc";
+import PhotoImg from "./PhotoImg";
+
+// Vedi PhotoGallery per il perché delle ladder. Qui la foto grande occupa 92vw:
+// senza srcSet un telefono scaricava la versione da 2000 px per un riquadro da
+// 360, cioè cinque volte i pixel che riesce a mostrare.
+const GRID_WIDTHS = [400, 600, 800] as const;
+const FULL_WIDTHS = [800, 1200, 1600, 2000] as const;
 import { useTranslations } from "next-intl";
 import type { Photo } from "@/lib/properties";
 import { useFocusTrap } from "@/lib/useFocusTrap";
@@ -42,6 +49,28 @@ export default function Lightbox({
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose, step]);
 
+  // Chi apre il lightbox quasi sempre preme subito la freccia. Senza precarico
+  // ogni passo è una richiesta che parte da zero — e la prima volta che una foto
+  // viene chiesta il proxy deve ricodificarla, quindi si aspetta. Le due
+  // adiacenti si scaricano mentre si guarda la corrente: al passo successivo
+  // sono già nella cache del browser. Solo due, non tutte: una scheda con
+  // quaranta foto non deve tirarne giù quaranta perché una è stata aperta.
+  useEffect(() => {
+    if (grid || photos.length < 2) return;
+    for (const d of [1, -1]) {
+      const p = photos[(i + d + photos.length) % photos.length];
+      const img = new window.Image();
+      // srcset e sizes vanno impostati come sul tag renderizzato, altrimenti il
+      // browser sceglie una larghezza diversa e il precarico non serve a nulla.
+      const set = photoSrcSet(p, FULL_WIDTHS);
+      if (set) {
+        img.sizes = "92vw";
+        img.srcset = set;
+      }
+      img.src = photoSrc(p, 2000);
+    }
+  }, [i, grid, photos]);
+
   if (grid) {
     return (
       <div
@@ -76,13 +105,16 @@ export default function Lightbox({
               }}
               className="group relative aspect-[4/3] overflow-hidden rounded-lg bg-neutral-900"
             >
-              <Image
-                src={p.thumb}
-                alt={p.alt}
-                fill
+              <PhotoImg
+                src={photoSrc(p, 600)}
+                srcSet={photoSrcSet(p, GRID_WIDTHS)}
                 sizes="(max-width: 640px) 50vw, 25vw"
+                alt={p.alt}
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
-                loading={idx < 12 ? undefined : "lazy"}
+                // Le prime dodici riempiono già la finestra: lazy le farebbe
+                // arrivare a scatti mentre si scorre. Niente fetchPriority alto,
+                // però: darlo a dodici immagini insieme non dà priorità a nessuna.
+                loading={idx < 12 ? "eager" : "lazy"}
               />
               <span className="absolute bottom-1.5 right-2 rounded bg-black/55 px-1.5 py-0.5 text-[10px] text-white/85">
                 {idx + 1}
@@ -158,13 +190,14 @@ export default function Lightbox({
         className="relative h-[85vh] w-[92vw] max-w-6xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <Image
+        <PhotoImg
           key={photos[i].url}
-          src={photos[i].url}
-          alt={photos[i].alt}
-          fill
+          src={photoSrc(photos[i], 2000)}
+          srcSet={photoSrcSet(photos[i], FULL_WIDTHS)}
           sizes="92vw"
+          alt={photos[i].alt}
           className="lightbox-photo object-contain"
+          priority
         />
       </div>
       <p className="absolute bottom-4 text-sm text-white/70">

@@ -1,17 +1,21 @@
 import { ViewTransition } from "react";
-import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import type { PropertyView } from "@/lib/propertyView";
 import PropertyBadge from "./PropertyBadge";
+import PhotoImg from "./PhotoImg";
 import Tilt from "./motion/Tilt";
 import FavHeart from "./account/FavHeart";
 
 export default function PropertyCard({
   view,
   photosComing,
+  priority = false,
 }: {
   view: PropertyView;
   photosComing: string;
+  // Prime card visibili senza scorrere: la copertina è il candidato LCP della
+  // pagina, quindi non va rimandata al primo scroll.
+  priority?: boolean;
 }) {
   const leftBadge = view.recentBadge ?? view.badge;
   const rightBadge = view.clusterBadge ?? view.featuredBadge;
@@ -26,11 +30,10 @@ export default function PropertyCard({
         <div className="relative aspect-[4/3] overflow-hidden bg-paper">
           {view.cover ? (
             <ViewTransition name={`prop-${view.slug}`} share="morph">
-              <Image
+              <PhotoImg
                 src={view.cover.url}
                 alt={view.cover.alt}
-                fill
-                sizes="(max-width: 768px) 100vw, 33vw"
+                priority={priority}
                 className="card-photo object-cover"
               />
             </ViewTransition>
