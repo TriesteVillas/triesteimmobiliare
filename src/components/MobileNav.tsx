@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "@/i18n/navigation";
+import LocaleSwitcher from "./LocaleSwitcher";
 import SellerCta from "./SellerCta";
 
 // Mobile navigation: the pill hides the desktop links below lg, so a
@@ -88,6 +89,15 @@ export default function MobileNav({
                   className="btn-hero mt-6 rounded-full bg-white px-6 py-3 text-sm font-semibold text-brand-dark"
                 />
               )}
+              {/* La scelta della lingua vive qui sul telefono: nella pillola
+                  occupava 90 px dei 311 disponibili ed era la ragione per cui il
+                  logo finiva sopra l'icona account. Qui di spazio ce n'è, ed è
+                  un'azione che si fa una volta, non a ogni pagina. */}
+              <LocaleSwitcher
+                tone="light"
+                className="mt-8 gap-2 text-base sm:hidden"
+                onPick={() => setOpen(false)}
+              />
             </nav>
           </div>,
           document.body,

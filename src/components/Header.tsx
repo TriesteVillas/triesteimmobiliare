@@ -27,9 +27,18 @@ export default async function Header() {
       style={{ viewTransitionName: "site-header" }}
     >
       <HeaderAutoHide />
-      <div className="pill-header mx-auto flex h-14 max-w-5xl items-center justify-between rounded-full pl-5 pr-3">
-        <Link href="/" aria-label="TriesteImmobiliare" className="flex items-center">
-          <Logo markClassName="h-6 w-auto" wordClassName="text-base" />
+      {/* Larghezze contate, non a occhio: a 375 px la pillola offre 311 px
+          interni e il contenuto ne chiedeva 385 — da lì il logo che finiva sopra
+          l'icona account. Il recupero sta in tre punti: il selettore lingua
+          scende nel menu (−98 px), il lockup rimpicciolisce sotto sm (−26 px) e
+          i margini interni si stringono (+8 px di spazio). */}
+      <div className="pill-header mx-auto flex h-14 max-w-5xl items-center justify-between rounded-full pl-4 pr-2 sm:pl-5 sm:pr-3">
+        <Link href="/" aria-label="TriesteImmobiliare" className="flex min-w-0 items-center">
+          <Logo
+            markClassName="h-5 w-auto sm:h-6"
+            wordClassName="text-sm sm:text-base"
+            className="gap-2 sm:gap-2.5"
+          />
         </Link>
         <nav className="hidden items-center gap-6 text-sm lg:flex">
           {links.map((l) => (
@@ -50,7 +59,8 @@ export default async function Header() {
           {/* Client-only: lo stato di login NON si legge server-side qui — l'header
               vive su pagine statiche e i cookie le renderebbero tutte dinamiche. */}
           <AccountLink />
-          <LocaleSwitcher />
+          {/* Sul telefono vive dentro MobileNav: vedi il commento sulla pillola. */}
+          <LocaleSwitcher className="hidden sm:flex" />
           <MobileNav
             links={links}
             ctaLabel={t("ctaValuation")}
