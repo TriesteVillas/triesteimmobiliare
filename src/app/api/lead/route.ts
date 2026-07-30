@@ -57,22 +57,36 @@ async function airtableCreate(fields: Record<string, unknown>) {
   return res.json();
 }
 
+// L'invio resta best-effort — il lead su Airtable è la fonte di verità e una
+// mail persa non deve far fallire la richiesta — ma NON silenzioso: prima questa
+// funzione ingoiava anche i rifiuti di Resend (`.catch(() => {})` senza guardare
+// `res.ok`), e il 30/07 è costato mezz'ora capire perché i recap non partivano
+// mentre tutto il resto sì. Se Resend dice di no, adesso finisce nei log.
 async function sendEmail(to: string, subject: string, html: string, replyTo?: string) {
   if (!RESEND_API_KEY || !RESEND_FROM) return; // email not configured yet
-  await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: RESEND_FROM,
-      to,
-      subject,
-      html,
-      ...(replyTo ? { reply_to: replyTo } : {}),
-    }),
-  }).catch(() => {});
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: RESEND_FROM,
+        to,
+        subject,
+        html,
+        ...(replyTo ? { reply_to: replyTo } : {}),
+      }),
+    });
+    if (!res.ok) {
+      console.error(
+        `[lead] resend ${res.status} per "${subject}" → ${to}: ${(await res.text()).slice(0, 300)}`,
+      );
+    }
+  } catch (e) {
+    console.error(`[lead] resend irraggiungibile per "${subject}" → ${to}:`, e);
+  }
 }
 
 const esc = (s: string) =>
