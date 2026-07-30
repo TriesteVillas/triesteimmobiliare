@@ -589,7 +589,8 @@
       "altro": "Other"
     },
     "messagePlaceholder": "Write your message here (optional)",
-    "name": "Full name",
+    "name": "First name",
+    "lastName": "Last name",
     "email": "Email",
     "phone": "Phone",
     "privacyPre": "I have read and accept the",

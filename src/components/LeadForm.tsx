@@ -33,6 +33,7 @@ export default function LeadForm({
   const [motivo, setMotivo] = useState<string>(MOTIVI[0].value);
   const [messaggio, setMessaggio] = useState("");
   const [nome, setNome] = useState("");
+  const [cognome, setCognome] = useState("");
   const [email, setEmail] = useState("");
   const [telefono, setTelefono] = useState("");
   const [privacy, setPrivacy] = useState(false);
@@ -60,7 +61,7 @@ export default function LeadForm({
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("sending");
-    const ok = await submit({ tipo: "info", motivo, messaggio, nome, email, telefono, privacyOk: privacy });
+    const ok = await submit({ tipo: "info", motivo, messaggio, nome, cognome, email, telefono, privacyOk: privacy });
     setStatus(ok ? "ok" : "error");
   }
 
@@ -133,9 +134,13 @@ export default function LeadForm({
               value={messaggio}
               onChange={(e) => setMessaggio(e.target.value)}
             />
+            {/* Nome e cognome separati: con un campo unico chi scriveva "Mario Rossi"
+                finiva tutto in `nome` e il cognome non esisteva — ed è da lì che
+                la dash proprietari mostrava cognomi interi dei lead (30/07). */}
             <input className={field} placeholder={t("name")} value={nome} onChange={(e) => setNome(e.target.value)} required />
+            <input className={field} placeholder={t("lastName")} value={cognome} onChange={(e) => setCognome(e.target.value)} required />
             <input className={field} type="email" placeholder={t("email")} value={email} onChange={(e) => setEmail(e.target.value)} required />
-            <input className={`${field} sm:col-span-2`} placeholder={t("phone")} value={telefono} onChange={(e) => setTelefono(e.target.value)} />
+            <input className={field} placeholder={t("phone")} value={telefono} onChange={(e) => setTelefono(e.target.value)} />
             <label className="flex items-start gap-2 text-sm sm:col-span-2">
               <input type="checkbox" className="mt-0.5 h-4 w-4 shrink-0 accent-brand" checked={privacy} onChange={(e) => setPrivacy(e.target.checked)} required />
               {privacyLabel}

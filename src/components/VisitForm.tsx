@@ -32,6 +32,7 @@ export default function VisitForm({
   const [selDays, setSelDays] = useState<string[]>([]); // iso or "asap"
   const [selSlots, setSelSlots] = useState<string[]>([]);
   const [nome, setNome] = useState("");
+  const [cognome, setCognome] = useState("");
   const [email, setEmail] = useState("");
   const [telefono, setTelefono] = useState("");
   const [privacy, setPrivacy] = useState(false);
@@ -79,6 +80,7 @@ export default function VisitForm({
           messaggio: "Visita di persona",
           disponibilita,
           nome,
+          cognome,
           email,
           telefono,
           privacyOk: privacy,
@@ -191,9 +193,12 @@ export default function VisitForm({
             <p><span className="font-medium text-neutral-800">{t("visitRecapDates")}:</span> {selDays.map(dayLabel).join(", ") || "—"}</p>
             <p className="mt-0.5"><span className="font-medium text-neutral-800">{t("visitRecapSlots")}:</span> {selSlots.length ? selSlots.map((s) => (s === "Qualsiasi" ? t("slotAny") : s)).join(", ") : t("slotAny")}</p>
           </div>
+          {/* nome e cognome separati — vedi LeadForm: il campo unico è ciò che
+              faceva uscire cognomi interi dei lead sulla dash proprietari. */}
           <input className={field} placeholder={t("name")} value={nome} onChange={(e) => setNome(e.target.value)} required />
+          <input className={field} placeholder={t("lastName")} value={cognome} onChange={(e) => setCognome(e.target.value)} required />
           <input className={field} type="email" placeholder={t("email")} value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <input className={`${field} sm:col-span-2`} placeholder={t("phone")} value={telefono} onChange={(e) => setTelefono(e.target.value)} />
+          <input className={field} placeholder={t("phone")} value={telefono} onChange={(e) => setTelefono(e.target.value)} />
           <label className="flex items-start gap-2 text-sm sm:col-span-2">
             <input type="checkbox" className="mt-0.5 h-4 w-4 shrink-0 accent-brand" checked={privacy} onChange={(e) => setPrivacy(e.target.checked)} required />
             <span className="text-neutral-600">

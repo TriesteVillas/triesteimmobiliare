@@ -589,7 +589,8 @@
       "altro": "Altro"
     },
     "messagePlaceholder": "Scrivi qui il tuo messaggio (opzionale)",
-    "name": "Nome e cognome",
+    "name": "Nome",
+    "lastName": "Cognome",
     "email": "Email",
     "phone": "Telefono",
     "privacyPre": "Ho letto e accetto la",

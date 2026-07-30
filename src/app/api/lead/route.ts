@@ -555,6 +555,7 @@ export async function POST(request: Request) {
         : "Richiesta info";
   const privacyOk = body.privacyOk === true;
   const nome = clean(body.nome, 120);
+  const cognome = clean(body.cognome, 120);
   const email = clean(body.email, 160);
   const telefono = clean(body.telefono, 40);
   const messaggio = clean(body.messaggio, 4000);
@@ -585,12 +586,15 @@ export async function POST(request: Request) {
   // il cognome non esisteva mai (fix 30/07 — è da qui che il portale proprietari
   // pescava cognomi interi). Split solo nei casi certi; nome_completo conserva
   // comunque la stringa intera, quindi non si perde niente.
-  const spNome = splitNomeCerta(nome);
+  // Il form chiede nome e cognome separati. Lo split resta come rete: i vecchi
+  // client in cache, e chi incolla "Mario Rossi" nel primo campo, passano di qui.
+  const spNome = cognome ? null : splitNomeCerta(nome);
+  const nomeCompleto = [nome, cognome].filter(Boolean).join(" ");
   try {
     await airtableCreate({
-      nome_completo: nome,
+      nome_completo: nomeCompleto,
       nome: spNome ? spNome.nome : nome,
-      ...(spNome ? { cognome: spNome.cognome } : {}),
+      ...(cognome ? { cognome } : spNome ? { cognome: spNome.cognome } : {}),
       email,
       telefono,
       canale,

@@ -589,7 +589,8 @@
       "altro": "Sonstiges"
     },
     "messagePlaceholder": "Schreiben Sie hier Ihre Nachricht (optional)",
-    "name": "Vor- und Nachname",
+    "name": "Vorname",
+    "lastName": "Nachname",
     "email": "E-Mail",
     "phone": "Telefon",
     "privacyPre": "Ich habe die",
