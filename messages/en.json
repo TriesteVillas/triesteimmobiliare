@@ -669,6 +669,7 @@
     "city": "The city you live in (optional)",
     "address": "Where is the property?",
     "addressPlaceholder": "Street and number, town (e.g. Strada Costiera 28, Trieste)",
+    "addressFound": "Location matched",
     "type": "Type",
     "typeOptions": {
       "0": "Apartment",

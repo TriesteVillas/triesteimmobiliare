@@ -669,6 +669,7 @@
     "city": "Stadt, in der Sie wohnen (optional)",
     "address": "Wo befindet sich die Immobilie?",
     "addressPlaceholder": "Straße und Hausnummer, Gemeinde (z. B. Strada Costiera 28, Triest)",
+    "addressFound": "Adresse erkannt",
     "type": "Typ",
     "typeOptions": {
       "0": "Wohnung",

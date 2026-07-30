@@ -669,6 +669,7 @@
     "city": "Città in cui vivi (facoltativo)",
     "address": "Dove si trova l'immobile?",
     "addressPlaceholder": "Via e civico, comune (es. Strada Costiera 28, Trieste)",
+    "addressFound": "Posizione riconosciuta",
     "type": "Tipologia",
     "typeOptions": {
       "0": "Appartamento",

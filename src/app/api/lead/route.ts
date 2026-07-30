@@ -30,6 +30,13 @@ const isEmail = (v: unknown): v is string =>
 const clean = (v: unknown, max = 2000): string =>
   typeof v === "string" ? v.trim().slice(0, max) : "";
 
+/** "45.64951, 13.77681" from a geocoded pick, or "" — never a partial pair. */
+const geoPoint = (lat: unknown, lon: unknown): string =>
+  typeof lat === "number" && Number.isFinite(lat) &&
+  typeof lon === "number" && Number.isFinite(lon)
+    ? `${lat.toFixed(5)}, ${lon.toFixed(5)}`
+    : "";
+
 async function airtableCreate(fields: Record<string, unknown>) {
   const res = await fetch(`https://api.airtable.com/v0/${LEADS_BASE_ID}/${LEADS_TABLE}`, {
     method: "POST",
@@ -290,6 +297,11 @@ async function handleValutazione(body: Record<string, unknown>) {
   // "wien"/"Wien"/"Vienna" devono essere una voce sola, non tre.
   const citta = normCity(clean(body.citta, 80));
   const indirizzo = clean(body.indirizzo, 300);
+  // Present only when the address was picked from the geocoder's suggestions;
+  // the field itself stays free text, so these are a bonus, never a given.
+  const cap = clean(body.cap, 10);
+  const cittaImmobile = clean(body.cittaImmobile, 80);
+  const coord = geoPoint(body.lat, body.lon);
   const tipologia = SELLER_TIPOLOGIE.has(clean(body.tipologia)) ? clean(body.tipologia) : "";
   const taglia = SELLER_TAGLIE.has(clean(body.taglia)) ? clean(body.taglia) : "";
   const statoImmobile = SELLER_STATI.has(clean(body.statoImmobile)) ? clean(body.statoImmobile) : "";
@@ -306,6 +318,9 @@ async function handleValutazione(body: Record<string, unknown>) {
 
   const daVendere = [
     indirizzo && `Indirizzo: ${indirizzo}`,
+    cap && `CAP: ${cap}`,
+    cittaImmobile && `Comune: ${cittaImmobile}`,
+    coord && `Coordinate: ${coord}  ·  https://www.google.com/maps?q=${encodeURIComponent(coord)}`,
     tipologia && `Tipologia: ${tipologia}`,
     taglia && `Dimensioni: ${taglia}`,
     statoImmobile && `Stato: ${statoImmobile}`,
@@ -326,6 +341,11 @@ async function handleValutazione(body: Record<string, unknown>) {
       ...(citta ? { citta_residenza: citta } : {}),
       destinatario_interno: "owners@TSV",
       motivo: "CTA sito: Valutazione riservata",
+      // Un mandato di vendita è il lead a più alto valore: nasce già a massima
+      // priorità (HOT · palla a NOI · owner) così è impossibile perderlo nel CRM.
+      temperatura: "HOT",
+      palla: "NOI",
+      lead_type: "Lead_Owner",
       ...(daVendere ? { ha_da_vendere: daVendere } : {}),
       ...(taglia ? { dimensioni_mq: taglia } : {}),
       ...(tempistiche ? { tempistiche } : {}),
@@ -341,18 +361,22 @@ async function handleValutazione(body: Record<string, unknown>) {
     return NextResponse.json({ ok: false, error: "save_failed" }, { status: 502 });
   }
 
-  await sendEmail(
-    NOTIFY_EMAIL,
-    "Nuova richiesta di valutazione dal sito",
-    `<p><strong>Nome:</strong> ${esc([nome, cognome].filter(Boolean).join(" ") || "—")}<br>
+  // Notifica interna ad ALTA evidenza: una valutazione è un potenziale mandato.
+  // Va sia alla casella del brand sia direttamente a Martino (owners desk, che
+  // è condiviso fra i marchi — vedi destinatario_interno "owners@TSV").
+  const valSubject = `🔴 Richiesta di VALUTAZIONE dal sito — ${[nome, cognome].filter(Boolean).join(" ") || "contatto"} (potenziale mandato)`;
+  const valHtml =
+    `<p style="font-size:15px"><strong>⛳️ Potenziale mandato di vendita — priorità massima.</strong></p>
+     <p><strong>Nome:</strong> ${esc([nome, cognome].filter(Boolean).join(" ") || "—")}<br>
      <strong>Email:</strong> ${esc(email) || "—"}<br>
      <strong>Telefono:</strong> ${esc(telefono) || "—"}</p>
      <p>${esc(daVendere || "—").replace(/\n/g, "<br>")}</p>
      ${tempistiche ? `<p><strong>Tempistiche:</strong> ${esc(tempistiche)}</p>` : ""}
      ${messaggio ? `<p><strong>Note:</strong><br>${esc(messaggio)}</p>` : ""}
-     <p><small>lingua ${esc(lingua)}</small></p>`,
-    isEmail(email) ? email : undefined,
-  );
+     <p><small>triesteimmobiliare.com · lingua ${esc(lingua)} · lead segnato HOT · palla a NOI nel CRM</small></p>`;
+  for (const to of [...new Set([NOTIFY_EMAIL, "martino@triestevillas.com"])]) {
+    await sendEmail(to, valSubject, valHtml, isEmail(email) ? email : undefined);
+  }
 
   if (isEmail(email)) {
     const lang = lingua as keyof typeof RECAP;

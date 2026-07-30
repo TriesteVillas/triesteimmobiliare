@@ -5,6 +5,8 @@ import { createPortal } from "react-dom";
 import { useLocale, useTranslations } from "next-intl";
 import { useFocusTrap } from "@/lib/useFocusTrap";
 import { CITY_LIST_ID, citySuggestions } from "@/lib/cities";
+import AddressAutocomplete from "./AddressAutocomplete";
+import type { AddressSuggestion } from "@/lib/geocode";
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -35,6 +37,9 @@ export default function SellerLeadModal({
   const [email, setEmail] = useState("");
   const [citta, setCitta] = useState("");
   const [indirizzo, setIndirizzo] = useState("");
+  // Set only when the address comes from a suggestion: carries the postcode
+  // and coordinates that free text cannot. Cleared as soon as it's edited.
+  const [luogo, setLuogo] = useState<AddressSuggestion | null>(null);
   const [tipologia, setTipologia] = useState("");
   const [taglia, setTaglia] = useState("");
   const [stato, setStato] = useState("");
@@ -80,6 +85,11 @@ export default function SellerLeadModal({
           citta,
           email,
           indirizzo,
+          // Present only when the address was picked from the suggestions.
+          cap: luogo?.postcode ?? "",
+          cittaImmobile: luogo?.city ?? "",
+          lat: luogo?.lat ?? null,
+          lon: luogo?.lon ?? null,
           tipologia,
           taglia,
           statoImmobile: stato,
@@ -198,8 +208,27 @@ export default function SellerLeadModal({
             </div>
 
             <p className="mt-5 text-sm font-medium text-neutral-700">{t("address")}</p>
-            <input className={`${input} mt-2`} placeholder={t("addressPlaceholder")}
-              value={indirizzo} onChange={(e) => setIndirizzo(e.target.value)} />
+            <div className="mt-2">
+              <AddressAutocomplete
+                value={indirizzo}
+                onChange={(v) => { setIndirizzo(v); setLuogo(null); }}
+                onPick={setLuogo}
+                placeholder={t("addressPlaceholder")}
+                className={input}
+                listClassName="border border-neutral-200 bg-white"
+                itemClassName="text-neutral-700 [&.is-active]:bg-brand/10 [&.is-active]:text-brand-dark"
+              />
+            </div>
+            {luogo && (
+              <p className="mt-1.5 flex items-center gap-1.5 text-xs text-brand">
+                <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="currentColor" aria-hidden>
+                  <path d="M10 2a5 5 0 0 0-5 5c0 3.5 5 11 5 11s5-7.5 5-11a5 5 0 0 0-5-5Zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4Z" />
+                </svg>
+                {t("addressFound")}
+                {luogo.postcode ? ` · ${luogo.postcode}` : ""}
+                {luogo.city ? ` · ${luogo.city}` : ""}
+              </p>
+            )}
 
             {chipRow(t("type"), TIPOLOGIE, tipologia, setTipologia, "typeOptions")}
             {chipRow(t("size"), TAGLIE, taglia, setTaglia, "sizeOptions")}
