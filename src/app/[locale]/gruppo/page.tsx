@@ -55,7 +55,7 @@ const STORY = [
 const VALUES = ["specialised", "local", "clarity", "journey"] as const;
 const TEAM = [
   { key: "carlin", photo: "/team/davide.webp", email: "davide@triestevillas.com", linkedin: "https://www.linkedin.com/in/davide-carlin-4bb42241/" },
-  { key: "martino", photo: "/team/martino.webp", email: "martino@triestevillas.com", linkedin: "https://www.linkedin.com/in/martino-coppola-di-canzano-6592b583/" },
+  { key: "paolo", photo: "/team/paolo.webp", email: "paolo@triesteimmobiliare.com", linkedin: "https://www.linkedin.com/in/paolo-isotti-216aba26/" },
   { key: "giada", photo: "/team/giada.webp", email: "giada@triestevillas.com", linkedin: "https://www.linkedin.com/in/giada-comelli-820433b2/" },
   { key: "cecile", photo: "/team/cecile.webp", email: "cecile@triestevillas.com", linkedin: null },
 ] as const;

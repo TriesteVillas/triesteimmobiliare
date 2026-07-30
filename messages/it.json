@@ -358,6 +358,8 @@
     "forRent": "In affitto",
     "badgePrivate": "Vendita riservata",
     "badgeNewBuild": "Nuova costruzione",
+    "onlineDays": "{count, plural, =0 {ONLINE OGGI} one {ONLINE DA # GIORNO} other {ONLINE DA # GIORNI}}",
+    "badgeFeatured": "IN EVIDENZA",
     "priceOnRequest": "Prezzo su richiesta",
     "priceReserved": "Trattativa riservata",
     "yearBuilt": "Anno di costruzione",
@@ -523,9 +525,9 @@
         "name": "Davide Carlin",
         "role": "Agente · Titolare e Amministratore"
       },
-      "martino": {
-        "name": "Martino Coppola di Canzano",
-        "role": "Socio · Sviluppo del gruppo"
+      "paolo": {
+        "name": "Paolo Isotti",
+        "role": "Agente · TriesteImmobiliare"
       },
       "giada": {
         "name": "Giada Comelli",

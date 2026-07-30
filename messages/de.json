@@ -358,6 +358,8 @@
     "forRent": "Zu vermieten",
     "badgePrivate": "Diskreter Verkauf",
     "badgeNewBuild": "Neubau",
+    "onlineDays": "{count, plural, =0 {HEUTE ONLINE} one {SEIT # TAG ONLINE} other {SEIT # TAGEN ONLINE}}",
+    "badgeFeatured": "EMPFOHLEN",
     "priceOnRequest": "Preis auf Anfrage",
     "priceReserved": "Verhandlung vertraulich",
     "yearBuilt": "Baujahr",
@@ -523,9 +525,9 @@
         "name": "Davide Carlin",
         "role": "Makler · Inhaber und Geschäftsführer"
       },
-      "martino": {
-        "name": "Martino Coppola di Canzano",
-        "role": "Gesellschafter · Entwicklung der Gruppe"
+      "paolo": {
+        "name": "Paolo Isotti",
+        "role": "Makler · TriesteImmobiliare"
       },
       "giada": {
         "name": "Giada Comelli",
