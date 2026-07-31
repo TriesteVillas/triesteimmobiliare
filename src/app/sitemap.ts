@@ -19,17 +19,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Una lettura sola (Data Cache 600s, come le pagine): senza gli articoli, la
   // sezione più indicizzabile del sito resterebbe fuori dalla mappa.
   const articles = await getArticles().catch(() => []);
-  const now = new Date();
 
   const staticPaths = ["/", "/immobili", "/vendi", "/risorse", "/investimenti", "/gruppo", "/contatti", "/privacy"];
   const entries: MetadataRoute.Sitemap = [];
 
+  // lastModified solo dove esiste una data vera: Google lo usa se è
+  // «consistently and verifiably accurate», altrimenti impara a ignorarlo.
+  // Le pagine fisse non ne hanno una → meglio nessun lastmod del timestamp
+  // di build.
   for (const path of staticPaths) {
     const languages = languagesFor(path);
     for (const locale of routing.locales) {
       entries.push({
         url: `${SITE_URL}${localizedPath(locale, path) === "/" ? "" : localizedPath(locale, path)}`,
-        lastModified: now,
         changeFrequency: path === "/" || path === "/immobili" ? "daily" : "monthly",
         priority: path === "/" ? 1 : path === "/vendi" ? 0.9 : path === "/immobili" ? 0.9 : path === "/risorse" ? 0.8 : 0.6,
         alternates: { languages },
@@ -37,9 +39,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  // Le guide: `lastModified` è la data VERA dell'articolo, non "adesso" come per
-  // le pagine fisse — un sitemap che dichiara tutto modificato oggi non dice
-  // niente a nessuno.
+  // Le guide: `lastModified` è la data VERA dell'articolo — un sitemap che
+  // dichiara tutto modificato oggi non dice niente a nessuno.
   for (const a of articles) {
     const path = `/risorse/${a.slug}`;
     const languages = languagesFor(path);
@@ -47,7 +48,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     for (const locale of routing.locales) {
       entries.push({
         url: absUrl(locale, path),
-        lastModified: touched ? new Date(touched) : now,
+        ...(touched ? { lastModified: new Date(touched) } : {}),
         changeFrequency: "monthly",
         priority: 0.7,
         alternates: { languages },
@@ -61,7 +62,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     for (const locale of routing.locales) {
       entries.push({
         url: absUrl(locale, path),
-        lastModified: now,
+        // onlineDa (la messa online) è l'unica data vera che il record porta.
+        ...(p.onlineDa ? { lastModified: new Date(p.onlineDa) } : {}),
         changeFrequency: "weekly",
         priority: 0.7,
         alternates: { languages },
