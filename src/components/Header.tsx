@@ -13,11 +13,12 @@ import AccountLink from "./account/AccountLink";
 export default async function Header() {
   const t = await getTranslations("nav");
 
+  // «Risorse» sta solo nella mappa del sito in fondo (scelta di Martino,
+  // 31/07/2026): il menu in alto resta sui percorsi commerciali.
   const links = [
     { href: "/immobili", label: t("properties") },
     { href: "/investimenti", label: t("invest") },
     { href: "/vendi", label: t("sell") },
-    { href: "/risorse", label: t("resources") },
     { href: "/gruppo", label: t("group") },
   ] as const;
 

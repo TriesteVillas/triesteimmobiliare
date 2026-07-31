@@ -1004,10 +1004,10 @@
     "disclaimer": "I'm Claude, TriesteImmobiliare' AI assistant — not infallible, and not a lawyer or tax adviser. For anything binding, the team takes over. Conversations are recorded so a human can pick up where I leave off.",
     "empty": "Ask how buying works, what it costs, mortgages as a non-resident — anything.",
     "starters": [
-      "What does buying a €800k home in Trieste really cost?",
-      "Can I get an Italian mortgage with a foreign income?",
-      "I'm not an EU citizen — can I even buy?",
-      "What is the Private Collection?"
+      "What paperwork do I need to sell?",
+      "What does selling cost, all in?",
+      "What taxes does a first-home buyer pay?",
+      "How is a price set in Trieste?"
     ],
     "placeholder": "Write your question…",
     "send": "Send",
@@ -1041,6 +1041,19 @@
       "What are the yearly running costs here?",
       "What's the area like? Services, parking, the sea?",
       "How does a viewing work? And the purchase after?"
+    ],
+    "barExamples": [
+      "What is my flat worth?",
+      "What paperwork do I need?",
+      "What does selling cost?",
+      "What taxes do buyers pay?",
+      "Price per m² in Barcola?"
+    ],
+    "listingExamples": [
+      "What taxes would I pay?",
+      "What are the running costs?",
+      "What is the area like?",
+      "When could I view it?"
     ]
   },
   "risorse": {

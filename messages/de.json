@@ -1004,10 +1004,10 @@
     "disclaimer": "Ich bin Claude, der KI-Assistent von TriesteImmobiliare — nicht unfehlbar, und weder Anwalt noch Steuerberater. Für alles Verbindliche übernimmt das Team. Gespräche werden aufgezeichnet, damit ein Mensch dort weitermachen kann, wo ich aufhöre.",
     "empty": "Fragen Sie, wie der Kauf abläuft, was er kostet, Hypothek als Nicht-Resident — was immer Sie möchten.",
     "starters": [
-      "Was kostet ein Haus um 800.000 € in Triest wirklich?",
-      "Bekomme ich eine italienische Hypothek mit ausländischem Einkommen?",
-      "Ich bin kein EU-Bürger — darf ich überhaupt kaufen?",
-      "Was ist die Private Collection?"
+      "Welche Unterlagen brauche ich zum Verkauf?",
+      "Was kostet ein Verkauf insgesamt?",
+      "Welche Steuern zahlt ein Erstkäufer?",
+      "Wie entsteht der Preis in Triest?"
     ],
     "placeholder": "Ihre Frage…",
     "send": "Senden",
@@ -1041,6 +1041,19 @@
       "Welche jährlichen Kosten hat dieses Haus?",
       "Wie ist die Lage? Infrastruktur, Parken, Meer?",
       "Wie läuft eine Besichtigung ab? Und der Kauf danach?"
+    ],
+    "barExamples": [
+      "Was ist meine Wohnung wert?",
+      "Welche Unterlagen brauche ich?",
+      "Was kostet der Verkauf?",
+      "Welche Steuern beim Kauf?",
+      "Preis pro m² in Barcola?"
+    ],
+    "listingExamples": [
+      "Welche Steuern zahle ich?",
+      "Welche laufenden Kosten?",
+      "Wie ist die Gegend?",
+      "Wann kann ich sie sehen?"
     ]
   },
   "risorse": {

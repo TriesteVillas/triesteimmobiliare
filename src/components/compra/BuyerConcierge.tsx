@@ -80,6 +80,53 @@ function saveStored(s: Stored): void {
   }
 }
 
+/**
+ * Il placeholder si scrive da solo, una domanda alla volta.
+ *
+ * Nasce da due problemi veri della barra vecchia: la frase unica lunga veniva
+ * TAGLIATA (il bottone occupa la coda del campo, e su telefono restavano tre
+ * parole e mezza), e un campo fermo somiglia a una ricerca qualunque — nessuno
+ * capiva di poter chiedere. Le domande di partenza sono corte, vere e già
+ * tradotte: farle scrivere una alla volta risolve il taglio e dice cosa si può
+ * chiedere, senza aggiungere una riga di testo alla pagina.
+ *
+ * Si ferma da sé quando l'ospite scrive (il placeholder non si vede più) e
+ * quando il sistema chiede meno animazioni (prefers-reduced-motion): in quel
+ * caso resta la prima domanda, ferma.
+ */
+function usePlaceholderVivo(frasi: string[], attivo: boolean, fermo: string): string {
+  const chiave = frasi.join("|");
+  const [testo, setTesto] = useState(fermo);
+
+  useEffect(() => {
+    const lista = chiave ? chiave.split("|") : [];
+    if (!attivo || lista.length === 0) return;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      setTesto(lista[0]);
+      return;
+    }
+    let i = 0, n = 0, cancella = false;
+    let timer = window.setTimeout(function passo() {
+      const f = lista[i % lista.length];
+      n += cancella ? -1 : 1;
+      setTesto(f.slice(0, Math.max(0, n)));
+      let attesa = cancella ? 18 : 38;
+      if (!cancella && n >= f.length) { cancella = true; attesa = 2600; }
+      else if (cancella && n <= 0) { cancella = false; i++; attesa = 260; }
+      timer = window.setTimeout(passo, attesa);
+    }, 1200);
+    return () => window.clearTimeout(timer);
+  }, [chiave, attivo]);
+
+  // Quando l'ospite comincia a scrivere il ciclo si ferma: si torna alla frase
+  // ferma, così se cancella tutto non resta mezza parola nel campo.
+  useEffect(() => {
+    if (!attivo) setTesto(fermo);
+  }, [attivo, fermo]);
+
+  return testo;
+}
+
 export default function BuyerConcierge({
   context,
 }: {
@@ -296,41 +343,62 @@ export default function BuyerConcierge({
   const starters = t.raw(context ? "listingStarters" : "starters") as string[];
   const barPlaceholder = context ? t("listingPlaceholder") : t("barPlaceholder");
   const barHint = context ? t("listingHint") : t("barHint");
+  // Esempi CORTI, scritti apposta per il campo: i suggerimenti del pannello
+  // (`starters`) sono domande intere e nel campo verrebbero tagliate a metà —
+  // che è il difetto da cui è nata questa riscrittura.
+  // L'array arriva nuovo a ogni render (t.raw lo ricrea): il ciclo NON si
+  // riavvia perché l'effetto dentro l'hook dipende dalle frasi unite in
+  // stringa, non dall'identità dell'array.
+  const esempi = (t.raw(context ? "listingExamples" : "barExamples") as string[]) ?? [];
+  const placeholderVivo = usePlaceholderVivo(esempi, !bar && !open, esempi[0] ?? barPlaceholder);
   const emptyLine = context ? t("listingEmpty", { title: context.title }) : t("empty");
   const gateField =
     "w-full rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-white/35 outline-none transition-colors focus:border-sand/60";
 
   return (
     <>
-      {/* La barra — l'ingresso a zero frizione. Il placeholder È l'invito. */}
+      {/* La barra — l'ingresso a zero frizione, e deve FARSI NOTARE: se sembra
+          un campo di ricerca qualunque nessuno ci chiede niente. Da qui
+          l'anello che gira, l'alone che respira e la domanda che si scrive da
+          sola. La pelle (colori, ombre) sta in globals.css: questo componente è
+          gemello su TriesteVillas e TriesteImmobiliare, che hanno due temi
+          opposti — le classi Tailwind di colore qui dentro renderebbero il box
+          bianco su bianco su uno dei due. */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
           openWith(bar);
         }}
-        className="group relative mx-auto flex w-full max-w-2xl items-center"
+        className="ai-bar group mx-auto w-full max-w-2xl"
         data-reveal
       >
-        <SparkIcon className="pointer-events-none absolute left-5 h-5 w-5 text-sand/80" />
-        <input
-          value={bar}
-          onChange={(e) => setBar(e.target.value)}
-          onFocus={() => {
-            if (msgs.length > 0) setOpen(true);
-          }}
-          maxLength={2000}
-          placeholder={barPlaceholder}
-          aria-label={barPlaceholder}
-          className="w-full rounded-full border border-white/15 bg-white/[0.05] py-4 pl-13 pr-32 text-base text-white placeholder:text-white/40 shadow-[0_18px_50px_-20px_rgba(207,183,149,0.25)] outline-none backdrop-blur transition-colors focus:border-sand/60 sm:pl-14"
-        />
-        <button
-          type="submit"
-          className="btn-press absolute right-2 rounded-full bg-sand px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-[#e0cba8]"
-        >
-          {t("barCta")}
-        </button>
+        <div className="ai-bar__inner relative flex items-center">
+          <SparkIcon className="ai-bar__spark pointer-events-none absolute left-4 h-5 w-5 sm:left-5" />
+          <input
+            value={bar}
+            onChange={(e) => setBar(e.target.value)}
+            onFocus={() => {
+              if (msgs.length > 0) setOpen(true);
+            }}
+            maxLength={2000}
+            placeholder={placeholderVivo}
+            aria-label={barPlaceholder}
+            className="ai-bar__input w-full rounded-full bg-transparent py-4 pl-12 pr-16 text-base outline-none sm:pl-14 sm:pr-32"
+          />
+          <button
+            type="submit"
+            aria-label={t("barCta")}
+            className="ai-bar__cta btn-press absolute right-1.5 flex h-11 items-center justify-center rounded-full px-3.5 text-sm font-semibold sm:right-2 sm:px-5"
+          >
+            <span className="hidden sm:inline">{t("barCta")}</span>
+            {/* Su telefono il testo del bottone mangiava metà campo: resta la freccia. */}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 sm:hidden" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </button>
+        </div>
       </form>
-      <p className="mx-auto mt-3 max-w-2xl text-center text-xs text-white/40" data-reveal>
+      <p className="ai-bar__hint mx-auto mt-3 max-w-2xl text-center text-xs" data-reveal>
         {barHint}
       </p>
 

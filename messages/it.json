@@ -1004,10 +1004,10 @@
     "disclaimer": "Sono Claude, l'assistente AI di TriesteImmobiliare — non infallibile, e non un avvocato né un fiscalista. Per tutto ciò che è vincolante subentra il team. Le conversazioni sono registrate perché un umano possa riprendere da dove mi fermo.",
     "empty": "Chiedimi come funziona l'acquisto, cosa costa, il mutuo da non residente — qualsiasi cosa.",
     "starters": [
-      "Quanto costa davvero comprare una casa da 800mila euro a Trieste?",
-      "Posso avere un mutuo italiano con redditi esteri?",
-      "Non sono cittadino UE — posso comprare?",
-      "Cos'è la Private Collection?"
+      "Quali documenti servono per vendere casa?",
+      "Quanto costa vendere, fra provvigione e imposte?",
+      "Quante imposte pago comprando la prima casa?",
+      "Come si forma il prezzo di una casa a Trieste?"
     ],
     "placeholder": "Scrivi la tua domanda…",
     "send": "Invia",
@@ -1041,6 +1041,19 @@
       "Che spese annue ha questa casa?",
       "Com'è la zona? Servizi, parcheggi, mare?",
       "Come funziona una visita? E poi, l'acquisto?"
+    ],
+    "barExamples": [
+      "Quanto vale la mia casa?",
+      "Che documenti servono per vendere?",
+      "Quanto costa vendere?",
+      "Quali imposte pago comprando?",
+      "Quanto costa al mq a Barcola?"
+    ],
+    "listingExamples": [
+      "Quanto pago di imposte?",
+      "Che spese ha questa casa?",
+      "Com'è la zona?",
+      "Quando posso vederla?"
     ]
   },
   "risorse": {

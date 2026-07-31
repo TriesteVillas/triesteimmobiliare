@@ -709,3 +709,114 @@ body:has(.pc-root) .pc-lang button.pc-lang-off:hover {
   padding: 0.1rem 0.35rem;
   font-size: 0.92em;
 }
+
+/* ---- Concierge AI: la barra che si fa notare ------------------------------
+   Gemella di quella su triestevillas.com — stesse classi, stesso componente
+   React — ma qui la carta è bianca: gli stessi colori di là (testo bianco,
+   fondo scuro trasparente) rendevano il box invisibile, bianco su bianco.
+   Un fascio di luce gira lungo il bordo, l'alone respira, la scintilla
+   saltella: tre animazioni lente, per farsi notare senza fare il luna park. */
+@property --ai-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.ai-bar {
+  position: relative;
+  border-radius: 9999px;
+  padding: 2px; /* spessore dell'anello luminoso */
+  animation: ai-float 7s ease-in-out infinite;
+}
+/* L'anello: un cono che ruota, ritagliato sul solo bordo con la maschera.
+   Senza @property (browser vecchi) resta un anello fermo, che va benissimo. */
+.ai-bar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: inherit;
+  background: conic-gradient(
+    from var(--ai-angle),
+    rgba(44, 107, 150, 0.18) 0deg,
+    rgba(44, 107, 150, 0.18) 170deg,
+    rgba(44, 107, 150, 0.75) 240deg,
+    #6fa1c6 272deg,
+    rgba(44, 107, 150, 0.75) 305deg,
+    rgba(44, 107, 150, 0.18) 355deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: ai-orbit 7s linear infinite;
+  pointer-events: none;
+}
+.ai-bar__inner {
+  border-radius: 9999px;
+  background: #ffffff;
+  box-shadow: 0 20px 55px -26px rgba(28, 74, 107, 0.55);
+  animation: ai-breath 5s ease-in-out infinite;
+}
+.ai-bar:focus-within .ai-bar__inner,
+.ai-bar:hover .ai-bar__inner {
+  animation-play-state: paused;
+  box-shadow: 0 24px 65px -22px rgba(28, 74, 107, 0.6);
+}
+/* Mentre si scrive, l'animazione si toglie di mezzo. */
+.ai-bar:focus-within {
+  animation-play-state: paused;
+}
+.ai-bar__spark {
+  color: var(--color-brand, #2c6b96);
+  animation: ai-hop 2.6s ease-in-out infinite;
+}
+.ai-bar__input {
+  color: var(--color-brand-dark, #1c4a6b);
+}
+.ai-bar__input::placeholder {
+  color: rgba(28, 74, 107, 0.55);
+}
+.ai-bar__cta {
+  background: var(--color-brand, #2c6b96);
+  color: #ffffff;
+  transition: background-color 200ms var(--ease-lux);
+}
+.ai-bar__cta:hover {
+  background: var(--color-brand-dark, #1c4a6b);
+}
+.ai-bar__hint {
+  color: #64748b;
+}
+
+@keyframes ai-orbit {
+  to {
+    --ai-angle: 360deg;
+  }
+}
+@keyframes ai-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@keyframes ai-breath {
+  0%, 100% { box-shadow: 0 18px 50px -28px rgba(28, 74, 107, 0.45); }
+  50% { box-shadow: 0 24px 66px -22px rgba(28, 74, 107, 0.62); }
+}
+@keyframes ai-hop {
+  0%, 62%, 100% { transform: translateY(0) scale(1); }
+  72% { transform: translateY(-4px) scale(1.08); }
+  86% { transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-bar,
+  .ai-bar::before,
+  .ai-bar__inner,
+  .ai-bar__spark {
+    animation: none;
+  }
+}
