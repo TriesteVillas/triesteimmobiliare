@@ -1082,6 +1082,15 @@
       "title": "What is your home actually worth? A valuation takes 48 hours.",
       "cta": "Sell with us"
     },
-    "updatesTitle": "Updates to this guide"
+    "updatesTitle": "Updates to this guide",
+    "ctaSellTitle": "Thinking of selling?",
+    "ctaSellText": "Valuation within 48 hours, online in 7 days, a plain three-month mandate. On mandates signed by September 2026, the seller pays 0%.",
+    "ctaSellCta": "Selling a home in Trieste",
+    "ctaBuyTitle": "Looking for a home in Trieste?",
+    "ctaBuyText": "Residential property in Trieste and its province, with paperwork, running costs and energy class on every listing.",
+    "ctaBuyCta": "Homes for sale in Trieste",
+    "guidesEyebrow": "Before you decide",
+    "guidesTitle": "The guides that answer the real questions",
+    "guidesCta": "All guides"
   }
 }

@@ -1082,6 +1082,15 @@
       "title": "Was ist Ihre Immobilie wirklich wert? Die Bewertung dauert 48 Stunden.",
       "cta": "Mit uns verkaufen"
     },
-    "updatesTitle": "Aktualisierungen zu diesem Beitrag"
+    "updatesTitle": "Aktualisierungen zu diesem Beitrag",
+    "ctaSellTitle": "Denken Sie über einen Verkauf nach?",
+    "ctaSellText": "Bewertung in 48 Stunden, online in 7 Tagen, einfacher Dreimonatsauftrag. Bei Aufträgen bis September 2026 zahlt der Verkäufer 0%.",
+    "ctaSellCta": "Immobilie in Triest verkaufen",
+    "ctaBuyTitle": "Suchen Sie eine Wohnung in Triest?",
+    "ctaBuyText": "Wohnimmobilien in Triest und Provinz — mit Unterlagen, laufenden Kosten und Energieklasse in jedem Exposé.",
+    "ctaBuyCta": "Immobilien in Triest kaufen",
+    "guidesEyebrow": "Bevor Sie entscheiden",
+    "guidesTitle": "Die Ratgeber, die die echten Fragen beantworten",
+    "guidesCta": "Alle Ratgeber"
   }
 }

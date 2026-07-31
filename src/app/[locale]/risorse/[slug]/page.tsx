@@ -15,7 +15,10 @@ import SourceList from "@/components/resources/SourceList";
 import ResourceCard from "@/components/resources/ResourceCard";
 import BuyerConcierge from "@/components/compra/BuyerConcierge";
 import JsonLd from "@/components/JsonLd";
-import { pageAlternates, pageOpenGraph, absUrl, breadcrumbJsonLd, SITE_URL } from "@/lib/seo";
+import {
+  pageAlternates, articleOpenGraph, seoTitle, seoDescription,
+  absUrl, breadcrumbJsonLd, SITE_URL,
+} from "@/lib/seo";
 
 // Pagina articolo delle Risorse. SSG per locale × slug, rivalidata dalla Data
 // Cache (600s) come il resto del sito. La riga "verificato il" non è
@@ -35,13 +38,20 @@ export async function generateMetadata({
   const { locale, slug } = await params;
   const a = await getArticle(slug);
   if (!a) return {};
-  const title = articleText(a.title, locale);
-  const description = articleText(a.abstract, locale).slice(0, 160);
+  // Il titolo in pagina resta intero (è per chi legge); quello del risultato di
+  // ricerca si accorcia bene invece di farsi tagliare male da Google.
+  const titolo = articleText(a.title, locale);
+  const title = seoTitle(titolo);
+  const description = seoDescription(articleText(a.abstract, locale));
   return {
     title: { absolute: title },
     description,
     alternates: pageAlternates(locale, `/risorse/${slug}`),
-    openGraph: pageOpenGraph(locale, `/risorse/${slug}`, title, description),
+    openGraph: articleOpenGraph(locale, `/risorse/${slug}`, titolo, description, {
+      publishedTime: a.publishedAt ?? undefined,
+      modifiedTime: a.updatedAt ?? a.publishedAt ?? undefined,
+      section: a.categoria ?? undefined,
+    }),
   };
 }
 
@@ -72,6 +82,9 @@ export default async function ArticlePage({
   const abstract = articleText(article.abstract, locale);
   const body = articleText(article.body, locale);
   const related = await getRelatedArticles(article);
+  // Chi legge di documenti, successioni o costi di vendita ha in mano una casa;
+  // chi legge di imposte d'acquisto, zone o prezzi ne sta cercando una.
+  const versoVendita = article.categoria === "Vendere casa" || article.categoria === "Documenti & pratiche";
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -181,6 +194,26 @@ export default async function ArticlePage({
         <p className="mt-8 rounded-2xl border border-brand/15 bg-paper px-5 py-4 text-xs leading-relaxed text-neutral-500">
           {t("disclaimer")}
         </p>
+
+        {/* Il passo dopo la lettura. Serve a chi legge — che a fine guida ha una
+            domanda pratica — e serve alle pagine commerciali, che da qui
+            ricevono un link interno con un'ancora che dice davvero di cosa
+            parla la destinazione. La meta dipende dal tema: chi legge di
+            documenti e vendita non cerca annunci, e viceversa. */}
+        <div className="mt-6 rounded-2xl border border-brand/20 bg-gradient-to-br from-paper to-white px-6 py-6" data-reveal>
+          <p className="text-lg font-semibold text-brand-dark">
+            {t(versoVendita ? "ctaSellTitle" : "ctaBuyTitle")}
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-neutral-600">
+            {t(versoVendita ? "ctaSellText" : "ctaBuyText")}
+          </p>
+          <Link
+            href={versoVendita ? "/vendi" : "/immobili"}
+            className="btn-hero mt-5 inline-block rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white"
+          >
+            {t(versoVendita ? "ctaSellCta" : "ctaBuyCta")} →
+          </Link>
+        </div>
       </article>
 
       {/* La domanda che l'articolo non ha chiuso */}

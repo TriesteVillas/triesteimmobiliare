@@ -58,6 +58,63 @@ export function pageOpenGraph(
   };
 }
 
+// ── Titolo e descrizione per i risultati di ricerca ─────────────────────────
+// Google taglia i titoli intorno ai 60 caratteri e le descrizioni intorno ai
+// 155. Un titolo tagliato a metà parola non è un dettaglio estetico: è la prima
+// riga che una persona legge prima di decidere se cliccare, e su una pagina di
+// guida è metà del lavoro. Qui si taglia bene invece di lasciar tagliare male.
+//
+// Ordine delle regole per il titolo:
+//  1. se ci sta (con un margine, la misura vera è in pixel) resta intero;
+//  2. altrimenti si taglia sul primo separatore naturale — parentesi, lineetta,
+//     due punti — purché resti un titolo vero e non un moncone;
+//  3. altrimenti all'ultima parola intera, con i puntini.
+const SEPARATORI = [" (", " — ", " – ", " - ", ": "];
+
+export function seoTitle(titolo: string, max = 65): string {
+  const t = titolo.trim().replace(/\s+/g, " ");
+  if (t.length <= max) return t;
+  for (const sep of SEPARATORI) {
+    const i = t.indexOf(sep);
+    if (i >= 20 && i <= max) return t.slice(0, i).replace(/[\s,;:–—-]+$/, "");
+  }
+  const taglio = t.slice(0, max - 1);
+  const sp = taglio.lastIndexOf(" ");
+  return (sp > 20 ? taglio.slice(0, sp) : taglio).replace(/[\s,;:–—-]+$/, "") + "…";
+}
+
+export function seoDescription(testo: string, max = 155): string {
+  const d = testo.trim().replace(/\s+/g, " ");
+  if (d.length <= max) return d;
+  const taglio = d.slice(0, max - 1);
+  // Meglio chiudere su una frase finita, se ce n'è una ragionevolmente lunga.
+  const punto = Math.max(taglio.lastIndexOf(". "), taglio.lastIndexOf("? "), taglio.lastIndexOf("! "));
+  if (punto > max * 0.6) return taglio.slice(0, punto + 1);
+  const sp = taglio.lastIndexOf(" ");
+  return (sp > 0 ? taglio.slice(0, sp) : taglio).replace(/[\s,;:–—-]+$/, "") + "…";
+}
+
+// OpenGraph di un ARTICOLO. `pageOpenGraph` dichiara type=website, che su una
+// guida è semplicemente falso: chi la condivide o la rilegge a macchina non
+// distingue un pezzo editoriale da una pagina di servizio, e le date di
+// pubblicazione e aggiornamento non viaggiano.
+export function articleOpenGraph(
+  locale: string,
+  path: string,
+  title: string,
+  description: string,
+  meta: { publishedTime?: string; modifiedTime?: string; section?: string } = {},
+) {
+  const base = pageOpenGraph(locale, path, title, description);
+  return {
+    ...base,
+    type: "article" as const,
+    publishedTime: meta.publishedTime || undefined,
+    modifiedTime: meta.modifiedTime || meta.publishedTime || undefined,
+    section: meta.section || undefined,
+  };
+}
+
 // Site-wide RealEstateAgent + Organization (group) — emitted once in the layout.
 export function orgJsonLd() {
   return {

@@ -6,6 +6,8 @@ import BuyerCta from "@/components/BuyerCta";
 import Timeline from "@/components/Timeline";
 import JsonLd from "@/components/JsonLd";
 import AutoVideo from "@/components/AutoVideo";
+import ResourceCard from "@/components/resources/ResourceCard";
+import { getArticle, readingMinutes } from "@/lib/articles";
 import { pageAlternates, pageOpenGraph, faqJsonLd } from "@/lib/seo";
 
 export async function generateMetadata({
@@ -40,6 +42,17 @@ export default async function SellPage({
   setRequestLocale(locale);
   const t = await getTranslations("sell");
   const tHome = await getTranslations("home");
+  const tRis = await getTranslations("risorse");
+
+  // Le tre guide che rispondono alle domande di chi sta valutando se vendere.
+  // Scelte per slug e non "le più recenti": questa pagina merita le sue.
+  const guide = (
+    await Promise.all(
+      ["quanto-costa-vendere-casa", "documenti-per-vendere-casa", "valutare-casa-trieste"].map((s) =>
+        getArticle(s).catch(() => null),
+      ),
+    )
+  ).filter((a): a is NonNullable<typeof a> => a !== null);
 
   // FAQ rich-results — questions localized, answers reuse the recovered blocks.
   const faqBlocks = ["zeroProvvigione", "mandatoSemplice", "velocita", "materiale", "venditaRiservata"];
@@ -187,6 +200,36 @@ export default async function SellPage({
           </div>
         </div>
       </section>
+
+      {/* Le guide sulla vendita — link interni con ancora vera, e la risposta a
+          chi non è ancora pronto a chiamare: se la pagina commerciale è l'unica
+          cosa che offriamo a chi sta ancora studiando, quella persona va a
+          cercare le risposte altrove. */}
+      {guide.length > 0 && (
+        <section className="mx-auto max-w-6xl px-6 pb-4 pt-16">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="eyebrow" data-reveal>{tRis("guidesEyebrow")}</p>
+              <h2 className="display-chapter mt-2 max-w-2xl text-brand-dark" data-reveal>
+                {tRis("guidesTitle")}
+              </h2>
+            </div>
+            <Link href="/risorse" className="text-sm font-semibold text-brand underline-offset-4 hover:underline">
+              {tRis("guidesCta")} →
+            </Link>
+          </div>
+          <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3" data-reveal-stagger>
+            {guide.map((a) => (
+              <ResourceCard
+                key={a.slug}
+                article={a}
+                locale={locale}
+                minutesLabel={tRis("minutes", { n: readingMinutes(a, locale) })}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Closing */}
       <section className="mx-auto max-w-4xl px-6 py-20">

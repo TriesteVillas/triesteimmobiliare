@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import ImmobiliBrowser from "@/components/ImmobiliBrowser";
 import BuyerCta from "@/components/BuyerCta";
 import { getProperties, getPrivateTeasers } from "@/lib/airtable";
 import { groupByZone, ZONE_ORDER, ZONE_OTHER } from "@/lib/properties";
 import { buildPropertyView } from "@/lib/propertyView";
+import ResourceCard from "@/components/resources/ResourceCard";
+import { getArticle, readingMinutes } from "@/lib/articles";
 import { pageAlternates, pageOpenGraph } from "@/lib/seo";
 
 export async function generateMetadata({
@@ -34,6 +37,18 @@ export default async function ImmobiliPage({
   const tProp = await getTranslations("property");
   const tZones = await getTranslations("zones");
   const tHelp = await getTranslations("immobili.buyerHelp");
+  const tRis = await getTranslations("risorse");
+
+  // Le guide per chi sta comprando: link interni con ancora vera, e una
+  // risposta per chi arriva sul catalogo con in testa una domanda che il
+  // catalogo non risolve (quanto pago di imposte, che zona mi conviene).
+  const guide = (
+    await Promise.all(
+      ["imposte-comprare-casa", "zone-di-trieste-dove-abitare", "prezzo-al-metro-quadro-trieste"].map((sl) =>
+        getArticle(sl).catch(() => null),
+      ),
+    )
+  ).filter((a): a is NonNullable<typeof a> => a !== null);
 
   // Immobili pubblici (i cluster PRIVATE sono esclusi alla fonte) + i teaser
   // senza dettaglio della Private Collection, raggruppati per zona insieme.
@@ -77,6 +92,32 @@ export default async function ImmobiliPage({
       </section>
 
       {/* Buyer nudge — "Ricerca libera" */}
+      {guide.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 pb-16">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="eyebrow" data-reveal>{tRis("guidesEyebrow")}</p>
+              <h2 className="display-chapter mt-2 max-w-2xl text-brand-dark" data-reveal>
+                {tRis("guidesTitle")}
+              </h2>
+            </div>
+            <Link href="/risorse" className="text-sm font-semibold text-brand underline-offset-4 hover:underline">
+              {tRis("guidesCta")} →
+            </Link>
+          </div>
+          <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3" data-reveal-stagger>
+            {guide.map((a) => (
+              <ResourceCard
+                key={a.slug}
+                article={a}
+                locale={locale}
+                minutesLabel={tRis("minutes", { n: readingMinutes(a, locale) })}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
       <section className="border-t border-neutral-200 bg-paper">
         <div className="mx-auto flex max-w-5xl flex-col items-start gap-6 px-6 py-16 sm:flex-row sm:items-center sm:justify-between">
           <div className="max-w-2xl" data-reveal="left">
