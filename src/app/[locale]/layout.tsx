@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 import PcLocaleSwitcher from "@/components/private/PcLocaleSwitcher";
 import Footer from "@/components/Footer";
 import RevealObserver from "@/components/RevealObserver";
+import Analytics from "@/components/Analytics";
 import JsonLd from "@/components/JsonLd";
 import { SITE_URL, orgJsonLd, webSiteJsonLd } from "@/lib/seo";
 import "../globals.css";
@@ -94,6 +95,7 @@ export default async function LocaleLayout({
           <main className="flex-1">{children}</main>
           <Footer />
           <RevealObserver />
+          <Analytics />
         </NextIntlClientProvider>
       </body>
     </html>
