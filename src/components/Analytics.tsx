@@ -3,11 +3,9 @@ import Script from "next/script";
 // ─────────────────────────────────────────────────────────────────────────────
 // Google Analytics 4.
 //
-// Gemello di quello su triestevillas.com. Qui manca ancora l'ID: la proprietà
-// GA4 di TriesteImmobiliare va creata nell'account Analytics del gruppo
-// (martino@triestevillas.com), che al 31/07/2026 non è raggiungibile dal Chrome
-// collegato. APPENA C'È L'ID: si scrive in GA_ID qui sotto e si rilascia —
-// niente altro da toccare, il componente è già montato nel layout.
+// Gemello di quello su triestevillas.com, acceso il 2026-07-31 con l'ID della
+// proprietà GA4 di TriesteImmobiliare (fornito da Martino dal flusso di dati
+// web dell'account Analytics del gruppo).
 //
 // L'ID di misurazione è un identificatore PUBBLICO (si legge nel sorgente di
 // ogni pagina): sta in chiaro qui e non in una variabile d'ambiente, così non
@@ -23,7 +21,7 @@ import Script from "next/script";
 // scelta consapevole del titolare, non come un default tecnico.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const GA_ID = ""; // ← ID di misurazione di TriesteImmobiliare (G-…), da creare
+const GA_ID = "G-TTVSE30EJF";
 
 export default function Analytics() {
   if (!GA_ID) return null;
