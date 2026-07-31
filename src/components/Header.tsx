@@ -17,6 +17,7 @@ export default async function Header() {
     { href: "/immobili", label: t("properties") },
     { href: "/investimenti", label: t("invest") },
     { href: "/vendi", label: t("sell") },
+    { href: "/risorse", label: t("resources") },
     { href: "/gruppo", label: t("group") },
   ] as const;
 

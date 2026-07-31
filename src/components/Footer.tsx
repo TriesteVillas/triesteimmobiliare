@@ -16,6 +16,7 @@ const NAV = [
   { href: "/immobili", key: "properties" },
   { href: "/investimenti", key: "invest" },
   { href: "/vendi", key: "sell" },
+  { href: "/risorse", key: "resources" },
   { href: "/gruppo", key: "group" },
   { href: "/contatti", key: "contact" },
 ] as const;

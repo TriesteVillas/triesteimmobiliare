@@ -17,7 +17,8 @@
     "valuation": "Valutazione",
     "menuLabel": "Menu",
     "closeLabel": "Chiudi",
-    "ctaValuation": "Richiedi valutazione"
+    "ctaValuation": "Richiedi valutazione",
+    "resources": "Risorse"
   },
   "seo": {
     "home": {
@@ -143,6 +144,12 @@
       "body": "Crediamo in quello che facciamo: apriamo un dialogo e vedrai che venderemo la tua casa al meglio. Raccontaci l'immobile e ti rispondiamo con una valutazione onesta, senza impegno e senza provvigione a tuo carico.",
       "cta": "Richiedi la valutazione",
       "secondary": "Parla con noi"
+    },
+    "resources": {
+      "eyebrow": "Risorse",
+      "title": "Le domande che ci fanno tutti, con le risposte per esteso.",
+      "body": "Documenti, imposte, tempi, prezzi per zona: le nostre guide, con le fonti e la data dell'ultima verifica.",
+      "cta": "Tutte le guide"
     }
   },
   "sell": {
@@ -1035,5 +1042,33 @@
       "Com'è la zona? Servizi, parcheggi, mare?",
       "Come funziona una visita? E poi, l'acquisto?"
     ]
+  },
+  "risorse": {
+    "meta": {
+      "title": "Risorse — guide su vendere e comprare casa a Trieste",
+      "description": "Le guide di TriesteImmobiliare: documenti, imposte, tempi, zone e prezzi. Fatti verificati e datati, per chi vende o compra casa a Trieste e Provincia."
+    },
+    "hero": {
+      "eyebrow": "Risorse",
+      "title": "Vendere e comprare casa a Trieste, spiegato bene.",
+      "intro": "Guide di riferimento, non notizie: cosa serve davvero: documenti, imposte, tempi, prezzi per zona. Scritte una volta e tenute aggiornate, con dentro anche quello che non conviene sentirsi dire.",
+      "promise": "Ogni guida porta le sue fonti e la data dell'ultima verifica."
+    },
+    "all": "Tutte",
+    "empty": "Le guide stanno arrivando. Torna a breve — o fai la tua domanda qui sopra.",
+    "minutes": "{n} min di lettura",
+    "published": "Pubblicata il {date}",
+    "verified": "Fatti verificati il {date}",
+    "sources": "Fonti",
+    "disclaimer": "Questa è una guida informativa, non consulenza legale o fiscale: le norme cambiano e ogni caso fa storia a sé. L'ultima parola resta al notaio e al commercialista. Per il tuo caso specifico scrivici: info@triesteimmobiliare.com · 040 2473628.",
+    "askEyebrow": "Resta una domanda?",
+    "askTitle": "Chiedi quello a cui questa pagina non ha risposto.",
+    "relatedEyebrow": "Continua a leggere",
+    "chapter": {
+      "eyebrow": "Il passo dopo",
+      "title": "Quanto vale davvero la tua casa? La valutazione arriva in 48 ore.",
+      "cta": "Vendi con noi"
+    },
+    "updatesTitle": "Aggiornamenti a questa guida"
   }
 }

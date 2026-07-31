@@ -3,6 +3,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { pageAlternates, pageOpenGraph } from "@/lib/seo";
 import { getProperties } from "@/lib/airtable";
+import { getArticles, readingMinutes } from "@/lib/articles";
+import ResourceCard from "@/components/resources/ResourceCard";
 import { zoneKey } from "@/lib/properties";
 import { buildPropertyView } from "@/lib/propertyView";
 import PropertyCard from "@/components/PropertyCard";
@@ -42,8 +44,12 @@ export default async function Home({
   const t = await getTranslations("home");
   const tProp = await getTranslations("property");
   const tZones = await getTranslations("zones");
+  const tRis = await getTranslations("risorse");
 
   const properties = await getProperties();
+  // Le tre guide in vetrina (in evidenza, poi le più recenti: l'ordine lo
+  // decide getArticles). Se la Biblioteca è vuota la fascia sparisce.
+  const articoli = (await getArticles().catch(() => [])).slice(0, 3);
 
   // La strip conserva l'ordine di vetrina deciso nel CRM.
   const reelItems = properties
@@ -268,6 +274,40 @@ export default async function Home({
           </Link>
         </div>
       </section>
+
+      {/* ── Risorse — le guide ────────────────────────────────────
+          Sta in home per due ragioni: chi valuta se affidarci una casa vuole
+          vedere che sappiamo di cosa parliamo, e un link dalla home è il modo
+          più diretto per far scoprire la sezione a chi indicizza. */}
+      {articoli.length > 0 && (
+        <section className="mx-auto max-w-6xl px-6 py-20">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="eyebrow" data-reveal>{t("resources.eyebrow")}</p>
+              <h2 className="display-chapter mt-2 max-w-2xl text-brand-dark" data-reveal>
+                {t("resources.title")}
+              </h2>
+              <p className="mt-3 max-w-2xl text-neutral-600">{t("resources.body")}</p>
+            </div>
+            <Link
+              href="/risorse"
+              className="text-sm font-semibold text-brand underline-offset-4 hover:underline"
+            >
+              {t("resources.cta")} →
+            </Link>
+          </div>
+          <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3" data-reveal-stagger>
+            {articoli.map((a) => (
+              <ResourceCard
+                key={a.slug}
+                article={a}
+                locale={locale}
+                minutesLabel={tRis("minutes", { n: readingMinutes(a, locale) })}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ── Group routing ─────────────────────────────────────────── */}
       <section className="border-y border-neutral-200 bg-paper">

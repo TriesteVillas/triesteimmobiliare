@@ -17,7 +17,8 @@
     "valuation": "Valuation",
     "menuLabel": "Menu",
     "closeLabel": "Close",
-    "ctaValuation": "Request a valuation"
+    "ctaValuation": "Request a valuation",
+    "resources": "Resources"
   },
   "seo": {
     "home": {
@@ -143,6 +144,12 @@
       "body": "We believe in what we do: open a conversation with us and you'll see we'll sell your home at its best. Tell us about the property and we'll come back with an honest valuation — no obligation, and no commission on your side.",
       "cta": "Request the valuation",
       "secondary": "Talk to us"
+    },
+    "resources": {
+      "eyebrow": "Resources",
+      "title": "The questions everyone asks, answered in full.",
+      "body": "Paperwork, taxes, timings, prices by neighbourhood: our guides, with sources and the date we last checked them.",
+      "cta": "All guides"
     }
   },
   "sell": {
@@ -1035,5 +1042,33 @@
       "What's the area like? Services, parking, the sea?",
       "How does a viewing work? And the purchase after?"
     ]
+  },
+  "risorse": {
+    "meta": {
+      "title": "Resources — guides to selling and buying a home in Trieste",
+      "description": "TriesteImmobiliare's guides: paperwork, taxes, timings, neighbourhoods and prices. Facts checked and dated, for anyone selling or buying in Trieste."
+    },
+    "hero": {
+      "eyebrow": "Resources",
+      "title": "Selling and buying in Trieste, properly explained.",
+      "intro": "Reference guides, not news: what the job actually takes — paperwork, taxes, timings, prices by neighbourhood. Written once and kept current, including the parts nobody enjoys hearing.",
+      "promise": "Every guide carries its sources and the date we last checked them."
+    },
+    "all": "All",
+    "empty": "The guides are on their way. Come back shortly — or ask your question above.",
+    "minutes": "{n} min read",
+    "published": "Published {date}",
+    "verified": "Facts checked {date}",
+    "sources": "Sources",
+    "disclaimer": "This is an informative guide, not legal or tax advice: rules change and every case differs. Your notaio and accountant have the final word. For your own case, write to us: info@triesteimmobiliare.com · +39 040 2473628.",
+    "askEyebrow": "Still a question?",
+    "askTitle": "Ask what this page didn't answer.",
+    "relatedEyebrow": "Keep reading",
+    "chapter": {
+      "eyebrow": "Next step",
+      "title": "What is your home actually worth? A valuation takes 48 hours.",
+      "cta": "Sell with us"
+    },
+    "updatesTitle": "Updates to this guide"
   }
 }

@@ -17,7 +17,8 @@
     "valuation": "Bewertung",
     "menuLabel": "Menü",
     "closeLabel": "Schließen",
-    "ctaValuation": "Bewertung anfordern"
+    "ctaValuation": "Bewertung anfordern",
+    "resources": "Ratgeber"
   },
   "seo": {
     "home": {
@@ -143,6 +144,12 @@
       "body": "Wir glauben an das, was wir tun: Wir eröffnen einen Dialog, und Sie werden sehen, dass wir Ihre Immobilie bestmöglich verkaufen. Erzählen Sie uns von der Immobilie, und Sie erhalten eine ehrliche Bewertung, unverbindlich und ohne Provision zu Ihren Lasten.",
       "cta": "Bewertung anfordern",
       "secondary": "Sprechen Sie mit uns"
+    },
+    "resources": {
+      "eyebrow": "Ratgeber",
+      "title": "Die Fragen, die alle stellen — ausführlich beantwortet.",
+      "body": "Unterlagen, Steuern, Fristen, Preise nach Stadtteil: unsere Ratgeber, mit Quellen und Datum der letzten Prüfung.",
+      "cta": "Alle Ratgeber"
     }
   },
   "sell": {
@@ -1035,5 +1042,33 @@
       "Wie ist die Lage? Infrastruktur, Parken, Meer?",
       "Wie läuft eine Besichtigung ab? Und der Kauf danach?"
     ]
+  },
+  "risorse": {
+    "meta": {
+      "title": "Ratgeber — Immobilien verkaufen und kaufen in Triest",
+      "description": "Die Ratgeber von TriesteImmobiliare: Unterlagen, Steuern, Fristen, Stadtteile und Preise. Geprüfte, datierte Fakten für Verkauf und Kauf in Triest."
+    },
+    "hero": {
+      "eyebrow": "Ratgeber",
+      "title": "Verkaufen und kaufen in Triest, verständlich erklärt.",
+      "intro": "Nachschlagewerke statt Nachrichten: was wirklich dazugehört — Unterlagen, Steuern, Fristen, Preise nach Stadtteil. Einmal geschrieben, laufend aktuell gehalten, auch dort, wo die Antwort unbequem ist.",
+      "promise": "Jeder Beitrag nennt seine Quellen und das Datum der letzten Prüfung."
+    },
+    "all": "Alle",
+    "empty": "Die Ratgeber entstehen gerade. Schauen Sie bald wieder vorbei — oder stellen Sie Ihre Frage oben.",
+    "minutes": "{n} Min. Lesezeit",
+    "published": "Veröffentlicht am {date}",
+    "verified": "Fakten geprüft am {date}",
+    "sources": "Quellen",
+    "disclaimer": "Dies ist eine informative Übersicht, keine Rechts- oder Steuerberatung: Vorschriften ändern sich, und jeder Fall liegt anders. Das letzte Wort haben Notar und Steuerberater. Für Ihren Fall schreiben Sie uns: info@triesteimmobiliare.com · +39 040 2473628.",
+    "askEyebrow": "Noch eine Frage?",
+    "askTitle": "Fragen Sie, was diese Seite offengelassen hat.",
+    "relatedEyebrow": "Weiterlesen",
+    "chapter": {
+      "eyebrow": "Der nächste Schritt",
+      "title": "Was ist Ihre Immobilie wirklich wert? Die Bewertung dauert 48 Stunden.",
+      "cta": "Mit uns verkaufen"
+    },
+    "updatesTitle": "Aktualisierungen zu diesem Beitrag"
   }
 }
