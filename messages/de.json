@@ -1092,5 +1092,13 @@
     "guidesEyebrow": "Bevor Sie entscheiden",
     "guidesTitle": "Die Ratgeber, die die echten Fragen beantworten",
     "guidesCta": "Alle Ratgeber"
+  },
+  "cookie": {
+    "testo": "Wir verwenden technische Cookies und, nur mit Ihrer Einwilligung, Statistik-Cookies (Google Analytics), um die Nutzung der Website zu verstehen. Keine Werbung, kein Profiling.",
+    "accetta": "Akzeptieren",
+    "rifiuta": "Nur notwendige",
+    "privacy": "Datenschutz und Cookies",
+    "preferenze": "Cookie-Einstellungen",
+    "aria": "Cookie-Einwilligung"
   }
 }

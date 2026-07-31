@@ -9,6 +9,7 @@ import PcLocaleSwitcher from "@/components/private/PcLocaleSwitcher";
 import Footer from "@/components/Footer";
 import RevealObserver from "@/components/RevealObserver";
 import Analytics from "@/components/Analytics";
+import CookieBanner from "@/components/CookieBanner";
 import JsonLd from "@/components/JsonLd";
 import { SITE_URL, orgJsonLd, webSiteJsonLd } from "@/lib/seo";
 import "../globals.css";
@@ -96,6 +97,7 @@ export default async function LocaleLayout({
           <Footer />
           <RevealObserver />
           <Analytics />
+          <CookieBanner />
         </NextIntlClientProvider>
       </body>
     </html>

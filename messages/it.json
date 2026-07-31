@@ -1092,5 +1092,13 @@
     "guidesEyebrow": "Prima di decidere",
     "guidesTitle": "Le guide che rispondono alle domande vere",
     "guidesCta": "Tutte le guide"
+  },
+  "cookie": {
+    "testo": "Usiamo cookie tecnici e, solo se acconsenti, cookie di statistica (Google Analytics) per capire come viene usato il sito. Nessuna pubblicità, nessuna profilazione.",
+    "accetta": "Accetta",
+    "rifiuta": "Solo necessari",
+    "privacy": "Privacy e cookie",
+    "preferenze": "Preferenze cookie",
+    "aria": "Consenso ai cookie"
   }
 }

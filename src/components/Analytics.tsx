@@ -16,9 +16,11 @@ import Script from "next/script";
 // i page_view sui cambi di cronologia. Niente listener nostro: due sorgenti di
 // page_view sarebbero doppio conteggio.
 //
-// ⚠️ CONSENSO: questo tag scrive cookie di analytics. Il sito NON ha ancora un
-// banner di consenso; finché non c'è, l'installazione va trattata come una
-// scelta consapevole del titolare, non come un default tecnico.
+// CONSENSO (Consent Mode v2, dal 2026-07-31): si parte con TUTTO negato, quindi
+// prima della scelta non viene scritto nessun cookie di analytics. La scelta
+// arriva da CookieBanner e vale subito, senza ricaricare. L'ordine conta: il
+// comando `default` entra nel dataLayer PRIMA di `config`, ed è nello stesso
+// script inline proprio per non doverlo sperare.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const GA_ID = "G-TTVSE30EJF";
@@ -31,6 +33,8 @@ export default function Analytics() {
       <Script id="ga4-init" strategy="afterInteractive">
         {`window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',wait_for_update:500});
+try{if(localStorage.getItem('tsi_consenso_v1')==='si'){gtag('consent','update',{analytics_storage:'granted'});}}catch(e){}
 gtag('js', new Date());
 gtag('config', '${GA_ID}');`}
       </Script>

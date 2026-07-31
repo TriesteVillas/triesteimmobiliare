@@ -1,6 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import Logo from "./Logo";
+import CookiePrefsButton from "./CookiePrefsButton";
 
 // TriesteImmobiliare's own channel (the flagship's socials stay on TSV).
 const SOCIALS = [
@@ -187,6 +188,9 @@ export default async function Footer() {
             <Link href="/privacy" className="transition-colors hover:text-white/70">
               {t("privacy")}
             </Link>
+            {/* La porta per cambiare idea sul consenso: senza, un sì dato una
+                volta resterebbe dato per sempre. */}
+            <CookiePrefsButton className="underline underline-offset-2 transition-colors hover:text-white/70" />
             <span className="text-white/75">{t("appointmentNote")}</span>
           </div>
         </div>
