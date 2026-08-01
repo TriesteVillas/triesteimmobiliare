@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { verifySession, PC_COOKIE } from "@/lib/private/session";
 import { findGrantById, isActive } from "@/lib/private/store";
@@ -8,6 +8,7 @@ import { getPrivateProperty } from "@/lib/airtable";
 import { localizedDescription, localizedTitle, priceLabel } from "@/lib/propertyView";
 import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
+import AccessGate from "@/components/private/AccessGate";
 import ProtectedImage from "@/components/private/ProtectedImage";
 import TrackView from "@/components/private/TrackView";
 import VoteWidget from "@/components/private/VoteWidget";
@@ -20,11 +21,14 @@ export const metadata: Metadata = {
 
 export default async function PrivateDetail({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string; slug: string }>;
+  searchParams: Promise<{ c?: string }>;
 }) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
+  const sp = await searchParams;
 
   // Gate: same cookie + live grant check as the collection page.
   const jar = await cookies();
@@ -35,13 +39,33 @@ export default async function PrivateDetail({
     if (g && isActive(g)) email = g.email || session.em;
   }
   if (!email) {
-    redirect(locale === routing.defaultLocale ? "/private" : `/${locale}/private`);
+    // Chi arriva da una mail nostra porta il codice in `?c=`: qui si mostra lo
+    // stesso cancello della collezione, che con il codice prefillato tenta
+    // l'accesso da solo e poi RESTA su questa casa (successHref).
+    //
+    // Prima si faceva `redirect` sulla collezione, e il codice andava perso per
+    // strada: il link a un immobile preciso funzionava solo per chi aveva ancora
+    // il cookie. Gemello esatto della stessa correzione su triestevillas-web:
+    // `lib/private` e le pagine della collezione vivono in due repo, e una
+    // correzione qui va fatta due volte.
+    //
+    // Nessun dato dell'immobile viene letto prima di questo punto: chi non passa
+    // il cancello non fa nemmeno partire la query.
+    const here = `${locale === routing.defaultLocale ? "" : `/${locale}`}/private/${encodeURIComponent(slug)}`;
+    return (
+      <div className="pc-root flex min-h-screen items-center px-4 py-24">
+        <AccessGate prefill={typeof sp.c === "string" ? sp.c : ""} expired={false} successHref={here} />
+      </div>
+    );
   }
 
   const t = await getTranslations("pc");
   const tProp = await getTranslations("property");
   const p = await getPrivateProperty(slug);
-  if (!p) notFound();
+  // Slug sconosciuto: si torna alla collezione invece di dare un 404. Questi link
+  // vivono nelle caselle di posta per settimane, e un annuncio rinominato o
+  // ritirato ne cambia lo slug.
+  if (!p) redirect(locale === routing.defaultLocale ? "/private" : `/${locale}/private`);
 
   // Titolo e descrizione nella lingua del visitatore, dagli stessi campi Airtable
   // che usa la scheda pubblica, con ritorno all'italiano quando la traduzione non
