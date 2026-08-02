@@ -1,4 +1,7 @@
+"use client";
+
 import Script from "next/script";
+import { usePathname } from "next/navigation";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Google Analytics 4.
@@ -26,6 +29,13 @@ import Script from "next/script";
 const GA_ID = "G-TTVSE30EJF";
 
 export default function Analytics() {
+  // ⚠️ NIENTE ANALYTICS DENTRO L'AREA RISERVATA — gemello della stessa esclusione su
+  // triestevillas-web. Il link delle mail porta il CODICE D'ACCESSO nella query, e
+  // GA4 manda `page_location` con la query intera: sarebbe la credenziale della
+  // collezione riservata spedita a un servizio di analytics a ogni uscita. L'area
+  // ha già un tracciamento suo, PC_ACCESS_LOG, molto più preciso.
+  const pathname = usePathname();
+  if (/^\/(it|en|de)?\/?private(\/|$)/.test(pathname ?? "")) return null;
   if (!GA_ID) return null;
   return (
     <>
