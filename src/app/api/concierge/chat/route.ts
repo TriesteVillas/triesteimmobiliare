@@ -149,6 +149,9 @@ export async function POST(request: Request) {
         email: acct?.em ?? "",
         brand: "TSI",
         ip,
+        // ISO-2 dal geo di Vercel: dà la bandierina (e il paese certo) alla vista
+        // Conversazioni del CRM senza geolocalizzare l'IP a posteriori.
+        paese: request.headers.get("x-vercel-ip-country") ?? "",
       }),
       signal: AbortSignal.timeout(60_000),
       cache: "no-store",
