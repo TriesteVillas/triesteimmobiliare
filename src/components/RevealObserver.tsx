@@ -12,7 +12,12 @@ export default function RevealObserver() {
   useEffect(() => {
     if (!document.documentElement.hasAttribute("data-reveal-armed")) return;
 
-    const els = document.querySelectorAll("[data-reveal], [data-reveal-stagger]");
+    // `data-reveal="now"` si anima da sé in CSS, senza aspettare il JS: è la
+    // variante di ciò che sta sopra la piega (vedi globals.css). Va esclusa,
+    // altrimenti .is-revealed scavalcherebbe la sua animazione.
+    const els = document.querySelectorAll(
+      '[data-reveal]:not([data-reveal="now"]), [data-reveal-stagger]',
+    );
     if (!els.length) return;
 
     // Once the entrance finishes, drop the reveal attributes so their

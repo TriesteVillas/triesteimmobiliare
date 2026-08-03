@@ -83,7 +83,7 @@ export default async function ImmobiliPage({
   return (
     <>
       <section className="mx-auto max-w-6xl px-4 pb-16 pt-32">
-        <header className="mb-12" data-reveal>
+        <header className="mb-12" data-reveal="now">
           <p className="eyebrow">{t("filterAll")}</p>
           <h1 className="display-chapter mt-3 text-brand-dark">{t("title")}</h1>
           <p className="mt-4 max-w-2xl text-neutral-600">{t("intro")}</p>

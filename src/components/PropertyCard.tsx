@@ -6,16 +6,30 @@ import PhotoImg from "./PhotoImg";
 import Tilt from "./motion/Tilt";
 import FavHeart from "./account/FavHeart";
 
+// Quanto è larga una card, per il browser che deve scegliere dal srcSet.
+//
+// Il default vale per la griglia — `sm:grid-cols-2 lg:grid-cols-3` dentro un
+// contenitore max-w-6xl: da 1024 px in su la colonna si ferma a ~355 px, quindi
+// oltre quella soglia si dichiara una misura FISSA e non una `vw`. È la
+// differenza fra chiedere 400 e chiedere 800 su un desktop: quattro volte i
+// pixel per la stessa identica card.
+//
+// Chi ha un'impaginazione diversa (il carosello della home) passa la sua.
+const GRID_SIZES = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px";
+
 export default function PropertyCard({
   view,
   photosComing,
   priority = false,
+  sizes = GRID_SIZES,
 }: {
   view: PropertyView;
   photosComing: string;
   // Prime card visibili senza scorrere: la copertina è il candidato LCP della
   // pagina, quindi non va rimandata al primo scroll.
   priority?: boolean;
+  /** Larghezza resa della card, se l'impaginazione non è la griglia standard. */
+  sizes?: string;
 }) {
   const leftBadge = view.recentBadge ?? view.badge;
   const rightBadge = view.clusterBadge ?? view.featuredBadge;
@@ -33,6 +47,10 @@ export default function PropertyCard({
             <ViewTransition name={`prop-${view.slug}`} share="morph">
               <PhotoImg
                 src={view.cover.url}
+                srcSet={view.cover.srcSet}
+                // `sizes` senza `srcSet` non serve a niente, e sui record
+                // PRIVATE il srcSet non c'è (url firmata, una sola larghezza).
+                sizes={view.cover.srcSet ? sizes : undefined}
                 alt={view.cover.alt}
                 priority={priority}
                 className="card-photo object-cover"

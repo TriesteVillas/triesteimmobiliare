@@ -55,13 +55,13 @@ export default async function InvestPage({
       {/* Hero */}
       <section className="grad-paper-sea">
         <div className="mx-auto max-w-4xl px-6 pb-16 pt-40">
-          <p className="eyebrow" data-reveal>
+          <p className="eyebrow" data-reveal="now">
             {t("hero.eyebrow")}
           </p>
-          <h1 className="display-hero mt-3 text-brand-dark" data-reveal>
+          <h1 className="display-hero mt-3 text-brand-dark" data-reveal="now">
             {t("hero.title")}
           </h1>
-          <p className="mt-5 max-w-2xl text-lg text-neutral-600" data-reveal>
+          <p className="mt-5 max-w-2xl text-lg text-neutral-600" data-reveal="now">
             {t("hero.intro")}
           </p>
           <div className="mt-8">

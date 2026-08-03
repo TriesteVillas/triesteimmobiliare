@@ -45,7 +45,7 @@ export default async function ContactPage({
       <div className="mx-auto max-w-5xl px-6 pb-20 pt-40">
         <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-2 lg:gap-14">
           <div>
-            <div data-reveal>
+            <div data-reveal="now">
               <BoatMark className="h-12 w-auto" />
             </div>
             <p className="eyebrow mt-6">{t("eyebrow")}</p>
@@ -96,7 +96,9 @@ export default async function ContactPage({
               poster="/video/angolo-studio.jpg"
               ariaLabel={t("videoAlt")}
               className="h-full w-full object-cover"
-              lazy={false}
+              // Come sull'hero della home: il poster si vede subito, l'mp4 non
+              // compete con il primo paint.
+              lazy
             />
           </div>
         </div>

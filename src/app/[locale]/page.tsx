@@ -64,10 +64,13 @@ export default async function Home({
       {/* ── Hero — calm harbour light ─────────────────────────────── */}
       <section className="grad-paper-sea relative overflow-hidden">
         <div className="relative mx-auto max-w-5xl px-6 pb-12 pt-36 sm:pb-16 sm:pt-44">
-          <div data-reveal>
+          {/* Hero: tutto quanto è sopra la piega usa `data-reveal="now"`, che si
+              anima in CSS senza aspettare l'hydration. Con `data-reveal` normale
+              questo blocco restava invisibile fino al JS — vedi globals.css. */}
+          <div data-reveal="now">
             <BoatMark className="h-12 w-auto sm:h-14" />
           </div>
-          <p className="eyebrow mt-7" data-reveal>
+          <p className="eyebrow mt-7" data-reveal="now">
             {t("hero.eyebrow")}
           </p>
           <h1 className="display-hero mt-3 max-w-3xl text-brand-dark">
@@ -86,7 +89,8 @@ export default async function Home({
             </span>
             <span className="block text-neutral-500">{t("hero.titleLine2")}</span>
           </h1>
-          <p className="mt-6 max-w-2xl text-base text-neutral-600 sm:text-lg" data-reveal>
+          {/* Questo <p> è l'elemento LCP misurato della home. */}
+          <p className="mt-6 max-w-2xl text-base text-neutral-600 sm:text-lg" data-reveal="now">
             {t("hero.subtitle")}
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-3">
@@ -104,13 +108,19 @@ export default async function Home({
           </div>
           <div
             className="mt-14 aspect-[16/9] overflow-hidden rounded-3xl border border-brand/15 shadow-[0_24px_70px_-30px_rgba(28,74,107,0.45)] sm:mt-16"
-            data-reveal
+            data-reveal="now"
           >
+            {/* `lazy` anche se il video è nell'hero: senza, il tag monta subito
+                la src e si porta via ~0,9 MB proprio mentre la pagina sta
+                dipingendo. Con lazy si vede il poster all'istante e il filmato
+                parte appena dopo l'hydration — l'occhio non se ne accorge, la
+                rete sì. */}
             <AutoVideo
               src="/video/trieste-aerea.mp4"
               poster="/video/trieste-aerea.jpg"
               ariaLabel={t("hero.videoAlt")}
               className="h-full w-full object-cover"
+              lazy
             />
           </div>
         </div>
@@ -155,7 +165,14 @@ export default async function Home({
           <FeaturedCarousel>
             {reelItems.map((v) => (
               <div key={v.slug} className="w-[78vw] shrink-0 snap-start sm:w-[38vw] lg:w-[28vw]">
-                <PropertyCard view={v} photosComing={tProp("photosComing")} />
+                {/* Le card del carosello NON sono larghe come quelle della
+                    griglia: `sizes` deve ricalcare le classi qui sopra, altrimenti
+                    il browser sceglie dal srcSet la larghezza sbagliata. */}
+                <PropertyCard
+                  view={v}
+                  photosComing={tProp("photosComing")}
+                  sizes="(max-width: 640px) 78vw, (max-width: 1024px) 38vw, 28vw"
+                />
               </div>
             ))}
             <div className="flex w-[40vw] shrink-0 snap-start items-center justify-center sm:w-[24vw]">

@@ -1,9 +1,15 @@
 import { formatPrice } from "./format";
-import { photoSrc } from "./photoSrc";
+import { photoSrc, photoSrcSet } from "./photoSrc";
 import type { Property } from "./properties";
 
 export type BadgeVariant = "default" | "private" | "cantiere" | "recent" | "featured";
 export type Badge = { label: string; variant: BadgeVariant };
+
+// Larghezze utili a una copertina di card. Una card non supera mai ~400 px CSS
+// (tre colonne in un max-w-6xl fanno ~352 px; il carosello della home 78vw su un
+// telefono da 412 px fa ~321 px), quindi 800 è il tetto: serve solo ai display
+// a DPR 2. Sopra non si sale — sarebbe scaricare pixel che nessuno vede.
+const CARD_WIDTHS = [400, 600, 800] as const;
 
 // Plain, serializable display model for a property card. Built on the server
 // (needs locale + translations) and handed to client components as-is.
@@ -18,9 +24,11 @@ export type PropertyView = {
   recentBadge?: Badge | null;
   featuredBadge?: Badge | null;
   meta: string;
-  cover: { url: string; alt: string } | null;
+  // `srcSet` manca solo sui record PRIVATE, che restano sulla url firmata di
+  // Airtable (il proxy /foto non li risolve): lì si serve una sola larghezza.
+  cover: { url: string; srcSet?: string; alt: string } | null;
   // Cover + up to 8 top photos (9 total), for the in-card photo slider.
-  gallery: { url: string; alt: string }[];
+  gallery: { url: string; srcSet?: string; alt: string }[];
 };
 
 type Translate = (key: string, values?: Record<string, string | number>) => string;
@@ -120,13 +128,17 @@ export function buildPropertyView(
   // 404. Quindi i record PRIVATE restano sulla url firmata di Airtable — la
   // guardia non è teorica, senza si romperebbero le foto della collezione.
   const isPrivate = p.cluster?.toUpperCase().trim() === "PRIVATE";
-  const gallery: { url: string; alt: string }[] = [];
+  const gallery: { url: string; srcSet?: string; alt: string }[] = [];
   for (const ph of [p.coverPhoto, ...p.topPhotos]) {
     if (!ph) continue;
     const key = ph.filename ?? ph.url;
     if (gallerySeen.has(key)) continue;
     gallerySeen.add(key);
-    gallery.push({ url: isPrivate ? ph.thumb : photoSrc(ph, 800), alt: cardTitle });
+    gallery.push({
+      url: isPrivate ? ph.thumb : photoSrc(ph, 800),
+      srcSet: isPrivate ? undefined : photoSrcSet(ph, CARD_WIDTHS),
+      alt: cardTitle,
+    });
     if (gallery.length >= 9) break;
   }
 
@@ -149,10 +161,16 @@ export function buildPropertyView(
     meta,
     // Le card passano dal proxy /foto (WebP alla larghezza giusta, url stabile);
     // solo i record privati restano sulla rendition firmata di Airtable.
+    // `url` resta l'800 come prima: è il fallback per chi ignora srcSet, e nel
+    // ladder è la larghezza più grande, quindi non introduce un download nuovo.
     // L'alt segue il titolo localizzato: `coverPhoto.alt` nasce dal titolo italiano
     // in mapRecord (che non conosce il locale), e su /en o /de sarebbe fuori lingua.
     cover: p.coverPhoto
-      ? { url: isPrivate ? p.coverPhoto.thumb : photoSrc(p.coverPhoto, 800), alt: cardTitle }
+      ? {
+          url: isPrivate ? p.coverPhoto.thumb : photoSrc(p.coverPhoto, 800),
+          srcSet: isPrivate ? undefined : photoSrcSet(p.coverPhoto, CARD_WIDTHS),
+          alt: cardTitle,
+        }
       : null,
   };
 }

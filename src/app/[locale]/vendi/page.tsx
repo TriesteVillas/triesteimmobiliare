@@ -70,10 +70,10 @@ export default async function SellPage({
           <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-14">
             <div>
               <p className="eyebrow text-white/85">{t("hero.eyebrow")}</p>
-              <h1 className="display-hero mt-3" data-reveal>
+              <h1 className="display-hero mt-3" data-reveal="now">
                 {t("hero.title")}
               </h1>
-              <p className="mt-5 max-w-2xl text-lg text-white/85" data-reveal>
+              <p className="mt-5 max-w-2xl text-lg text-white/85" data-reveal="now">
                 {t("hero.intro")}
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
@@ -90,14 +90,17 @@ export default async function SellPage({
             </div>
             <div
               className="aspect-[5/4] overflow-hidden rounded-3xl border border-white/15 shadow-[0_24px_70px_-30px_rgba(0,0,0,0.45)] lg:self-center"
-              data-reveal
+              data-reveal="now"
             >
               <AutoVideo
                 src="/video/soggiorno-terrazza.mp4"
                 poster="/video/soggiorno-terrazza.jpg"
                 ariaLabel={t("hero.videoAlt")}
                 className="h-full w-full object-cover"
-                lazy={false}
+                // Era `lazy={false}`: montava 1,1 MB di mp4 nella finestra
+                // dell'LCP. Il poster copre il riquadro, il video parte subito
+                // dopo. Vedi la stessa scelta sull'hero della home.
+                lazy
               />
             </div>
           </div>

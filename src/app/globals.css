@@ -189,6 +189,37 @@ html[data-reveal-armed] [data-reveal="left"] {
 html[data-reveal-armed] [data-reveal="scale"] {
   transform: translateY(20px) scale(0.96);
 }
+
+/* `data-reveal="now"` — la stessa entrata, ma SENZA passare dal JavaScript.
+ *
+ * Perché esiste. Le altre varianti nascondono l'elemento (opacity: 0) e
+ * aspettano che RevealObserver aggiunga .is-revealed: cioè download del
+ * bundle, hydration di React, useEffect, e solo allora i 750ms di transizione.
+ * Su ciò che sta SOPRA LA PIEGA quel giro è il tempo di caricamento percepito
+ * del sito. Misurato su www.triesteimmobiliare.com il 2026-08-03 con Lighthouse
+ * mobile: l'elemento LCP era il sottotitolo dell'hero, `<p data-reveal>`, e
+ * l'LCP 9,1 s — di cui 8,1 s (89%) di solo "render delay", cioè attesa del JS.
+ * Il testo era già arrivato con l'HTML: era l'animazione a tenerlo invisibile.
+ *
+ * Come. Una `animation` invece di una `transition`: parte da sola al primo
+ * frame utile, quindi l'opacità è > 0 subito e l'LCP si registra lì, senza
+ * aspettare nulla. L'effetto per l'occhio è identico.
+ *
+ * Quando usarla. Solo su ciò che è già nel viewport al caricamento (l'hero).
+ * Più in basso non serve e si perderebbe l'entrata allo scroll: lì resta
+ * `data-reveal` normale. RevealObserver ignora di proposito questa variante. */
+html[data-reveal-armed] [data-reveal="now"] {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: none;
+  animation: reveal-now 750ms var(--ease-lux) var(--reveal-delay, 0ms) both;
+}
+@keyframes reveal-now {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
 html[data-reveal-armed] [data-reveal].is-revealed {
   opacity: 1;
   transform: none;

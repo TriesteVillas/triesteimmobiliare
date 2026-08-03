@@ -357,7 +357,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
         </div>
 
         <div className="absolute inset-x-0 bottom-0 mx-auto max-w-5xl px-6 pb-12">
-          <div className="flex flex-wrap items-center gap-2" data-reveal>
+          <div className="flex flex-wrap items-center gap-2" data-reveal="now">
             <PropertyBadge {...contractBadge(property, t)} />
             {clusterBadge(property, t) && (
               <PropertyBadge {...clusterBadge(property, t)!} />
