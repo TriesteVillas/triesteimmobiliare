@@ -52,6 +52,10 @@ export async function generateMetadata({
     robots: ALLOW_INDEX
       ? { index: true, follow: true }
       : { index: false, follow: false },
+    // Token Search Console via env: niente deploy quando si (ri)verifica la proprietà.
+    ...(process.env.GOOGLE_SITE_VERIFICATION
+      ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } }
+      : {}),
     openGraph: {
       type: "website",
       siteName: "TriesteImmobiliare",
