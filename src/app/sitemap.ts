@@ -14,6 +14,14 @@ function languagesFor(path: string): Record<string, string> {
   return languages;
 }
 
+// La sitemap si rigenera ogni 10 minuti, come le pagine (2026-08-04).
+// Senza questa riga Next la considera statica e la costruisce UNA volta, al
+// deploy: verificato sul campo il 04/08, un articolo pubblicato dal CRM
+// compariva in /risorse entro dieci minuti ma restava fuori dalla sitemap fino
+// al deploy successivo. La finestra di Data Cache dentro getArticles() non
+// basta a rendere ISR una route di metadati: il tempo va dichiarato qui.
+export const revalidate = 600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const properties = await getProperties();
   // Una lettura sola (Data Cache 600s, come le pagine): senza gli articoli, la
