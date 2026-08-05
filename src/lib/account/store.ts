@@ -285,6 +285,10 @@ export async function linkOrCreateLead(input: {
       azienda: ACCT_BRAND.leadAzienda,
       tipo_richiesta: ACCT_BRAND.leadTipoRichiesta,
       fonte_lead: ACCT_BRAND.leadFonte,
+      // Provenienza (2026-08-05): un lead nato da una registrazione account non è
+      // una richiesta — ha un'intenzione più tiepida. Prima `import_source` restava
+      // vuoto e questa differenza si perdeva.
+      import_source: ["WEB_ACCOUNT"],
       lingua: input.lingua,
       privacy_ok: true,
       stato: "NUOVO",

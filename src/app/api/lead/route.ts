@@ -45,14 +45,25 @@ const geoPoint = (lat: unknown, lon: unknown): string =>
     ? `${lat.toFixed(5)}, ${lon.toFixed(5)}`
     : "";
 
+// PROVENIENZA — ogni scheda dice da quale porta è entrata (2026-08-05).
+// Prima i lead dei form nascevano con `import_source` VUOTO: su 100 lead di una
+// settimana, 34 non dichiaravano chi li avesse creati, e dal CRM un lead arrivato
+// dal sito era indistinguibile da uno battuto a mano. `canale` dice QUALE sito;
+// questo dice con quale MECCANISMO — insieme rendono la provenienza leggibile
+// senza indovinarla. Si scrive qui, nell'unica funzione che crea i lead, invece
+// che sui singoli handler: un modulo nuovo la eredita senza doversene ricordare.
+const IMPORT_SOURCE = "WEB_FORM";
+
 async function airtableCreate(fields: Record<string, unknown>) {
+  // Il chiamante che ha già deciso la provenienza comanda: qui si riempie un vuoto.
+  const withSource = "import_source" in fields ? fields : { ...fields, import_source: [IMPORT_SOURCE] };
   const res = await fetch(`https://api.airtable.com/v0/${LEADS_BASE_ID}/${LEADS_TABLE}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${LEADS_TOKEN}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ records: [{ fields }], typecast: true }),
+    body: JSON.stringify({ records: [{ fields: withSource }], typecast: true }),
   });
   if (!res.ok) throw new Error(`Airtable ${res.status}: ${await res.text()}`);
   return res.json();

@@ -177,6 +177,10 @@ function leadFieldsFrom(input: RequestInput, propRecId?: string | null): Record<
     azienda: "TriesteImmobiliare",
     tipo_richiesta: "Private Collection",
     fonte_lead: "PRIVATE COLLECTION TSI",
+    // Provenienza (2026-08-05): prima questi lead nascevano con `import_source`
+    // vuoto e nel CRM non si distinguevano da quelli battuti a mano. `canale` dice
+    // QUALE sito, `fonte_lead` PERCHÉ, questo con quale MECCANISMO è entrato.
+    import_source: ["WEB_PC"],
     ...(leadZones.length ? { zona_interesse_norm: leadZones, zone_preferite: leadZones.join(", ") } : {}),
     ...(lows.length ? { budget_min_eur: Math.min(...lows) } : {}),
     ...(highs.length ? { budget_max_eur: Math.max(...highs) } : {}),
