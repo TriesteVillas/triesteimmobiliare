@@ -76,6 +76,7 @@ export const F = {
   tipoProprieta: "fldZiREblKauVYoWM", // imm_tipo_proprieta_# (singleSelect → string)
   classeImmobile: "fldqxd7FwkFMgFfPS", // imm_classe_immobile_# (singleSelect → string)
   trattativaRiservata: "fld6JmapDP4Qi8RT6",
+  pubblicatoSu: "fldcF2m1cmxHmumWN", // pubblicato_su (multipleSelects: canali accesi)
   // 2026-07-23: tax box + tabella costi area riservata (stessi campi del gemello TSV).
   impostePrima: "fld8SMr41gceLNOiN", // imposte_prima (currency)
   imposteSeconda: "fldFQIfYqL0m48QWu", // imposte_seconda (currency)
@@ -186,6 +187,9 @@ export type Property = {
   tipoProprieta: string | null;
   classeImmobile: string | null;
   trattativaRiservata: boolean;
+  // Canali su cui il record e' pubblicato: serve alla regola di
+  // de-cannibalizzazione col gemello TSV (v. canonical nella scheda).
+  pubblicatoSu: string[];
   impostePrima: number | null;
   imposteSeconda: number | null;
   noteImposte: string | null;
@@ -377,6 +381,9 @@ export function mapRecord(recordId: string, f: Fields): Property {
     tipoProprieta: str(f[F.tipoProprieta]),
     classeImmobile: str(f[F.classeImmobile]),
     trattativaRiservata: f[F.trattativaRiservata] === true,
+    pubblicatoSu: Array.isArray(f[F.pubblicatoSu])
+      ? (f[F.pubblicatoSu] as unknown[]).filter((x): x is string => typeof x === "string")
+      : [],
     impostePrima: num(f[F.impostePrima]),
     imposteSeconda: num(f[F.imposteSeconda]),
     noteImposte: str(f[F.noteImposte]),

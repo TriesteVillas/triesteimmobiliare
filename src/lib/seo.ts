@@ -10,8 +10,12 @@ export const SITE_URL =
   (process.env.NEXT_PUBLIC_SITE_URL || "").trim() || "https://www.triesteimmobiliare.com";
 
 export const LOCALES = ["it", "en", "de"] as const;
-// hreflang region codes (en-GB: British-leaning copy; de-DE: the key market).
-const HREFLANG: Record<string, string> = { it: "it-IT", en: "en-GB", de: "de-DE" };
+// hreflang SOLO-LINGUA (2026-08-11, allineato al gemello TSV): i codici
+// regionali de-DE/en-GB lasciavano fuori de-AT e l'inglese non-UK, che in SERP
+// cadevano sulla x-default. I codici lingua coprono tutte le regioni.
+const HREFLANG: Record<string, string> = { it: "it", en: "en", de: "de" };
+// og:locale vuole il formato regionale: mappa separata, usata solo da OG.
+const OG_LOCALE: Record<string, string> = { it: "it_IT", en: "en_GB", de: "de_DE" };
 
 // Path on the wire for a given locale. `path` uses "/" for home.
 export function localizedPath(locale: string, path: string): string {
@@ -43,9 +47,9 @@ export function pageOpenGraph(
   return {
     type: "website" as const,
     siteName: "TriesteImmobiliare",
-    locale: HREFLANG[locale]?.replace("-", "_") ?? "it_IT",
-    localeAlternate: LOCALES.filter((l) => l !== locale).map((l) =>
-      (HREFLANG[l] ?? "it-IT").replace("-", "_"),
+    locale: OG_LOCALE[locale] ?? "it_IT",
+    localeAlternate: LOCALES.filter((l) => l !== locale).map(
+      (l) => OG_LOCALE[l] ?? "it_IT",
     ),
     url: absUrl(locale, path),
     title,

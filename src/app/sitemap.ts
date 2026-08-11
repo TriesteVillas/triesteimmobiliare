@@ -4,7 +4,8 @@ import { getArticles } from "@/lib/articles";
 import { routing } from "@/i18n/routing";
 import { absUrl, localizedPath, SITE_URL } from "@/lib/seo";
 
-const HREFLANG: Record<string, string> = { it: "it-IT", en: "en-GB", de: "de-DE" };
+// Solo-lingua dal 2026-08-11, in coppia con lib/seo.ts (de-DE escludeva de-AT).
+const HREFLANG: Record<string, string> = { it: "it", en: "en", de: "de" };
 
 // hreflang alternates for a path across all locales (+ x-default → it).
 function languagesFor(path: string): Record<string, string> {

@@ -83,10 +83,25 @@ export async function generateMetadata({
     property.oneliner ??
     metaClamp(property.description) ??
     "TriesteImmobiliare";
+  // De-cannibalizzazione col gemello TSV: slug identici e canonical self su
+  // entrambi i domini facevano competere le stesse schede in SERP (audit
+  // 2026-08-11). Regola condivisa e complementare a quella di TSV: dai 500k in
+  // su il pregio e' mestiere di TriesteVillas — se il record e' pubblicato
+  // anche la', questa copia cede il posto. Sotto i 500k (o senza prezzo) vince
+  // TSI, quindi qui si resta self-canonical. Hreflang omessi sul duplicato.
+  const tsvWins =
+    property.pubblicatoSu.includes("triestevillas.com") &&
+    property.priceSale != null &&
+    property.priceSale >= 500_000;
+  const alternates = tsvWins
+    ? {
+        canonical: `https://triestevillas.com${locale === "it" ? "" : `/${locale}`}/annuncio/${slug}`,
+      }
+    : pageAlternates(locale, `/annuncio/${slug}`);
   return {
     title: { absolute: `${title} · TriesteImmobiliare` },
     description,
-    alternates: pageAlternates(locale, `/annuncio/${slug}`),
+    alternates,
     openGraph: pageOpenGraph(
       locale,
       `/annuncio/${slug}`,
