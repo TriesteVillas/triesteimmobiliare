@@ -17,9 +17,11 @@ import { createHmac, randomUUID } from "node:crypto";
 //  · firma HMAC-SHA256 del corpo grezzo, contratto della porta unica
 //    POST /api/ingresso (x-porta + x-firma), idempotenza a carico del fondo.
 //
-// ⚠️ QUESTO FILE ESISTE IN 5 COPIE, una per repo dei siti (triestevillas-web,
-// triesteimmobiliare, triesteaffitti, lignanovillas, tsv-reference): cambiano
-// solo PORTA e SITO qui sotto. Chi lo corregge, lo corregge in tutte e cinque.
+// ⚠️ QUESTO FILE ESISTE IN 4 COPIE, una per repo dei siti (triestevillas-web
+// — che copre anche la richiesta Private Collection —, triesteimmobiliare,
+// triesteaffitti, lignanovillas): cambiano solo PORTA e SITO qui sotto. Chi lo
+// corregge, lo corregge in tutte e quattro. E ~/dev/tsv-reference NON è un
+// quinto repo: è un secondo clone di triestevillas-web (verificato 12/08).
 // ─────────────────────────────────────────────────────────────────────────────
 
 const URL_PORTA = process.env.INGRESSO_URL ?? "https://tsv-pg.vercel.app/api/ingresso";
