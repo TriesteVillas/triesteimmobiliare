@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { bussaIngresso } from "@/lib/ingressoPorta";
 import { normCity } from "@/lib/citynorm";
 import { splitNomeCerta } from "@/lib/nomesplit";
 import {
@@ -534,6 +535,16 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
   }
+
+  // Fase ombra v1↔v4 (12/08): la submission si POSA nel fondo `ingresso` del
+  // CRM nuovo PRIMA della validazione — accanto ad Airtable, non al suo posto,
+  // così «nessuno ha compilato» e «la porta è rotta» smettono di sembrare
+  // uguali. Spenta senza INGRESSO_HMAC; mai bloccante (src/lib/ingressoPorta.ts).
+  await bussaIngresso(
+    String(body.tipo ?? "info"),
+    { nome: body.nome, cognome: body.cognome, email: body.email, telefono: body.telefono },
+    body,
+  );
 
   // Se chi invia il form è un utente registrato loggato, la richiesta diventa
   // anche un evento contact_request nel suo profilo comportamentale (è il
