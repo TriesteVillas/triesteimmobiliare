@@ -1,5 +1,6 @@
 import "server-only";
 import { ACCT_BRAND, acctBrandClause, PRIVACY_VERSION } from "./brand";
+import { bussaIngresso } from "../ingressoPorta";
 
 // Accesso Airtable dell'area clienti: WEB_ACCOUNTS (account), WEB_EVENTS (log
 // comportamentale), WEB_PREFERITI (stato corrente cuore/voto per immobile),
@@ -180,6 +181,21 @@ export type NewAccountInput = {
 
 export async function createAccount(input: NewAccountInput): Promise<string | null> {
   const email = normEmail(input.email);
+  // Fase ombra v1↔v4: anche la registrazione account si POSA nel fondo
+  // `ingresso` — era una delle due porte rimaste fuori (misurato il 24/08:
+  // 4 lead ACCOUNT SITO mai visti dal v4 dal 13/08). Accanto ad Airtable,
+  // mai bloccante, spenta senza INGRESSO_HMAC (src/lib/ingressoPorta.ts).
+  await bussaIngresso(
+    "account",
+    { nome: input.nome, email, telefono: input.telefono },
+    {
+      lingua: input.lingua,
+      via: input.googleSub ? "google" : "password",
+      consenso_marketing: input.consMarketing,
+      consenso_profilazione: input.consProfilazione,
+      ...(input.criteri ? { criteri: input.criteri } : {}),
+    },
+  );
   const leadId = await linkOrCreateLead({
     email,
     nome: input.nome,
