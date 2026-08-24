@@ -28,6 +28,6 @@ export async function POST(req: Request) {
   if ((req.headers.get("x-revalidate-secret") ?? "") !== atteso) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
-  revalidateTag("properties");
+  revalidateTag("properties", "max");
   return NextResponse.json({ ok: true, tag: "properties" });
 }
