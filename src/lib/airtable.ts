@@ -1,5 +1,6 @@
 import "server-only";
 import { F, mapRecord, type Property } from "./properties";
+import { getPropertiesDaVetrina, VETRINA_ATTIVA } from "./vetrina";
 import { priceSlotLabel } from "./private/bands";
 import { BRAND } from "./private/brand";
 
@@ -112,6 +113,13 @@ export function compareShowcase(a: Property, b: Property): number {
 }
 
 export async function getProperties(): Promise<Property[]> {
+  // Fase 2 del taglio (24/08): con CATALOGO_SORGENTE=pg il catalogo pubblico
+  // arriva dalla vetrina Postgres di tsv-pg — stessa regola, stessa forma,
+  // stesso ordinamento. La Private Collection NON passa di là e continua sotto
+  // (PRIVATE_FILTER). Rollback = rimettere la variabile. Vedi src/lib/vetrina.ts.
+  if (VETRINA_ATTIVA) {
+    return (await getPropertiesDaVetrina()).sort(compareShowcase);
+  }
   let raw: RawRecord[];
   if (TOKEN) {
     raw = await fetchAllRaw(FILTER);

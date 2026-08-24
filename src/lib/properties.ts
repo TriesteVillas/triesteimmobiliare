@@ -249,7 +249,9 @@ function lines(v: unknown): string[] {
 // The dashboard URL (/models/<id>) — often pasted from the logged-in Matterport
 // backend — refuses iframe embedding (X-Frame-Options) and renders as
 // "connection refused". Handles /models/, /show/?m= and a bare model id.
-function matterportEmbed(v: unknown): string | null {
+// Esportata dal 24/08: la usa anche src/lib/vetrina.ts (catalogo da Postgres),
+// così i due percorsi normalizzano il link Matterport nello stesso identico modo.
+export function matterportEmbed(v: unknown): string | null {
   const raw = str(v);
   if (!raw) return null;
   if (/matterport\.com\/show\/\?/i.test(raw)) return raw; // already embeddable
