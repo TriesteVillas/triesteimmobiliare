@@ -56,6 +56,18 @@ const geoPoint = (lat: unknown, lon: unknown): string =>
 const IMPORT_SOURCE = "WEB_FORM";
 
 async function airtableCreate(fields: Record<string, unknown>) {
+  // ⚠️ L'INVERSIONE DEI MODULI (25/08): con `LEAD_SU_AIRTABLE=no` questa
+  // funzione non scrive più. Il lead lo crea il CRM v4, che riceve la stessa
+  // submission dalla porta `ingresso` (bussaIngresso, qui sopra) — un solo
+  // esecutore, mai due, o la stessa persona diventerebbe due schede.
+  //
+  // È un interruttore e non una cancellazione: il rollback è rimettere la
+  // variabile, senza toccare il codice. La bussata alla porta resta SEMPRE
+  // attiva, anche col flag spento: il fondo `ingresso` è append-only e non
+  // perde niente nemmeno se il motore del v4 è fermo — cosa che questa
+  // scrittura, se Airtable non risponde, non garantisce.
+  if (process.env.LEAD_SU_AIRTABLE === "no") return null;
+
   // Il chiamante che ha già deciso la provenienza comanda: qui si riempie un vuoto.
   const withSource = "import_source" in fields ? fields : { ...fields, import_source: [IMPORT_SOURCE] };
   const res = await fetch(`https://api.airtable.com/v0/${LEADS_BASE_ID}/${LEADS_TABLE}`, {
