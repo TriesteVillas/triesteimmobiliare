@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
+import { bussaIngresso } from "@/lib/ingressoPorta";
 import { createLeadAndRequest } from "@/lib/private/store";
 import { ackEmail, sendMail, type Lang } from "@/lib/private/mail";
 import { MAIL_REPLY_TO } from "@/lib/private/brand";
@@ -48,6 +49,21 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
   }
+
+  // La richiesta si POSA nel fondo `ingresso` del CRM v4 PRIMA della validazione
+  // — accanto ad Airtable, non al suo posto. Mai bloccante, spenta senza
+  // INGRESSO_HMAC (src/lib/ingressoPorta.ts).
+  //
+  // ⚠️ Mancava, mentre il gemello TSV ce l'aveva dal 12/08: questa era l'UNICA
+  // porta pubblica del gruppo che il v4 non vedeva. Trovata il 25/08 col
+  // censimento fatto prima di invertire i moduli — spegnere la scrittura
+  // Airtable senza questa riga avrebbe fatto sparire le richieste di accesso
+  // alla Private Collection di TriesteImmobiliare, senza un errore da nessuna parte.
+  await bussaIngresso(
+    "pc-richiesta",
+    { nome: body.nome, cognome: body.cognome, email: body.email, telefono: body.telefono },
+    body,
+  );
 
   const nome = clean(body.nome, 120);
   const cognome = clean(body.cognome, 120);
