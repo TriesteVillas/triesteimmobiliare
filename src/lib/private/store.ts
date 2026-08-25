@@ -2,6 +2,10 @@ import "server-only";
 import { type Lang } from "./mail";
 import { BRAND, brandClause } from "./brand";
 import { normCity } from "../citynorm";
+import {
+  PC_DA_POSTGRES, PC_MANCA_SEGRETO,
+  pgFindGrantByCode, pgFindGrantById, pgRegisterLogin, pgLogAccess, pgRecentViewExists,
+} from "./porta";
 
 // Airtable data access for the Private Collection: PC_RICHIESTE (requests +
 // credential lifecycle), PC_ACCESS_LOG (audit) and the existing LEAD_ table.
@@ -325,6 +329,11 @@ export function isActive(g: Grant): boolean {
 export async function findGrantByCode(code: string): Promise<Grant | null> {
   const c = code.trim().toUpperCase();
   if (!c) return null;
+  // Fase A del taglio: con PC_SORGENTE=pg il codice si risolve dalla porta di
+  // tsv-pg, dove il MARCHIO lo decide la porta e non questa formula. Senza la
+  // variabile, tutto come prima. (`./porta.ts` spiega il resto.)
+  if (PC_DA_POSTGRES) return pgFindGrantByCode(c);
+  if (PC_MANCA_SEGRETO) throw new Error("PC_SORGENTE=pg ma PC_PORTA_SEGRETO manca: senza firma la porta risponde 401 e nessuno entrerebbe. Non ripiego su Airtable in silenzio.");
   const recs = await aList(T_REQ, {
     filter: `AND(UPPER({codice})='${escFormula(c)}',${brandClause()})`,
     max: 1,
@@ -337,6 +346,7 @@ export async function findGrantByCode(code: string): Promise<Grant | null> {
 // errore, questo filtro è ciò che impedisce a una sessione dell'altro brand di
 // risolvere un grant qui.
 export async function findGrantById(id: string): Promise<Grant | null> {
+  if (PC_DA_POSTGRES) return pgFindGrantById(id);
   const recs = await aList(T_REQ, {
     filter: `AND(RECORD_ID()='${escFormula(id)}',${brandClause()})`,
     max: 1,
@@ -345,6 +355,9 @@ export async function findGrantById(id: string): Promise<Grant | null> {
 }
 
 export async function registerLogin(g: Grant): Promise<void> {
+  // ⚠️ Dalla porta il contatore si alza IN SQL (accessi + 1): due schede aperte
+  // insieme non perdono una visita, come invece succede leggendo-e-riscrivendo.
+  if (PC_DA_POSTGRES) return pgRegisterLogin(g.id);
   await aPatch(T_REQ, g.id, {
     ultimo_accesso: new Date().toISOString(),
     accessi: (g.accessi ?? 0) + 1,
@@ -377,6 +390,12 @@ export async function logAccess(e: {
   // su cui il CRM aggrega — un titolo si riscrive, uno slug no.
   slug?: string;
 }): Promise<void> {
+  if (PC_DA_POSTGRES) {
+    return pgLogAccess({
+      evento: e.evento, codice: e.codice, email: e.email, ip: e.ip, ua: e.ua,
+      dettaglio: e.dettaglio, slug: e.slug, richiesta: e.requestId,
+    });
+  }
   try {
     await aPost(T_LOG, {
       evento_key: `${e.email ?? e.codice ?? "?"} — ${e.evento} — ${new Date().toISOString()}`,
@@ -416,6 +435,7 @@ export async function logAccess(e: {
 // TriesteVillas — cioè una view vera che sparisce dal CRM.
 export async function recentViewExists(codice: string, slug: string, sinceIso: string): Promise<boolean> {
   if (!codice || !slug) return false;
+  if (PC_DA_POSTGRES) return pgRecentViewExists(codice, slug, sinceIso);
   try {
     const recs = await aList(T_LOG, {
       filter: `AND({evento}='view',{codice}='${escFormula(codice)}',{slug_immobile}='${escFormula(slug)}',IS_AFTER({quando},'${escFormula(sinceIso)}'),${brandClause()})`,
