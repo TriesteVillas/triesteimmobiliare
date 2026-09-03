@@ -472,6 +472,19 @@ html[data-header-hidden] header[data-pill] {
   hyphens: manual;
 }
 
+/* L'etichetta sotto il numero: dice DI COSA è quel numero. Il valore grande
+   («48h») e la parola piccola in maiuscoletto («Valutazione») sono una coppia:
+   letta di sfuggita si vede il numero, letta per bene si capisce cosa promette.
+   Prima la cella conteneva una frase unica e i due livelli non esistevano. */
+.stat-label {
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  line-height: 1.25;
+  text-transform: uppercase;
+  color: rgba(20, 52, 74, 0.55);
+}
+
 /* Edge-to-edge scrolling ribbon (Marquee). */
 .marquee-track {
   display: inline-flex;

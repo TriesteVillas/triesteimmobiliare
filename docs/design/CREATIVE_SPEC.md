@@ -7,6 +7,15 @@
 > exactly. Nothing here invents a new design language — it composes the `globals.css` grammar
 > we already have into a confident, light, nautical site.
 
+> 🛑 **SUPERATO IN PARTE — 03/09/2026: la promo «0% al venditore» è RITIRATA.**
+> Ogni riga di questo documento che nomina lo 0%, la provvigione azzerata per chi
+> vende o la scadenza «mandati entro settembre 2026» **non vale più**: era il claim
+> di lancio, e non è stato lui a portare i mandati. Al suo posto la posizione vera —
+> siamo TriesteVillas (nome e notorietà social del gruppo), il marketing degli
+> immobili, i compratori esteri. Il testo vivo sta in `messages/{it,en,de}.json`;
+> il resto di questo spec resta valido. Vedi `README.md`.
+
+
 ---
 
 ## 0. The one-second test
@@ -16,7 +25,7 @@ TSV = dark cinema, gold, video that scrubs under your scroll. TSI = **white pape
 nautical blues, a paper boat, motion that glides instead of looms.** Same craft, less premium —
 restraint, not cheapness. We earn that read with three things, in order: (1) the real origami
 **paper-boat** mark, used confidently and large; (2) a **light hero** with a kinetic headline over
-a soft blue-gradient "sea"; (3) the **0% al venditore** promise stated as a hard, dated fact, not
+a soft blue-gradient "sea"; (3) ⚠️ *era* la promessa **0% al venditore** come fatto datato — ritirata il 03/09/2026, al suo posto il nome TriesteVillas e i compratori esteri; non
 a slogan. If any section feels like generic-agency stock ("la casa dei tuoi sogni", smiling-couple
 hero), it's wrong — kill it.
 
@@ -70,7 +79,7 @@ photo behind hero copy — that's TSV's move; TSI's hero is paper + boat + a sin
   H2s. `eyebrow` (0.78rem, 0.22em tracking, uppercase, `brand`) above every section title.
 - Body: `text-neutral-600` on white, `text-white/75` on dark. Never pure black — `brand-dark` or
   `neutral-900` for the darkest ink.
-- **Number-forward copy.** TSI's whole pitch is concrete numbers (24h, 7gg, 3 mesi, 0%, 25%, 50%,
+- **Number-forward copy.** TSI's whole pitch is concrete numbers (24h, 48h, 7gg, 3 mesi, 50%,
   ~€500k). Set the four headline promises as a **stat strip** with the number large in `brand` and
   the label small under it — numbers do the persuading.
 
@@ -178,7 +187,7 @@ in one screen — exactly the brand.
 
 | TSV component | Port? | Light-skin adaptation |
 |---|---|---|
-| `Marquee.tsx` + `.marquee*` CSS | **YES** | Copy `Marquee.tsx` verbatim. Port the CSS but recolor: `.marquee-item` color `#2c6b96` (was sand-gold `#cfb795`), `.marquee-dot` `rgba(44,107,150,0.5)`, use the boat `◆`. Use it as the **promise marquee** ("Valutazione 24h ◆ Online 7 giorni ◆ Mandato 3 mesi ◆ 0% al venditore") — an infinite, hover-pausable strip. |
+| `Marquee.tsx` + `.marquee*` CSS | **YES** | Copy `Marquee.tsx` verbatim. Port the CSS but recolor: `.marquee-item` color `#2c6b96` (was sand-gold `#cfb795`), `.marquee-dot` `rgba(44,107,150,0.5)`, use the boat `◆`. Use it as the **promise marquee** ("Marketing e trattativa IT · EN · DE ◆ Valutazione 48h ◆ Mandato 3 mesi ◆ Online 7 giorni") — an infinite, hover-pausable strip. |
 | `Timeline.tsx` | **Already in TSI** | Reuse as-is for the **seller process** and the **group story**. It already uses `brand-light` for the line — on-brand. |
 | `FeaturedCarousel.tsx` | **Already in TSI** | Reuse for the listings reel. Arrows already use `.pill-header` (light glass) — good. |
 | `ProjectsShowcase.tsx` | **YES, repurpose** | Becomes the **6-brand ecosystem strip**: same `aspect-[3/4]` rounded cards + `data-reveal-stagger`, but cards carry **brand logos + one-line role** instead of project covers; `kind: external` links out to the live sibling sites, `soon` for not-yet-live ones. Swap `bg-ink-2` → `bg-brand-dark`/`bg-paper` per card; overlay `from-brand-dark/70`. |
@@ -214,8 +223,8 @@ Owner-journey reassurance → Investor teaser → 6-brand ecosystem → Marketin
 - Layout: 4 cells, `grid grid-cols-2 md:grid-cols-4`, on `paper` band or white with a `grad-crease`
   top rule. Each cell: big number in `brand` (700, ~2.5rem) + small label under it.
 - Content (recovered "headline promise strip"):
-  **24h** Valutazione · **7 giorni** Online · **3 mesi** Mandato · **0%** Al venditore.
-- Under the 0% cell, a small `brand-dark` line: *"Promozione: mandati firmati entro settembre 2026."*
+  **48h** Valutazione · **7 giorni** Online · **3 mesi** Mandato · **IT · EN · DE** Marketing e trattativa.
+- Sotto la strip, una riga piccola in `brand-dark`: *"Il marketing e la rete del gruppo TriesteVillas: i compratori non arrivano solo da Trieste."* (era la nota della promo 0%, ritirata il 03/09/2026)
   (the dated nuance — keep it true). `data-reveal-stagger` on the four cells.
 
 ### 5.3 Promise marquee (ported `Marquee`, recolored)
@@ -284,7 +293,7 @@ Owner-journey reassurance → Investor teaser → 6-brand ecosystem → Marketin
 ## 6. PAGE: `/vendi` — seller flagship (priority #1)
 
 **Section order:**
-`Seller hero → Stat-strip (24h/7gg/3mesi/0%) → Process timeline → Seller value grid (all recovered
+`Seller hero → Stat-strip (48h/7gg/3mesi/IT·EN·DE) → Fascia «Perché noi» (3 motivi) → Process timeline → Seller value grid (all recovered
 blocks) → "Two smart moves" (lifting + check-up) → Foreign-buyer block → Discreet-sale note →
 Cross-brand "Forza del gruppo" → Valuation form band`
 
@@ -292,12 +301,12 @@ Cross-brand "Forza del gruppo" → Valuation form band`
 - `grad-deep-sea` (`from-brand to-brand-dark`, white) — the ONE dark hero on the site (sellers get
   the confident, premium-feeling treatment; matches the recovered live `/vendi` energy). `eyebrow
   text-white/85` "Vendi con TriesteImmobiliare", H1 (kinetic optional, or plain `display-hero`):
-  **"Vendi casa a Trieste con più strategia, meno attrito e 0% al venditore."** (recovered verbatim),
+  **"Vendi casa a Trieste con più strategia, meno attrito e il marketing di TriesteVillas."** (il terzo termine era «0% al venditore», ritirato il 03/09/2026),
   intro = recovered ("Valutazione entro 48 ore, primo contatto entro 24, online anche in 7 giorni…"),
   CTA `.btn-hero bg-white text-brand-dark` "Richiedi una valutazione strategica" → SellerCta.
 
 ### 6.2 Stat-strip (reuse `StatStrip`)
-- Same four-number strip as home, on the dark hero's foot or a `paper` band right after. The 0%
+- Same four-number strip as home, on the dark hero's foot or a `paper` band right after. The reach
   September-2026 nuance + the **+25% buy-back** line ("se vendi e ricompri con noi → 25% di sconto
   sulla provvigione d'acquisto") sit here as fine print.
 
@@ -316,7 +325,7 @@ Cross-brand "Forza del gruppo" → Valuation form band`
 ### 6.4 Seller value grid — recover ALL the live blocks (don't lose them)
 - A `grid sm:grid-cols-2` of value cards (`data-reveal-stagger`), each a recovered block BY NAME
   (brief §3). Include the full set, not the home's three:
-  - **Velocità** (24h/48h/7gg) · **0% al venditore** (+25% buy-back) · **Mandato semplice** (no
+  - **Velocità** (24h/48h/7gg) · **Siamo TriesteVillas** (notorietà + social) · **Mandato semplice** (no
     tacito rinnovo, "il materiale resta tuo") · **Casa pronta a vendere** (check documentale,
     anticipiamo il 50% del costo del controllo e, se manca, l'APE) · **Foto/video/drone/tour 3D**
     ("non serve a fare scena: filtra visite inutili") · **Vendita riservata** (canale discreto quando
@@ -518,8 +527,8 @@ similar listings`
 
 - **No generic LLM real-estate fluff.** Every claim concrete and TRUE. Recover blocks BY NAME from
   `home.txt`/`vendi.txt`/`gruppo.txt`; don't paraphrase them into mush.
-- **The 0% promo is dated** — always "mandati firmati entro settembre 2026". The buy-back is **25%**
-  on the *purchase* commission, only "se vendi e ricompri con noi".
+- ⚠️ **La promo 0% e il buy-back 25% sono RITIRATI (03/09/2026).** Non si scrivono più: né
+  «0%», né «senza provvigione a tuo carico», né la scadenza «entro settembre 2026».
 - **Marketing numbers:** "milioni di visualizzazioni" unless 2M YT / 5.6M FB are re-verified.
 - **Investor page:** no advertised units, no prices, no addresses — curiosity → profiling → lead.
 - **One CRM, brand-tagged:** every lead carries `azienda`/`canale`=TriesteImmobiliare; only write to

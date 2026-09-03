@@ -1,7 +1,17 @@
 # TriesteImmobiliare — sito
 
-Sito ufficiale di **TriesteImmobiliare**, il brand mid-market del gruppo TriesteVillas
-("l'agenzia smart per comprare e vendere casa a Trieste: provvigione 0% per chi vende").
+Sito ufficiale di **TriesteImmobiliare**, il brand mid-market del gruppo TriesteVillas:
+l'agenzia smart per comprare e vendere casa a Trieste, col marketing e la rete della
+capogruppo — compratori esteri compresi.
+
+> ⚠️ **03/09/2026 — la promo «0% al venditore» è ritirata.** Era il claim di lancio
+> ("mandati firmati entro settembre 2026") e stava in decine di punti: strip della home,
+> hero di `/vendi`, blocco dedicato, FAQ JSON-LD, meta tag e og:title delle tre lingue.
+> Decisione di Martino: i mandati non li ha portati lo sconto, li ha portati il nome
+> TriesteVillas, la notorietà social e la capacità di proporre gli immobili all'estero.
+> **Nel sito non deve rientrare nessun accenno allo 0%, alla provvigione azzerata per
+> chi vende o alla scadenza «entro settembre 2026».** La provvigione del venditore si
+> concorda in sede di incarico e il sito non la dichiara.
 
 Gemello strutturale di `triestevillas-web` (stessi componenti, stessa pipeline immobili
 da Airtable, stessi nomi di classe CSS per la portabilità), ma con una skin volutamente

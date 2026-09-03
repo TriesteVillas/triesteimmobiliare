@@ -1,5 +1,13 @@
 # TSI Copy Deck — Notes for EN/DE translators + implementer
 
+> 🛑 **03/09/2026 — LA PROMO «0% AL VENDITORE» È RITIRATA.** Tutto ciò che in questo
+> documento la dà per buona (lo 0%, la provvigione azzerata per chi vende, il buy-back
+> del 25%, la scadenza «mandati entro settembre 2026») **non vale più e non va
+> reintrodotto**. Decisione di Martino: i mandati li ha portati il nome TriesteVillas,
+> la notorietà social e la capacità di proporre gli immobili all'estero — non lo sconto.
+> Il testo vivo del sito sta in `messages/{it,en,de}.json`.
+
+
 `it.json` is the **MASTER**. EN (`en.json`) and DE (`de.json`) mirror it **key-for-key**:
 same nesting, same key names, only values translated. Do not add/remove/rename keys per locale —
 next-intl resolves by key path and a missing key throws.
@@ -8,8 +16,8 @@ next-intl resolves by key path and a missing key throws.
 - Concrete, confident, plain, lightly witty. NO generic real-estate filler.
 - Every claim TRUE. Marketing stats softened to "milioni di visualizzazioni" (no hard 2M/5.6M) — keep soft.
 - EN = clear British-leaning professional. DE = sachlich, präzise, kein Werbe-Geschwätz; "Sie"-Form.
-- Keep promo nuance **everywhere it appears**: "0% al venditore" is time-boxed to **mandati firmati entro settembre 2026**, and the **25% buy-back** (sconto provvigione d'acquisto se vendi+ricompri). Don't drop the date or the 25%.
-- Numbers fixed across locales: 24h, 7 giorni, 3 mesi, ~500.000 €, 200.000–400.000 €, 50% costo controllo, APE, oltre 20 unità, 25%.
+- ⚠️ ~~Keep promo nuance everywhere: "0% al venditore" time-boxed to settembre 2026 + 25% buy-back.~~ **Promo e buy-back RITIRATI il 03/09/2026**: non si scrivono più in nessuna lingua. Al loro posto: siamo TriesteVillas (notorietà + social), il materiale che produciamo, i compratori esteri.
+- Numbers fixed across locales: 48h (valutazione), 24h (primo contatto e sopralluogo), 7 giorni, 3 mesi, ~500.000 €, 200.000–400.000 €, 50% costo controllo, APE, oltre 20 unità. ⚠️ Il 25% del buy-back è fuori dal 03/09/2026.
 
 ## Top-level namespaces
 `nav · seo · home · sell · invest · immobili · zones · listing · property · group · contact · lead · buyerForm · sellerForm · investorForm · footer · meta`
@@ -30,7 +38,7 @@ next-intl resolves by key path and a missing key throws.
   → `investorTeaser` (block + cta)
   → `groupRouting` (4 routing lines: luxury/fvg/rent/business + cta)
   → `valuationCta` (final seller CTA, 2 buttons).
-- **sell** (/vendi) — `hero` (2 CTAs) → `blocks.*` (14 discrete blocks: velocita, zeroProvvigione [has `promoBadge`+`buybackBadge`], mandatoSemplice, checkup [cta], materiale [cta], liftingPreVendita, ownerJourney, primaVendiPoiCerca [cta], affittaMentreVendi [cta], acquirentiEsteri [+`quote` pull-quote + cta], houseTour, venditaRiservata, forzaDelGruppo) → `process.steps.*` (5 numbered: call/docs/online/visits/deal, each `n`+title+text) → `closing` (2 CTAs). Render blocks as cards/alternating sections; some carry their own CTA.
+- **sell** (/vendi) — `hero` (2 CTAs) → `reasons` (cappello della fascia «Perché noi») → `blocks.*` (⚠️ dal 03/09/2026 sono 12: `zeroProvvigione` è stato eliminato; `forzaDelGruppo` è diventato «Siamo TriesteVillas»; tre — forzaDelGruppo, materiale, acquirentiEsteri — si rendono nella fascia in cima e non nella griglia) (velocita, mandatoSemplice, checkup [cta], materiale [cta], liftingPreVendita, ownerJourney, primaVendiPoiCerca [cta], affittaMentreVendi [cta], acquirentiEsteri [+`quote` pull-quote + cta], houseTour, venditaRiservata, forzaDelGruppo) → `process.steps.*` (5 numbered: call/docs/online/visits/deal, each `n`+title+text) → `closing` (2 CTAs). Render blocks as cards/alternating sections; some carry their own CTA.
 - **invest** (/investimenti) — `hero` → `narrative` (perché Trieste + income sub-block) → `ricercaLibera` + `ricercaROI` (two-up) → `teaser` (off-market, has `disclaimer`) → `howItWorks.steps.*` (4 numbered) → `cta` (2 buttons). Funnel target = investorForm.
 - **immobili** — listing index intro + `buyerHelp` block (Ricerca libera CTA → buyerForm).
 - **group** (/gruppo) — `title`="Brand diversi, una regia sola" → `ecosystem` (intro + tagline) → `brands.*` (6: tsv/tsi/affitti/friuli/business/lignano, each name+**tag**[chip]+desc) → `story.*` (start/pivot/today) → `values.*` (4) → `team.*` (4 people) → `cta*` (2 buttons) → `legal.*` (exact legal data from brief).

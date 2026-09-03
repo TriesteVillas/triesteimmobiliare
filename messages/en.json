@@ -23,14 +23,14 @@
   "seo": {
     "home": {
       "title": "TriesteImmobiliare — buy & sell homes in Trieste",
-      "description": "TriesteVillas' non-luxury spin-off. Valuation in 48h, online in 7 days, 3-month mandate, 0% seller fee (mandates by Sept 2026). Trieste and province.",
-      "ogTitle": "TriesteImmobiliare — 0% seller commission, flagship-grade marketing",
+      "description": "TriesteVillas' non-luxury spin-off. Valuation in 48h, online in 7 days, a 3-month mandate and the group's marketing, foreign buyers included.",
+      "ogTitle": "TriesteImmobiliare — the marketing of TriesteVillas, on residential",
       "ogDescription": "The same marketing as TriesteVillas, applied to residential Trieste and province up to around €500,000. Valuation in 48h, a simple 3-month mandate."
     },
     "sell": {
-      "title": "Sell your home in Trieste — 0% seller fee",
-      "description": "Sell your home in Trieste: valuation in 48h, 3-month mandate, photos/video/drone/3D tour included, 0% seller fee (mandates by Sept 2026).",
-      "ogTitle": "Sell your home in Trieste: 0% seller commission, marketing included",
+      "title": "Sell your home in Trieste — the marketing of TriesteVillas",
+      "description": "Sell your home in Trieste: valuation in 48h, a 3-month mandate with no auto-renewal, photos/video/drone/3D tour included, and buyers from abroad.",
+      "ogTitle": "Sell in Trieste: flagship-grade marketing, foreign buyers",
       "ogDescription": "Flagship-grade marketing, a pre-sale check-up, a pre-sale lift, and discreet off-market sales. An orderly process that takes weight off your shoulders rather than adding it."
     },
     "invest": {
@@ -75,11 +75,23 @@
       "scrollHint": "Scroll"
     },
     "promiseStrip": {
-      "valuation": "Valuation in 48h",
-      "online": "Online within 7 days",
-      "mandate": "3-month mandate",
-      "fee": "0% seller commission",
-      "promoNote": "Promo: 0% seller commission on mandates signed by September 2026."
+      "valuation": {
+        "value": "48h",
+        "label": "Valuation"
+      },
+      "online": {
+        "value": "7 days",
+        "label": "Online"
+      },
+      "mandate": {
+        "value": "3 months",
+        "label": "Mandate"
+      },
+      "reach": {
+        "value": "IT · EN · DE",
+        "label": "Marketing and negotiation"
+      },
+      "reachNote": "The marketing and the reach of the TriesteVillas group: your buyers won't come from Trieste alone."
     },
     "positioning": {
       "eyebrow": "About us",
@@ -103,21 +115,21 @@
     "sellerValue": {
       "eyebrow": "For sellers",
       "title": "A sale done well takes weight off your shoulders — it doesn't pile it on.",
-      "subtitle": "Speed, a clean contract, and flagship-grade marketing. Here's what changes when you sell with us.",
+      "subtitle": "The marketing we're known for, buyers from outside Italy, a clean contract and dates you can rely on. Here's what changes when you sell with us.",
       "fast": {
         "title": "A genuinely fast valuation",
         "text": "A call with the owner, you send over the paperwork, viewing within 24h. If the documents and the property allow, we go online within 7 days."
       },
-      "zeroFee": {
-        "title": "0% seller commission",
-        "text": "On mandates signed by September 2026 you pay no commission. And if you sell and buy back through us, you get 25% off the purchase commission."
+      "estero": {
+        "title": "Buyers from outside Italy too",
+        "text": "Many of our buyers aren't from Trieste: the site, the material and the negotiation all run in Italian, English and German, with orientation calls, 3D tours and remote handling. And when it's time to see the home for real, we show them around the city."
       },
       "simpleMandate": {
         "title": "A simple contract",
         "text": "A 3-month exclusive, no auto-renewal, no hidden costs. Photos, video, drone and 3D tour included. If you don't renew, the material is yours to keep."
       },
       "marketing": {
-        "title": "Marketing at full strength",
+        "title": "The marketing we're known for",
         "text": "TriesteVillas is among the most-followed agencies in the area on social, with millions of views a year across YouTube and Facebook. TriesteImmobiliare may not deal in luxury, but it deserves nothing less."
       },
       "cta": "See how we sell"
@@ -141,7 +153,7 @@
     "valuationCta": {
       "eyebrow": "No obligation",
       "title": "What's your home really worth?",
-      "body": "We believe in what we do: open a conversation with us and you'll see we'll sell your home at its best. Tell us about the property and we'll come back with an honest valuation — no obligation, and no commission on your side.",
+      "body": "We believe in what we do: open a conversation with us and you'll see we'll sell your home at its best. Tell us about the property and we'll come back with an honest valuation — no obligation.",
       "cta": "Request the valuation",
       "secondary": "Talk to us"
     },
@@ -155,22 +167,20 @@
   "sell": {
     "hero": {
       "eyebrow": "Sell with TriesteImmobiliare",
-      "title": "Sell your home in Trieste with more strategy, less friction, and 0% seller commission.",
+      "title": "Sell your home in Trieste with the strategy and the marketing of TriesteVillas.",
       "intro": "First contact within 24h, valuation within 48h, online in as little as 7 days if the home is ready to launch well. We bring together speed, document control, strong marketing, and a process designed to disturb the seller as little as possible.",
       "videoAlt": "A bright living room opening onto the terrace.",
       "ctaPrimary": "Request a strategic valuation",
       "ctaSecondary": "Book a video call"
     },
+    "reasons": {
+      "eyebrow": "Why us",
+      "title": "Three reasons, before anything else."
+    },
     "blocks": {
       "velocita": {
         "title": "Speed",
         "text": "First contact within 24h, valuation within 48h. If the paperwork and the state of the property allow, we can go online in as little as 7 days."
-      },
-      "zeroProvvigione": {
-        "title": "0% seller commission",
-        "text": "On mandates signed by September 2026 the seller pays no commission. And if you sell and buy back through us, you get 25% off the purchase commission.",
-        "promoBadge": "Promo until September 2026",
-        "buybackBadge": "−25% if you buy back with us"
       },
       "mandatoSemplice": {
         "title": "A simple mandate",
@@ -219,8 +229,8 @@
         "text": "Selling isn't only about posting on the portals. Sometimes the right move is a discreet sale, away from public channels, shared only with genuinely on-target buyers. When discretion matters, we run the deal off the showcase."
       },
       "forzaDelGruppo": {
-        "title": "The strength of the group",
-        "text": "With TriesteImmobiliare you're not working with a single sign over the door. When it helps, we also bring in TriesteVillas, FriuliVillas, LignanoVillas and TriesteAffitti: short-term lets, reallocating capital, or moves better suited to your next step."
+        "title": "We are TriesteVillas",
+        "text": "TriesteImmobiliare isn't a new name over the door: it's the residential spin-off of TriesteVillas, among the most-followed agencies in the area on social, with millions of views a year across YouTube and Facebook. Your home goes into that shop window. And when it helps, we also bring in FriuliVillas, LignanoVillas and TriesteAffitti: short-term lets, reallocating capital, or moves better suited to your next step."
       }
     },
     "process": {
@@ -251,7 +261,7 @@
         "deal": {
           "n": "05",
           "title": "Negotiation and completion",
-          "text": "We handle offers and negotiation through to completion. You walk away with the result, and no commission on your side."
+          "text": "We handle offers and negotiation through to completion. You walk away with the result."
         }
       }
     },
@@ -263,7 +273,7 @@
     },
     "blocksTitle": "What changes when you sell with us",
     "faqQ": {
-      "0": "How much does it cost to sell with TriesteImmobiliare?",
+      "0": "Why sell with TriesteImmobiliare?",
       "1": "How long is the sales mandate?",
       "2": "How quickly does my property go online?",
       "3": "What is included in the selling service?",
@@ -669,7 +679,7 @@
   "sellerForm": {
     "eyebrow": "Sell with TriesteImmobiliare",
     "title": "Request a valuation",
-    "subtitle": "No obligation and no commission on your side: just an honest valuation of your property.",
+    "subtitle": "No obligation: just an honest valuation of your property.",
     "firstName": "First name",
     "lastName": "Surname",
     "phone": "Mobile",
@@ -778,7 +788,7 @@
   },
   "meta": {
     "title": "TriesteImmobiliare — Buying and selling homes in Trieste",
-    "description": "TriesteVillas' non-luxury spin-off: valuation in 48h, online in 7 days, 0% seller fee (mandates by Sept 2026). Residential Trieste and province."
+    "description": "TriesteVillas' non-luxury spin-off: valuation in 48h, online in 7 days, group-grade marketing and buyers from abroad too. Residential Trieste and province."
   },
   "ui": {
     "prev": "Previous",
@@ -1084,7 +1094,7 @@
     },
     "updatesTitle": "Updates to this guide",
     "ctaSellTitle": "Thinking of selling?",
-    "ctaSellText": "Valuation within 48 hours, online in 7 days, a plain three-month mandate. On mandates signed by September 2026, the seller pays 0%.",
+    "ctaSellText": "Valuation within 48 hours, online in 7 days, a plain three-month mandate. Plus the marketing of the TriesteVillas group, foreign buyers included.",
     "ctaSellCta": "Selling a home in Trieste",
     "ctaBuyTitle": "Looking for a home in Trieste?",
     "ctaBuyText": "Residential property in Trieste and its province, with paperwork, running costs and energy class on every listing.",

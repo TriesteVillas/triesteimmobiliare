@@ -1,3 +1,7 @@
+### ARCHIVIO — copy del vecchio sito WordPress, ripresa il 30/06/2026.
+### Non è copy buono da riusare così: la promo «0% al venditore per i mandati
+### firmati entro settembre 2026» è RITIRATA dal 03/09/2026 e non va reintrodotta
+### in nessuna forma. Il testo vivo sta in messages/{it,en,de}.json.
 
 TRIESTEIMMOBILIARE.COM
 

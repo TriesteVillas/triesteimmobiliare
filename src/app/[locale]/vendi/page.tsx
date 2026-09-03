@@ -26,11 +26,16 @@ export async function generateMetadata({
 }
 
 const STEPS = ["call", "docs", "online", "visits", "deal"] as const;
-// Recovered seller blocks, in funnel order.
+const PROMISES = ["valuation", "online", "mandate", "reach"] as const;
+// I tre motivi per cui ci prendono i mandati stanno in cima, in una fascia
+// loro, fuori dalla griglia: siamo TriesteVillas, il materiale che produciamo,
+// i compratori esteri. Il 03/09/2026 dall'elenco è uscito `zeroProvvigione`:
+// la promo «0% al venditore» è ritirata, e non era lei a portare i mandati.
+const REASONS = ["forzaDelGruppo", "materiale", "acquirentiEsteri"] as const;
+// Recovered seller blocks, in funnel order. Nove: tre righe piene da tre.
 const BLOCKS = [
-  "velocita", "zeroProvvigione", "mandatoSemplice", "checkup", "materiale",
-  "liftingPreVendita", "ownerJourney", "primaVendiPoiCerca", "affittaMentreVendi",
-  "acquirentiEsteri", "houseTour", "venditaRiservata", "forzaDelGruppo",
+  "velocita", "mandatoSemplice", "checkup", "liftingPreVendita", "ownerJourney",
+  "primaVendiPoiCerca", "affittaMentreVendi", "houseTour", "venditaRiservata",
 ] as const;
 
 export default async function SellPage({
@@ -55,7 +60,11 @@ export default async function SellPage({
   ).filter((a): a is NonNullable<typeof a> => a !== null);
 
   // FAQ rich-results — questions localized, answers reuse the recovered blocks.
-  const faqBlocks = ["zeroProvvigione", "mandatoSemplice", "velocita", "materiale", "venditaRiservata"];
+  // La prima domanda era «quanto costa vendere con noi», e la risposta era la
+  // promo 0%. Ritirata quella, la provvigione del venditore si concorda in
+  // sede di incarico e il sito non la dichiara: la domanda diventa «perché
+  // voi», che sappiamo rispondere senza promettere cifre.
+  const faqBlocks = ["forzaDelGruppo", "mandatoSemplice", "velocita", "materiale", "venditaRiservata"];
   const faqItems = faqBlocks.map((b, i) => ({
     q: t(`faqQ.${i}`),
     a: t(`blocks.${b}.text`),
@@ -107,18 +116,65 @@ export default async function SellPage({
         </div>
       </section>
 
-      {/* Promise strip */}
+      {/* Promise strip — numero grande, etichetta sotto (vedi la home). */}
       <section className="mx-auto -mt-8 max-w-5xl px-6">
         <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-brand/15 bg-brand/15 shadow-lg sm:grid-cols-4">
-          {(["valuation", "online", "mandate", "fee"] as const).map((k) => (
+          {PROMISES.map((k) => (
             <div key={k} className="bg-white px-3 py-5 text-center sm:px-5 sm:py-6">
-              <p className="stat-num">{tHome(`promiseStrip.${k}`)}</p>
+              <p className="stat-num">{tHome(`promiseStrip.${k}.value`)}</p>
+              <p className="stat-label mt-1.5">{tHome(`promiseStrip.${k}.label`)}</p>
             </div>
           ))}
         </div>
         <p className="mt-3 text-center text-xs text-neutral-500">
-          {tHome("promiseStrip.promoNote")}
+          {tHome("promiseStrip.reachNote")}
         </p>
+      </section>
+
+      {/* ── Perché noi — i tre motivi ─────────────────────────────────
+          Prende il posto che nel funnel teneva il blocco «0% al venditore»:
+          subito dopo la strip, dove chi legge si chiede «perché voi». Non
+          sono card come quelle sotto — tre colonne aperte, un filetto sopra,
+          più aria e più corpo di tipo: la gerarchia dice quali argomenti
+          contano davvero, invece di annegarli in una griglia di tredici. */}
+      <section className="mx-auto max-w-6xl px-6 pt-20">
+        <p className="eyebrow">{t("reasons.eyebrow")}</p>
+        <h2 className="display-chapter mt-2 max-w-3xl text-brand-dark">{t("reasons.title")}</h2>
+        <div
+          className="mt-12 grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-8"
+          data-reveal-stagger
+        >
+          {REASONS.map((b) => (
+            <div key={b} className="flex flex-col border-t-2 border-brand/40 pt-6">
+              <h3 className="text-[1.35rem] font-semibold leading-snug text-brand-dark">
+                {t(`blocks.${b}.title`)}
+              </h3>
+              <p className="mt-3 flex-1 text-[0.95rem] leading-relaxed text-neutral-600">
+                {t(`blocks.${b}.text`)}
+              </p>
+              {b === "acquirentiEsteri" && (
+                <>
+                  <p className="mt-5 border-l-2 border-brand pl-3 text-sm font-medium italic text-brand-dark">
+                    “{t("blocks.acquirentiEsteri.quote")}”
+                  </p>
+                  <BuyerCta
+                    label={t("blocks.acquirentiEsteri.cta")}
+                    fonteCta="Vendi · House tour"
+                    className="btn-press mt-5 self-start rounded-full border border-brand/40 px-4 py-1.5 text-sm font-semibold text-brand hover:border-brand hover:bg-brand/5"
+                  />
+                </>
+              )}
+              {b === "materiale" && (
+                <Link
+                  href="/immobili"
+                  className="mt-5 self-start text-sm font-semibold text-brand underline-offset-4 hover:underline"
+                >
+                  {t("blocks.materiale.cta")} →
+                </Link>
+              )}
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* Process timeline */}
@@ -147,24 +203,7 @@ export default async function SellPage({
               >
                 <h3 className="text-lg font-semibold text-brand-dark">{t(`blocks.${b}.title`)}</h3>
 
-                {b === "zeroProvvigione" && (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <span className="rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand">
-                      {t("blocks.zeroProvvigione.promoBadge")}
-                    </span>
-                    <span className="rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand">
-                      {t("blocks.zeroProvvigione.buybackBadge")}
-                    </span>
-                  </div>
-                )}
-
                 <p className="mt-3 flex-1 text-sm text-neutral-600">{t(`blocks.${b}.text`)}</p>
-
-                {b === "acquirentiEsteri" && (
-                  <p className="mt-4 border-l-2 border-brand pl-3 text-sm font-medium italic text-brand-dark">
-                    “{t("blocks.acquirentiEsteri.quote")}”
-                  </p>
-                )}
 
                 {/* Block-level CTAs (only where there's a real destination) */}
                 {b === "checkup" && (
@@ -172,14 +211,6 @@ export default async function SellPage({
                     label={t("blocks.checkup.cta")}
                     className="btn-press mt-4 self-start rounded-full border border-brand/40 px-4 py-1.5 text-sm font-semibold text-brand hover:border-brand hover:bg-brand/5"
                   />
-                )}
-                {b === "materiale" && (
-                  <Link
-                    href="/immobili"
-                    className="mt-4 self-start text-sm font-semibold text-brand underline-offset-4 hover:underline"
-                  >
-                    {t("blocks.materiale.cta")} →
-                  </Link>
                 )}
                 {b === "affittaMentreVendi" && (
                   <a
@@ -190,13 +221,6 @@ export default async function SellPage({
                   >
                     {t("blocks.affittaMentreVendi.cta")} ↗
                   </a>
-                )}
-                {b === "acquirentiEsteri" && (
-                  <BuyerCta
-                    label={t("blocks.acquirentiEsteri.cta")}
-                    fonteCta="Vendi · House tour"
-                    className="btn-press mt-4 self-start rounded-full border border-brand/40 px-4 py-1.5 text-sm font-semibold text-brand hover:border-brand hover:bg-brand/5"
-                  />
                 )}
               </article>
             ))}

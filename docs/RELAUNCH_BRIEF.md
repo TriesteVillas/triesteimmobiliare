@@ -1,5 +1,13 @@
 # TriesteImmobiliare.com — Relaunch Brief (single source of truth)
 
+> 🛑 **03/09/2026 — LA PROMO «0% AL VENDITORE» È RITIRATA.** Tutto ciò che in questo
+> documento la dà per buona (lo 0%, la provvigione azzerata per chi vende, il buy-back
+> del 25%, la scadenza «mandati entro settembre 2026») **non vale più e non va
+> reintrodotto**. Decisione di Martino: i mandati li ha portati il nome TriesteVillas,
+> la notorietà social e la capacità di proporre gli immobili all'estero — non lo sconto.
+> Il testo vivo del sito sta in `messages/{it,en,de}.json`.
+
+
 > Authored 2026-06-30. Drives the `feat/tsi-relaunch` rebuild. Every subagent and
 > implementer reads this first. Verbatim copy of the **current live WordPress site**
 > (the content we must not lose) is in the repo at `docs/livesite/*.txt`.
@@ -11,7 +19,7 @@ online. It must read, in one second, as **the non-luxury sibling of TriesteVilla
 same marketing muscle, same property quality, **non-stratospheric budgets** (residential
 Trieste + provincia up to ~€500k). Three jobs, in priority order:
 
-1. **Property ACQUISITION (sellers)** — the #1 commercial goal. "0% al venditore" promo,
+1. **Property ACQUISITION (sellers)** — the #1 commercial goal. ⚠️ *era* la promo "0% al venditore" (ritirata il 03/09/2026),
    fast valuation, simple 3-month mandate, real marketing. Make it shine.
 2. **Off-market INVESTMENT funnel** — we hold ≥20 already-rented investment units, €200–400k,
    in very central recently-renovated buildings, that **cannot be advertised** but can be
@@ -56,9 +64,9 @@ Group logos appear on the current live homepage — recreate a clean "ecosystem"
 Full verbatim source: `docs/livesite/{home,vendi,gruppo}.txt`. The well-structured ideas:
 
 ### Seller / acquisition (priority #1)
-- **Headline promise strip:** "Valutazione in 24h · Online entro 7 giorni · Mandato 3 mesi · **0% al venditore**".
-- **Promo (time-boxed, keep accurate):** "0% al venditore per **mandati firmati entro settembre 2026**."
-- **+ Buy-back incentive:** "Se vendi **e** ricompri con noi → **25% di sconto** sulla provvigione d'acquisto."
+- **Headline promise strip:** "**48h** Valutazione · **7 giorni** Online · **3 mesi** Mandato · **IT · EN · DE** Marketing e trattativa" (la quarta cella era "0% al venditore" fino al 03/09/2026).
+- ~~**Promo (time-boxed):** "0% al venditore per mandati firmati entro settembre 2026."~~ **RITIRATA il 03/09/2026.** Al suo posto la nota di portata: "Il marketing e la rete del gruppo TriesteVillas: i compratori non arrivano solo da Trieste."
+- ~~**+ Buy-back incentive:** "Se vendi e ricompri con noi → 25% di sconto sulla provvigione d'acquisto."~~ **Ritirato insieme alla promo** (03/09/2026): era la sua contropartita.
 - **Valutazione rapidissima:** call col titolare → invio documentazione → sopralluogo entro 24h → se i documenti lo consentono, online entro 7 giorni.
 - **Contratto semplice:** venditore non paga · esclusiva 3 mesi · **no tacito rinnovo** · nessun costo nascosto · foto/video/drone/tour 3D inclusi · **"se non rinnovi, ti regaliamo il materiale."**
 - **Il massimo del marketing:** TSV è l'agenzia con più follower; **~2M visualizzazioni YouTube**, **~5.6M su Facebook** nell'ultimo anno (⚠️ cross-check exact figures). "TSI, pur non trattando Luxury, non merita di meno."
@@ -81,9 +89,9 @@ Martino HATES generic LLM real-estate filler. Every claim must be true and speci
 
 ## 4. Information architecture (target)
 
-- `/` Home — hero (paper-boat, claim, two CTAs) → promise strip (24h/7gg/3 mesi/0%) →
+- `/` Home — hero (paper-boat, claim, two CTAs) → promise strip (48h/7gg/3 mesi/IT·EN·DE) →
   featured listings → seller value blocks (recovered) → investor teaser → group ecosystem → valuation CTA.
-- `/vendi` — **seller flagship**: all recovered seller blocks, the 0% promo, process timeline, valuation form.
+- `/vendi` — **seller flagship**: fascia «Perché noi» (siamo TriesteVillas · materiale · compratori esteri) → all recovered seller blocks → process timeline → valuation form. Il blocco della promo 0% non c'è più.
 - `/investimenti` (new) — off-market investment story + ROI/profiling funnel → investor lead.
 - `/immobili` (+ `/annuncio/[slug]`) — browse listed portfolio + property dossier + lead modals.
 - `/gruppo` — the 6-brand ecosystem with logos + story + team + legal.
@@ -140,7 +148,7 @@ Reuse TSI's existing `globals.css` grammar (kinetic-word, data-reveal, card-cine
 
 - Contacts (TSI-specific): **info@triesteimmobiliare.com · 040 2473628 · Via Torino 34, 2° piano, Trieste · su appuntamento · Facebook**.
 - Legal: TriesteVillas srl · Via Milano 5, 34132 Trieste · C.F./P.IVA 01235580329 · REA TS 134793 · cap. 10.200 € i.v. · PEC milou@pec.emailc.it.
-- Promo "0% al venditore" is **time-boxed to mandati entro settembre 2026** — keep that nuance.
+- ⚠️ Promo "0% al venditore": **RITIRATA il 03/09/2026.** Non si scrive più, né col time-box né senza. La provvigione del venditore si concorda in sede di incarico e il sito non la dichiara.
 - Marketing stats (2M YT / 5.6M FB) — cross-check / soften to "milioni di visualizzazioni" if unverifiable.
 - Team (from current it.json): Davide Carlin (titolare/agente), Martino Coppola di Canzano (socio/sviluppo),
   Giada Comelli (affitti), Cécile Van der Salm (affitti).

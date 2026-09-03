@@ -15,6 +15,15 @@
 > the gate is the *profiling form*, and the only thing you "unlock" is a human
 > callback with a tailored ROI shortlist.
 
+> 🛑 **SUPERATO IN PARTE — 03/09/2026: la promo «0% al venditore» è RITIRATA.**
+> Ogni riga di questo documento che nomina lo 0%, la provvigione azzerata per chi
+> vende o la scadenza «mandati entro settembre 2026» **non vale più**: era il claim
+> di lancio, e non è stato lui a portare i mandati. Al suo posto la posizione vera —
+> siamo TriesteVillas (nome e notorietà social del gruppo), il marketing degli
+> immobili, i compratori esteri. Il testo vivo sta in `messages/{it,en,de}.json`;
+> il resto di questo spec resta valido. Vedi `README.md`.
+
+
 ---
 
 ## 0. The two funnels at a glance
@@ -47,11 +56,11 @@ visual convenience. Order top-to-bottom on `/vendi`:
 
 | # | Stage (visitor's mental state) | Recovered block placed here | Job it does |
 |---|---|---|---|
-| 0 | **Land** ("is this even for me?") | Hero + **promise strip**: "Valutazione in 24h · Online entro 7 giorni · Mandato 3 mesi · **0% al venditore**" | One-second proof this is serious + free. The 0% is the hook. |
-| 1 | **The catch?** ("0% — where's the trick?") | **Promo nuance**: "0% al venditore per mandati firmati **entro settembre 2026**." + **Contratto semplice**: venditore non paga · esclusiva 3 mesi · **no tacito rinnovo** · nessun costo nascosto · foto/video/drone/tour 3D inclusi · **"se non rinnovi, ti regaliamo il materiale."** | Kills the "free = low effort / hidden lock-in" fear immediately. The give-back-the-material line is the trust spike — lead with it. |
+| 0 | **Land** ("is this even for me?") | Hero + **promise strip**: "48h Valutazione · 7 giorni Online · 3 mesi Mandato · **IT · EN · DE** marketing e trattativa" | One-second proof this is serious. Dal 03/09/2026 l'aggancio non è più lo sconto: è il nome TriesteVillas e la vetrina anche estera. |
+| 1 | **Why you?** ("perché voi e non un'altra agenzia?") | **Fascia «Perché noi»** (tre motivi, `/vendi` subito dopo la strip): **siamo TriesteVillas** (notorietà e social del gruppo) · **foto/video/drone/tour 3D** prodotti in casa · **compratori esteri**. Poi **Contratto semplice**: esclusiva 3 mesi · **no tacito rinnovo** · nessun costo nascosto · **"se non rinnovi, il materiale resta tuo."** | È il posto che teneva la promo 0%. La riga sul materiale che resta al venditore è il picco di fiducia: va detta presto. |
 | 2 | **Speed** ("how fast, really?") | **Valutazione rapidissima**: call col titolare → invio documentazione → sopralluogo entro 24h → se i documenti lo consentono, online entro 7 giorni. Render as the **process timeline** (4 steps). | Converts the abstract "24h/7gg" into a concrete, believable sequence. |
 | 3 | **Will it actually sell?** ("marketing muscle") | **Il massimo del marketing**: TSV è l'agenzia con più follower; "milioni di visualizzazioni" (soft figure — see A.5). "TSI, pur non trattando Luxury, non merita di meno." + foto/video/drone/tour 3D. | Borrows TSV's reach as proof. Same craft, smaller budget. |
-| 4 | **Is my house ready?** (pre-sale doubt) | **Check-up pre-vendita**: check documentale con tecnici esterni; **anticipiamo il 50% del costo del controllo** e, se manca, **anche il costo dell'APE.** + **Buy-back incentive**: "vendi **e** ricompri con noi → **25% di sconto** sulla provvigione d'acquisto." | De-risks the "my papers are a mess" objection (we front the money) and plants the repeat-customer hook. |
+| 4 | **Is my house ready?** (pre-sale doubt) | **Check-up pre-vendita**: check documentale con tecnici esterni; **anticipiamo il 50% del costo del controllo** e, se manca, **anche il costo dell'APE.** | De-risks the "my papers are a mess" objection: i soldi li mettiamo avanti noi. ⚠️ Lo sconto buy-back del 25% era legato alla promo 0% e dal 03/09/2026 **non si offre più sul sito**. |
 | 5 | **Should I list as-is?** (value-add) | **Lifting pre-vendita**: architetto + artigiani per preventivi; **"potremmo essere partecipi all'investimento."** | We don't just list — we co-invest in making it sell higher. Premium signal at a non-premium price. |
 | 6 | **Will selling wreck my life?** (friction) | **Owner journey**: **visite concentrate in un solo giorno a settimana**, fascia concordata. "Una vendita ben fatta ti toglie peso, non te ne aggiunge." | The empathy block. Most agencies never address the lived hassle. |
 | 7 | **Timing anxiety** | **Prima vendi bene, poi cerca** (link to blog article) + **Affitta mentre vendi** (messa a reddito temporanea con **TriesteAffitti**). | Removes the "but I need the next house first" panic that makes sellers undersell. Cross-brand handoff to TriesteAffitti. |
@@ -115,7 +124,7 @@ Render stage 2 as a numbered horizontal timeline (mirrors TSV `Timeline.tsx`, li
 
 ### A.5 Accuracy guardrails (brief §8)
 
-- **0% promo:** always render the "entro settembre 2026" nuance. Never the bare "0%" without it.
+- **Promo 0%: RITIRATA il 03/09/2026.** Non si scrive più «0%», «senza provvigione a tuo carico», «entro settembre 2026» da nessuna parte. Quanto paga il venditore si concorda in sede di incarico e il sito non lo dichiara.
 - **Marketing stats:** brief flags 2M YT / 5.6M FB as ⚠️ cross-check. **Default to the soft
   form "milioni di visualizzazioni"** unless Martino confirms the exact figures. Do not assert
   precise numbers we can't source.

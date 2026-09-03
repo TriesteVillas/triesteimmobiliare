@@ -16,7 +16,12 @@ import { BoatMark } from "@/components/Logo";
 import BuyerCta from "@/components/BuyerCta";
 import SellerCta from "@/components/SellerCta";
 
-const SELLER_CARDS = ["fast", "zeroFee", "simpleMandate", "marketing"] as const;
+// L'ordine racconta perché ci scelgono, e l'ordine è cambiato il 03/09/2026:
+// prima c'era `zeroFee` in seconda posizione, la promo «0% al venditore».
+// I mandati non li ha portati lo sconto — li ha portati il nome del gruppo,
+// il marketing e i compratori che arrivano da fuori. Quelli vanno per primi.
+const SELLER_CARDS = ["marketing", "estero", "fast", "simpleMandate"] as const;
+const PROMISES = ["valuation", "online", "mandate", "reach"] as const;
 const ROUTING = ["luxury", "fvg", "rent", "business"] as const;
 
 export async function generateMetadata({
@@ -58,6 +63,11 @@ export default async function Home({
     .map((p) => buildPropertyView(p, locale, tProp, tZones(zoneKey(p))));
 
   const heroWords = t("hero.titleKinetic").split(" ");
+
+  // Il marquee ricompone le celle della strip in frasi brevi — «Valutazione
+  // 48h» — perché lì il valore da solo ("48h") non direbbe di cosa parla.
+  const promessa = (k: (typeof PROMISES)[number]) =>
+    `${t(`promiseStrip.${k}.label`)} ${t(`promiseStrip.${k}.value`)}`;
 
   return (
     <>
@@ -125,17 +135,22 @@ export default async function Home({
           </div>
         </div>
 
-        {/* Promise strip — the four numbers */}
+        {/* Promise strip — the four numbers.
+            Ogni cella ora è numero + etichetta: «48h» grande, «Valutazione»
+            sotto. Prima era una frase sola per cella («Valutazione in 48h») e
+            il numero non si leggeva da lontano — CREATIVE_SPEC la descriveva
+            già così, l'implementazione l'aveva appiattita. */}
         <div className="relative mx-auto max-w-5xl px-6 pb-16">
           <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-brand/15 bg-brand/15 sm:grid-cols-4">
-            {(["valuation", "online", "mandate", "fee"] as const).map((k) => (
+            {PROMISES.map((k) => (
               <div key={k} className="bg-white/85 px-3 py-5 text-center backdrop-blur sm:px-5 sm:py-6">
-                <p className="stat-num">{t(`promiseStrip.${k}`)}</p>
+                <p className="stat-num">{t(`promiseStrip.${k}.value`)}</p>
+                <p className="stat-label mt-1.5">{t(`promiseStrip.${k}.label`)}</p>
               </div>
             ))}
           </div>
           <p className="mt-3 text-center text-xs text-neutral-500">
-            {t("promiseStrip.promoNote")}
+            {t("promiseStrip.reachNote")}
           </p>
         </div>
       </section>
@@ -145,11 +160,11 @@ export default async function Home({
       <div className="bg-brand-dark py-6 text-white/85">
         <Marquee
           items={[
-            t("promiseStrip.fee"),
+            promessa("reach"),
             t("hero.eyebrow"),
-            t("promiseStrip.valuation"),
-            t("promiseStrip.mandate"),
-            t("promiseStrip.online"),
+            promessa("valuation"),
+            promessa("mandate"),
+            promessa("online"),
           ]}
         />
       </div>

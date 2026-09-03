@@ -11,6 +11,15 @@
 > JSON-LD anywhere.** `/investimenti` route does not exist yet and is **absent
 > from `sitemap.ts`**. `robots.ts` is minimal. This spec closes all of that.
 
+> 🛑 **SUPERATO IN PARTE — 03/09/2026: la promo «0% al venditore» è RITIRATA.**
+> Ogni riga di questo documento che nomina lo 0%, la provvigione azzerata per chi
+> vende o la scadenza «mandati entro settembre 2026» **non vale più**: era il claim
+> di lancio, e non è stato lui a portare i mandati. Al suo posto la posizione vera —
+> siamo TriesteVillas (nome e notorietà social del gruppo), il marketing degli
+> immobili, i compratori esteri. Il testo vivo sta in `messages/{it,en,de}.json`;
+> il resto di questo spec resta valido. Vedi `README.md`.
+
+
 ---
 
 ## 0. Conventions, scope, hard rules
@@ -48,7 +57,7 @@
 
 | Cluster | Primary IT queries | EN / DE equivalents (foreign buyers, esp. DE-speaking) |
 |---|---|---|
-| **Seller (priority #1)** | `vendere casa Trieste`, `vendere casa Trieste 0 provvigione`, `agenzia immobiliare Trieste vendita`, `valutazione casa Trieste gratis` | `sell house Trieste agency`, `Haus verkaufen Triest Makler`, `Immobilienbewertung Triest` |
+| **Seller (priority #1)** | `vendere casa Trieste`, `agenzia immobiliare Trieste vendita`, `valutazione casa Trieste gratis`, `vendere casa a stranieri Trieste` | `sell house Trieste agency`, `Haus verkaufen Triest Makler`, `Immobilienbewertung Triest` |
 | **Agency / brand** | `agenzia immobiliare Trieste`, `immobiliare Trieste` | `real estate agency Trieste`, `Immobilienmakler Triest`, `Immobilienagentur Triest` |
 | **Investor** | `investire immobili Trieste rendita`, `immobili a reddito Trieste`, `investimento immobiliare Trieste ROI` | `property investment Trieste yield`, `Immobilien Kapitalanlage Triest Rendite` |
 | **Buyer / listings** | `case in vendita Trieste`, `appartamenti in vendita Trieste`, `case Trieste provincia` | `houses for sale Trieste`, `apartments for sale Trieste`, `Wohnung kaufen Triest`, `Haus kaufen Triest` |
@@ -132,9 +141,9 @@ metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.triesteim
 
 | Locale | Title (≤60) | Description (≤155) |
 |---|---|---|
-| **IT** | `Agenzia immobiliare a Trieste — TriesteImmobiliare` (50) | `Compra, vendi e investi a Trieste e provincia. Vendi con 0% al venditore, valutazione in 24h e marketing vero. Casa di ogni fascia, fino a ~500k.` (151) |
-| **EN** | `Trieste Real Estate Agency — TriesteImmobiliare` (47) | `Buy, sell and invest in Trieste and its province. Sellers pay 0% commission, 24h valuation and real marketing. Homes of every budget, up to ~€500k.` (146) |
-| **DE** | `Immobilienmakler in Triest — TriesteImmobiliare` (47) | `Kaufen, verkaufen und investieren in Triest und Umgebung: 0 % Provision für Verkäufer, Bewertung in 24 h, echtes Marketing. Wohnen bis ca. 500.000 €.` (151) |
+| **IT** | `Agenzia immobiliare a Trieste — TriesteImmobiliare` (50) | `Compra, vendi e investi a Trieste e provincia. Il marketing del gruppo TriesteVillas, valutazione in 48h, compratori anche esteri. Fino a ~500k.` (150) |
+| **EN** | `Trieste Real Estate Agency — TriesteImmobiliare` (47) | `Buy, sell and invest in Trieste and its province. The marketing of the TriesteVillas group, 48h valuation, buyers from abroad too. Up to ~€500k.` (148) |
+| **DE** | `Immobilienmakler in Triest — TriesteImmobiliare` (47) | `Kaufen, verkaufen und investieren in Triest und Umgebung: Marketing der Gruppe TriesteVillas, Bewertung in 48 h, Käufer auch aus dem Ausland.` (144) |
 
 H1 stays the kinetic hero claim (on-page, §5), NOT the SEO title.
 
@@ -142,9 +151,9 @@ H1 stays the kinetic hero claim (on-page, §5), NOT the SEO title.
 
 | Locale | Title (≤60) | Description (≤155) |
 |---|---|---|
-| **IT** | `Vendere casa a Trieste con 0% al venditore` (43) | `Vendi casa a Trieste senza provvigione a tuo carico: valutazione in 24h, online in 7 giorni, mandato 3 mesi senza tacito rinnovo. 0% entro settembre 2026.` (153) |
-| **EN** | `Sell Your Home in Trieste — 0% Seller Commission` (48) | `Sell your Trieste home with zero seller commission: 24h valuation, online in 7 days, a simple 3-month mandate with no auto-renewal. 0% until September 2026.` (155) |
-| **DE** | `Haus verkaufen in Triest — 0 % Verkäuferprovision` (49) | `Verkaufen Sie Ihr Haus in Triest ohne Verkäuferprovision: Bewertung in 24 h, online in 7 Tagen, 3-Monats-Auftrag ohne Verlängerung. 0 % bis September 2026.` (154) |
+| **IT** | `Vendere casa a Trieste — il marketing di TriesteVillas` (54) | `Vendi casa a Trieste: valutazione in 48h, mandato di 3 mesi senza tacito rinnovo, foto/video/drone/tour 3D inclusi e compratori anche esteri.` (144) |
+| **EN** | `Sell your home in Trieste — the marketing of TriesteVillas` (58) | `Sell your home in Trieste: valuation in 48h, a 3-month mandate with no auto-renewal, photos/video/drone/3D tour included, and buyers from abroad.` (147) |
+| **DE** | `Haus verkaufen in Triest — Marketing von TriesteVillas` (54) | `Haus verkaufen in Triest: Bewertung in 48 h, 3-Monats-Mandat ohne Verlängerung, Fotos/Video/Drohne/3D-Tour inklusive, Käufer auch aus dem Ausland.` (148) |
 
 ### 1.3 `/investimenti` — Off-market investment funnel (NEW route)
 
@@ -337,10 +346,10 @@ These answers are drawn verbatim-in-substance from the recovered seller copy
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "Quanto paga il venditore di provvigione?",
+      "name": "Perché vendere con TriesteImmobiliare?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Per i mandati firmati entro settembre 2026 il venditore non paga provvigione: 0% a tuo carico. Se vendi e ricompri con noi, hai anche il 25% di sconto sulla provvigione d'acquisto."
+        "text": "TriesteImmobiliare è lo spin-off residenziale di TriesteVillas: il nome, il marketing e la rete della capogruppo, con compratori che arrivano anche da fuori Italia. La provvigione si concorda in sede di incarico."
       }
     },
     {
@@ -599,22 +608,22 @@ never repeated mechanically.
 ### `/` Home
 - **H1** (kinetic hero): the brand claim, e.g. IT *"Comprare, vendere e investire a
   Trieste. Senza giri di parole."* — must contain *Trieste* + the three verbs once.
-- **H2s** (chapter heads): *"Vendi con 0% al venditore"* · *"Immobili in evidenza a
+- **H2s** (chapter heads): *"Una vendita ben fatta ti toglie peso"* · *"Immobili in evidenza a
   Trieste"* · *"Investire a reddito a Trieste"* · *"Il Gruppo TriesteVillas"*.
 - Primary signal: `agenzia immobiliare Trieste`. Don't repeat "Trieste" more than
   ~once per heading; let body copy carry zones (Barcola, Carso, Costiera, Muggia).
 
 ### `/vendi` (priority #1)
-- **H1:** *"Vendere casa a Trieste, con 0% al venditore"* — exact-intent, mirrors the
-  top query. (Live H1 was "Vendi casa a Trieste con più strategia…" — keep the
-  strategy idea in the subhead, lead the H1 with the query.)
+- **H1:** *"Vendi casa a Trieste con più strategia, meno attrito e il marketing di
+  TriesteVillas."* — l'H1 di lancio puntava sulla query «0% al venditore»; ritirata la
+  promo, l'intento si copre col nome del gruppo e coi compratori esteri.
 - **H2s** (recovered blocks → each is an intent magnet): *"Valutazione in 24h, online
   in 7 giorni"* · *"Mandato semplice di 3 mesi, senza tacito rinnovo"* · *"Check-up
   pre-vendita"* · *"Specialisti in acquirenti esteri"* (DE/EN intent) · *"Affitta
   mentre vendi"* · *"Prima vendi bene, poi cerca la prossima casa"*.
 - Secondary intent: `valutazione casa Trieste gratis`, `mandato vendita 3 mesi`,
-  `provvigione 0 venditore`. The promo time-box ("entro settembre 2026") appears in
-  body + FAQ, NOT only in metadata — keeps it honest and crawlable.
+  `vendere casa a compratori stranieri Trieste`. ⚠️ Il time-box «entro settembre 2026»
+  NON si scrive più da nessuna parte: la promo è ritirata (03/09/2026).
 
 ### `/investimenti`
 - **H1:** *"Investire in immobili a Trieste, a reddito"*.

@@ -23,14 +23,14 @@
   "seo": {
     "home": {
       "title": "TriesteImmobiliare — Immobilien in Triest",
-      "description": "Non-Luxury-Spin-off von TriesteVillas. Bewertung in 48 h, online in 7 Tagen, 3-Monats-Mandat, 0 % für Verkäufer (Mandate bis Sept. 2026).",
-      "ogTitle": "TriesteImmobiliare — 0 % für Verkäufer, Marketing der Muttergesellschaft",
+      "description": "Non-Luxury-Spin-off von TriesteVillas. Bewertung in 48 h, online in 7 Tagen, 3-Monats-Mandat und das Marketing der Gruppe, auch im Ausland.",
+      "ogTitle": "TriesteImmobiliare — das Marketing von TriesteVillas für Wohnimmobilien",
       "ogDescription": "Dasselbe Marketing wie TriesteVillas, für Wohnimmobilien in Triest und Provinz bis rund 500.000 €. Bewertung in 48 h, einfaches 3-Monats-Mandat."
     },
     "sell": {
-      "title": "Haus verkaufen in Triest — 0 % Provision",
-      "description": "Haus verkaufen in Triest: Bewertung in 48 h, 3-Monats-Mandat, Fotos/Video/Drohne/3D-Tour inklusive, 0 % für Verkäufer (bis Sept. 2026).",
-      "ogTitle": "Wohnung in Triest verkaufen: 0 % für Verkäufer, Material inklusive",
+      "title": "Haus verkaufen in Triest — Marketing von TriesteVillas",
+      "description": "Haus verkaufen in Triest: Bewertung in 48 h, 3-Monats-Mandat ohne Verlängerung, Fotos/Video/Drohne/3D-Tour inklusive, Käufer auch aus dem Ausland.",
+      "ogTitle": "Wohnung in Triest verkaufen: Marketing der Gruppe, Käufer aus dem Ausland",
       "ogDescription": "Marketing der Muttergesellschaft, Vorverkaufs-Check-up, Vorverkaufs-Lifting, diskreter Verkauf. Ein geordneter Ablauf, der Sie entlastet statt belastet."
     },
     "invest": {
@@ -75,11 +75,23 @@
       "scrollHint": "Scrollen"
     },
     "promiseStrip": {
-      "valuation": "Bewertung in 48 h",
-      "online": "Online innerhalb von 7 Tagen",
-      "mandate": "3-Monats-Mandat",
-      "fee": "0 % für Verkäufer",
-      "promoNote": "Aktion: 0 % für Verkäufer bei Mandaten, die bis September 2026 unterzeichnet werden."
+      "valuation": {
+        "value": "48 h",
+        "label": "Bewertung"
+      },
+      "online": {
+        "value": "7 Tage",
+        "label": "Online"
+      },
+      "mandate": {
+        "value": "3 Monate",
+        "label": "Mandat"
+      },
+      "reach": {
+        "value": "IT · EN · DE",
+        "label": "Marketing und Verhandlung"
+      },
+      "reachNote": "Das Marketing und die Reichweite der Gruppe TriesteVillas: Ihre Käufer kommen nicht nur aus Triest."
     },
     "positioning": {
       "eyebrow": "Wer wir sind",
@@ -103,21 +115,21 @@
     "sellerValue": {
       "eyebrow": "Für Verkäufer",
       "title": "Ein gut gemachter Verkauf entlastet Sie, statt Sie zu belasten.",
-      "subtitle": "Tempo, sauberer Vertrag und Marketing der Muttergesellschaft. Das ändert sich, wenn Sie mit uns verkaufen.",
+      "subtitle": "Das Marketing, für das man uns kennt, Käufer auch von außerhalb Italiens, ein sauberer Vertrag und verlässliche Zeiten. Das ändert sich, wenn Sie mit uns verkaufen.",
       "fast": {
         "title": "Blitzschnelle Bewertung",
         "text": "Telefonat mit dem Inhaber, Übermittlung der Unterlagen, Besichtigung innerhalb von 24 h. Wenn Unterlagen und Immobilie es zulassen, gehen wir innerhalb von 7 Tagen online."
       },
-      "zeroFee": {
-        "title": "0 % für Verkäufer",
-        "text": "Bei Mandaten, die bis September 2026 unterzeichnet werden, zahlen Sie keine Provision. Und wenn Sie mit uns verkaufen und wieder kaufen, erhalten Sie 25 % Rabatt auf die Kaufprovision."
+      "estero": {
+        "title": "Käufer auch von außerhalb Italiens",
+        "text": "Viele unserer Käufer sind keine Triestiner: Website, Material und Verhandlung auf Italienisch, Englisch und Deutsch, dazu orientierende Calls, 3D-Touren und Fernabwicklung. Und wenn die Immobilie wirklich besichtigt werden soll, begleiten wir sie in die Stadt."
       },
       "simpleMandate": {
         "title": "Einfacher Vertrag",
         "text": "Exklusivität für 3 Monate, keine stillschweigende Verlängerung, keine versteckten Kosten. Foto, Video, Drohne und 3D-Tour inklusive. Verlängern Sie nicht, bleibt das Material Ihnen."
       },
       "marketing": {
-        "title": "Marketing vom Feinsten",
+        "title": "Das Marketing, für das man uns kennt",
         "text": "TriesteVillas gehört zu den meistgefolgten Agenturen der Region in den sozialen Medien, mit Millionen Aufrufen pro Jahr auf YouTube und Facebook. TriesteImmobiliare verdient nicht weniger, auch wenn es nicht das Luxussegment bedient."
       },
       "cta": "So verkaufen wir"
@@ -141,7 +153,7 @@
     "valuationCta": {
       "eyebrow": "Unverbindlich",
       "title": "Was ist Ihre Immobilie wirklich wert?",
-      "body": "Wir glauben an das, was wir tun: Wir eröffnen einen Dialog, und Sie werden sehen, dass wir Ihre Immobilie bestmöglich verkaufen. Erzählen Sie uns von der Immobilie, und Sie erhalten eine ehrliche Bewertung, unverbindlich und ohne Provision zu Ihren Lasten.",
+      "body": "Wir glauben an das, was wir tun: Wir eröffnen einen Dialog, und Sie werden sehen, dass wir Ihre Immobilie bestmöglich verkaufen. Erzählen Sie uns von der Immobilie, und Sie erhalten eine ehrliche Bewertung, unverbindlich.",
       "cta": "Bewertung anfordern",
       "secondary": "Sprechen Sie mit uns"
     },
@@ -155,22 +167,20 @@
   "sell": {
     "hero": {
       "eyebrow": "Verkaufen mit TriesteImmobiliare",
-      "title": "Verkaufen Sie Ihre Wohnung in Triest mit mehr Strategie, weniger Reibung und 0 % für Verkäufer.",
+      "title": "Haus verkaufen in Triest — mit der Strategie und dem Marketing von TriesteVillas.",
       "intro": "Erster Kontakt innerhalb von 24 h, Bewertung innerhalb von 48 h, online schon in 7 Tagen, wenn die Immobilie startklar ist. Wir verbinden Tempo, Dokumentenprüfung, starkes Marketing und einen Ablauf, der Verkäufer so wenig wie möglich stört.",
       "videoAlt": "Heller Wohnraum mit Zugang zur Terrasse.",
       "ctaPrimary": "Strategische Bewertung anfordern",
       "ctaSecondary": "Videocall buchen"
     },
+    "reasons": {
+      "eyebrow": "Warum wir",
+      "title": "Drei Gründe, vor allem anderen."
+    },
     "blocks": {
       "velocita": {
         "title": "Tempo",
         "text": "Erster Kontakt innerhalb von 24 h, Bewertung innerhalb von 48 h. Wenn Unterlagen und Zustand der Immobilie es zulassen, können wir schon in 7 Tagen online gehen."
-      },
-      "zeroProvvigione": {
-        "title": "0 % für Verkäufer",
-        "text": "Bei Mandaten, die bis September 2026 unterzeichnet werden, zahlt der Verkäufer keine Provision. Und wenn Sie mit uns verkaufen und wieder kaufen, erhalten Sie 25 % Rabatt auf die Kaufprovision.",
-        "promoBadge": "Aktion bis September 2026",
-        "buybackBadge": "−25 %, wenn Sie mit uns wieder kaufen"
       },
       "mandatoSemplice": {
         "title": "Einfaches Mandat",
@@ -219,8 +229,8 @@
         "text": "Verkaufen heißt nicht nur, auf den Portalen zu inserieren. Manchmal ist der diskrete Verkauf der richtige Zug, abseits der öffentlichen Kanäle, nur denjenigen erzählt, die wirklich in Frage kommen. Wenn Diskretion gefragt ist, führen wir die Verhandlung außerhalb des Schaufensters."
       },
       "forzaDelGruppo": {
-        "title": "Die Stärke der Gruppe",
-        "text": "Mit TriesteImmobiliare arbeiten Sie nicht nur mit einer einzigen Marke. Wenn nötig, beziehen wir auch TriesteVillas, FriuliVillas, LignanoVillas und TriesteAffitti ein: befristete Vermietungen, Kapitalumschichtung oder Lösungen, die besser zu Ihrem nächsten Schritt passen."
+        "title": "Wir sind TriesteVillas",
+        "text": "TriesteImmobiliare ist keine neue Marke: Es ist der Wohnimmobilien-Spin-off von TriesteVillas, einer der meistgefolgten Agenturen der Region in den sozialen Medien, mit Millionen Aufrufen pro Jahr auf YouTube und Facebook. Ihre Immobilie kommt in dieses Schaufenster. Und wenn nötig, beziehen wir auch FriuliVillas, LignanoVillas und TriesteAffitti ein: befristete Vermietungen, Kapitalumschichtung oder Lösungen, die besser zu Ihrem nächsten Schritt passen."
       }
     },
     "process": {
@@ -251,7 +261,7 @@
         "deal": {
           "n": "05",
           "title": "Verhandlung und Notartermin",
-          "text": "Wir steuern Angebote und Verhandlung bis zum Notartermin. Sie holen das Ergebnis nach Hause, ohne Provision zu Ihren Lasten."
+          "text": "Wir steuern Angebote und Verhandlung bis zum Notartermin. Sie holen das Ergebnis nach Hause."
         }
       }
     },
@@ -263,7 +273,7 @@
     },
     "blocksTitle": "Was sich ändert, wenn Sie mit uns verkaufen",
     "faqQ": {
-      "0": "Was kostet der Verkauf mit TriesteImmobiliare?",
+      "0": "Warum mit TriesteImmobiliare verkaufen?",
       "1": "Wie lange läuft der Verkaufsauftrag?",
       "2": "Wie schnell geht meine Immobilie online?",
       "3": "Was ist im Verkaufsservice enthalten?",
@@ -669,7 +679,7 @@
   "sellerForm": {
     "eyebrow": "Verkaufen mit TriesteImmobiliare",
     "title": "Bewertung anfordern",
-    "subtitle": "Unverbindlich und ohne Provision zu Ihren Lasten: nur eine ehrliche Bewertung Ihrer Immobilie.",
+    "subtitle": "Unverbindlich: nur eine ehrliche Bewertung Ihrer Immobilie.",
     "firstName": "Vorname",
     "lastName": "Nachname",
     "phone": "Mobiltelefon",
@@ -778,7 +788,7 @@
   },
   "meta": {
     "title": "TriesteImmobiliare — Wohnungen in Triest kaufen und verkaufen",
-    "description": "Non-Luxury-Spin-off von TriesteVillas: Bewertung 48 h, online in 7 Tagen, 0 % für Verkäufer (bis Sept. 2026). Wohnimmobilien in Triest und Provinz."
+    "description": "Non-Luxury-Spin-off von TriesteVillas: Bewertung in 48 h, online in 7 Tagen, Marketing der Gruppe und Käufer auch aus dem Ausland. Triest und Provinz."
   },
   "ui": {
     "prev": "Zurück",
@@ -1084,7 +1094,7 @@
     },
     "updatesTitle": "Aktualisierungen zu diesem Beitrag",
     "ctaSellTitle": "Denken Sie über einen Verkauf nach?",
-    "ctaSellText": "Bewertung in 48 Stunden, online in 7 Tagen, einfacher Dreimonatsauftrag. Bei Aufträgen bis September 2026 zahlt der Verkäufer 0%.",
+    "ctaSellText": "Bewertung in 48 Stunden, online in 7 Tagen, einfacher Dreimonatsauftrag. Dazu das Marketing der Gruppe TriesteVillas, auch für Käufer aus dem Ausland.",
     "ctaSellCta": "Immobilie in Triest verkaufen",
     "ctaBuyTitle": "Suchen Sie eine Wohnung in Triest?",
     "ctaBuyText": "Wohnimmobilien in Triest und Provinz — mit Unterlagen, laufenden Kosten und Energieklasse in jedem Exposé.",

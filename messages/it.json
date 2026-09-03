@@ -23,14 +23,14 @@
   "seo": {
     "home": {
       "title": "TriesteImmobiliare — comprare e vendere a Trieste",
-      "description": "Spin-off non-luxury di TriesteVillas. Valutazione 48h, online in 7 giorni, mandato 3 mesi, 0% al venditore (mandati entro set. 2026). Trieste e Provincia.",
-      "ogTitle": "TriesteImmobiliare — 0% al venditore, marketing da capogruppo",
+      "description": "Spin-off non-luxury di TriesteVillas. Valutazione in 48h, online in 7 giorni, mandato di 3 mesi e il marketing del gruppo, anche sul mercato estero.",
+      "ogTitle": "TriesteImmobiliare — il marketing di TriesteVillas sul residenziale",
       "ogDescription": "Lo stesso marketing di TriesteVillas, sul residenziale di Trieste e Provincia fino a circa 500.000 €. Valutazione in 48h, mandato semplice di 3 mesi."
     },
     "sell": {
-      "title": "Vendere casa a Trieste — 0% al venditore",
-      "description": "Vendi casa a Trieste: valutazione 48h, mandato 3 mesi senza tacito rinnovo, foto/video/drone/tour 3D inclusi, 0% al venditore (entro set. 2026).",
-      "ogTitle": "Vendi casa a Trieste: 0% al venditore, materiale incluso",
+      "title": "Vendere casa a Trieste — il marketing di TriesteVillas",
+      "description": "Vendi casa a Trieste: valutazione in 48h, mandato di 3 mesi senza tacito rinnovo, foto/video/drone/tour 3D inclusi e compratori anche esteri.",
+      "ogTitle": "Vendi casa a Trieste: marketing da capogruppo, compratori esteri",
       "ogDescription": "Marketing da capogruppo, check-up pre-vendita, lifting pre-vendita, vendita riservata. Un percorso ordinato che ti toglie peso, non te ne aggiunge."
     },
     "invest": {
@@ -75,11 +75,23 @@
       "scrollHint": "Scorri"
     },
     "promiseStrip": {
-      "valuation": "Valutazione in 48h",
-      "online": "Online entro 7 giorni",
-      "mandate": "Mandato di 3 mesi",
-      "fee": "0% al venditore",
-      "promoNote": "Promo: 0% al venditore per i mandati firmati entro settembre 2026."
+      "valuation": {
+        "value": "48h",
+        "label": "Valutazione"
+      },
+      "online": {
+        "value": "7 giorni",
+        "label": "Online"
+      },
+      "mandate": {
+        "value": "3 mesi",
+        "label": "Mandato"
+      },
+      "reach": {
+        "value": "IT · EN · DE",
+        "label": "Marketing e trattativa"
+      },
+      "reachNote": "Il marketing e la rete del gruppo TriesteVillas: i compratori non arrivano solo da Trieste."
     },
     "positioning": {
       "eyebrow": "Chi siamo",
@@ -103,21 +115,21 @@
     "sellerValue": {
       "eyebrow": "Per chi vende",
       "title": "Una vendita ben fatta ti toglie peso, non te ne aggiunge.",
-      "subtitle": "Velocità, contratto pulito e marketing da capogruppo. Ecco cosa cambia a vendere con noi.",
+      "subtitle": "Il marketing per cui ci conoscono, compratori anche da fuori Italia, un contratto pulito e tempi certi. Ecco cosa cambia a vendere con noi.",
       "fast": {
         "title": "Valutazione rapidissima",
         "text": "Call con il titolare, invio della documentazione, sopralluogo entro 24h. Se documenti e immobile lo consentono, andiamo online entro 7 giorni."
       },
-      "zeroFee": {
-        "title": "0% al venditore",
-        "text": "Per i mandati firmati entro settembre 2026 non paghi provvigione. E se vendi e ricompri con noi, hai il 25% di sconto sulla provvigione d'acquisto."
+      "estero": {
+        "title": "Compratori anche da fuori Italia",
+        "text": "Molti dei nostri compratori non sono triestini: sito, materiale e trattativa in italiano, inglese e tedesco, call orientative, tour 3D e gestione da remoto. E quando serve vedere la casa davvero, li accompagniamo in città."
       },
       "simpleMandate": {
         "title": "Contratto semplice",
         "text": "Esclusiva di 3 mesi, niente tacito rinnovo, nessun costo nascosto. Foto, video, drone e tour 3D inclusi. Se non rinnovi, il materiale resta tuo."
       },
       "marketing": {
-        "title": "Il massimo del marketing",
+        "title": "Il marketing per cui ci conoscono",
         "text": "TriesteVillas è tra le agenzie del territorio più seguite sui social, con milioni di visualizzazioni l'anno tra YouTube e Facebook. TriesteImmobiliare, pur non trattando il luxury, non merita di meno."
       },
       "cta": "Scopri come vendiamo"
@@ -141,7 +153,7 @@
     "valuationCta": {
       "eyebrow": "Senza impegno",
       "title": "Quanto vale davvero la tua casa?",
-      "body": "Crediamo in quello che facciamo: apriamo un dialogo e vedrai che venderemo la tua casa al meglio. Raccontaci l'immobile e ti rispondiamo con una valutazione onesta, senza impegno e senza provvigione a tuo carico.",
+      "body": "Crediamo in quello che facciamo: apriamo un dialogo e vedrai che venderemo la tua casa al meglio. Raccontaci l'immobile e ti rispondiamo con una valutazione onesta, senza impegno.",
       "cta": "Richiedi la valutazione",
       "secondary": "Parla con noi"
     },
@@ -155,22 +167,20 @@
   "sell": {
     "hero": {
       "eyebrow": "Vendi con TriesteImmobiliare",
-      "title": "Vendi casa a Trieste con più strategia, meno attrito e 0% al venditore.",
+      "title": "Vendi casa a Trieste con la strategia e il marketing di TriesteVillas.",
       "intro": "Primo contatto entro 24h, valutazione entro 48h, online anche in 7 giorni se la casa è pronta a partire bene. Mettiamo insieme velocità, controllo documentale, marketing forte e un percorso pensato per disturbare il meno possibile chi vende.",
       "videoAlt": "Soggiorno luminoso che si apre sulla terrazza.",
       "ctaPrimary": "Richiedi una valutazione strategica",
       "ctaSecondary": "Prenota una videocall"
     },
+    "reasons": {
+      "eyebrow": "Perché noi",
+      "title": "Tre motivi, prima di tutto il resto."
+    },
     "blocks": {
       "velocita": {
         "title": "Velocità",
         "text": "Primo contatto entro 24h, valutazione entro 48h. Se documenti e situazione dell'immobile lo consentono, possiamo andare online anche in 7 giorni."
-      },
-      "zeroProvvigione": {
-        "title": "0% al venditore",
-        "text": "Per i mandati firmati entro settembre 2026 il venditore non paga provvigione. E se vendi e ricompri con noi, hai il 25% di sconto sulla provvigione d'acquisto.",
-        "promoBadge": "Promo entro settembre 2026",
-        "buybackBadge": "−25% se ricompri con noi"
       },
       "mandatoSemplice": {
         "title": "Mandato semplice",
@@ -219,8 +229,8 @@
         "text": "Vendere non significa solo pubblicare sui portali. A volte la mossa giusta è una vendita discreta, fuori dai canali pubblici, raccontata solo a chi è davvero in target. Quando serve riservatezza, gestiamo la trattativa fuori vetrina."
       },
       "forzaDelGruppo": {
-        "title": "La forza del gruppo",
-        "text": "Con TriesteImmobiliare non lavori con una sola insegna. Se serve, ragioniamo anche con TriesteVillas, FriuliVillas, LignanoVillas e TriesteAffitti: locazioni transitorie, riallocazione del capitale o operazioni più adatte al tuo prossimo passo."
+        "title": "Siamo TriesteVillas",
+        "text": "TriesteImmobiliare non è un'insegna nuova: è lo spin-off residenziale di TriesteVillas, tra le agenzie del territorio più seguite sui social, con milioni di visualizzazioni l'anno tra YouTube e Facebook. La tua casa entra in quella vetrina. E se serve, ragioniamo anche con FriuliVillas, LignanoVillas e TriesteAffitti: locazioni transitorie, riallocazione del capitale o operazioni più adatte al tuo prossimo passo."
       }
     },
     "process": {
@@ -251,7 +261,7 @@
         "deal": {
           "n": "05",
           "title": "Trattativa e rogito",
-          "text": "Gestiamo offerte e trattativa fino al rogito. Tu porti a casa il risultato, senza provvigione a tuo carico."
+          "text": "Gestiamo offerte e trattativa fino al rogito. Tu porti a casa il risultato."
         }
       }
     },
@@ -263,7 +273,7 @@
     },
     "blocksTitle": "Cosa cambia a vendere con noi",
     "faqQ": {
-      "0": "Quanto costa vendere casa con TriesteImmobiliare?",
+      "0": "Perché vendere con TriesteImmobiliare?",
       "1": "Quanto dura il mandato di vendita?",
       "2": "In quanto tempo il mio immobile va online?",
       "3": "Cosa è incluso nel servizio di vendita?",
@@ -669,7 +679,7 @@
   "sellerForm": {
     "eyebrow": "Vendi con TriesteImmobiliare",
     "title": "Richiedi una valutazione",
-    "subtitle": "Nessun impegno e nessuna provvigione a tuo carico: solo una valutazione onesta del tuo immobile.",
+    "subtitle": "Nessun impegno: solo una valutazione onesta del tuo immobile.",
     "firstName": "Nome",
     "lastName": "Cognome",
     "phone": "Cellulare",
@@ -778,7 +788,7 @@
   },
   "meta": {
     "title": "TriesteImmobiliare — Vendere e comprare casa a Trieste",
-    "description": "Spin-off non-luxury di TriesteVillas: valutazione 48h, online in 7 giorni, 0% al venditore (mandati entro set. 2026). Residenziale a Trieste e Provincia."
+    "description": "Spin-off non-luxury di TriesteVillas: valutazione in 48h, online in 7 giorni, il marketing del gruppo e compratori anche esteri. Trieste e Provincia."
   },
   "ui": {
     "prev": "Precedente",
@@ -1084,7 +1094,7 @@
     },
     "updatesTitle": "Aggiornamenti a questa guida",
     "ctaSellTitle": "Stai pensando di vendere?",
-    "ctaSellText": "Valutazione in 48 ore, immobile online in 7 giorni, mandato semplice di 3 mesi. Sui mandati firmati entro settembre 2026, 0% al venditore.",
+    "ctaSellText": "Valutazione in 48 ore, immobile online in 7 giorni, mandato semplice di 3 mesi. E il marketing del gruppo TriesteVillas, anche verso i compratori esteri.",
     "ctaSellCta": "Vendere casa a Trieste",
     "ctaBuyTitle": "Stai cercando casa a Trieste?",
     "ctaBuyText": "Il residenziale di Trieste e Provincia, con le schede complete di documenti, spese e classe energetica.",

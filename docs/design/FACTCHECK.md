@@ -1,5 +1,20 @@
 # TriesteImmobiliare Relaunch — Fact Cross-Check Audit
 
+> 🛑 **03/09/2026 — LA PROMO «0% AL VENDITORE» È RITIRATA.** Tutto ciò che in questo
+> documento la dà per buona (lo 0%, la provvigione azzerata per chi vende, il buy-back
+> del 25%, la scadenza «mandati entro settembre 2026») **non vale più e non va
+> reintrodotto**. Decisione di Martino: i mandati li ha portati il nome TriesteVillas,
+> la notorietà social e la capacità di proporre gli immobili all'estero — non lo sconto.
+> Il testo vivo del sito sta in `messages/{it,en,de}.json`.
+
+> In particolare **la sezione A qui sotto è superata per intero**: verificava come
+> dichiarare correttamente la promo (time-box, buy-back, chi paga la provvigione).
+> Resta utile come storia di *perché* quelle frasi erano rischiose — non come istruzione.
+> ⚠️ Nota aperta: togliendo la promo, la domanda «chi paga la provvigione» torna
+> scoperta. Il sito **non** dice più nulla in proposito (scelta deliberata); nel CRM la
+> provvigione lato compratore resta 4% + IVA.
+
+
 > Role: Fact Cross-Check Auditor. Every factual claim the relaunch will make, verified against
 > the live-site source (`docs/livesite/{home,vendi,gruppo}.txt`), the brief (`docs/RELAUNCH_BRIEF.md`),
 > the current draft copy (`messages/{it,en,de}.json`), and the lead API (`src/app/api/lead/route.ts`).
