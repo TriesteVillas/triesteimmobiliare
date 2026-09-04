@@ -15,6 +15,7 @@ import PhotoGallery from "@/components/PhotoGallery";
 import PhotoImg from "@/components/PhotoImg";
 import RicordaScheda from "@/components/RicordaScheda";
 import { photoSrc, photoSrcSet } from "@/lib/photoSrc";
+import { gallerySet } from "@/lib/photoSet";
 import Planimetrie from "@/components/Planimetrie";
 import PropertyBadge from "@/components/PropertyBadge";
 import PropertyCard from "@/components/PropertyCard";
@@ -479,7 +480,13 @@ export default async function PropertyPage({ params }: { params: Params }) {
               allPhotos={property.photos}
               compact
               labels={{
-                viewAll: t("galViewAll", { count: property.photos.length }),
+                // Il conteggio deve essere quello della lista VERA del
+                // lightbox (copertina + curate + tutte, senza doppioni), non
+                // quello del solo campo `foto`: altrimenti l'etichetta
+                // promette dieci foto e la griglia ne apre altre.
+                viewAll: t("galViewAll", {
+                  count: gallerySet(property.coverPhoto, property.topPhotos, property.photos).length,
+                }),
                 close: t("galClose"),
                 photosComing: t("photosComing"),
                 grid: t("galGrid"),

@@ -4,6 +4,7 @@ import { useState, ViewTransition } from "react";
 import { photoSrc, photoSrcSet } from "@/lib/photoSrc";
 import PhotoImg from "./PhotoImg";
 import type { Photo } from "@/lib/properties";
+import { gallerySet } from "@/lib/photoSet";
 import Lightbox from "./Lightbox";
 
 // Ladder delle miniature. Serve soprattutto al telefono: il riquadro è 50vw,
@@ -37,24 +38,40 @@ export default function PhotoGallery({
   // lo scroll dalla foto 1).
   const [open, setOpen] = useState<{ idx: number; grid: boolean } | null>(null);
   const hero = cover ?? allPhotos[0] ?? null;
-  const thumbs = topPhotos.length ? topPhotos : allPhotos;
-  const fullSet = allPhotos.length ? allPhotos : hero ? [hero] : [];
 
-  const openAt = (photo: Photo) => {
-    const i = fullSet.findIndex((x) => x.url === photo.url);
-    setOpen({ idx: i >= 0 ? i : 0, grid: false });
-  };
+  // UNA lista sola, deduplicata, dietro sia le miniature sia il lightbox: così
+  // la miniatura cliccata si apre all'indice esatto in cui poi si sfoglia.
+  //
+  // Prima le miniature venivano da `topPhotos` e il lightbox da `allPhotos`, e
+  // il click si riagganciava confrontando le url. Ma `cover`, `foto_top8` e
+  // `foto` sono campi attachment DIVERSI di Airtable: la stessa immagine ha id
+  // diverso in ognuno, quindi url diversa (lo dice già il commento in
+  // properties.ts, «so the gallery can de-dupe a photo that appears in more
+  // than one field»). Il findIndex tornava sempre −1 e si ripiegava su 0:
+  // qualunque miniatura si cliccasse, si apriva la prima foto. Misurato in
+  // produzione il 04/09/2026 su /annuncio/via-roma-114-…: quinta miniatura
+  // attnwnOBnR6nqt9Py, foto aperta attpVRmFfLVqPO8xC.
+  //
+  // Si deduplica per `filename` (con ripiego sull'url), come fa il gemello
+  // triestevillas.com e come già fa qui `propertyView.ts` per la galleria
+  // delle card. La funzione sta in `lib/photoSet.ts` perché la stessa lista
+  // serve alla pagina per contare le foto nell'etichetta «vedi tutte le N»:
+  // due conteggi diversi sono il modo in cui il guasto è nato.
+  const fullSet = gallerySet(cover, topPhotos, allPhotos);
+  const thumbs = fullSet;
+
+  const openAt = (idx: number) => setOpen({ idx, grid: false });
 
   if (compact) {
     return (
       <section id="foto" className="scroll-mt-32">
         {thumbs.length > 0 && (
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {thumbs.slice(0, 8).map((p) => (
+            {thumbs.slice(0, 8).map((p, idx) => (
               <button
                 key={p.url}
                 type="button"
-                onClick={() => openAt(p)}
+                onClick={() => openAt(idx)}
                 className="relative aspect-[4/3] overflow-hidden rounded-lg bg-neutral-100"
               >
                 <PhotoImg
@@ -113,11 +130,11 @@ export default function PhotoGallery({
           </button>
           {thumbs.length > 0 && (
             <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {thumbs.slice(0, 8).map((p) => (
+              {thumbs.slice(0, 8).map((p, idx) => (
                 <button
                   key={p.url}
                   type="button"
-                  onClick={() => openAt(p)}
+                  onClick={() => openAt(idx)}
                   className="relative aspect-[4/3] overflow-hidden rounded-lg bg-neutral-100"
                 >
                   <PhotoImg
