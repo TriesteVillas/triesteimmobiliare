@@ -246,7 +246,10 @@ export function listingJsonLd(p: ListingSchemaInput) {
     ...(p.mq
       ? { floorSize: { "@type": "QuantitativeValue", value: p.mq, unitCode: "MTK" } }
       : {}),
-    ...(p.camere ? { numberOfRooms: p.camere } : {}),
+    // `camere` sono le camere da LETTO (properties.ts: «bedrooms»): come
+    // numberOfRooms un 114 m² usciva a «2» — ed è il campo che leggono i
+    // motori e gli assistenti. Stessa correzione fatta sul gemello TSV.
+    ...(p.camere ? { numberOfBedrooms: p.camere } : {}),
     ...(p.baths ? { numberOfBathroomsTotal: p.baths } : {}),
     ...(p.floor ? { floorLevel: p.floor } : {}),
     ...(p.annoCostruzione ? { yearBuilt: p.annoCostruzione } : {}),

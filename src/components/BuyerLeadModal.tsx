@@ -211,7 +211,7 @@ export default function BuyerLeadModal({
             <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
                 <p className="mb-2 text-sm font-medium text-neutral-700">{t("budget")}</p>
-                <RangeDual {...BUDGET} value={budget} maxLabel="3 M€ +"
+                <RangeDual {...BUDGET} value={budget} maxLabel="1,5 M€ +"
                   format={fmtEur}
                   onChange={(v) => { setBudget(v); setBudgetTouched(true); }} />
               </div>
