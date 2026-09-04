@@ -407,6 +407,8 @@
     "locationTitle": "Location",
     "locationApprox": "Approximate location within the area. The exact position is shared on request.",
     "photosComing": "Photos coming soon",
+    "photoPrev": "Previous photo",
+    "photoNext": "Next photo",
     "backToList": "Back to properties",
     "contactCta": "Request information",
     "reference": "Ref.",

@@ -407,6 +407,8 @@
     "locationTitle": "Posizione",
     "locationApprox": "Posizione indicativa nell'area. La collocazione esatta viene condivisa su richiesta.",
     "photosComing": "Foto in arrivo",
+    "photoPrev": "Foto precedente",
+    "photoNext": "Foto successiva",
     "backToList": "Torna agli immobili",
     "contactCta": "Richiedi informazioni",
     "reference": "Rif.",

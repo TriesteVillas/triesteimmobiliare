@@ -1,8 +1,7 @@
-import { ViewTransition } from "react";
 import { Link } from "@/i18n/navigation";
 import type { PropertyView } from "@/lib/propertyView";
 import PropertyBadge from "./PropertyBadge";
-import PhotoImg from "./PhotoImg";
+import CardGallery from "./CardGallery";
 import Tilt from "./motion/Tilt";
 import FavHeart from "./account/FavHeart";
 
@@ -33,6 +32,10 @@ export default function PropertyCard({
 }) {
   const leftBadge = view.recentBadge ?? view.badge;
   const rightBadge = view.clusterBadge ?? view.featuredBadge;
+  // `gallery` è copertina + top 8; `cover` da solo è la rete di sicurezza per
+  // un record che avesse la copertina e nient'altro (stessa guardia della card
+  // della Private Collection).
+  const photos = view.gallery.length ? view.gallery : view.cover ? [view.cover] : [];
 
   return (
     <Tilt className="rounded-2xl">
@@ -42,25 +45,17 @@ export default function PropertyCard({
         className="card-cine group block"
         data-slug={view.slug}
       >
-        <div className="relative aspect-[4/3] overflow-hidden bg-paper">
-          {view.cover ? (
-            <ViewTransition name={`prop-${view.slug}`} share="morph">
-              <PhotoImg
-                src={view.cover.url}
-                srcSet={view.cover.srcSet}
-                // `sizes` senza `srcSet` non serve a niente, e sui record
-                // PRIVATE il srcSet non c'è (url firmata, una sola larghezza).
-                sizes={view.cover.srcSet ? sizes : undefined}
-                alt={view.cover.alt}
-                priority={priority}
-                className="card-photo object-cover"
-              />
-            </ViewTransition>
-          ) : (
-            <div className="flex h-full items-center justify-center bg-gradient-to-br from-paper to-neutral-200 text-sm text-neutral-400">
-              {photosComing}
-            </div>
-          )}
+        {/* Le foto si sfogliano nella card, senza aprire la scheda: la
+            galleria era già costruita in propertyView e la rendeva solo la
+            Private Collection. Vedi CardGallery. */}
+        <CardGallery
+          photos={photos}
+          slug={view.slug}
+          alt={view.title}
+          sizes={sizes}
+          priority={priority}
+          photosComing={photosComing}
+        >
           <span className="card-sheen" aria-hidden />
           <PropertyBadge {...leftBadge} className="absolute left-3 top-3 z-[2] shadow-sm" />
           {rightBadge && (
@@ -72,7 +67,7 @@ export default function PropertyCard({
           {/* Cuore preferiti: la card è tutta un <Link>, il componente fa
               preventDefault/stopPropagation su ogni click al suo interno. */}
           <FavHeart slug={view.slug} variant="card" />
-        </div>
+        </CardGallery>
         <div className="space-y-1 p-5">
           <p className="text-xl font-semibold tracking-tight text-brand-dark">
             {view.priceLabel}
