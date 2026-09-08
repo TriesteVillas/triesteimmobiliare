@@ -385,6 +385,7 @@
     "badgeNewBuild": "Nuova costruzione",
     "onlineDays": "{count, plural, =0 {ONLINE OGGI} one {ONLINE DA # GIORNO} other {ONLINE DA # GIORNI}}",
     "badgeFeatured": "IN EVIDENZA",
+    "badgeSold": "Venduto",
     "priceOnRequest": "Prezzo su richiesta",
     "priceReserved": "Trattativa riservata",
     "yearBuilt": "Anno di costruzione",

@@ -7,6 +7,10 @@ export const F = {
   publicName: "fldcGog8cRFRjZIrI",
   contratto: "fld8sD96k6YChA8pA",
   cluster: "fldcdPH8aCWSfvFlD",
+  // 2026-09-08: lo stato COMMERCIALE (ACTIVE · UNDER_OFFER · SOLD · RENTED …).
+  // Da non confondere con `stato` qui sotto, che è la condizione FISICA
+  // dell'immobile (imm_stato_immobile). Oggi serve solo al badge «Venduto».
+  statusCommerciale: "fldwoixrfkBqOClHV", // status (singleSelect → string)
   tipologia: "fldr7auGhgNEOpiHg",
   via: "fldSOUwCWIs69WX8B",
   civico: "fld9eWwzOafQXHNFC",
@@ -141,6 +145,9 @@ export type Property = {
   onlineDa: string | null;
   contratto: "VENDITA" | "AFFITTO" | null;
   cluster: string | null;
+  // Stato commerciale grezzo (SOLD, ACTIVE, …): la vetrina lo espone e lo
+  // specchio Airtable lo porta con lo stesso nome. Non è la condizione fisica.
+  statusCommerciale: string | null;
   tipologia: string | null;
   zona: string | null;
   comune: string | null;
@@ -340,6 +347,7 @@ export function mapRecord(recordId: string, f: Fields): Property {
     onlineDa: typeof f[F.onlineDa] === "string" ? (f[F.onlineDa] as string) : null,
     contratto,
     cluster: str(f[F.cluster]),
+    statusCommerciale: str(f[F.statusCommerciale]),
     tipologia: str(f[F.tipologia]),
     zona: str(f[F.zona]),
     comune: str(f[F.comune]),

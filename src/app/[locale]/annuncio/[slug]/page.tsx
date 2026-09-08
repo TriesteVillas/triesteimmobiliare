@@ -32,6 +32,7 @@ import {
   localizedTitle,
   metaClamp,
   priceLabel,
+  soldBadge,
   translatedDescription,
 } from "@/lib/propertyView";
 import { pageAlternates, pageOpenGraph, listingJsonLd, breadcrumbJsonLd } from "@/lib/seo";
@@ -374,6 +375,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
 
         <div className="absolute inset-x-0 bottom-0 mx-auto max-w-5xl px-6 pb-12">
           <div className="flex flex-wrap items-center gap-2" data-reveal="now">
+            {soldBadge(property, t) && <PropertyBadge {...soldBadge(property, t)!} />}
             <PropertyBadge {...contractBadge(property, t)} />
             {clusterBadge(property, t) && (
               <PropertyBadge {...clusterBadge(property, t)!} />

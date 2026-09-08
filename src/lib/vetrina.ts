@@ -199,6 +199,7 @@ function mapRiga(r: RigaVetrina): Property {
     onlineDa: giorno(r.online_da),
     contratto: str(r.contratto) as Property["contratto"],
     cluster: str(r.cluster),
+    statusCommerciale: str(r.status),
     tipologia: str(r.tipologia),
     zona: str(r.zona),
     comune: str(r.comune),

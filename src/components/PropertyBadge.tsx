@@ -8,6 +8,8 @@ const VARIANT: Record<Badge["variant"], string> = {
   cantiere: "bg-brand text-white uppercase tracking-[0.08em]",
   recent: "bg-[#b88a3e] text-white uppercase tracking-[0.08em] shadow-sm",
   featured: "bg-brand-dark text-white uppercase tracking-[0.08em] shadow-sm",
+  // Venduto — pieno, scuro, senza ambiguità: deve leggersi prima del prezzo.
+  sold: "bg-neutral-900 text-white ring-1 ring-white/50 uppercase tracking-[0.12em] shadow-md",
 };
 
 export default function PropertyBadge({

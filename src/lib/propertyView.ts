@@ -2,7 +2,7 @@ import { formatPrice } from "./format";
 import { photoSrc, photoSrcSet } from "./photoSrc";
 import type { Property } from "./properties";
 
-export type BadgeVariant = "default" | "private" | "cantiere" | "recent" | "featured";
+export type BadgeVariant = "default" | "private" | "cantiere" | "recent" | "featured" | "sold";
 export type Badge = { label: string; variant: BadgeVariant };
 
 // Larghezze utili a una copertina di card. Una card non supera mai ~400 px CSS
@@ -23,6 +23,7 @@ export type PropertyView = {
   clusterBadge: Badge | null;
   recentBadge?: Badge | null;
   featuredBadge?: Badge | null;
+  soldBadge?: Badge | null;
   meta: string;
   // `srcSet` manca solo sui record PRIVATE, che restano sulla url firmata di
   // Airtable (il proxy /foto non li risolve): lì si serve una sola larghezza.
@@ -89,6 +90,14 @@ export function clusterBadge(p: Property, t: Translate): Badge | null {
   if (cluster === "PRIVATE") return { label: t("badgePrivate"), variant: "private" };
   if (cluster === "CANTIERI") return { label: t("badgeNewBuild"), variant: "cantiere" };
   return null;
+}
+
+// «Venduto»: l'immobile resta in vetrina, col suo prezzo, ma lo si dice. Solo
+// lo stato commerciale SOLD; UNDER_OFFER e RESERVED non si annunciano.
+export function soldBadge(p: Property, t: Translate): Badge | null {
+  return p.statusCommerciale?.toUpperCase().trim() === "SOLD"
+    ? { label: t("badgeSold"), variant: "sold" }
+    : null;
 }
 
 // Price label: a reserved-negotiation listing hides the figure.
@@ -158,6 +167,7 @@ export function buildPropertyView(
     featuredBadge: p.inEvidenza
       ? { label: t("badgeFeatured"), variant: "featured" }
       : null,
+    soldBadge: soldBadge(p, t),
     meta,
     // Le card passano dal proxy /foto (WebP alla larghezza giusta, url stabile);
     // solo i record privati restano sulla rendition firmata di Airtable.

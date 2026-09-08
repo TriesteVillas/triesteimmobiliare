@@ -30,7 +30,9 @@ export default function PropertyCard({
   /** Larghezza resa della card, se l'impaginazione non è la griglia standard. */
   sizes?: string;
 }) {
-  const leftBadge = view.recentBadge ?? view.badge;
+  // «Venduto» vince su tutto a sinistra: un immobile venduto non è «online da
+  // 3 giorni» né semplicemente «in vendita».
+  const leftBadge = view.soldBadge ?? view.recentBadge ?? view.badge;
   const rightBadge = view.clusterBadge ?? view.featuredBadge;
   // `gallery` è copertina + top 8; `cover` da solo è la rete di sicurezza per
   // un record che avesse la copertina e nient'altro (stessa guardia della card
