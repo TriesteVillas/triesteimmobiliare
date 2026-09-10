@@ -38,6 +38,13 @@
   --color-paper: #f5f7f9;
 
   --ease-lux: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Elegie Duino — palette del sito dedicato, usata solo dalla scena in scheda (.eld-*).
+     sage: SOLO filetti/pallini (3,4:1 su ink), mai testo. */
+  --color-eld-ink: #1a1a1a;
+  --color-eld-cream: #fbfaf6;
+  --color-eld-beige: #d6d1c5;
+  --color-eld-sage: #7d8b72;
+  --color-eld-mute: #9a9690;
 }
 
 body {
@@ -946,4 +953,71 @@ body:has(.pc-root) .pc-lang button.pc-lang-off:hover {
 }
 @media (prefers-reduced-motion: reduce) {
   .cc-bar { animation: none; }
+}
+
+/* ----------------------------------------------------------------
+   Scena Elegie Duino (annuncio) — src/components/ElegieDuinoInvito.tsx
+   --p arriva da Scene (mode cover): 0 = il top entra dal basso, .5 = centrata,
+   1 = il bottom esce dall'alto. Con prefers-reduced-motion Scene pinna --p = 1.
+   Ogni regola di moto sta sotto html[data-reveal-armed] (JS attivo e nessuna
+   preferenza di riduzione, impostato dal layout prima del paint): senza gate lo
+   stato è quello di riposo, completo e fermo. Niente animazioni autonome.
+---------------------------------------------------------------- */
+.eld-eyebrow {
+  display: flex; align-items: center; gap: 0.75rem;
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
+  color: #d6d1c5;
+}
+.eld-eyebrow::before { content: ""; width: 2rem; height: 1px; background: #7d8b72; flex: none; }
+
+.eld-tri > li { display: inline-flex; align-items: center; gap: 0.5rem; }
+.eld-tri > li::before {
+  content: ""; width: 5px; height: 5px; border-radius: 999px; background: #7d8b72; flex: none;
+}
+.eld-n { font-variant-numeric: tabular-nums; }
+
+.eld-ring { position: relative; border-radius: 9999px; }
+.eld-ring::before {
+  content: ""; position: absolute; inset: -2px; border-radius: inherit; padding: 2px;
+  pointer-events: none;
+  background: conic-gradient(from calc(var(--p, 0) * 540deg),
+    transparent 0 62%, #d6d1c5 78%, #7d8b72 88%, transparent 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+.eld-arrow { transition: transform 300ms var(--ease-lux); }
+.group:hover .eld-arrow, .group:focus-visible .eld-arrow { transform: translate(2px, -2px); }
+
+/* --- moto: solo con il gate --- */
+/* La foto scorre e si stringe solo da 640px: sotto è una banda 4:5 in testa alla
+   scena (vedi ElegieDuinoInvito), e un translate scoprirebbe i bordi. */
+@media (min-width: 640px) {
+  html[data-reveal-armed] .eld-img {
+    transform: translate3d(0, calc((var(--p, 0) - 0.5) * -6%), 0) scale(calc(1.14 - var(--p, 0) * 0.14));
+    will-change: transform;
+  }
+}
+html[data-reveal-armed] .eld-logo {
+  transform: translate3d(0, calc((var(--p, 0) - 0.5) * -4vh), 0);
+  will-change: transform;
+}
+/* Le tre righe si accendono presto (p .05/.12/.19) e partono da 0.8, non da 0.42:
+   su telefono la scena è alta ~3 finestre e con le soglie desktop la terza riga
+   restava a 2,4:1 proprio dove la si legge (revisione 10/09). Beige a 0.8 sul
+   fondo medio è 4,6:1; l'accensione vera la fa il pallino, che va da .4 a 1. */
+html[data-reveal-armed] .eld-tri {
+  --f1: clamp(0, calc((var(--p, 0) - 0.05) / 0.08), 1);
+  --f2: clamp(0, calc((var(--p, 0) - 0.12) / 0.08), 1);
+  --f3: clamp(0, calc((var(--p, 0) - 0.19) / 0.08), 1);
+}
+html[data-reveal-armed] .eld-tri > li { opacity: calc(0.8 + 0.2 * var(--f, 1)); }
+html[data-reveal-armed] .eld-tri > li::before { transform: scale(calc(0.4 + 0.6 * var(--f, 1))); }
+html[data-reveal-armed] .eld-tri > li:nth-child(1) { --f: var(--f1); }
+html[data-reveal-armed] .eld-tri > li:nth-child(2) { --f: var(--f2); }
+html[data-reveal-armed] .eld-tri > li:nth-child(3) { --f: var(--f3); }
+
+@media (prefers-reduced-motion: reduce) {
+  .eld-img, .eld-logo, .eld-tri > li::before { transform: none !important; will-change: auto; }
+  .eld-tri > li { opacity: 1 !important; }
+  .eld-arrow { transition: none !important; }
 }

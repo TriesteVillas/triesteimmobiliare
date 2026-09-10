@@ -43,6 +43,8 @@ import PropertyActions from "@/components/account/PropertyActions";
 import AccountPerks from "@/components/account/AccountPerks";
 import DwellTracker from "@/components/account/DwellTracker";
 import BuyerConcierge from "@/components/compra/BuyerConcierge";
+import ElegieDuinoInvito, { ElegieChip, ElegiePlansHint } from "@/components/ElegieDuinoInvito";
+import { isElegieProgetto } from "@/lib/elegie";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.triesteimmobiliare.com";
 
@@ -178,6 +180,12 @@ export default async function PropertyPage({ params }: { params: Params }) {
   // quando la traduzione non è ancora stata scritta (vedi localizedDescription).
   const title = localizedTitle(property, locale);
   const description = localizedDescription(property, locale);
+  // Elegie Duino: la scheda è una delle otto unità del progetto → scena-ponte
+  // verso elegieduino.it (chip in hero, voce nav, scena dopo le foto, hint
+  // planimetrie). Decide SOLO il campo progetto, mai il cluster CANTIERI.
+  const isElegie = isElegieProgetto(property.progetto);
+  const tElegie = isElegie ? await getTranslations("elegie") : null;
+  const SITO = "triesteimmobiliare.com" as const;
 
   // Box costi indicativi (solo vendita), col toggle prima/seconda casa —
   // stesso impianto del gemello TriesteVillas: imposta dallo scenario, fee 4%
@@ -278,6 +286,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
   // Sticky anchor nav (immobiliare.it style) — only sections that exist.
   const nav = [
     (property.coverPhoto || property.photos.length) && { id: "foto", label: t("galPhotos") },
+    isElegie && tElegie && { id: "elegie", label: tElegie("nav") },
     description && { id: "descrizione", label: t("descriptionTitle") },
     property.planimetrie.length && { id: "planimetrie", label: t("galPlans") },
     ytIds.length && { id: "video", label: t("galVideo") },
@@ -380,6 +389,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
             {clusterBadge(property, t) && (
               <PropertyBadge {...clusterBadge(property, t)!} />
             )}
+            {isElegie && <ElegieChip property={property} locale={locale} sito={SITO} />}
           </div>
           <h1 className="display-chapter mt-4 max-w-3xl text-white [text-shadow:0_4px_30px_rgba(0,0,0,0.5)]">
             {title}
@@ -496,6 +506,10 @@ export default async function PropertyPage({ params }: { params: Params }) {
             />
           </div>
 
+
+          {isElegie && (
+            <ElegieDuinoInvito property={property} title={title} locale={locale} sito={SITO} />
+          )}
           <PropertyCharacteristics
             title={t("characteristicsTitle")}
             items={characteristics}
@@ -522,6 +536,8 @@ export default async function PropertyPage({ params }: { params: Params }) {
             title={t("galPlans")}
             closeLabel={t("galClose")}
           />
+
+          {isElegie && <ElegiePlansHint property={property} locale={locale} sito={SITO} />}
 
           {ytIds.length > 0 && (
             <section id="video" className="mt-8 scroll-mt-32">

@@ -52,6 +52,7 @@ type RigaVetrina = {
   contratto: string | null;
   tipologia: string | null;
   cluster: string | null;
+  progetto: string | null;
   prezzo_eur: string | number | null;
   canone_mensile_eur: string | number | null;
   mq: string | number | null;
@@ -199,6 +200,7 @@ function mapRiga(r: RigaVetrina): Property {
     onlineDa: giorno(r.online_da),
     contratto: str(r.contratto) as Property["contratto"],
     cluster: str(r.cluster),
+    progetto: str(r.progetto),
     statusCommerciale: str(r.status),
     tipologia: str(r.tipologia),
     zona: str(r.zona),
