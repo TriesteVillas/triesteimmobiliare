@@ -7,6 +7,10 @@ export const F = {
   publicName: "fldcGog8cRFRjZIrI",
   contratto: "fld8sD96k6YChA8pA",
   cluster: "fldcdPH8aCWSfvFlD",
+  // 2026-09-10: progetto/cantiere (singleSelect → string, es. «DUINO RICCESI»).
+  // Serve alla scheda per riconoscere le unità di un progetto con sito dedicato
+  // (invito Elegie Duino). Stesso field id del gemello triestevillas-web.
+  progetto: "fldJjLwwFF2ipL6zJ",
   // 2026-09-08: lo stato COMMERCIALE (ACTIVE · UNDER_OFFER · SOLD · RENTED …).
   // Da non confondere con `stato` qui sotto, che è la condizione FISICA
   // dell'immobile (imm_stato_immobile). Oggi serve solo al badge «Venduto».
@@ -145,6 +149,9 @@ export type Property = {
   onlineDa: string | null;
   contratto: "VENDITA" | "AFFITTO" | null;
   cluster: string | null;
+  // Progetto/cantiere di appartenenza («DUINO RICCESI»…), null se l'unità non
+  // fa parte di un progetto. Decide l'invito al sito dedicato nella scheda.
+  progetto: string | null;
   // Stato commerciale grezzo (SOLD, ACTIVE, …): la vetrina lo espone e lo
   // specchio Airtable lo porta con lo stesso nome. Non è la condizione fisica.
   statusCommerciale: string | null;
@@ -347,6 +354,7 @@ export function mapRecord(recordId: string, f: Fields): Property {
     onlineDa: typeof f[F.onlineDa] === "string" ? (f[F.onlineDa] as string) : null,
     contratto,
     cluster: str(f[F.cluster]),
+    progetto: str(f[F.progetto]),
     statusCommerciale: str(f[F.statusCommerciale]),
     tipologia: str(f[F.tipologia]),
     zona: str(f[F.zona]),
