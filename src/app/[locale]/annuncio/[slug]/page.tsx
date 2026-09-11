@@ -343,7 +343,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
         ]}
       />
       {/* Cinematic hero — parallax cover, shared-element morph target */}
-      <Scene as="header" mode="cover" smooth={0.14} className="relative h-[82vh] min-h-[520px] overflow-hidden bg-ink-2">
+      <Scene as="header" mode="cover" smooth={0.14} className="relative min-h-[82vh] overflow-hidden bg-ink-2 sm:h-[82vh] sm:min-h-[520px]">
         {/* L'alt delle foto nasce dal titolo italiano in mapRecord (che non conosce
             il locale): sull'immagine principale usiamo il titolo localizzato. Le foto
             della galleria restano con l'alt costruito in mapRecord. */}
@@ -382,7 +382,12 @@ export default async function PropertyPage({ params }: { params: Params }) {
           </Link>
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 mx-auto max-w-5xl px-6 pb-12">
+        {/* Sotto 640px il blocco sta nel flusso (pt-40 lascia libere testata fissa e
+            «Torna agli immobili») e l'hero cresce con lui: ancorato in basso a
+            un'altezza fissa, su un telefono da 320 px la riga dei badge finiva
+            sotto la testata (misurato l'11/09). Da sm in su torna assoluto in
+            fondo all'hero, com'era. Stessa correzione del gemello TSV. */}
+        <div className="relative mx-auto max-w-5xl px-6 pb-12 pt-40 sm:absolute sm:inset-x-0 sm:bottom-0 sm:pt-0">
           <div className="flex flex-wrap items-center gap-2" data-reveal="now">
             {soldBadge(property, t) && <PropertyBadge {...soldBadge(property, t)!} />}
             <PropertyBadge {...contractBadge(property, t)} />
