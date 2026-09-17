@@ -291,6 +291,14 @@ export type Grant = {
   email: string;
   lingua: Lang;
   expiresAtMs: number | null;
+  /** Quando il CODICE è stato emesso. Serve alla finestra di grazia qui sotto:
+   *  è l'unico modo di distinguere una riga che una PERSONA ha appena approvato
+   *  dal CRM da una che aspetta da giorni.
+   *  ⚠️ OPZIONALE apposta: lo riempie `toGrant` leggendo Airtable, ma i grant
+   *  che arrivano dalla porta di tsv-pg (`porta.ts`, usata solo per il login)
+   *  non lo portano — e un campo obbligatorio che in metà dei casi non c'è è
+   *  un tipo che mente. Chi lo legge tratta «assente» come «non lo so». */
+  issuedAtMs?: number | null;
   accessi: number;
   leadIds: string[];
 };
@@ -309,6 +317,7 @@ function toGrant(r: AirRecord): Grant {
     email: str(f.email),
     lingua: ["it", "en", "de"].includes(lang) ? lang : "en",
     expiresAtMs: exp ? new Date(exp).getTime() : null,
+    issuedAtMs: (() => { const t = Date.parse(str(f.issued_at)); return Number.isFinite(t) ? t : null; })(),
     accessi: typeof f.accessi === "number" ? f.accessi : 0,
     leadIds: lead,
   };
@@ -468,11 +477,64 @@ export function genCode(): string {
 // righe: ensureCredential è idempotente sul codice, markCredentialSent no —
 // quindi il risultato sarebbe un doppio invio, o la credenziale di un brand
 // spedita col template dell'altro.
-export async function listApprovedNeedingCredential(): Promise<Grant[]> {
+/**
+ * LA FINESTRA DI GRAZIA — decisa da Martino dopo il secondo caso (16/09/2026).
+ *
+ * Questo cron e il pannello «✉️ Manda credenziali» del CRM v4 fanno LO STESSO
+ * lavoro sulla stessa riga, e il cron vinceva sempre: lui passa ogni 15 minuti,
+ * l'operatore ha i secondi che gli servono per scrivere. Due casi veri:
+ *
+ *  · 04/09, Cesare Marchesan — «emetti accesso» alle 16:14:47, il giro spedisce
+ *    alle 16:15:00, e all'operatore che preme «Invia» il CRM risponde
+ *    «credenziali già inviate» su un lead mai toccato prima;
+ *  · 16/09, Holger Holle — avvocato d'affari con studio a Monaco di Baviera,
+ *    email @web.de. La sua richiesta era registrata `lingua = it` (è la lingua
+ *    della PAGINA da cui ha compilato il form, non la sua): mentre l'operatore
+ *    riscriveva la lettera in inglese, il giro gliel'ha spedita IN ITALIANO.
+ *
+ * Da qui in avanti il giro **aspetta**: una riga emessa da meno di
+ * `PC_GRAZIA_MIN` minuti non viene servita, e chi l'ha appena approvata ha il
+ * tempo di scrivere con parole sue, dalla casella del marchio, correggendo la
+ * lingua se serve. Scaduta la finestra il giro la prende comunque: è la rete di
+ * sicurezza, e chi si dimentica non lascia un cliente ad aspettare per sempre.
+ *
+ * ⚠️ Una riga SENZA `issued_at` non aspetta niente: è una riga portata a
+ * `Approved` a mano su Airtable, dove il codice lo conia questo cron — non c'è
+ * nessun operatore che stia componendo, e farla aspettare sarebbe solo ritardo.
+ */
+const PC_GRAZIA_MIN = (() => {
+  const n = Number(process.env.PC_GRAZIA_MIN);
+  return Number.isFinite(n) && n >= 0 ? n : 120;
+})();
+
+// I cron dei due siti girano su progetti Vercel distinti ma leggono la STESSA
+// tabella. Senza questo filtro sarebbero due mailer concorrenti sulle stesse
+// righe: ensureCredential è idempotente sul codice, markCredentialSent no —
+// quindi il risultato sarebbe un doppio invio, o la credenziale di un brand
+// spedita col template dell'altro.
+export async function listApprovedNeedingCredential(): Promise<{
+  /** Le righe che il giro serve adesso. */
+  daServire: Grant[];
+  /** Quante ne ha lasciate all'operatore, e per quanto ancora: non è un numero
+   *  decorativo — è la differenza fra «oggi non c'era niente da mandare» e
+   *  «c'era, e ho aspettato apposta». Finisce nella risposta del cron. */
+  inAttesa: { id: string; email: string; fraMinuti: number }[];
+}> {
   const recs = await aList(T_REQ, {
     filter: `AND({stato}='Approved',{credenziali_inviate}!=1,${brandClause()})`,
   });
-  return recs.map(toGrant);
+  const ora = Date.now();
+  const soglia = PC_GRAZIA_MIN * 60_000;
+  const daServire: Grant[] = [];
+  const inAttesa: { id: string; email: string; fraMinuti: number }[] = [];
+  for (const g of recs.map(toGrant)) {
+    // `== null` prende anche l'assente: senza istante di emissione non si
+    // aspetta (vedi il cappello) — `Infinity` vuol dire «servila adesso».
+    const eta = g.issuedAtMs == null ? Infinity : ora - g.issuedAtMs;
+    if (eta >= soglia) daServire.push(g);
+    else inAttesa.push({ id: g.id, email: g.email, fraMinuti: Math.ceil((soglia - eta) / 60_000) });
+  }
+  return { daServire, inAttesa };
 }
 
 // Ensure a code exists (so login works immediately) and return the live values.

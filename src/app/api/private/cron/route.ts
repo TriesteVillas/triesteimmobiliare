@@ -10,7 +10,12 @@ import { MAIL_REPLY_TO } from "@/lib/private/brand";
 // (which sends `Authorization: Bearer ${CRON_SECRET}`) or manually with
 // `?key=${CRON_SECRET}`. Idempotent: guarded by the credenziali_inviate /
 // cortesia_inviata checkboxes, so re-runs are safe.
-//   1) Approved + no credential yet → issue a code and email it (luxury@). The
+//   1) Approved + no credential yet → issue a code and email it (luxury@) —
+//      MA NON SUBITO: dal 16/09/2026 una riga emessa da meno di PC_GRAZIA_MIN
+//      minuti (default 120) si lascia all'operatore del CRM, che può scrivere
+//      con parole sue e nella lingua giusta. Il perché, coi due casi che l'hanno
+//      pagata, sta su `listApprovedNeedingCredential` in lib/private/store.ts.
+//      The
 //      duration is NOT fixed at 15 days: 15 is the floor this cron applies when it
 //      has to mint the code itself (row flipped to Approved by hand on Airtable).
 //      When the CRM approved it, code and expiry are already on the record and this
@@ -45,9 +50,16 @@ export async function GET(request: Request) {
   if (!authorized(request)) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
-  const result = { issued: 0, expired: 0, flagged: 0, mail: mailConfigured() };
+  const result: {
+    issued: number; expired: number; flagged: number; mail: boolean;
+    attesa: { id: string; email: string; fraMinuti: number }[];
+  } = { issued: 0, expired: 0, flagged: 0, mail: mailConfigured(), attesa: [] };
 
-  for (const g of await listApprovedNeedingCredential()) {
+  const coda = await listApprovedNeedingCredential();
+  // Le righe trattenute si DICHIARANO nella risposta: un cron che tace non si
+  // distingue da un cron che non ha trovato niente.
+  result.attesa = coda.inAttesa;
+  for (const g of coda.daServire) {
     try {
       const { code, expiresAtMs } = await ensureCredential(g);
       const mail = credentialEmail(g.lingua, g.nome, code, fmtDate(expiresAtMs, g.lingua), daysUntil(expiresAtMs));
