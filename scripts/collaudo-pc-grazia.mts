@@ -32,7 +32,11 @@ globalThis.fetch = (async (u: string | URL | Request, init?: RequestInit) => {
   return vero(u as never, init);
 }) as typeof fetch;
 
-const { listApprovedNeedingCredential } = await import("../src/lib/private/store.ts");
+// ⚠️ SENZA estensione: con `.ts` esplicito `next build` fallisce il type check
+// («An import path can only end with a .ts extension when
+// allowImportingTsExtensions is enabled») — e questo file sta dentro il
+// perimetro che Next controlla. Costato un deploy rosso il 17/09.
+const { listApprovedNeedingCredential } = await import("../src/lib/private/store");
 
 let ko = 0;
 const prova = (atteso: unknown, avuto: unknown, cosa: string) => {
