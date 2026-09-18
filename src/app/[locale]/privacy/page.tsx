@@ -47,7 +47,7 @@ const CONTENT: Record<string, Content> = {
       },
       {
         h: "9. Cookie",
-        p: "Il sito utilizza cookie tecnici necessari al funzionamento. Eventuali servizi di terze parti (es. mappe, video) possono impostare cookie propri quando ne attivi i contenuti.",
+        p: "Il sito usa cookie tecnici necessari al funzionamento e, solo con il tuo consenso, cookie di statistica di Google Analytics 4 (Google Ireland Ltd) per capire come viene usato il sito. Fino alla tua scelta non viene scritto nessun cookie di statistica; puoi cambiare idea in ogni momento dal link «Preferenze cookie» in fondo a ogni pagina. Nessuna pubblicità, nessuna profilazione. Eventuali servizi di terze parti (es. mappe, video) possono impostare cookie propri quando ne attivi i contenuti.",
       },
       {
         h: "10. Area riservata e personalizzazione",
@@ -96,7 +96,7 @@ const CONTENT: Record<string, Content> = {
       },
       {
         h: "9. Cookies",
-        p: "The site uses technical cookies required for operation. Third-party services (e.g. maps, video) may set their own cookies when you activate their content.",
+        p: "The site uses technical cookies required for operation and, only with your consent, Google Analytics 4 statistics cookies (Google Ireland Ltd) to understand how the site is used. No statistics cookie is set until you choose; you can change your mind at any time via the “Cookie preferences” link at the bottom of every page. No advertising, no profiling. Third-party services (e.g. maps, video) may set their own cookies when you activate their content.",
       },
       {
         h: "10. Account area and personalisation",
@@ -145,7 +145,7 @@ const CONTENT: Record<string, Content> = {
       },
       {
         h: "9. Cookies",
-        p: "Die Website verwendet technisch notwendige Cookies. Dienste Dritter (z. B. Karten, Videos) können eigene Cookies setzen, wenn Sie deren Inhalte aktivieren.",
+        p: "Die Website verwendet technisch notwendige Cookies und, nur mit Ihrer Einwilligung, Statistik-Cookies von Google Analytics 4 (Google Ireland Ltd), um die Nutzung der Website zu verstehen. Bis zu Ihrer Entscheidung wird kein Statistik-Cookie gesetzt; Sie können Ihre Wahl jederzeit über den Link „Cookie-Einstellungen“ am Ende jeder Seite ändern. Keine Werbung, kein Profiling. Dienste Dritter (z. B. Karten, Videos) können eigene Cookies setzen, wenn Sie deren Inhalte aktivieren.",
       },
       {
         h: "10. Kontobereich und Personalisierung",
