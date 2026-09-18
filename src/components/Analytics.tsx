@@ -6,9 +6,17 @@ import { usePathname } from "next/navigation";
 // ─────────────────────────────────────────────────────────────────────────────
 // Google Analytics 4.
 //
-// Gemello di quello su triestevillas.com, acceso il 2026-07-31 con l'ID della
-// proprietà GA4 di TriesteImmobiliare (fornito da Martino dal flusso di dati
-// web dell'account Analytics del gruppo).
+// Gemello di quello su triestevillas.com, acceso il 2026-07-31.
+//
+// ⚠️ L'ID È CAMBIATO IL 2026-09-18. Dal 31/07 il sito spediva `G-TTVSE30EJF`,
+// che NON è il flusso della proprietà di TriesteImmobiliare: è un secondo flusso
+// creato DENTRO la proprietà «TRIESTEVILLAS.com - GA4» (337699857). Risultato:
+// sette settimane di visite di TSI contate come TSV, e la proprietà vera di TSI
+// («www.triesteimmobiliare.com», 530742980) a zero — «ma non è possibile, c'è
+// chi ci ha scritto». Lo ha scoperto la sentinella del CRM v4 leggendo i flussi
+// per ID (lib/marketing/siti-copertura.ts). L'ID qui sotto è quello del flusso
+// della proprietà giusta; il registro dei siti del v4 (lib/marketing/siti.ts)
+// deve dire lo stesso, o la sentinella griderà «senza proprietà».
 //
 // L'ID di misurazione è un identificatore PUBBLICO (si legge nel sorgente di
 // ogni pagina): sta in chiaro qui e non in una variabile d'ambiente, così non
@@ -26,7 +34,7 @@ import { usePathname } from "next/navigation";
 // script inline proprio per non doverlo sperare.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const GA_ID = "G-TTVSE30EJF";
+const GA_ID = "G-K3ZQZN73NV";
 
 export default function Analytics() {
   // ⚠️ NIENTE ANALYTICS DENTRO L'AREA RISERVATA — gemello della stessa esclusione su
