@@ -4,7 +4,7 @@ import {
   listExpiredNeedingCourtesy, markExpired, detectAbuse,
 } from "@/lib/private/store";
 import { credentialEmail, expiryEmail, mailConfigured, sendMail, inviaMail, MITTENTE_EFFETTIVO } from "@/lib/private/mail";
-import { segnalaConsegnaCredenziali, PC_TRACCIA_CRON } from "@/lib/private/porta";
+import { segnalaConsegnaCredenziali, segnalaGiroVivo, PC_TRACCIA_CRON } from "@/lib/private/porta";
 import { MAIL_REPLY_TO } from "@/lib/private/brand";
 
 // Processor for the Private Collection lifecycle. Triggered by Vercel Cron
@@ -55,6 +55,9 @@ export async function GET(request: Request) {
   if (!authorized(request)) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
+  // ⚠️ Si segna l'istante di partenza per il BATTITO in fondo: quanto è durata
+  // una corsa è la prima cosa che si guarda quando un cron comincia a saltare.
+  const partito = Date.now();
   const result: {
     issued: number; expired: number; flagged: number; mail: boolean;
     /* ⛔ `flagged: 0` NON vuol dire «nessun abuso» se il registro letto è
@@ -78,7 +81,7 @@ export async function GET(request: Request) {
     falliti: { id: string; email: string; perche: string }[];
     /* Cosa ha detto la porta del CRM, quando l'interruttore è acceso: una
        traccia che non si scrive deve vedersi qui, non sparire. */
-    traccia: { acceso: boolean; scritte: number; guasti: number };
+    traccia: { acceso: boolean; scritte: number; guasti: number; battito?: string };
   } = {
     issued: 0, expired: 0, flagged: 0, mail: mailConfigured(), attesa: [],
     antiAbuso: { attendibile: false, ultimoAccessoNoto: null,
@@ -170,6 +173,27 @@ export async function GET(request: Request) {
       perche: `la scansione è fallita: ${String(e).slice(0, 200)}`,
     };
   }
+
+  // ── IL BATTITO, per ultimo ───────────────────────────────────────────────
+  // ⛔ QUI E NON IN UN `finally`, ed è una decisione. Questo battito vuol dire
+  // «la corsa è arrivata in fondo»: se una delle letture qui sopra esplode, la
+  // rotta muore con un 500 e il battito NON parte — e la sentinella del CRM
+  // finisce per gridare, che è esattamente quello che deve succedere. Batterlo
+  // nel `finally` renderebbe verde un giro che fallisce a ogni passaggio, cioè
+  // ricostruirebbe il guasto che questo battito esiste per chiudere.
+  //
+  // ⚠️ Non tocca il risultato del giro: `segnalaGiroVivo` non alza mai e a
+  // interruttore spento non chiama niente.
+  const battito = await segnalaGiroVivo({
+    inviate: result.issued,
+    falliti: result.falliti.length,
+    attesa: result.attesa.length,
+    scaduti: result.expired,
+    sospetti: result.flagged,
+    antiAbusoAttendibile: result.antiAbuso.attendibile,
+    durataMs: Date.now() - partito,
+  });
+  result.traccia.battito = battito.esito;
 
   return NextResponse.json({ ok: true, ...result });
 }

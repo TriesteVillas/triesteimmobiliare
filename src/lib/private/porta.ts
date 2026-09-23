@@ -544,3 +544,95 @@ export async function segnalaConsegnaCredenziali(d: {
     return { esito: "guasto", perche };
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// IL GIRO DICE CHE È VIVO — la sentinella che mancava (23/09/2026)
+//
+// Questo cron (`/api/private/cron`) è l'unico processo di tutto il sistema che
+// manda PASSWORD a clienti veri, ed è anche l'unico che non ha mai avuto una
+// sentinella: nel v4 ogni cron lascia un battito e una riga nel registro dei
+// processi, e una spia grida quando tace oltre la soglia. Questo no, perché
+// gira in un altro repo e in un altro progetto Vercel. Se si fermasse — un
+// `vercel.json` modificato, un deploy andato storto, un progetto sospeso —
+// nessuno se ne accorgerebbe: le richieste `Approved` resterebbero in coda e
+// i clienti aspetterebbero la loro password senza che niente lo dica.
+//
+// Da qui in avanti il giro lo dichiara, dalla stessa porta firmata che questo
+// file usa già: azione `battito-giro`. Il CRM scrive nel SUO registro dei
+// battiti, con le sue spie e il suo pannello — nessun meccanismo nuovo.
+//
+// ⛔ NON È LA TRACCIA DEGLI INVII (`segnalaConsegnaCredenziali`, qui sopra).
+// Quella risponde a «a questa persona le credenziali sono uscite?», questa a
+// «la macchina che le manda è viva?». Un giro che passa e non trova niente da
+// fare è sano e non scrive nessuna traccia d'invio: senza un battito a parte,
+// quel silenzio è indistinguibile da un giro morto.
+//
+// ⛔ NON MANDA INDIRIZZI NÉ CODICI: solo conteggi. Un canale di sorveglianza
+// non è il posto dove far passare i dati di una persona «già che ci siamo».
+//
+// ── L'INTERRUTTORE: lo stesso `PC_TRACCIA_CRON`, e nasce SPENTO ────────────
+// Non un quarto interruttore. I due gesti hanno la stessa natura (il giro
+// racconta al CRM quello che ha fatto), lo stesso destinatario, lo stesso
+// rischio — nessuno — e lo stesso rollback. Un interruttore in più sarebbe
+// solo un modo per accenderne uno e dimenticare l'altro.
+//
+// ⚠️ IL PATTO, che vale nell'altro verso: dal primo battito il CRM registra il
+// processo e comincia a sorvegliarlo. Spegnere `PC_TRACCIA_CRON` da allora in
+// poi fa gridare la spia — giustamente, perché il giro torna muto — ma non è
+// un guasto. Chi lo spegne deve, nello stesso gesto, mettere `attivo = false`
+// sulla riga `processo` del CRM. Sta scritto anche nel campo `come_si_ferma`
+// di quella riga, che è dove si va a cercare come si zittisce un allarme.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** Quanto si aspetta la porta. Corto: è una prova di vita, e il giro ha
+ *  finito il suo lavoro — non deve tenere aperta una lambda per un battito. */
+const ATTESA_BATTITO_MS = 5_000;
+
+/** Il riassunto della corsa. ⛔ Conteggi e basta. */
+export interface RiassuntoGiroPc {
+  inviate: number;
+  falliti: number;
+  attesa: number;
+  scaduti: number;
+  sospetti: number;
+  /** La guardia anti-abuso ha potuto GUARDARE? `false` = cieca (dal 26/08 lo è). */
+  antiAbusoAttendibile: boolean;
+  durataMs: number;
+}
+
+/**
+ * «Sono passato.» Non alza MAI e non fa fallire niente: chi la chiama ha appena
+ * consegnato credenziali a clienti veri, e una prova di vita non scritta vale
+ * molto meno di un cron ucciso a metà.
+ */
+export async function segnalaGiroVivo(r: RiassuntoGiroPc): Promise<EsitoTracciaCron> {
+  if (PC_TRACCIA_MANCA_SEGRETO) return { esito: "spenta" };
+  if (!PC_TRACCIA_CRON) return { esito: "spenta" };
+
+  const corpo = JSON.stringify({ azione: "battito-giro", giro: r });
+  try {
+    const risposta = await fetch(URL_PORTA, {
+      method: "POST",
+      headers: { "x-porta": PORTA, "x-firma": firmaDi(corpo), "Content-Type": "application/json" },
+      body: corpo,
+      signal: AbortSignal.timeout(ATTESA_BATTITO_MS),
+      cache: "no-store",
+    });
+    if (!risposta.ok) {
+      const perche = `http ${risposta.status}`;
+      console.error("[pc battito]", perche);
+      return { esito: "guasto", perche };
+    }
+    const dati = (await risposta.json().catch(() => ({}))) as { ok?: unknown; nota?: unknown; perche?: unknown };
+    if (dati.ok !== true) {
+      const perche = typeof dati.perche === "string" ? dati.perche : "rifiutato senza motivo";
+      console.error("[pc battito] il CRM non ha registrato il battito —", perche);
+      return { esito: "guasto", perche };
+    }
+    return { esito: "scritta", nota: typeof dati.nota === "string" ? dati.nota : "" };
+  } catch (e) {
+    const perche = `rete: ${String(e).slice(0, 160)}`;
+    console.error("[pc battito]", perche);
+    return { esito: "guasto", perche };
+  }
+}
