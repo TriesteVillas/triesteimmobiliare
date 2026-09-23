@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Script from "next/script";
 import { usePathname } from "next/navigation";
 
@@ -37,6 +38,41 @@ import { usePathname } from "next/navigation";
 const GA_ID = "G-K3ZQZN73NV";
 
 export default function Analytics() {
+  // ── Gli eventi che contano (23/09/2026) ────────────────────────────────────
+  // Senza eventi GA4 misura pagine e basta. Un ascoltatore solo, delegato al
+  // documento, per tutti i punti di contatto del sito — così un modulo nuovo o
+  // un numero di telefono in una pagina nuova sono già misurati senza toccare
+  // niente:
+  //   · `generate_lead` (evento raccomandato GA4) a ogni submit di un <form>,
+  //     con `modulo` = id/nome del form. In fase di CATTURA, quindi anche se
+  //     React chiama preventDefault: conta la richiesta, non l'esito.
+  //   · `contatto` al clic su tel: / WhatsApp / mailto:, con `canale`.
+  // Nel CRM v4 il job `eventi` li marca come eventi chiave e registra i due
+  // parametri come dimensioni: senza, nei report non comparirebbero.
+  useEffect(() => {
+    const invia = (nome: string, parametri: Record<string, string>) => {
+      try { (window as unknown as { gtag?: (...a: unknown[]) => void }).gtag?.("event", nome, parametri); } catch { /* niente analytics = niente da fare */ }
+    };
+    const alClic = (e: MouseEvent) => {
+      const a = (e.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null;
+      if (!a) return;
+      const h = a.getAttribute("href") ?? "";
+      if (/^tel:/i.test(h)) invia("contatto", { canale: "telefono" });
+      else if (/wa\.me|api\.whatsapp\.com|^whatsapp:/i.test(h)) invia("contatto", { canale: "whatsapp" });
+      else if (/^mailto:/i.test(h)) invia("contatto", { canale: "email" });
+    };
+    const alSubmit = (e: Event) => {
+      const f = e.target as HTMLFormElement | null;
+      if (!f || f.tagName !== "FORM") return;
+      invia("generate_lead", { modulo: f.id || f.getAttribute("name") || f.getAttribute("aria-label") || "form" });
+    };
+    document.addEventListener("click", alClic, true);
+    document.addEventListener("submit", alSubmit, true);
+    return () => {
+      document.removeEventListener("click", alClic, true);
+      document.removeEventListener("submit", alSubmit, true);
+    };
+  }, []);
   // ⚠️ NIENTE ANALYTICS DENTRO L'AREA RISERVATA — gemello della stessa esclusione su
   // triestevillas-web. Il link delle mail porta il CODICE D'ACCESSO nella query, e
   // GA4 manda `page_location` con la query intera: sarebbe la credenziale della

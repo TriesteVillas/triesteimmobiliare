@@ -52,10 +52,10 @@ export async function generateMetadata({
     robots: ALLOW_INDEX
       ? { index: true, follow: true }
       : { index: false, follow: false },
-    // Token Search Console via env: niente deploy quando si (ri)verifica la proprietà.
-    ...(process.env.GOOGLE_SITE_VERIFICATION
-      ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } }
-      : {}),
+    // Token Search Console (23/09/2026): è pubblico e sta qui, come l'ID GA4 —
+    // la env resta come scavalco. Ottenuto dalla sentinella del CRM v4 (Site
+    // Verification API), verificato dallo stesso job dopo il deploy.
+    verification: { google: process.env.GOOGLE_SITE_VERIFICATION ?? "NfZ3sIL_owbEf3s_HAVxDAfG42LUzpK2nB4Z8udxHtc" },
     openGraph: {
       type: "website",
       siteName: "TriesteImmobiliare",
