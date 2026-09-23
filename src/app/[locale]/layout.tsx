@@ -52,10 +52,15 @@ export async function generateMetadata({
     robots: ALLOW_INDEX
       ? { index: true, follow: true }
       : { index: false, follow: false },
-    // Token Search Console (23/09/2026): è pubblico e sta qui, come l'ID GA4 —
-    // la env resta come scavalco. Ottenuto dalla sentinella del CRM v4 (Site
-    // Verification API), verificato dallo stesso job dopo il deploy.
-    verification: { google: process.env.GOOGLE_SITE_VERIFICATION ?? "NfZ3sIL_owbEf3s_HAVxDAfG42LUzpK2nB4Z8udxHtc" },
+    // Token Search Console (23/09/2026). Sono DUE, di proposito: quello nella
+    // env GOOGLE_SITE_VERIFICATION su Vercel appartiene a un altro utente Google
+    // (è quello che il sito serviva già), quello scritto qui è di martino@ ed è
+    // stato chiesto dalla sentinella del CRM v4 (Site Verification API). Google
+    // verifica un utente alla volta e cerca IL SUO token: con «env ?? costante»
+    // la costante non usciva mai e la verifica di martino@ falliva con «token
+    // non trovato». Next accetta una lista: escono entrambi, ogni utente trova
+    // il suo. Pubblici come l'ID GA4.
+    verification: { google: [process.env.GOOGLE_SITE_VERIFICATION, "NfZ3sIL_owbEf3s_HAVxDAfG42LUzpK2nB4Z8udxHtc"].filter((t): t is string => !!t) },
     openGraph: {
       type: "website",
       siteName: "TriesteImmobiliare",
