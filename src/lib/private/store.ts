@@ -3,7 +3,7 @@ import { type Lang } from "./mail";
 import { BRAND, brandClause } from "./brand";
 import { normCity } from "../citynorm";
 import {
-  PC_DA_POSTGRES, PC_MANCA_SEGRETO,
+  PC_DA_POSTGRES, PC_MANCA_SEGRETO, PC_RICHIESTA_DA_POSTGRES,
   pgFindGrantByCode, pgFindGrantById, pgRegisterLogin, pgLogAccess, pgRecentViewExists,
 } from "./porta";
 
@@ -30,8 +30,32 @@ const T_PROP = "tblwAUWPnX7KF8FhU"; // PROPRIETA
 
 export const VALIDITY_DAYS = BRAND.validityDays;
 
-// Airtable Interface/grid deep-link for the daily digest CTA.
+/* ── IL BOTTONE DELLA LETTERA DEL MATTINO SEGUE IL DATO (23/09/2026) ───────
+   La mail del digest porta un pulsante «apri le richieste». Finché le
+   richieste nascono su Airtable, quella è la tabella giusta. Ma dal 23/09
+   esiste la strada `crea-richiesta`: con `PC_RICHIESTA_SORGENTE=pg` una
+   richiesta nasce in Postgres con un id `locale:…` e **su Airtable non ci
+   arriva mai** (decisione 12 del cantiere: una riga sola). Il giorno in cui
+   quell'interruttore si accende, questo pulsante diventerebbe un vicolo cieco:
+   porta a una griglia dove la richiesta appena arrivata non c'è.
+
+   Perciò il link non è fisso: **segue la stessa condizione che decide dove la
+   richiesta nasce**. Un solo interruttore per due cose che devono muoversi
+   insieme è meglio di due che qualcuno può disallineare — ed è lo stesso
+   ragionamento della decisione 13, che ha messo nel codice l'ordine di
+   accensione invece che in una nota.
+
+   ⛔ Oggi non cambia niente: `PC_RICHIESTA_DA_POSTGRES` è spento su entrambi i
+   siti, quindi il pulsante resta quello di sempre. Il rollback è lo stesso
+   dell'altra strada: togliere la variabile. */
 export function requestsAirtableUrl(): string {
+  if (PC_RICHIESTA_DA_POSTGRES) {
+    // La coda «Accessi e richieste» del pannello del v4, filtrata sul marchio
+    // di questo sito: è lì che la richiesta nata in casa si vede e si approva.
+    const base = (process.env.PC_PORTA_URL ?? "https://tsv-pg.vercel.app/api/pc-sito")
+      .replace(/\/api\/pc-sito\/?$/, "");
+    return `${base}/immobili/private?v=accessi&m=tsi`;
+  }
   return `https://airtable.com/${BASE_ID}/${T_REQ}`;
 }
 
@@ -582,7 +606,117 @@ export async function setUnderReview(id: string, note: string): Promise<void> {
 // Abuse heuristic: an active credential used from too many distinct IPs in 24h.
 const ABUSE_IP_THRESHOLD = 4;
 
-export async function detectAbuse(): Promise<number> {
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⛔ QUESTA GUARDIA È CIECA DAL 26/08/2026, E FINORA LO DICEVA COME «0».
+
+   `detectAbuse` cerca gli accessi in PC_ACCESS_LOG su Airtable. Quel registro
+   NON SI SCRIVE PIÙ: misurato il 23/09/2026 sulla base vera, l'ultimo
+   `login_ok` che contiene è del **26/08/2026 alle 14:43** — 28 giorni fa. Il
+   registro vivo è `pc_log` in Postgres, dove gli accessi nascono nativi: nella
+   stessa finestra ha **36 `login_ok`** che qui dentro non si vedono.
+
+   L'effetto: la finestra di 24 ore di questa funzione torna **zero righe**, il
+   ciclo non gira mai, e il giro risponde `flagged: 0`. Che si legge «ho
+   guardato e va tutto bene», mentre vuol dire «non ho potuto guardare».
+   È il tipo di guasto peggiore — un verdetto VERO su dati SBAGLIATI — e non se
+   n'è accorto nessuno per 28 giorni proprio perché il numero sembrava sano.
+
+   ── PERCHÉ NON LA RIPARO QUI, E COSA FACCIO INVECE ────────────────────────
+   Non le faccio leggere Postgres e non le faccio chiedere al v4: la guardia
+   gemella **esiste già nel v4** (`web/lib/pc-abusi.ts`), legge il registro
+   giusto, e dal 23/09 gira ogni 15 minuti in sola misura (`pc_abusi`,
+   `sospendi:false`). Una terza implementazione dello stesso controllo sarebbe
+   il «due motori sullo stesso lavoro» che questo cantiere passa il tempo a
+   chiudere — e quello muto vince sempre.
+
+   E il numero dice che non c'è fretta: nei 28 giorni di cecità **nessun codice
+   ha superato la soglia** (massimo osservato: 4 IP distinti in un giorno per un
+   codice, e la soglia scatta sopra 4). Riparare qui non avrebbe sospeso
+   nessuno. Quello che serve non è un verdetto in più: è che questo smetta di
+   mentire, e che il giorno in cui succede di nuovo lo dica da solo.
+
+   Quindi la funzione resta identica nel COMPORTAMENTO — stessa soglia, stessa
+   sospensione, e se Airtable tornasse a scrivere tornerebbe a funzionare — ma
+   adesso **dichiara se il registro che legge è vivo**.
+
+   ── LA SOGLIA DI FRESCHEZZA: 14 GIORNI, E IL PERCHÉ È MISURATO ────────────
+   Su `pc_log` (172 `login_ok` da giugno) l'intervallo fra due accessi
+   consecutivi è in media 0,53 giorni, il 95° percentile 2,1 e **il silenzio
+   più lungo mai osservato 8,8 giorni**. Quattordici giorni sono 1,6 volte il
+   silenzio massimo di un registro SANO: un portale davvero tranquillo non ci
+   arriva quasi mai, e quello morto ci arriva col doppio (28 e in crescita).
+   Non è un numero scelto a occhio, ed è scritto qui perché chi lo cambierà
+   sappia cosa stava guardando chi l'ha messo.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/** Quanti giorni di silenzio bastano a dichiarare fermo il registro. */
+const ABUSO_REGISTRO_FERMO_GIORNI = 14;
+
+export interface EsitoAntiAbuso {
+  /** Quante credenziali sono state messe in «Under review». */
+  flagged: number;
+  /** ⛔ `false` = il registro letto è fermo, e `flagged` NON vuol dire «nessun
+   *  abuso»: vuol dire «non ho potuto guardare». Chi legge questa risposta
+   *  deve poter distinguere le due cose senza aprire il codice. */
+  attendibile: boolean;
+  /** L'ultimo accesso che il registro di Airtable conosce, ISO. `null` = mai. */
+  ultimoAccessoNoto: string | null;
+  /** In chiaro, per chi legge i log del cron. */
+  perche?: string;
+  /** Chi guarda davvero, quando questa è cieca. */
+  guardiaVera?: string;
+}
+
+export async function detectAbuse(): Promise<EsitoAntiAbuso> {
+  // PRIMA la freschezza, POI il verdetto: leggere l'ultimo accesso in assoluto
+  // costa una chiamata e trasforma un «0» muto in una diagnosi. Senza questa
+  // riga il guasto resta invisibile finché qualcuno non va a contare a mano.
+  let ultimoAccessoNoto: string | null = null;
+  try {
+    const ultimi = await aList(T_LOG, {
+      filter: `AND({evento}='login_ok',${brandClause()})`,
+      fields: ["quando"],
+      sort: [{ field: "quando", dir: "desc" }],
+      max: 1,
+    });
+    ultimoAccessoNoto = ultimi.length ? str(ultimi[0].fields.quando) || null : null;
+  } catch (e) {
+    console.error("[pc cron] non riesco a datare il registro accessi:", e);
+    return {
+      flagged: 0, attendibile: false, ultimoAccessoNoto: null,
+      perche: "il registro accessi di Airtable non risponde: nessun verdetto",
+      guardiaVera: "pc-abusi nel CRM v4 (Postgres)",
+    };
+  }
+
+  const fermoDa = ultimoAccessoNoto
+    ? (Date.now() - Date.parse(ultimoAccessoNoto)) / 86_400_000
+    : Number.POSITIVE_INFINITY;
+  const attendibile = fermoDa <= ABUSO_REGISTRO_FERMO_GIORNI;
+
+  if (!attendibile) {
+    // ⛔ Non si prosegue: girare su un registro fermo produrrebbe di nuovo lo
+    // `0` che sembra sano. Meglio nessun numero che un numero che mente.
+    const quanto = Number.isFinite(fermoDa)
+      ? `fermo da ${fermoDa.toFixed(0)} giorni (ultimo accesso: ${ultimoAccessoNoto})`
+      : "non contiene nemmeno un accesso";
+    console.error(
+      `[pc cron] ANTI-ABUSO CIECO: PC_ACCESS_LOG su Airtable ${quanto}.`,
+      "Il registro vivo è pc_log in Postgres; guarda pc-abusi nel CRM v4.",
+    );
+    return {
+      flagged: 0, attendibile: false, ultimoAccessoNoto,
+      perche: `PC_ACCESS_LOG ${quanto}: questo giro non ha potuto guardare`,
+      guardiaVera: "pc-abusi nel CRM v4 (Postgres)",
+    };
+  }
+
+  return { ...(await scansionaAbusi()), attendibile, ultimoAccessoNoto };
+}
+
+/** Il controllo vero, invariato dal 2026: una credenziale viva usata da troppi
+ *  IP distinti in 24 ore. Gira solo se il registro è vivo. */
+async function scansionaAbusi(): Promise<{ flagged: number }> {
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   // Filtrato per brand: senza, gli accessi legittimi dell'altro portale
   // gonfierebbero il conteggio di IP distinti e metterebbero "Under review"
@@ -608,7 +742,7 @@ export async function detectAbuse(): Promise<number> {
       flagged++;
     }
   }
-  return flagged;
+  return { flagged };
 }
 
 // ---- Digest ----------------------------------------------------------------

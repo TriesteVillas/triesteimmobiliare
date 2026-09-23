@@ -24,13 +24,40 @@ export function mailConfigured(): boolean {
 const esc = (s: string) =>
   s.replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" })[c]!);
 
-export async function sendMail(
+/** L'indirizzo da cui esce davvero questa posta. Serve a chi la registra
+ *  altrove (la porta del CRM v4) per scrivere il mittente VERO invece di
+ *  indovinarlo: è `luxury@…`, non la casella del composer del CRM. */
+export const MITTENTE_EFFETTIVO = FROM;
+
+/** Cosa è successo davvero all'invio. */
+export type EsitoInvio =
+  | { inviata: true }
+  | { inviata: false; perche: string };
+
+/**
+ * L'INVIO CHE DICE PERCHÉ HA FALLITO (23/09/2026).
+ *
+ * `sendMail` qui sotto torna `false` e basta: cattura l'errore e lo butta. È
+ * la metà invisibile del buco di registro del giro delle credenziali, e ha un
+ * caso misurato — la richiesta `recKPr7u9PQ2GD8He` (`diego@…`, codice emesso
+ * il 01/09/2026) soddisfa il filtro del cron da **22 giorni**, cioè ~2.100
+ * passaggi, e non è mai stata servita. Nessun log, nessun contatore: dal
+ * cruscotto di Resend si vedrebbe, da qui no.
+ *
+ * ⚠️ Il corpo della risposta di Resend si legge e si riporta, ma TAGLIATO e
+ * senza l'HTML della mail: nel motivo deve finire «perché no», non la lettera
+ * con dentro la password.
+ *
+ * `sendMail` resta esattamente com'era — è chiamata da mezzo repo — e adesso è
+ * un involucro di questa.
+ */
+export async function inviaMail(
   to: string,
   subject: string,
   html: string,
   replyTo?: string,
-): Promise<boolean> {
-  if (!RESEND_API_KEY) return false;
+): Promise<EsitoInvio> {
+  if (!RESEND_API_KEY) return { inviata: false, perche: "RESEND_API_KEY non configurata su questo progetto" };
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -46,10 +73,27 @@ export async function sendMail(
         ...(replyTo ? { reply_to: replyTo } : {}),
       }),
     });
-    return res.ok;
-  } catch {
-    return false;
+    if (res.ok) return { inviata: true };
+    // Il corpo di Resend porta il motivo vero (indirizzo non valido, dominio
+    // non verificato, quota). Se non si riesce a leggere, resta lo stato: è
+    // comunque più di quanto si sapesse prima.
+    const dettaglio = await res.text().catch(() => "");
+    return {
+      inviata: false,
+      perche: `Resend ha risposto ${res.status}${dettaglio ? `: ${dettaglio.replace(/\s+/g, " ").trim().slice(0, 300)}` : ""}`,
+    };
+  } catch (e) {
+    return { inviata: false, perche: `rete verso Resend: ${String(e).slice(0, 200)}` };
   }
+}
+
+export async function sendMail(
+  to: string,
+  subject: string,
+  html: string,
+  replyTo?: string,
+): Promise<boolean> {
+  return (await inviaMail(to, subject, html, replyTo)).inviata;
 }
 
 // Dark + gold shell, matching the Private Collection theme.

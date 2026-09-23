@@ -416,3 +416,131 @@ export async function pgCreaRichiesta(m: ModuloPcDaSpedire): Promise<EsitoCreaRi
 
   return { esito: "creata", richiestaId: id, gia: dati.gia === true };
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// IL GIRO DICHIARA COSA HA SPEDITO — l'ultimo mittente muto (23/09/2026)
+//
+// Questo sito ha un cron (`/api/private/cron`, **`0 6 * * *`** su Vercel —
+// UNA VOLTA AL GIORNO, non ogni quarto d'ora come su TriesteVillas: i due
+// siti non sono gemelli, misurato il 23/09/2026) che prende
+// ogni riga `Approved` col flag `credenziali_inviate` spento e SPEDISCE LUI le
+// credenziali, col testo standard della collezione. È l'ultima mail che parte
+// da sola in tutto il sistema, e finora non lasciava riga da nessuna parte:
+// accendeva il flag su Airtable e basta.
+//
+// Il prezzo, pagato due volte su clienti veri e scritto per esteso in
+// `progetti/private-collection/PIANO-V4.md` (§04/09 e §16/09):
+//  · il CRM, davanti a un lead servito dal giro, diceva all'operatore
+//    «credenziali già inviate… probabilmente consegnate a mano» — su un lead
+//    mai toccato da nessuno;
+//  · e quando il giro sbagliava lingua (caso Holle: un avvocato tedesco
+//    registrato `it` perché aveva compilato il form dalla pagina italiana),
+//    nessuno poteva nemmeno sapere COSA gli era arrivato.
+//
+// Da qui in avanti il giro lo dice, passando dalla stessa porta firmata che
+// questo file usa già per i codici: azione `credenziali-spedite`. Il CRM scrive
+// la riga nei suoi registri — la colonna «Credenziali» del pannello smette di
+// rispondere «quando e da chi: non risulta a registro».
+//
+// ── L'INTERRUTTORE: PC_TRACCIA_CRON=pg, e nasce SPENTO ────────────────────
+// Senza la variabile il giro spedisce esattamente come oggi e non chiama
+// niente. Il rollback è togliere la variabile — nessun deploy. Stesso schema di
+// `PC_SORGENTE` e `PC_CHAT_SORGENTE` qui sopra.
+//
+// ⚠️ Un interruttore SUO, e non uno dei due che ci sono già: quelli spostano
+// da dove il sito LEGGE, questo aggiunge una SCRITTURA nel CRM. Il giorno in cui
+// la porta desse problemi, spegnere la traccia non deve rimandare su Airtable
+// l'autenticazione di chi ha un accesso vivo.
+//
+// ⛔ NON CAMBIA NIENTE PER IL CLIENTE. Non decide se spedire, non cambia il
+// testo, non tocca il flag: parla DOPO, a cose fatte. L'unico effetto fuori dal
+// CRM è che la scheda del lead risulta contattata il giorno in cui la mail è
+// partita davvero — che è la verità, e oggi non la sa nessuno.
+//
+// ⛔ E NON PUÒ FAR FALLIRE UN INVIO: chi chiama non aspetta oltre i secondi
+// dichiarati qui sotto e ingoia ogni errore. Una traccia non scritta è un dato
+// in meno; un cron che muore mentre consegna credenziali è un cliente che
+// aspetta per sempre.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** L'interruttore della traccia. Acceso solo se la variabile c'è E il segreto
+ *  pure: senza firma ogni chiamata tornerebbe 401 a ogni giro. */
+export const PC_TRACCIA_CRON = process.env.PC_TRACCIA_CRON === "pg" && SEGRETO.length > 0;
+
+/** Acceso ma senza segreto: è un errore di configurazione, e si dice nei log
+ *  invece di sparire. */
+export const PC_TRACCIA_MANCA_SEGRETO = process.env.PC_TRACCIA_CRON === "pg" && SEGRETO.length === 0;
+
+/** Quanto si aspetta la porta. Corto apposta: il cron ha altre righe da servire
+ *  e la traccia non vale un secondo di ritardo sulla consegna successiva. */
+const ATTESA_TRACCIA_MS = 8_000;
+
+export type EsitoTracciaCron =
+  | { esito: "scritta"; nota: string }
+  | { esito: "spenta" }
+  | { esito: "guasto"; perche: string };
+
+/**
+ * «Ho spedito (o non ci sono riuscito) le credenziali di questa riga.»
+ *
+ * Non alza MAI: chi la chiama sta consegnando credenziali a clienti veri.
+ */
+export async function segnalaConsegnaCredenziali(d: {
+  /** L'`id` del record PC_RICHIESTE servito. */
+  richiesta: string;
+  codice: string;
+  email: string;
+  /** `true` = Resend ha accettato. */
+  inviata: boolean;
+  /** Il motivo del no, quando c'è. */
+  errore?: string;
+  lingua?: string;
+  oggetto?: string;
+  /** Il mittente vero di questo sito (`MITTENTE_EFFETTIVO` in private/mail). */
+  mittente?: string;
+}): Promise<EsitoTracciaCron> {
+  if (PC_TRACCIA_MANCA_SEGRETO) {
+    console.error("[pc traccia] PC_TRACCIA_CRON=pg ma PC_PORTA_SEGRETO manca: il giro resta muto.");
+    return { esito: "spenta" };
+  }
+  if (!PC_TRACCIA_CRON) return { esito: "spenta" };
+
+  const corpo = JSON.stringify({
+    azione: "credenziali-spedite",
+    richiesta: d.richiesta, codice: d.codice, email: d.email,
+    inviata: d.inviata,
+    ...(d.errore ? { errore: d.errore.slice(0, 500) } : {}),
+    ...(d.lingua ? { lingua: d.lingua } : {}),
+    ...(d.oggetto ? { oggetto: d.oggetto.slice(0, 300) } : {}),
+    ...(d.mittente ? { mittente: d.mittente } : {}),
+    quando: new Date().toISOString(),
+  });
+
+  try {
+    const r = await fetch(URL_PORTA, {
+      method: "POST",
+      headers: { "x-porta": PORTA, "x-firma": firmaDi(corpo), "Content-Type": "application/json" },
+      body: corpo,
+      signal: AbortSignal.timeout(ATTESA_TRACCIA_MS),
+      cache: "no-store",
+    });
+    if (!r.ok) {
+      const perche = `http ${r.status}`;
+      console.error("[pc traccia]", d.richiesta, perche);
+      return { esito: "guasto", perche };
+    }
+    const dati = (await r.json().catch(() => ({}))) as { ok?: unknown; nota?: unknown; perche?: unknown };
+    if (dati.ok !== true) {
+      // Il CRM ha rifiutato con un perché (codice che non combacia, specchio
+      // indietro): non è un guasto di rete e va letto, non ripetuto all'infinito.
+      const perche = typeof dati.perche === "string" ? dati.perche : "rifiutata senza motivo";
+      console.error("[pc traccia] il CRM non ha registrato", d.richiesta, "—", perche);
+      return { esito: "guasto", perche };
+    }
+    return { esito: "scritta", nota: typeof dati.nota === "string" ? dati.nota : "" };
+  } catch (e) {
+    const perche = `rete: ${String(e).slice(0, 160)}`;
+    console.error("[pc traccia]", d.richiesta, perche);
+    return { esito: "guasto", perche };
+  }
+}
