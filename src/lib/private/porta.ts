@@ -275,3 +275,144 @@ export async function chatDallaPorta(d: {
 
   return { esito: "ok", testo, bloccato: dati.bloccato === true };
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LA RICHIESTA DI ACCESSO NASCE NEL v4 — la terza strada (23/09/2026)
+//
+// Oggi il modulo `/private/richiedi` scrive su Airtable: `createLeadAndRequest`
+// fa due POST — LEAD_ e PC_RICHIESTE — e il CRM nuovo le vede solo dopo la
+// copia. Misurato il 23/09 dal lato v4: **151 righe di `pc_richiesta` su 151**
+// sono nate così. Finché è così, Airtable non si può spegnere.
+//
+// Qui c'è l'altra strada: la stessa porta firmata che questo file usa già per i
+// codici e per la chat, azione `crea-richiesta`. La riga nasce in Postgres,
+// `solo_locale`, e su Airtable non ci va affatto.
+//
+// ── ⛔ L'INTERRUTTORE NON SI ACCENDE DA SOLO, ED È IL PUNTO ────────────────
+// Si accende con **PC_RICHIESTA_SORGENTE=pg**, ma la variabile NON BASTA: la
+// strada è viva solo se su questo sito è già acceso `PC_SORGENTE=pg`, cioè se
+// questo sito autentica già i codici leggendo Postgres.
+//
+// Il perché è una catena corta e va letta tutta: una richiesta nata in Postgres
+// viene approvata dal pannello del v4, che le scrive il codice **in Postgres**.
+// Se questo sito continuasse a risolvere i codici su Airtable, quel codice non
+// esisterebbe da nessuna parte per lui: il cliente riceverebbe una mail con una
+// password che non apre niente, e nel CRM risulterebbe tutto in ordine. È
+// esattamente il difetto che il cartello di `lib/pc-admin.ts` del v4 racconta
+// come già successo una volta, al contrario.
+//
+// Per questo la condizione è nel CODICE e non in una nota: un ordine di
+// accensione che vive solo in un documento è un ordine che prima o poi qualcuno
+// inverte. Chi accende solo `PC_RICHIESTA_SORGENTE` non ottiene niente, e il
+// log glielo dice.
+//
+// ── COSA SUCCEDE SE LA PORTA NON RISPONDE ─────────────────────────────────
+// Si RIPIEGA su Airtable, e qui il ripiego è giusto — al contrario della chat
+// (vedi ① là sopra). La differenza: là il v4 emette un VERDETTO su un accesso,
+// e rifarlo chiedere al v1 vorrebbe dire rimettere in servizio una copia
+// vecchia; qui il v4 esegue una SCRITTURA, e se non riesce l'alternativa non è
+// «una risposta meno buona» ma **una richiesta di un cliente che si perde**.
+// Fra una riga su Airtable e nessuna riga, vince la riga.
+//
+// ⚠️ Chi ripiega lo SCRIVE nei log. Una strada nuova che ripiega sempre in
+// silenzio sembra, da fuori, una strada nuova che funziona.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** L'interruttore della nascita. Acceso solo se: la variabile c'è, il segreto
+ *  pure, E la lettura dei codici è già passata a Postgres. Vedi il cartello. */
+export const PC_RICHIESTA_DA_POSTGRES =
+  process.env.PC_RICHIESTA_SORGENTE === "pg" && SEGRETO.length > 0 && PC_DA_POSTGRES;
+
+/** Interruttore acceso ma una delle due condizioni manca. Non è un dettaglio da
+ *  ignorare: chi l'ha acceso crede di aver spostato la nascita del dato e non
+ *  l'ha spostata. Si dice, a ogni richiesta. */
+export const PC_RICHIESTA_NON_ARMATA =
+  process.env.PC_RICHIESTA_SORGENTE === "pg" && !(SEGRETO.length > 0 && PC_DA_POSTGRES);
+
+/** Perché non è armata, in parole. Vuoto se lo è (o se nessuno l'ha accesa). */
+export function pcRichiestaPerche(): string {
+  if (!PC_RICHIESTA_NON_ARMATA) return "";
+  if (SEGRETO.length === 0) return "manca PC_PORTA_SEGRETO";
+  return "PC_SORGENTE non è 'pg': questo sito risolve ancora i codici su Airtable, quindi un codice emesso in Postgres non aprirebbe niente";
+}
+
+/** Il modulo, nella forma che la porta del v4 accetta. Gli stessi campi che
+ *  `createLeadAndRequest` scrive su Airtable: non si arricchisce e non si
+ *  deriva niente qui — zone, fasce, città e lingua le rinormalizza il v4, che
+ *  è quello che poi decide su quei valori. */
+export interface ModuloPcDaSpedire {
+  nome: string; cognome: string; email: string; telefono: string;
+  citta: string; intro: string;
+  zone: string[]; bands: string[];
+  immobileTrigger: string; lingua: string;
+}
+
+export type EsitoCreaRichiesta =
+  /** Nata in Postgres. `gia` = era già in coda da pochi minuti (doppio invio). */
+  | { esito: "creata"; richiestaId: string; gia: boolean }
+  /** Il v4 ha rifiutato il modulo: è un giudizio sui DATI, e ripetere la stessa
+   *  cosa su Airtable creerebbe una riga che il v4 considera non valida. */
+  | { esito: "rifiutato"; errore: string; campo: string }
+  /** Guasto: chi chiama ripiega su Airtable. */
+  | { esito: "guasto"; perche: string };
+
+/**
+ * Fa nascere la richiesta nel v4.
+ *
+ * ⚠️ Non usa `bussa()`, per la stessa ragione della chat: `bussa` alza su
+ * qualunque risposta non-2xx, e così il 400 («questo modulo non è valido») e il
+ * 500 («la porta è rotta») diventerebbero lo stesso errore. Qui i due casi
+ * portano a decisioni opposte — non riprovare, e riprovare su Airtable.
+ */
+export async function pgCreaRichiesta(m: ModuloPcDaSpedire): Promise<EsitoCreaRichiesta> {
+  const corpo = JSON.stringify({
+    azione: "crea-richiesta",
+    nome: m.nome, cognome: m.cognome, email: m.email, telefono: m.telefono,
+    citta: m.citta, intro: m.intro, zone: m.zone, bands: m.bands,
+    immobileTrigger: m.immobileTrigger, lingua: m.lingua,
+    // ⚠️ `privacyOk` si manda ESPLICITO e sempre `true`: qui ci si arriva solo
+    // dopo che la route ha già rifiutato chi non l'ha spuntata. La porta lo
+    // pretende lo stesso — è il campo che poi scrive sulla scheda — e un
+    // consenso dedotto non è un consenso.
+    privacyOk: true,
+    origine: `sito:${PORTA.replace(/^pc-/, "")}/pc-richiesta`,
+  });
+
+  let r: Response;
+  try {
+    r = await fetch(URL_PORTA, {
+      method: "POST",
+      headers: { "x-porta": PORTA, "x-firma": firmaDi(corpo), "Content-Type": "application/json" },
+      body: corpo,
+      signal: AbortSignal.timeout(10_000),
+      cache: "no-store",
+    });
+  } catch (e) {
+    return { esito: "guasto", perche: `rete: ${String(e).slice(0, 160)}` };
+  }
+
+  let dati: { ok?: unknown; richiestaId?: unknown; gia?: unknown; errore?: unknown; campo?: unknown };
+  try {
+    dati = (await r.json()) as typeof dati;
+  } catch {
+    return { esito: "guasto", perche: `risposta non è JSON (http ${r.status})` };
+  }
+
+  // 400 = giudizio sui dati. Non si ripiega: le stesse regole valgono di qua e
+  // di là, e ricreare su Airtable un modulo che il v4 rifiuta vorrebbe dire
+  // farsi scrivere una riga che nessuno dei due sistemi considera buona.
+  if (r.status === 400) {
+    return {
+      esito: "rifiutato",
+      errore: typeof dati.errore === "string" ? dati.errore : "bad_request",
+      campo: typeof dati.campo === "string" ? dati.campo : "",
+    };
+  }
+  if (!r.ok) return { esito: "guasto", perche: `http ${r.status}` };
+  const id = typeof dati.richiestaId === "string" ? dati.richiestaId : "";
+  // 200 senza id è un guasto travestito: senza questa riga il sito direbbe
+  // «grazie» a un cliente la cui richiesta non esiste da nessuna parte.
+  if (dati.ok !== true || !id) return { esito: "guasto", perche: "risposta senza richiestaId" };
+
+  return { esito: "creata", richiestaId: id, gia: dati.gia === true };
+}

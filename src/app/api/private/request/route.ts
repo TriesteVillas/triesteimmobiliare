@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { bussaIngresso } from "@/lib/ingressoPorta";
 import { createLeadAndRequest } from "@/lib/private/store";
+import {
+  PC_RICHIESTA_DA_POSTGRES, PC_RICHIESTA_NON_ARMATA, pcRichiestaPerche, pgCreaRichiesta,
+} from "@/lib/private/porta";
 import { ackEmail, sendMail, type Lang } from "@/lib/private/mail";
 import { MAIL_REPLY_TO } from "@/lib/private/brand";
 import { BUDGET_BANDS } from "@/lib/private/bands";
@@ -34,7 +37,13 @@ function limited(ip: string, max = 6, windowMs = 600_000): boolean {
 }
 
 export async function POST(request: Request) {
-  if (!process.env.AIRTABLE_TOKEN && !process.env.LEADS_AIRTABLE_TOKEN) {
+  // ⚠️ «Non configurato» vuol dire: NESSUNA delle due strade è praticabile.
+  // Fino al 23/09 qui bastava l'assenza del token Airtable per rifiutare, e
+  // sarebbe diventato il difetto del giorno in cui il token si toglie: il
+  // modulo avrebbe risposto 503 a tutti mentre la strada Postgres funzionava
+  // benissimo. Si guarda quello che serve DAVVERO a chi scriverà.
+  if (!PC_RICHIESTA_DA_POSTGRES
+      && !process.env.AIRTABLE_TOKEN && !process.env.LEADS_AIRTABLE_TOKEN) {
     return NextResponse.json({ ok: false, error: "not_configured" }, { status: 503 });
   }
   const h = await headers();
@@ -59,6 +68,13 @@ export async function POST(request: Request) {
   // censimento fatto prima di invertire i moduli — spegnere la scrittura
   // Airtable senza questa riga avrebbe fatto sparire le richieste di accesso
   // alla Private Collection di TriesteImmobiliare, senza un errore da nessuna parte.
+  //
+  // ⚠️ RESTA anche con `PC_RICHIESTA_SORGENTE=pg`, e non è un doppione: questa
+  // è la copia GREZZA di quello che ha premuto il cliente, posata prima di
+  // qualunque validazione, e serve proprio a distinguere «nessuno ha
+  // compilato» da «la porta è rotta» — cioè il caso in cui `crea-richiesta`
+  // fallisse. Il fondo non genera un secondo lead: l'esecutore del v4 salta di
+  // proposito il ramo `modulo-pc-richiesta` (lib/ingresso/motore.ts).
   await bussaIngresso(
     "pc-richiesta",
     { nome: body.nome, cognome: body.cognome, email: body.email, telefono: body.telefono },
@@ -97,13 +113,47 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "city_required" }, { status: 400 });
   }
 
-  try {
-    await createLeadAndRequest({
-      nome, cognome, email, telefono, citta, intro, zone, bands, immobileTrigger, lingua,
-    });
-  } catch (e) {
-    console.error("[pc] request save failed:", e);
-    return NextResponse.json({ ok: false, error: "save_failed" }, { status: 502 });
+  // ── DOVE NASCE LA RICHIESTA ──────────────────────────────────────
+  // Strada storica: due POST su Airtable (LEAD_ + PC_RICHIESTE).
+  // Strada nuova, dietro `PC_RICHIESTA_SORGENTE=pg`: la porta firmata del v4,
+  // che la fa nascere in Postgres. L'interruttore nasce spento, e non si
+  // accende senza `PC_SORGENTE=pg` — il perché sta nel cartello di
+  // `src/lib/private/porta.ts`, ed è la riga da leggere prima di toccarlo.
+  //
+  // ⚠️ Il ripiego su Airtable è VOLUTO e vale solo sul GUASTO: se il v4 non
+  // risponde, la richiesta di un cliente non si perde. Se invece il v4 RIFIUTA
+  // il modulo, non si ripiega — sarebbe scrivere su Airtable una riga che il
+  // sistema nuovo considera non valida.
+  const modulo = { nome, cognome, email, telefono, citta, intro, zone, bands, immobileTrigger, lingua };
+  let natoNelV4 = false;
+
+  if (PC_RICHIESTA_NON_ARMATA) {
+    // Acceso ma inerte: chi l'ha acceso crede di aver spostato la nascita del
+    // dato. Lo deve sapere a ogni richiesta, non alla prima stranezza.
+    console.error(`[pc] PC_RICHIESTA_SORGENTE=pg ma la strada non è armata — ${pcRichiestaPerche()}. Si continua su Airtable.`);
+  }
+
+  if (PC_RICHIESTA_DA_POSTGRES) {
+    const esito = await pgCreaRichiesta(modulo);
+    if (esito.esito === "rifiutato") {
+      // Stesso vocabolario di errori delle validazioni qui sopra: il form sa
+      // già tradurli, e un codice nuovo sarebbe una schermata muta.
+      return NextResponse.json({ ok: false, error: esito.errore }, { status: 400 });
+    }
+    if (esito.esito === "creata") {
+      natoNelV4 = true;
+    } else {
+      console.error(`[pc] crea-richiesta sul v4 non riuscita (${esito.perche}): ripiego su Airtable.`);
+    }
+  }
+
+  if (!natoNelV4) {
+    try {
+      await createLeadAndRequest(modulo);
+    } catch (e) {
+      console.error("[pc] request save failed:", e);
+      return NextResponse.json({ ok: false, error: "save_failed" }, { status: 502 });
+    }
   }
 
   // Acknowledgement (best-effort): the saved request is the source of truth.
