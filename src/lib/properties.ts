@@ -7,7 +7,7 @@ export const F = {
   publicName: "fldcGog8cRFRjZIrI",
   contratto: "fld8sD96k6YChA8pA",
   cluster: "fldcdPH8aCWSfvFlD",
-  // 2026-09-10: progetto/cantiere (singleSelect → string, es. «DUINO RICCESI»).
+  // 2026-09-10: progetto/cantiere (singleSelect → string, es. «DUINO»).
   // Serve alla scheda per riconoscere le unità di un progetto con sito dedicato
   // (invito Elegie Duino). Stesso field id del gemello triestevillas-web.
   progetto: "fldJjLwwFF2ipL6zJ",
@@ -149,7 +149,7 @@ export type Property = {
   onlineDa: string | null;
   contratto: "VENDITA" | "AFFITTO" | null;
   cluster: string | null;
-  // Progetto/cantiere di appartenenza («DUINO RICCESI»…), null se l'unità non
+  // Progetto/cantiere di appartenenza («DUINO»…), null se l'unità non
   // fa parte di un progetto. Decide l'invito al sito dedicato nella scheda.
   progetto: string | null;
   // Stato commerciale grezzo (SOLD, ACTIVE, …): la vetrina lo espone e lo

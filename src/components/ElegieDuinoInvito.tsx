@@ -7,7 +7,7 @@ import ElegieDuinoTrack from "@/components/ElegieDuinoTrack";
 import type { Property } from "@/lib/properties";
 import { elegieHref, type ElegieSito } from "@/lib/elegie";
 
-// Scena-ponte «una delle otto»: compare solo sulle unità con progetto DUINO RICCESI
+// Scena-ponte «una delle otto»: compare solo sulle unità con progetto DUINO (era «DUINO RICCESI» fino al 24/09: il cognome non esce più dalla vetrina)
 // (decide il page con isElegieProgetto). Palette del sito dedicato via token eld-*
 // (globals.css): sage SOLO decorativo (3,4:1 su nero non basta per testo).
 // Tutto server-reso: il moto è CSS su --p (Scene, mode cover) + data-reveal; l'unica

@@ -3,7 +3,17 @@
 // - /de/ non esiste (404): i visitatori tedeschi vanno su /en/;
 // - le ancore EN sono diverse da quelle IT (#planimetrie → #plans, #capitolato → #spec).
 // Le UTM vivono qui e in nessun altro posto.
-export const ELEGIE_PROGETTO = "DUINO RICCESI";
+// ⚠️ È «DUINO» E NON PIÙ «DUINO RICCESI» (24/09/2026), e il motivo va saputo.
+// Il CRM serve questo campo su una rotta PUBBLICA e senza autenticazione, e
+// «RICCESI» è il cognome di chi vende: darlo a un compratore gli dice chi è la
+// controparte prima che lo decida il venditore — è la regola ferrea del
+// gruppo. Da oggi la porta della vetrina toglie il termine riservato e lascia
+// il resto, perché il criterio non è «via il campo» ma «è segreto solo ciò che
+// il pubblico non legge già»: «Duino» è un luogo, sta nella zona e
+// nell'indirizzo di ogni annuncio.
+// ⛔ Se qui si rimette la stringa vecchia, questa scena smette di comparire e
+// nessuno se ne accorge: il confronto semplicemente non combacia più.
+export const ELEGIE_PROGETTO = "DUINO";
 export const ELEGIE_BASE = "https://elegieduino.it";
 
 export type ElegieSito = "triestevillas.com" | "triesteimmobiliare.com";

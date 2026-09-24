@@ -22,7 +22,7 @@ export default function ElegieDuinoTrack({
       creative_name: "scheda-scena",
       location_id: sito,
       lingua: locale,
-      items: [{ item_id: propId, item_name: title, item_category: "DUINO RICCESI" }],
+      items: [{ item_id: propId, item_name: title, item_category: "DUINO" }],
     };
     const onClick = (e: Event) => {
       const a = (e.target as Element | null)?.closest?.("a[data-eld-cta]") as HTMLElement | null;
