@@ -32,12 +32,17 @@ export default function FavoritesMap({ points, discoverLabel }: { points: FavPoi
       if (cancelled || !el || (el as unknown as { _leaflet_id?: number })._leaflet_id) return;
 
       const map = L.map(el, { scrollWheelZoom: false, zoomControl: true });
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-        subdomains: "abcd",
-        maxZoom: 20,
+      // CARTO dal 09/2026 vuole una API key e al posto delle tessere serve
+      // «API KEY REQUIRED»: si usano le tessere di OpenStreetMap (niente chiave,
+      // attribuzione obbligatoria), schiarite col filtro sul pane per restare
+      // vicine allo stile «light» di prima.
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
         attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       }).addTo(map);
+      const tilePane = map.getPane("tilePane");
+      if (tilePane) tilePane.style.filter = "grayscale(0.85) brightness(1.04) contrast(0.92)";
 
       const icon = L.divIcon({
         html: HEART_SVG,
