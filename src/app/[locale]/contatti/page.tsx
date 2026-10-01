@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { BoatMark } from "@/components/Logo";
 import SellerCta from "@/components/SellerCta";
 import BuyerCta from "@/components/BuyerCta";
-import AutoVideo from "@/components/AutoVideo";
+import VideoSito from "@/components/VideoSito";
 import { pageAlternates, pageOpenGraph } from "@/lib/seo";
 
 export async function generateMetadata({
@@ -87,20 +87,18 @@ export default async function ContactPage({
 
             <p className="mt-8 text-sm text-neutral-400">{t("poweredBy")} · P.IVA 01235580329</p>
           </div>
-          <div
-            className="aspect-[5/4] overflow-hidden rounded-3xl border border-brand/15 shadow-[0_24px_70px_-30px_rgba(28,74,107,0.45)] lg:self-center"
-            data-reveal
-          >
-            <AutoVideo
-              src="/video/angolo-studio.mp4"
-              poster="/video/angolo-studio.jpg"
-              ariaLabel={t("videoAlt")}
-              className="h-full w-full object-cover"
-              // Come sull'hero della home: il poster si vede subito, l'mp4 non
-              // compete con il primo paint.
-              lazy
-            />
-          </div>
+          {/* Come sull'hero della home: il poster si vede subito, l'mp4 non
+              compete con il primo paint. Etichetta e didascalia AI dal
+              registro dei video del CRM (VideoSito). */}
+          <VideoSito
+            percorso="/video/angolo-studio.mp4"
+            poster="/video/angolo-studio.jpg"
+            ariaLabel={t("videoAlt")}
+            locale={locale}
+            className="lg:self-center"
+            riquadro="aspect-[5/4] rounded-3xl border border-brand/15 shadow-[0_24px_70px_-30px_rgba(28,74,107,0.45)]"
+            reveal
+          />
         </div>
       </div>
     </section>

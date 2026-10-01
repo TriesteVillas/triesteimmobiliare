@@ -5,7 +5,7 @@ import SellerCta from "@/components/SellerCta";
 import BuyerCta from "@/components/BuyerCta";
 import Timeline from "@/components/Timeline";
 import JsonLd from "@/components/JsonLd";
-import AutoVideo from "@/components/AutoVideo";
+import VideoSito from "@/components/VideoSito";
 import ResourceCard from "@/components/resources/ResourceCard";
 import { getArticle, readingMinutes } from "@/lib/articles";
 import { pageAlternates, pageOpenGraph, faqJsonLd } from "@/lib/seo";
@@ -97,21 +97,20 @@ export default async function SellPage({
                 />
               </div>
             </div>
-            <div
-              className="aspect-[5/4] overflow-hidden rounded-3xl border border-white/15 shadow-[0_24px_70px_-30px_rgba(0,0,0,0.45)] lg:self-center"
-              data-reveal="now"
-            >
-              <AutoVideo
-                src="/video/soggiorno-terrazza.mp4"
-                poster="/video/soggiorno-terrazza.jpg"
-                ariaLabel={t("hero.videoAlt")}
-                className="h-full w-full object-cover"
-                // Era `lazy={false}`: montava 1,1 MB di mp4 nella finestra
-                // dell'LCP. Il poster copre il riquadro, il video parte subito
-                // dopo. Vedi la stessa scelta sull'hero della home.
-                lazy
-              />
-            </div>
+            {/* Era `lazy={false}`: montava 1,1 MB di mp4 nella finestra
+                dell'LCP. Il poster copre il riquadro, il video parte subito
+                dopo. Vedi la stessa scelta sull'hero della home. Etichetta e
+                didascalia AI dal registro dei video del CRM (VideoSito). */}
+            <VideoSito
+              percorso="/video/soggiorno-terrazza.mp4"
+              poster="/video/soggiorno-terrazza.jpg"
+              ariaLabel={t("hero.videoAlt")}
+              locale={locale}
+              className="lg:self-center"
+              riquadro="aspect-[5/4] rounded-3xl border border-white/15 shadow-[0_24px_70px_-30px_rgba(0,0,0,0.45)]"
+              reveal="now"
+              tono="scuro"
+            />
           </div>
         </div>
       </section>

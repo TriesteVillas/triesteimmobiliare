@@ -2,6 +2,11 @@ import "server-only";
 import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import { LINGUE, normalizzaTrattamento, type Testi, type TrasparenzaVetrina } from "./trasparenza";
+import {
+  CHIAVE_VIDEO,
+  normalizzaTrattamentoVideo,
+  type VideoRegistro,
+} from "./trasparenza-video";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LA TRASPARENZA AI DAL CRM — la seconda chiamata alla vetrina (01/10/2026).
@@ -125,9 +130,10 @@ let ultimaBuona: Map<string, TrasparenzaVetrina> | null = null;
 
 class GuastoVetrina extends Error {}
 
-/** UNA lettura della vista; lancia su tutto ciò che non è una risposta buona. */
-async function leggiVista(): Promise<Righe> {
-  if (Date.now() < guastoFinoA) throw new GuastoVetrina("in pausa dopo un guasto recente");
+/** Lo scaricamento della vista, comune a foto e video: lancia su rete,
+ *  timeout, 4xx/5xx (il 503 di SPEC §10.2 compreso), JSON storto, `stato`
+ *  diverso da «letta». */
+async function scaricaVista(): Promise<{ stato?: unknown; immobili?: unknown; video?: unknown }> {
   let res: Response;
   try {
     res = await fetch(`${VETRINA_URL}?sito=${SITO}&vista=trasparenza`, {
@@ -138,7 +144,7 @@ async function leggiVista(): Promise<Righe> {
     throw new GuastoVetrina(`rete: ${e instanceof Error ? e.message : String(e)}`);
   }
   if (!res.ok) throw new GuastoVetrina(`HTTP ${res.status}`);
-  let data: { stato?: unknown; immobili?: unknown };
+  let data: { stato?: unknown; immobili?: unknown; video?: unknown };
   try {
     data = (await res.json()) as typeof data;
   } catch {
@@ -147,6 +153,13 @@ async function leggiVista(): Promise<Righe> {
   // «letta» è l'unico stato in cui `trasparenza: null` vuol dire davvero
   // «nessun dato». Uno stato mancante (vista di un CRM più vecchio) si accetta.
   if (data.stato !== undefined && data.stato !== "letta") throw new GuastoVetrina(`stato: ${String(data.stato)}`);
+  return data;
+}
+
+/** UNA lettura della vista; lancia su tutto ciò che non è una risposta buona. */
+async function leggiVista(): Promise<Righe> {
+  if (Date.now() < guastoFinoA) throw new GuastoVetrina("in pausa dopo un guasto recente");
+  const data = await scaricaVista();
   if (!Array.isArray(data.immobili)) throw new GuastoVetrina("risposta senza `immobili`");
   const out: Righe = [];
   for (const r of data.immobili as Record<string, unknown>[]) {
@@ -192,6 +205,93 @@ export const getTrasparenzaSito = cache(async (): Promise<Map<string, Trasparenz
     }
     console.warn(
       "[trasparenza] CRM non raggiungibile e nessuna vista buona: restano le sole etichette dai nomi dei file —",
+      e instanceof Error ? e.message : e,
+    );
+    return new Map();
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// I VIDEO — il registro `video_trasparenza` (SPEC v1.2 §10.1).
+//
+// Stessa vista, chiave `video`, ma una cache A SÉ: il registro dei video ha i
+// suoi guasti, e non devono toccare le foto. Quando il CRM non legge il
+// registro risponde `video: null` con la vista «letta» e 200 (i video non
+// spengono le etichette delle foto): se le foto e i video stessero nella
+// stessa voce di cache, quel null o fermerebbe le foto sull'ultima risposta
+// buona (lanciando) o cancellerebbe le etichette dei video (accettandolo).
+// Così ognuno tiene la SUA ultima risposta buona, con le stesse tre difese
+// delle foto: la voce vecchia di `unstable_cache` (che sulla rivalidazione che
+// lancia resta servita), poi l'ultima mappa buona in memoria, poi la mappa
+// vuota — e lì restano solo le etichette scritte nel codice come ripiego
+// (l'arredo virtuale della home: video-sito.ts → `videoDelSito(…, ripiego)`).
+// Costo: la vista si scarica due volte ogni 10 minuti (~140 kB).
+// ═══════════════════════════════════════════════════════════════════════════
+
+function leggiRigaVideo(v: unknown): VideoRegistro | null {
+  if (!v || typeof v !== "object") return null;
+  const o = v as Record<string, unknown>;
+  if (typeof o.chiave !== "string" || !CHIAVE_VIDEO.test(o.chiave)) return null;
+  return {
+    chiave: o.chiave,
+    trattamento: normalizzaTrattamentoVideo(o.trattamento),
+    fotoAi: o.foto_ai === true,
+    voceSintetica: o.voce_sintetica === true,
+    etichetta: testi(o.etichetta),
+    didascalia: testi(o.didascalia),
+  };
+}
+
+type RigheVideo = [string, VideoRegistro][];
+
+let guastoVideoFinoA = 0;
+let ultimaBuonaVideo: Map<string, VideoRegistro> | null = null;
+
+async function leggiRegistroVideo(): Promise<RigheVideo> {
+  if (Date.now() < guastoVideoFinoA) throw new GuastoVetrina("in pausa dopo un guasto recente");
+  const data = await scaricaVista();
+  if (data.video === null) throw new GuastoVetrina("registro dei video illeggibile (`video: null`)");
+  if (!Array.isArray(data.video)) throw new GuastoVetrina("risposta senza `video`");
+  const out: RigheVideo = [];
+  for (const v of data.video) {
+    const r = leggiRigaVideo(v);
+    if (r) out.push([r.chiave, r]);
+  }
+  return out;
+}
+
+const leggiVideoInCache = unstable_cache(
+  async (): Promise<RigheVideo> => {
+    try {
+      return await leggiRegistroVideo();
+    } catch (e) {
+      if (!(e instanceof GuastoVetrina) || !e.message.startsWith("in pausa")) {
+        guastoVideoFinoA = Date.now() + PAUSA_DOPO_GUASTO_MS;
+        console.warn(
+          `[trasparenza] registro dei video non valido (${e instanceof Error ? e.message : e}): resta l'ultima risposta buona`,
+        );
+      }
+      throw e;
+    }
+  },
+  ["trasparenza-video", SITO, VETRINA_URL],
+  { revalidate: REVALIDATE_SECONDS, tags: ["properties"] },
+);
+
+/** chiave → riga del registro dei video. Mai lancia; vuota se non c'è nulla
+ *  di buono da usare. Una lettura per richiesta. */
+export const getVideoSito = cache(async (): Promise<Map<string, VideoRegistro>> => {
+  try {
+    const m = new Map(await leggiVideoInCache());
+    ultimaBuonaVideo = m;
+    return m;
+  } catch (e) {
+    if (ultimaBuonaVideo) {
+      console.warn("[trasparenza] registro dei video non raggiungibile: uso l'ultimo buono di questa istanza");
+      return ultimaBuonaVideo;
+    }
+    console.warn(
+      "[trasparenza] registro dei video non raggiungibile e nessuna copia buona: restano le sole etichette di ripiego —",
       e instanceof Error ? e.message : e,
     );
     return new Map();

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/check-analytics.mjs && node scripts/check-messaggi.mjs",
+    "prebuild": "node scripts/check-analytics.mjs && node scripts/check-messaggi.mjs && node scripts/check-video-registro.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

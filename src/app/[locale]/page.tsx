@@ -12,8 +12,10 @@ import FeaturedCarousel from "@/components/FeaturedCarousel";
 import Marquee from "@/components/Marquee";
 import ClosureBanner from "@/components/ClosureBanner";
 import AutoVideo from "@/components/AutoVideo";
-import EtichettaAi from "@/components/EtichettaAi";
+import EtichettaVideo from "@/components/EtichettaVideo";
+import VideoSito from "@/components/VideoSito";
 import { testiTrasparenza } from "@/lib/trasparenza";
+import { videoDelSito } from "@/lib/video-sito";
 import { BoatMark } from "@/components/Logo";
 import BuyerCta from "@/components/BuyerCta";
 import SellerCta from "@/components/SellerCta";
@@ -65,6 +67,17 @@ export default async function Home({
     .map((p) => buildPropertyView(p, locale, tProp, tZones(zoneKey(p))));
 
   const heroWords = t("hero.titleKinetic").split(" ");
+
+  // Il video dell'arredo virtuale: etichetta e didascalia dal registro dei
+  // video del CRM. Prima del registro l'etichetta era scritta qui a mano
+  // («AI · simulazione», il trattamento delle foto con elementi aggiunti):
+  // resta come ripiego quando la riga non c'è, o il registro non si legge.
+  const etichettaStaging = testiTrasparenza(locale).etichetta.ai_aggiunte;
+  const staging = await videoDelSito("/video/staging-mansarda.mp4", locale, {
+    etichetta: etichettaStaging,
+    aria: `${etichettaStaging} — ${t("videoBreak.alt")}`,
+    didascalia: null,
+  });
 
   // Il marquee ricompone le celle della strip in frasi brevi — «Valutazione
   // 48h» — perché lì il valore da solo ("48h") non direbbe di cosa parla.
@@ -118,23 +131,21 @@ export default async function Home({
               {t("hero.ctaSecondary")}
             </Link>
           </div>
-          <div
-            className="mt-14 aspect-[16/9] overflow-hidden rounded-3xl border border-brand/15 shadow-[0_24px_70px_-30px_rgba(28,74,107,0.45)] sm:mt-16"
-            data-reveal="now"
-          >
-            {/* `lazy` anche se il video è nell'hero: senza, il tag monta subito
-                la src e si porta via ~0,9 MB proprio mentre la pagina sta
-                dipingendo. Con lazy si vede il poster all'istante e il filmato
-                parte appena dopo l'hydration — l'occhio non se ne accorge, la
-                rete sì. */}
-            <AutoVideo
-              src="/video/trieste-aerea.mp4"
-              poster="/video/trieste-aerea.jpg"
-              ariaLabel={t("hero.videoAlt")}
-              className="h-full w-full object-cover"
-              lazy
-            />
-          </div>
+          {/* `lazy` anche se il video è nell'hero: senza, il tag monta subito
+              la src e si porta via ~0,9 MB proprio mentre la pagina sta
+              dipingendo. Con lazy si vede il poster all'istante e il filmato
+              parte appena dopo l'hydration — l'occhio non se ne accorge, la
+              rete sì. Etichetta e didascalia AI dal registro dei video del
+              CRM (VideoSito). */}
+          <VideoSito
+            percorso="/video/trieste-aerea.mp4"
+            poster="/video/trieste-aerea.jpg"
+            ariaLabel={t("hero.videoAlt")}
+            locale={locale}
+            className="mt-14 sm:mt-16"
+            riquadro="aspect-[16/9] rounded-3xl border border-brand/15 shadow-[0_24px_70px_-30px_rgba(28,74,107,0.45)]"
+            reveal="now"
+          />
         </div>
 
         {/* Promise strip — the four numbers.
@@ -245,14 +256,10 @@ export default async function Home({
         <div className="absolute inset-0 bg-gradient-to-t from-brand-dark from-8% via-brand-dark/85 via-25% to-transparent to-46% sm:from-10% sm:via-20% sm:to-36%" />
         {/* L'arredo di questo video è generato con l'AI: l'etichetta resta
             VISIBILE per tutta la durata (e sul poster), in alto a destra — non
-            basta che lo dica l'aria-label (01/10/2026, SPEC §0 e §5.1). */}
-        <div className="pointer-events-none absolute right-4 top-4 z-[1] sm:right-6 sm:top-6">
-          <EtichettaAi
-            testo={testiTrasparenza(locale).etichetta.ai_aggiunte}
-            aria={`${testiTrasparenza(locale).etichetta.ai_aggiunte} — ${t("videoBreak.alt")}`}
-            forma="estesa"
-          />
-        </div>
+            basta che lo dica l'aria-label (01/10/2026, SPEC §0 e §5.1). Dal
+            registro dei video del CRM; senza la riga, quella scritta a mano
+            prima del registro (`stagingRipiego`). */}
+        <EtichettaVideo ai={staging} className="right-4 top-4 sm:right-6 sm:top-6" />
         <div className="absolute inset-x-0 bottom-0">
           <div className="mx-auto max-w-6xl px-6 pb-10 sm:pb-14" data-reveal>
             <p className="eyebrow text-sand">{t("videoBreak.eyebrow")}</p>
@@ -262,6 +269,14 @@ export default async function Home({
           </div>
         </div>
       </section>
+      {/* La didascalia del registro, subito sotto il video, sullo stesso
+          fondo della sezione che segue: sopra il video coprirebbe l'arredo
+          che spiega. */}
+      {staging?.didascalia && (
+        <p className="bg-brand-dark text-white/75">
+          <span className="mx-auto block max-w-6xl px-6 pt-4 text-xs leading-snug">{staging.didascalia}</span>
+        </p>
+      )}
 
       {/* ── Seller value (job #1) ─────────────────────────────────── */}
       <section className="bg-brand-dark text-white">

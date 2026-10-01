@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import InvestorCta from "@/components/InvestorCta";
 import BuyerCta from "@/components/BuyerCta";
-import AutoVideo from "@/components/AutoVideo";
+import VideoSito from "@/components/VideoSito";
 import GhostCard from "@/components/private/GhostCard";
 import { Link } from "@/i18n/navigation";
 import { getPrivateTeasers } from "@/lib/airtable";
@@ -88,18 +88,15 @@ export default async function InvestPage({
               <p className="mt-2 text-neutral-600">{t("narrative.incomeBody")}</p>
             </div>
           </div>
-          <div
-            className="aspect-[5/4] overflow-hidden rounded-3xl border border-brand/15 shadow-[0_24px_70px_-30px_rgba(28,74,107,0.45)]"
-            data-reveal
-          >
-            <AutoVideo
-              src="/video/terrazza-vista-mare.mp4"
-              poster="/video/terrazza-vista-mare.jpg"
-              ariaLabel={t("narrative.videoAlt")}
-              className="h-full w-full object-cover"
-              lazy
-            />
-          </div>
+          {/* Etichetta e didascalia AI dal registro dei video del CRM. */}
+          <VideoSito
+            percorso="/video/terrazza-vista-mare.mp4"
+            poster="/video/terrazza-vista-mare.jpg"
+            ariaLabel={t("narrative.videoAlt")}
+            locale={locale}
+            riquadro="aspect-[5/4] rounded-3xl border border-brand/15 shadow-[0_24px_70px_-30px_rgba(28,74,107,0.45)]"
+            reveal
+          />
         </div>
       </section>
 

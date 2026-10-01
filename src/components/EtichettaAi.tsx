@@ -9,24 +9,31 @@
 // `role="img"` + `aria-label`: il lettore di schermo legge l'etichetta con la
 // didascalia, non la sola sigla; `title` dà la stessa frase a chi passa col
 // mouse. Niente hook: si usa da componenti server e client.
+//
+// `passante`: i clic attraversano l'etichetta (pointer-events: none). Serve
+// sopra un player YouTube, dove l'angolo in alto a destra è dei suoi controlli:
+// l'etichetta si vede, ma non li blocca (niente `title` al passaggio, allora:
+// lo dicono l'aria-label e la didascalia sotto il player).
 export default function EtichettaAi({
   testo,
   aria,
   forma = "glifo",
   className = "",
+  passante = false,
 }: {
   testo: string;
   aria: string;
   forma?: "glifo" | "estesa";
   className?: string;
+  passante?: boolean;
 }) {
   if (!testo) return null;
   return (
     <span
       role="img"
       aria-label={aria}
-      title={aria}
-      className={`pointer-events-auto inline-flex select-none items-center whitespace-nowrap rounded-md bg-ink/85 font-semibold leading-none text-white shadow-md ring-1 ring-white/30 backdrop-blur-sm ${
+      title={passante ? undefined : aria}
+      className={`${passante ? "pointer-events-none" : "pointer-events-auto"} inline-flex select-none items-center whitespace-nowrap rounded-md bg-ink/85 font-semibold leading-none text-white shadow-md ring-1 ring-white/30 backdrop-blur-sm ${
         forma === "estesa" ? "px-2 py-1.5 text-xs tracking-wide" : "px-1.5 py-1 text-[11px] tracking-wider"
       } ${className}`}
     >

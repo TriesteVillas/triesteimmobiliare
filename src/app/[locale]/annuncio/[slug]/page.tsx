@@ -24,6 +24,8 @@ import Scene from "@/components/motion/Scene";
 import LeadForm from "@/components/LeadForm";
 import VisitForm from "@/components/VisitForm";
 import TourFrame from "@/components/TourFrame";
+import VideoYoutube from "@/components/VideoYoutube";
+import { videoYoutube } from "@/lib/video-sito";
 import {
   buildPropertyView,
   contractBadge,
@@ -190,6 +192,8 @@ export default async function PropertyPage({ params }: { params: Params }) {
     .join(", ");
   const hasLocation = property.lat != null && property.lng != null;
   const ytIds = youtubeIds(property.videos);
+  // Il registro dei video del CRM, letto solo se la scheda ha video.
+  const videoAiYt = await videoYoutube(ytIds, locale);
 
   // Titolo e descrizione nella lingua del visitatore, con ritorno all'italiano
   // quando la traduzione non è ancora stata scritta (vedi localizedDescription).
@@ -603,21 +607,38 @@ export default async function PropertyPage({ params }: { params: Params }) {
             <section id="video" className="mt-8 scroll-mt-32">
               <h2 className="text-lg font-semibold">{t("galVideo")}</h2>
               <div className="mt-3 space-y-4">
-                {ytIds.map((id) => (
-                  <div
-                    key={id}
-                    className="relative aspect-video overflow-hidden rounded-xl bg-neutral-900"
-                  >
-                    <iframe
-                      src={`https://www.youtube-nocookie.com/embed/${id}`}
-                      title={title}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      loading="lazy"
-                      className="absolute inset-0 h-full w-full border-0"
-                    />
-                  </div>
-                ))}
+                {ytIds.map((id, i) => {
+                  // Trasparenza AI (SPEC v1.2 §10.1): con un'etichetta nel
+                  // registro dei video del CRM, il player etichettato
+                  // (VideoYoutube); senza, l'iframe di prima, identico — più
+                  // la didascalia, se la riga ne ha una senza etichetta.
+                  const ai = videoAiYt[i];
+                  if (ai?.etichetta) {
+                    return <VideoYoutube key={id} id={id} title={title} ai={ai} fsLabel={fsLabel} />;
+                  }
+                  const player = (
+                    <div
+                      key={id}
+                      className="relative aspect-video overflow-hidden rounded-xl bg-neutral-900"
+                    >
+                      <iframe
+                        src={`https://www.youtube-nocookie.com/embed/${id}`}
+                        title={title}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        loading="lazy"
+                        className="absolute inset-0 h-full w-full border-0"
+                      />
+                    </div>
+                  );
+                  if (!ai?.didascalia) return player;
+                  return (
+                    <figure key={id}>
+                      {player}
+                      <figcaption className="mt-2 text-xs leading-snug text-neutral-500">{ai.didascalia}</figcaption>
+                    </figure>
+                  );
+                })}
               </div>
             </section>
           )}
