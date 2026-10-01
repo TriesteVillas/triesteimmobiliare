@@ -27,7 +27,7 @@ export default function EtichettaAi({
       aria-label={aria}
       title={aria}
       className={`pointer-events-auto inline-flex select-none items-center whitespace-nowrap rounded-md bg-ink/85 font-semibold leading-none text-white shadow-md ring-1 ring-white/30 backdrop-blur-sm ${
-        forma === "estesa" ? "px-2 py-1.5 text-xs tracking-wide" : "px-1.5 py-1 text-[10px] tracking-wider"
+        forma === "estesa" ? "px-2 py-1.5 text-xs tracking-wide" : "px-1.5 py-1 text-[11px] tracking-wider"
       } ${className}`}
     >
       {testo}

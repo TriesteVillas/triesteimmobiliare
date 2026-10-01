@@ -446,7 +446,7 @@
     "taxInfoTitle": "Come sono calcolate",
     "taxCriteria": "Criteri di calcolo",
     "taxInfoAria": "Dettagli sul calcolo delle tasse",
-    "taxAiDisclaimer": "Stime preparate su base catastale (prezzo-valore) quando l'annuncio è stato inserito, anche con l'aiuto dell'AI: possono quindi contenere errori di calcolo o di trascrizione. L'unica fonte certa è il confronto di persona con il titolare, dopo aver studiato la singola situazione concreta.",
+    "taxAiDisclaimer": "Stime scritte nella scheda quando l'annuncio è stato inserito, anche con l'aiuto dell'AI: possono quindi contenere errori di calcolo o di trascrizione. L'unica fonte certa è il confronto di persona con il titolare, dopo aver studiato la singola situazione concreta.",
     "taxGroupAcquisto": "Costi di acquisto (una tantum)",
     "taxGroupGestione": "Costi di gestione annui",
     "taxPlusVat": "+ IVA",

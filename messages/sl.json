@@ -446,7 +446,7 @@
     "taxInfoTitle": "Kako so izračunani",
     "taxCriteria": "Merila izračuna",
     "taxInfoAria": "Podrobnosti o izračunu davkov",
-    "taxAiDisclaimer": "Ocene so bile pripravljene na katastrski osnovi (prezzo-valore) ob vnosu oglasa, tudi s pomočjo umetne inteligence, zato lahko vsebujejo računske napake ali napake pri prepisu. Edini zanesljivi vir je osebni pogovor z vodjo agencije po preučitvi konkretnega primera.",
+    "taxAiDisclaimer": "Ocene so bile vpisane ob vnosu oglasa, tudi s pomočjo umetne inteligence, zato lahko vsebujejo računske napake ali napake pri prepisu. Edini zanesljivi vir je osebni pogovor z vodjo agencije po preučitvi konkretnega primera.",
     "taxGroupAcquisto": "Stroški nakupa (enkratni)",
     "taxGroupGestione": "Letni stroški lastništva",
     "taxPlusVat": "+ DDV",

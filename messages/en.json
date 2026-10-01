@@ -446,7 +446,7 @@
     "taxInfoTitle": "How these are calculated",
     "taxCriteria": "Calculation criteria",
     "taxInfoAria": "Tax calculation details",
-    "taxAiDisclaimer": "Estimates prepared on the cadastral (price-value) basis when the listing was entered, partly with the help of AI: they may therefore contain calculation or transcription errors. The only reliable source is an in-person discussion with the owner, after studying the specific situation.",
+    "taxAiDisclaimer": "Estimates entered in the listing when it was created, partly with the help of AI: they may therefore contain calculation or transcription errors. The only reliable source is an in-person discussion with the owner, after studying the specific situation.",
     "taxGroupAcquisto": "Purchase costs (one-off)",
     "taxGroupGestione": "Annual running costs",
     "taxPlusVat": "+ VAT",

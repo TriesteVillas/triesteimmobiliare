@@ -23,8 +23,8 @@ import type { Photo, Property } from "./properties";
 //
 // ⛔ Additività. Un immobile senza dati di trasparenza esce IDENTICO a prima:
 // nessuna etichetta, nessuna sezione, nessun cambio d'ordine, la stessa
-// impaginazione del lightbox. Ogni funzione qui sotto, su `null`, restituisce
-// il suo ingresso tale e quale.
+// impaginazione del lightbox, gli stessi URL delle foto. Ogni funzione qui
+// sotto, su `null`, restituisce il suo ingresso tale e quale.
 // ═══════════════════════════════════════════════════════════════════════════
 
 export const LINGUE = ["it", "en", "de", "sl"] as const satisfies readonly Locale[];
@@ -39,7 +39,7 @@ export type Trattamento =
   | "ai_aggiunte"
   | "ai_rendering"
   | "rendering";
-type ConEtichetta = Exclude<Trattamento, "tecnico">;
+export type ConEtichetta = Exclude<Trattamento, "tecnico">;
 
 const NOTI: readonly Trattamento[] = [
   "tecnico", "ai", "ai_luce", "ai_pulizia", "ai_aggiunte", "ai_rendering", "rendering",
@@ -56,14 +56,71 @@ export function eSimulazione(t: Trattamento | null | undefined): boolean {
   return t === "ai_aggiunte" || t === "ai_rendering" || t === "rendering";
 }
 
+/** Passata da un modello generativo: tutto tranne «tecnico» (nessun modello)
+ *  e «rendering» (da v1.1 il render di progetto fatto SENZA AI) — la stessa
+ *  regola di TRATTAMENTI_AI nel CRM (lib/trasparenza-regole.mjs). */
+export function eAi(t: Trattamento | null | undefined): boolean {
+  return t === "ai" || t === "ai_luce" || t === "ai_pulizia" || t === "ai_aggiunte" || t === "ai_rendering";
+}
+
+// ── La marcatura nei metadati (SPEC §5.7) ─────────────────────────────────
+//
+// La marcatura IPTC `DigitalSourceType` la scrive il proxy /foto nell'XMP del
+// WebP (route.ts), e NON la copia dal file di partenza: le foto caricate su
+// Airtable di norma non l'hanno, e quando un XMP c'è porta anche data,
+// apparecchio e quota del drone. Si scrive un pacchetto minimo, costruito dal
+// trattamento.
+//
+// La marca entra anche nell'URL (`/foto/<att>/<w>-ctam.webp`): il proxy serve
+// le foto con cache immutabile di un anno, quindi un URL già servito senza
+// marcatura resterebbe muto per sempre. Una foto senza riga nel CRM (o
+// «tecnico», o «rendering») tiene l'URL di prima, al byte.
+//
+// «rendering» non si marca: per il CRM è `trainedAlgorithmicMedia` (eredità
+// v1), ma da v1.1 è il render di progetto fatto SENZA AI e scriverlo nel file
+// sarebbe falso. «tecnico» nemmeno: nessun modello generativo, niente da
+// dichiarare, e niente URL nuovi per nulla.
+export const IPTC_MARCA = {
+  ctam: "compositeWithTrainedAlgorithmicMedia",
+  tam: "trainedAlgorithmicMedia",
+} as const;
+export type MarcaXmp = keyof typeof IPTC_MARCA;
+
+export function marcaXmp(t: Trattamento | null | undefined): MarcaXmp | null {
+  if (t === "ai_rendering") return "tam";
+  if (t === "ai" || t === "ai_luce" || t === "ai_pulizia" || t === "ai_aggiunte") return "ctam";
+  return null;
+}
+
+/** Il pacchetto XMP minimo: solo `Iptc4xmpExt:DigitalSourceType`. */
+export function pacchettoXmp(m: MarcaXmp): string {
+  return (
+    '<?xpacket begin="﻿" id="W5M0MpCehiHzreSzNTczkc9d"?>' +
+    '<x:xmpmeta xmlns:x="adobe:ns:meta/">' +
+    '<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">' +
+    '<rdf:Description rdf:about="" xmlns:Iptc4xmpExt="http://iptc.org/std/Iptc4xmpExt/2008-02-29/">' +
+    `<Iptc4xmpExt:DigitalSourceType>http://cv.iptc.org/newscodes/digitalsourcetype/${IPTC_MARCA[m]}</Iptc4xmpExt:DigitalSourceType>` +
+    "</rdf:Description></rdf:RDF></x:xmpmeta>" +
+    '<?xpacket end="r"?>'
+  );
+}
+
 // ── I dati grezzi, come li attacca getProperties() ─────────────────────────
 
 /** Ciò che il CRM dice di UNA foto pubblicata (o il ripiego generico). */
 export type FotoTrasparenza = {
   trattamento: Trattamento;
-  /** true = nessuna riga per questa foto, ma l'immobile ha righe AI che non
-   *  combaciano più con nessuna foto mostrata: etichetta generica «AI». */
-  generica: boolean;
+  /** Da dove viene l'etichetta:
+   *  · "crm" — una riga di foto_trasparenza per questo filename;
+   *  · "nome" — nessuna riga, ma il nome del file è quello di un generatore
+   *    (`hf_<data>_<ora>_<uuid>`, «…_Nano_Banana_…», «…-decluttering-AI») o di
+   *    un render: la stessa regola della sentinella del CRM (sembraGenerata);
+   *  · "precauzione" — nessuna riga e un nome qualunque, ma il CRM ha righe AI
+   *    di questo immobile che non trovano più la loro foto (file rinominato o
+   *    ricaricato): nel dubbio, «AI».
+   *  Solo "crm" entra nel conteggio delle foto modificate; le altre due si
+   *  dichiarano a parte («in ricontrollo»). */
+  fonte: "crm" | "nome" | "precauzione";
   bloccoDifetti: boolean;
   didascalia: Testi | null;
   /** URL già pronti: la vetrina serve l'originale da sé (cache NON immutabile,
@@ -77,10 +134,15 @@ export type TrasparenzaImmobile = {
   nota: Testi | null;
   conteggi: {
     pubblicate: number;
+    /** foto con una riga del CRM e un trattamento AI */
     ai: number;
+    /** foto senza riga con l'etichetta generica precauzionale */
+    ricontrollo: number;
     bloccoDifetti: number;
     conOriginale: number;
   };
+  /** Le etichette che compaiono sulle foto di questo annuncio, per la legenda. */
+  etichette: ConEtichetta[];
 };
 
 // ── La vista per il browser, già nella lingua del visitatore ──────────────
@@ -91,8 +153,10 @@ export type FotoAi = {
   etichetta: string;
   /** Glifo compatto (miniature, card): «AI» o «Rendering». "" se tecnico. */
   glifo: string;
-  /** Nome accessibile dell'etichetta: etichetta + didascalia. */
+  /** Nome accessibile dell'etichetta: etichetta + didascalia del CRM. */
   aria: string;
+  /** La didascalia del CRM o, per l'etichetta «AI» senza didascalia, la frase
+   *  di ripiego che dice perché c'è. */
   didascalia: string | null;
   /** m = lato lungo 1600, xl = lato lungo 2560 (SPEC §1, `dati_m`/`dati_xl`). */
   originale: {
@@ -107,9 +171,9 @@ export type FotoAi = {
 // I TESTI — dizionario inline tipizzato: `satisfies Record<Locale, …>` rende
 // obbligatorio il ramo di OGNI lingua di routing.ts (lo sloveno compreso). Le
 // etichette sono quelle della SPEC §5.1 e §9.3, lettera per lettera.
+// ⚠️ Le frasi slovene nuove (tessere, legenda, ripieghi) vanno fatte
+// rileggere a un madrelingua, come il resto dello sloveno del sito.
 // ═══════════════════════════════════════════════════════════════════════════
-
-type Conteggi = TrasparenzaImmobile["conteggi"];
 
 type TestiTrasparenza = {
   etichetta: Record<ConEtichetta, string>;
@@ -118,19 +182,29 @@ type TestiTrasparenza = {
   glifo: { ai: string; rendering: string };
   /** aria-label dell'etichetta «ai» generica (SPEC §9.3). */
   ariaGenerica: string;
+  /** Didascalia visibile di una riga `ai` del CRM che non ne ha una sua. */
+  didascaliaAi: string;
+  /** Didascalia visibile dell'etichetta precauzionale (foto senza riga). */
+  didascaliaGenerica: string;
+  /** Un render riconosciuto dal solo nome del file: non si sa ancora se è il
+   *  progetto dell'architetto (senza AI) o un'immagine generata. */
+  ariaRenderNome: string;
+  didascaliaRenderNome: string;
   vediOriginale: string;
   /** Suggerimento del tasto, accanto al bottone. */
   tasto: string;
   originale: string;
   didascaliaOriginale: string;
+  eyebrow: string;
   titolo: string;
   nav: string;
-  riga: (c: Conteggi) => string;
+  tessere: { pubblicate: string; ai: string; ricontrollo: string; conOriginale: string; bloccoDifetti: string };
+  legendaTitolo: string;
+  legenda: Record<ConEtichetta, string>;
+  dettaglio: string;
   chiusura: string;
   linkAi: string;
 };
-
-const plSl = new Intl.PluralRules("sl");
 
 export const TESTI_TRASPARENZA = {
   it: {
@@ -144,22 +218,36 @@ export const TESTI_TRASPARENZA = {
     },
     glifo: { ai: "AI", rendering: "Rendering" },
     ariaGenerica: "Foto modificata con AI, in ricontrollo",
+    didascaliaAi: "Foto passata da un modello generativo. La descrizione di cosa è cambiato è in preparazione.",
+    didascaliaGenerica:
+      "Etichetta precauzionale: stiamo ricontrollando quali foto di questo annuncio sono passate da un modello generativo, e nel dubbio l'etichetta resta.",
+    ariaRenderNome: "Rendering, non una fotografia: in ricontrollo",
+    didascaliaRenderNome:
+      "Rendering: non è una fotografia. Stiamo ricontrollando come è stato prodotto, e se è passato da un modello generativo.",
     vediOriginale: "Vedi l'originale",
     tasto: "tasto O",
     originale: "Originale",
     didascaliaOriginale: "Foto originale, prima dell'intervento. Volti e dati personali sfocati.",
+    eyebrow: "Trasparenza",
     titolo: "Come abbiamo usato l'AI in queste foto",
     nav: "AI nelle foto",
-    riga: ({ pubblicate, ai, bloccoDifetti, conOriginale }) =>
-      [
-        `${ai} foto su ${pubblicate} ${ai === 1 ? "modificata" : "modificate"} con l'AI`,
-        bloccoDifetti > 0 ? `${bloccoDifetti} con i difetti protetti` : null,
-        conOriginale > 0
-          ? conOriginale === ai && ai > 1
-            ? "originale visibile su ognuna"
-            : `originale visibile su ${conOriginale}`
-          : null,
-      ].filter(Boolean).join(" · "),
+    tessere: {
+      pubblicate: "Foto pubblicate",
+      ai: "Modificate con l'AI",
+      ricontrollo: "In ricontrollo",
+      conOriginale: "Con l'originale a un clic",
+      bloccoDifetti: "Con i difetti lasciati visibili",
+    },
+    legendaTitolo: "Le etichette sulle foto",
+    legenda: {
+      ai: "modello generativo, dettagli in ricontrollo",
+      ai_luce: "solo luce e colore",
+      ai_pulizia: "oggetti tolti, le parti nascoste ricostruite dal modello",
+      ai_aggiunte: "elementi aggiunti o ricostruiti: è una simulazione",
+      ai_rendering: "immagine generata per intero con l'AI",
+      rendering: "immagine di progetto, senza AI",
+    },
+    dettaglio: "Leggi la nota completa",
     chiusura: "La visita resta l'unico riferimento.",
     linkAi: "Come usiamo l'AI",
   },
@@ -174,22 +262,36 @@ export const TESTI_TRASPARENZA = {
     },
     glifo: { ai: "AI", rendering: "Rendering" },
     ariaGenerica: "Photo edited with AI, under review",
+    didascaliaAi: "This photo was processed by a generative model. A description of what changed is being prepared.",
+    didascaliaGenerica:
+      "Precautionary label: we are re-checking which photos in this listing went through a generative model, and until we are sure the label stays.",
+    ariaRenderNome: "Rendering, not a photograph: under review",
+    didascaliaRenderNome:
+      "Rendering: this is not a photograph. We are re-checking how it was made, and whether it went through a generative model.",
     vediOriginale: "See the original",
     tasto: "key O",
     originale: "Original",
     didascaliaOriginale: "Original photo, before editing. Faces and personal data blurred.",
+    eyebrow: "Transparency",
     titolo: "How we used AI in these photos",
     nav: "AI in the photos",
-    riga: ({ pubblicate, ai, bloccoDifetti, conOriginale }) =>
-      [
-        `${ai} of ${pubblicate} ${pubblicate === 1 ? "photo" : "photos"} edited with AI`,
-        bloccoDifetti > 0 ? `${bloccoDifetti} with defects protected` : null,
-        conOriginale > 0
-          ? conOriginale === ai && ai > 1
-            ? "original viewable on each"
-            : `original viewable on ${conOriginale}`
-          : null,
-      ].filter(Boolean).join(" · "),
+    tessere: {
+      pubblicate: "Photos published",
+      ai: "Edited with AI",
+      ricontrollo: "Being re-checked",
+      conOriginale: "Original one click away",
+      bloccoDifetti: "With defects left visible",
+    },
+    legendaTitolo: "The labels on the photos",
+    legenda: {
+      ai: "generative model, details being re-checked",
+      ai_luce: "light and colour only",
+      ai_pulizia: "objects removed, hidden areas filled in by the model",
+      ai_aggiunte: "elements added or rebuilt: a simulation",
+      ai_rendering: "image generated entirely with AI",
+      rendering: "design visualisation, no AI",
+    },
+    dettaglio: "Read the full note",
     chiusura: "The viewing remains the only reference.",
     linkAi: "How we use AI",
   },
@@ -204,22 +306,36 @@ export const TESTI_TRASPARENZA = {
     },
     glifo: { ai: "AI", rendering: "Rendering" },
     ariaGenerica: "Mit KI bearbeitetes Foto, wird erneut geprüft",
+    didascaliaAi: "Dieses Foto wurde von einem generativen Modell bearbeitet. Eine Beschreibung der Änderungen folgt.",
+    didascaliaGenerica:
+      "Vorsorgliche Kennzeichnung: Wir prüfen gerade, welche Fotos dieses Inserats ein generatives Modell durchlaufen haben; bis dahin bleibt die Kennzeichnung.",
+    ariaRenderNome: "Rendering, kein Foto: wird erneut geprüft",
+    didascaliaRenderNome:
+      "Rendering: kein Foto. Wir prüfen gerade, wie es entstanden ist und ob es ein generatives Modell durchlaufen hat.",
     vediOriginale: "Original ansehen",
     tasto: "Taste O",
     originale: "Original",
     didascaliaOriginale: "Originalfoto vor der Bearbeitung. Gesichter und persönliche Daten unkenntlich gemacht.",
+    eyebrow: "Transparenz",
     titolo: "Wie wir KI in diesen Fotos eingesetzt haben",
     nav: "KI in den Fotos",
-    riga: ({ pubblicate, ai, bloccoDifetti, conOriginale }) =>
-      [
-        `${ai} von ${pubblicate} ${pubblicate === 1 ? "Foto" : "Fotos"} mit KI bearbeitet`,
-        bloccoDifetti > 0 ? `${bloccoDifetti} mit geschützten Mängeln` : null,
-        conOriginale > 0
-          ? conOriginale === ai && ai > 1
-            ? "Original bei jedem einsehbar"
-            : `Original einsehbar bei ${conOriginale}`
-          : null,
-      ].filter(Boolean).join(" · "),
+    tessere: {
+      pubblicate: "Veröffentlichte Fotos",
+      ai: "Mit KI bearbeitet",
+      ricontrollo: "In Prüfung",
+      conOriginale: "Original mit einem Klick",
+      bloccoDifetti: "Mängel sichtbar belassen",
+    },
+    legendaTitolo: "Die Kennzeichnungen auf den Fotos",
+    legenda: {
+      ai: "generatives Modell, Details in Prüfung",
+      ai_luce: "nur Licht und Farbe",
+      ai_pulizia: "Gegenstände entfernt, verdeckte Stellen vom Modell ergänzt",
+      ai_aggiunte: "Elemente hinzugefügt oder rekonstruiert: eine Simulation",
+      ai_rendering: "vollständig mit KI erzeugtes Bild",
+      rendering: "Projektvisualisierung, ohne KI",
+    },
+    dettaglio: "Vollständigen Hinweis lesen",
     chiusura: "Die Besichtigung bleibt der einzige Maßstab.",
     linkAi: "Wie wir KI einsetzen",
   },
@@ -234,24 +350,37 @@ export const TESTI_TRASPARENZA = {
     },
     glifo: { ai: "AI", rendering: "Vizualizacija" },
     ariaGenerica: "Fotografija, urejena z umetno inteligenco, v ponovnem pregledu",
+    didascaliaAi: "Fotografijo je obdelal generativni model. Opis sprememb je v pripravi.",
+    didascaliaGenerica:
+      "Previdnostna oznaka: preverjamo, katere fotografije v tem oglasu je obdelal generativni model; do takrat oznaka ostane.",
+    ariaRenderNome: "Vizualizacija, ne fotografija: v ponovnem pregledu",
+    didascaliaRenderNome:
+      "Vizualizacija: to ni fotografija. Preverjamo, kako je nastala in ali jo je obdelal generativni model.",
     vediOriginale: "Poglej izvirnik",
     tasto: "tipka O",
     originale: "Izvirnik",
     didascaliaOriginale: "Izvirna fotografija pred posegom. Obrazi in osebni podatki so zabrisani.",
+    eyebrow: "Preglednost",
     titolo: "Kako smo pri teh fotografijah uporabili umetno inteligenco",
     nav: "AI na fotografijah",
-    // Zgradba z dvopičjem: število ne vpliva na ujemanje glagola. «od» zahteva
-    // rodilnik: 1, 101 … fotografije; vse drugo fotografij (dvojina = množina).
-    riga: ({ pubblicate, ai, bloccoDifetti, conOriginale }) =>
-      [
-        `Urejeno z umetno inteligenco: ${ai} od ${pubblicate} ${plSl.select(pubblicate) === "one" ? "fotografije" : "fotografij"}`,
-        bloccoDifetti > 0 ? `z zaščitenimi pomanjkljivostmi: ${bloccoDifetti}` : null,
-        conOriginale > 0
-          ? conOriginale === ai && ai > 1
-            ? "izvirnik na ogled pri vseh"
-            : `izvirnik na ogled: ${conOriginale}`
-          : null,
-      ].filter(Boolean).join(" · "),
+    // Naslovi ploščic: število stoji ločeno, zato se ne sklanja.
+    tessere: {
+      pubblicate: "Objavljene fotografije",
+      ai: "Urejene z umetno inteligenco",
+      ricontrollo: "V ponovnem pregledu",
+      conOriginale: "Izvirnik na en klik",
+      bloccoDifetti: "Pomanjkljivosti ostale vidne",
+    },
+    legendaTitolo: "Oznake na fotografijah",
+    legenda: {
+      ai: "generativni model, podrobnosti v ponovnem pregledu",
+      ai_luce: "le svetloba in barve",
+      ai_pulizia: "predmeti odstranjeni, zakrite dele je dopolnil model",
+      ai_aggiunte: "dodani ali rekonstruirani elementi: simulacija",
+      ai_rendering: "slika, v celoti ustvarjena z umetno inteligenco",
+      rendering: "projektna vizualizacija, brez umetne inteligence",
+    },
+    dettaglio: "Preberite celotno opombo",
     chiusura: "Ogled ostaja edino merilo.",
     linkAi: "Kako uporabljamo umetno inteligenco",
   },
@@ -267,6 +396,15 @@ export function nellaLingua(t: Testi | null | undefined, locale: string): string
   return t[locale as Locale] ?? t.en ?? t.it ?? null;
 }
 
+/**
+ * La pagina /ai («AI a carte scoperte», SPEC §6) su questo sito NON esiste
+ * ancora: finché non c'è, il riepilogo non la linka (un link morto proprio nel
+ * riquadro della trasparenza toglierebbe fiducia). Quando la pagina arriva —
+ * e la SPEC §9.2 la tiene in anteprima finché il legale non la rilegge —
+ * basta mettere `true` qui.
+ */
+export const PAGINA_AI_PRONTA = false;
+
 // ═══════════════════════════════════════════════════════════════════════════
 // L'ABBINAMENTO — i dati del CRM sulle foto del sito.
 // ═══════════════════════════════════════════════════════════════════════════
@@ -281,7 +419,9 @@ export type TrasparenzaVetrina = {
     didascalia: Testi | null;
     originale: { id: string; larghezza: number | null; altezza: number | null } | null;
   }[];
-  conteggi: { ai_non_abbinate: number };
+  /** `ai` e `foto_pubblicate` del CRM servono solo a scrivere nel log quando
+   *  il conto del sito non torna col suo (due copie del catalogo non allineate). */
+  conteggi: { ai_non_abbinate: number; ai: number | null; foto_pubblicate: number | null };
 };
 
 const chiave = (p: Photo) => p.filename ?? p.url;
@@ -289,7 +429,7 @@ const chiave = (p: Photo) => p.filename ?? p.url;
 /** La lista canonica della scheda (copertina, top 8, galleria, senza
  *  doppioni) — la stessa di photoSet.ts, ricopiata qui per non importare un
  *  modulo che importa a sua volta i tipi da qui. */
-function listaSito(p: Property): Photo[] {
+function listaSito(p: Pick<Property, "coverPhoto" | "topPhotos" | "photos">): Photo[] {
   const seen = new Set<string>();
   const out: Photo[] = [];
   for (const ph of [p.coverPhoto, ...p.topPhotos, ...p.photos]) {
@@ -302,27 +442,106 @@ function listaSito(p: Property): Photo[] {
   return out;
 }
 
+// ── IL NOME DEL FILE CHE TRADISCE UN GENERATORE ────────────────────────────
+//
+// La STESSA regola della sentinella del CRM (tsv-pg, lib/trasparenza-regole.mjs
+// → sembraGenerata, misurata il 01/10 sulle 2.128 foto pubblicate: 861
+// riconosciute su 861, zero falsi positivi sulle altre 1.267). Il censimento di
+// quel giorno ha trovato 133 foto così su TriesteImmobiliare, in 7 annunci,
+// senza nessuna etichetta: finché il CRM non ha la loro riga, l'etichetta la
+// mette il sito — e la mette ANCHE quando il CRM è giù, che è proprio quando
+// le righe non arrivano. Un nome da generatore vale «AI» (generica); un nome
+// da render vale «Rendering», che dice «non è una fotografia» senza affermare
+// né negare l'AI: il CRM stesso lascia la scelta fra `rendering` e
+// `ai_rendering` a chi guarda da dove viene l'immagine.
+// ⚠️ Chi cambia la regola nel CRM, la cambia anche qui (e su triestevillas-web).
+const siglaAi = (f: string): boolean => {
+  const base = f.replace(/\.[a-z0-9]{2,5}$/i, "");
+  if (!/(^|[_\s.-])AI([_\s.-]|$)/.test(base)) return false;
+  // In un nome tutto maiuscolo «AI» è anche la preposizione («VISTA AI
+  // GIARDINI.jpg»): lì vale solo come ULTIMA parola.
+  if (/[a-zà-ÿ]/.test(base)) return true;
+  return /(^|[_\s.-])AI[_\s.\d-]*$/.test(base);
+};
+const NOMI_DA_GENERATORE: readonly (readonly ["ai" | "rendering", (f: string) => boolean])[] = [
+  ["ai", (f) => /^hf_\d{8}_\d{6}_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(f)],
+  [
+    "ai",
+    (f) =>
+      /(^|[_\s.-])(nano[_\s-]?banana|seedream|imagegen|gpt[_\s-]?image|dall[_·-]e|midjourney|firefly|ideogram)([_\s.-]|$)/i.test(f),
+  ],
+  ["ai", (f) => /chatgpt[_\s-]?image|gemini[_\s-]generated[_\s-]image/i.test(f)],
+  ["ai", siglaAi],
+  ["rendering", (f) => /(^|[_\s.-])render(ing)?([_\s.\d-]|$)/i.test(f)],
+];
+
+/** Il nome del file dice che è uscito da un generatore («ai») o che è un
+ *  render («rendering»)? null = nome qualunque. */
+export function trattamentoDalNome(filename: string | null | undefined): "ai" | "rendering" | null {
+  if (!filename) return null;
+  for (const [t, prova] of NOMI_DA_GENERATORE) if (prova(filename)) return t;
+  return null;
+}
+
 /**
  * Attacca a ogni immobile la sua trasparenza e a ogni foto la sua riga.
  * `perId` = airtable_id → trasparenza (solo gli immobili che ne hanno).
  * `baseOriginali` = `${VETRINA_BASE}/api/vetrina/foto` (SPEC §5.6).
- * Gli immobili senza dati escono con gli STESSI oggetti di prima.
+ * Un immobile senza dati del CRM e senza nomi da generatore esce con lo
+ * STESSO oggetto di prima.
  */
 export function applicaTrasparenza(
   lista: Property[],
   perId: Map<string, TrasparenzaVetrina>,
   baseOriginali: string,
 ): Property[] {
-  if (perId.size === 0) return lista;
   return lista.map((p) => {
     const t = perId.get(p.recId);
-    return t ? conTrasparenza(p, t, baseOriginali) : p;
+    return t ? conTrasparenza(p, t, baseOriginali) : conNomiDaGeneratore(p);
   });
+}
+
+const ORDINE_ETICHETTE: readonly ConEtichetta[] = [
+  "ai_luce", "ai_pulizia", "ai_aggiunte", "ai_rendering", "ai", "rendering",
+];
+
+const dalNome = (ph: Photo): FotoTrasparenza | null => {
+  const t = trattamentoDalNome(ph.filename);
+  return t ? { trattamento: t, fonte: "nome", bloccoDifetti: false, didascalia: null, originale: null } : null;
+};
+
+/** Nessun dato del CRM: solo l'etichetta generica sui nomi da generatore.
+ *  Niente riepilogo, niente cambi d'ordine — non sappiamo abbastanza. */
+function conNomiDaGeneratore(p: Property): Property {
+  let tocca = false;
+  const marca = (ph: Photo): Photo => {
+    const d = dalNome(ph);
+    if (!d) return ph;
+    tocca = true;
+    return { ...ph, trasparenza: d };
+  };
+  const coverPhoto = p.coverPhoto ? marca(p.coverPhoto) : null;
+  const topPhotos = p.topPhotos.map(marca);
+  const photos = p.photos.map(marca);
+  return tocca ? { ...p, coverPhoto, topPhotos, photos } : p;
 }
 
 function conTrasparenza(p: Property, t: TrasparenzaVetrina, base: string): Property {
   const righe = new Map(t.foto.map((f) => [f.filename, f]));
-  const generiche = t.conteggi.ai_non_abbinate > 0;
+  // L'etichetta PRECAUZIONALE («AI» su ogni foto senza riga e con un nome
+  // qualunque) scatta solo se c'è la prova che una riga AI ha perso la sua
+  // foto: lo dice il CRM (`ai_non_abbinate`, contato sulla sua copia del
+  // catalogo) o lo vede il sito (una riga AI il cui filename non è fra le foto
+  // che QUESTA pagina mostra — il sito può leggere Airtable dal vivo mentre la
+  // copia del CRM è indietro di ore, e un file rinominato lì combacia ancora).
+  // NON scatta solo perché l'annuncio ha foto AI: i carichi di «sola
+  // etichetta» (le 861 foto del censimento) danno una riga alle sole foto da
+  // generatore, e la regola letterale della SPEC §0 metterebbe «AI» sulle
+  // fotografie vere accanto — 26 su 29 a Gorizia 36. Le foto AI senza riga e
+  // col nome di un generatore le copre `dalNome`.
+  const nomiMostrati = new Set(listaSito(p).map((ph) => ph.filename).filter((f): f is string => !!f));
+  const perseDalSito = t.foto.filter((f) => eAi(f.trattamento) && !nomiMostrati.has(f.filename)).length;
+  const precauzione = t.conteggi.ai_non_abbinate > 0 || perseDalSito > 0;
 
   const datiDi = (ph: Photo): FotoTrasparenza | null => {
     const r = ph.filename ? righe.get(ph.filename) : undefined;
@@ -331,7 +550,7 @@ function conTrasparenza(p: Property, t: TrasparenzaVetrina, base: string): Prope
       const radice = o ? `${base}/${encodeURIComponent(p.recId)}/${encodeURIComponent(o.id)}` : null;
       return {
         trattamento: r.trattamento,
-        generica: false,
+        fonte: "crm",
         bloccoDifetti: r.blocco_difetti,
         didascalia: r.didascalia,
         originale: o && radice
@@ -339,19 +558,22 @@ function conTrasparenza(p: Property, t: TrasparenzaVetrina, base: string): Prope
           : null,
       };
     }
-    // SPEC §0: righe AI che non combaciano più con nessuna foto ⇒ il sito
-    // non sa quale foto fossero, quindi l'etichetta generica va su tutte
-    // quelle senza riga. Meglio un'etichetta di troppo che una in meno.
-    return generiche
-      ? { trattamento: "ai", generica: true, bloccoDifetti: false, didascalia: null, originale: null }
-      : null;
+    return (
+      dalNome(ph) ??
+      (precauzione
+        ? { trattamento: "ai", fonte: "precauzione", bloccoDifetti: false, didascalia: null, originale: null }
+        : null)
+    );
   };
   // Una foto può comparire in tre campi (copertina, top 8, galleria) con id
   // diversi: la riga si attacca a ciascuna copia, così ovunque la si mostri
-  // porta la stessa etichetta.
+  // porta la stessa etichetta. La marca XMP va solo sulle righe VERE: su una
+  // foto senza riga il sito non sa cosa dichiarare nel file.
   const marca = (ph: Photo): Photo => {
     const d = datiDi(ph);
-    return d ? { ...ph, trasparenza: d } : ph;
+    if (!d) return ph;
+    const xmp = d.fonte === "crm" ? marcaXmp(d.trattamento) : null;
+    return xmp ? { ...ph, trasparenza: d, xmp } : { ...ph, trasparenza: d };
   };
 
   let coverPhoto = p.coverPhoto ? marca(p.coverPhoto) : null;
@@ -359,9 +581,11 @@ function conTrasparenza(p: Property, t: TrasparenzaVetrina, base: string): Prope
   const photos = p.photos.map(marca);
 
   // ── l'ordine (SPEC §9.3): una simulazione non apre mai la galleria ──────
-  const prima = { ...p, coverPhoto, topPhotos, photos };
-  const tutte = listaSito(prima);
-  if (tutte.length > 0 && eSimulazione(tutte[0].trasparenza?.trattamento)) {
+  // Solo quando lo dice una riga del CRM: su un nome di file non si sposta
+  // la copertina.
+  const tutte = listaSito({ coverPhoto, topPhotos, photos });
+  const prima = tutte[0]?.trasparenza;
+  if (prima?.fonte === "crm" && eSimulazione(prima.trattamento)) {
     const vera = tutte.find((ph) => !eSimulazione(ph.trasparenza?.trattamento));
     // Se sono tutte simulazioni, l'ordine resta: l'etichetta basta.
     if (vera) {
@@ -375,19 +599,57 @@ function conTrasparenza(p: Property, t: TrasparenzaVetrina, base: string): Prope
 
   const finale: Property = { ...p, coverPhoto, topPhotos, photos };
   const mostrate = listaSito(finale);
+  const dalCrm = (ph: Photo) => ph.trasparenza?.fonte === "crm";
+  const presenti = new Set<ConEtichetta>();
+  for (const ph of mostrate) {
+    const d = ph.trasparenza;
+    if (!d || d.trattamento === "tecnico") continue;
+    // La legenda spiega le etichette del CRM, più la «AI» generica. Un render
+    // riconosciuto dal nome no: la voce «Rendering» dice «senza AI», e di
+    // quello non lo sappiamo (lo spiega la sua didascalia).
+    if (d.fonte === "crm" || d.trattamento === "ai") presenti.add(d.trattamento);
+  }
   const conteggi = {
     pubblicate: mostrate.length,
-    // «modificate con l'AI»: non il «tecnico» e non il «rendering», che in
-    // v1.1 è l'immagine di progetto fatta SENZA AI (SPEC §9.3).
-    ai: mostrate.filter(
-      (ph) => ph.trasparenza && ph.trasparenza.trattamento !== "tecnico" && ph.trasparenza.trattamento !== "rendering",
-    ).length,
-    bloccoDifetti: mostrate.filter((ph) => ph.trasparenza?.bloccoDifetti).length,
-    conOriginale: mostrate.filter((ph) => ph.trasparenza?.originale).length,
+    // «modificate con l'AI» = solo le foto per cui il CRM LO DICE. Le
+    // generiche no: sono un'etichetta su foto di cui non sappiamo abbastanza,
+    // contarle farebbe dire «3 foto su 3 modificate» a un annuncio che ne ha
+    // una. Si dichiarano a parte («in ricontrollo»).
+    ai: mostrate.filter((ph) => dalCrm(ph) && eAi(ph.trasparenza!.trattamento)).length,
+    ricontrollo: mostrate.filter((ph) => ph.trasparenza && !dalCrm(ph) && ph.trasparenza.trattamento !== "tecnico")
+      .length,
+    bloccoDifetti: mostrate.filter((ph) => dalCrm(ph) && ph.trasparenza!.bloccoDifetti).length,
+    conOriginale: mostrate.filter((ph) => dalCrm(ph) && ph.trasparenza!.originale).length,
   };
-  finale.trasparenza = { nota: t.nota, conteggi };
+  // Il conto del sito e quello del CRM seguono la stessa regola (foto mostrate,
+  // TRATTAMENTI_AI); se divergono, le due copie del catalogo non sono allineate.
+  // Si scrive nel log, non in pagina: in pagina vale ciò che il visitatore vede.
+  if (t.conteggi.ai !== null && t.conteggi.ai !== conteggi.ai) {
+    console.warn(
+      `[trasparenza] ${p.recId}: ${conteggi.ai} foto AI contate dal sito, ${t.conteggi.ai} dal CRM (foto ${conteggi.pubblicate}/${t.conteggi.foto_pubblicate ?? "?"})`,
+    );
+  }
+  finale.trasparenza = {
+    nota: t.nota,
+    conteggi,
+    etichette: ORDINE_ETICHETTE.filter((e) => presenti.has(e)),
+  };
   return finale;
 }
+
+/**
+ * La foto dell'anteprima social (og:image). Le anteprime di WhatsApp e
+ * Facebook non portano etichette: lì va la prima foto, nell'ordine della
+ * scheda, che non ne porterebbe una sul sito (niente AI, niente render, niente
+ * etichetta precauzionale). Se ce l'hanno tutte, null: resta l'immagine del
+ * sito. Senza nessuna etichetta: la copertina, come prima.
+ */
+export function fotoPerAnteprima(p: Property): Photo | null {
+  const lista = listaSito(p);
+  if (!lista.some((ph) => ph.trasparenza)) return p.coverPhoto;
+  return lista.find((ph) => !ph.trasparenza || ph.trasparenza.trattamento === "tecnico") ?? null;
+}
+
 
 // ═══════════════════════════════════════════════════════════════════════════
 // LA RESA NELLA LINGUA DEL VISITATORE (server → client)
@@ -397,12 +659,26 @@ function conTrasparenza(p: Property, t: TrasparenzaVetrina, base: string): Prope
 export function fotoAi(d: FotoTrasparenza | null | undefined, locale: string): FotoAi | null {
   if (!d) return null;
   const tx = testiTrasparenza(locale);
-  const didascalia = nellaLingua(d.didascalia, locale);
+  const propria = nellaLingua(d.didascalia, locale);
   const etichetta = d.trattamento === "tecnico" ? "" : tx.etichetta[d.trattamento];
   const glifo =
     d.trattamento === "tecnico" ? "" : d.trattamento === "rendering" ? tx.glifo.rendering : tx.glifo.ai;
-  const base = d.trattamento === "ai" ? tx.ariaGenerica : etichetta;
-  const aria = didascalia ? (base ? `${base} — ${didascalia}` : didascalia) : base;
+  const renderDalNome = d.fonte === "nome" && d.trattamento === "rendering";
+  const base = d.trattamento === "ai" ? tx.ariaGenerica : renderDalNome ? tx.ariaRenderNome : etichetta;
+  const aria = propria ? (base ? `${base} — ${propria}` : propria) : base;
+  // L'etichetta «AI» (o un render riconosciuto dal nome) senza didascalia,
+  // nella vista singola, da sola non spiega niente: una frase di ripiego dice
+  // perché c'è. Il nome del file da generatore è una prova («passata da un
+  // modello generativo»); l'etichetta precauzionale no, e lo dice.
+  const didascalia =
+    propria ??
+    (renderDalNome
+      ? tx.didascaliaRenderNome
+      : d.trattamento === "ai"
+        ? d.fonte === "precauzione"
+          ? tx.didascaliaGenerica
+          : tx.didascaliaAi
+        : null);
   // Una foto «tecnico» senza didascalia né originale non ha niente da mostrare.
   if (!etichetta && !didascalia && !d.originale) return null;
   return {
@@ -424,6 +700,42 @@ export function localizzaFoto(ph: Photo, locale: string): Photo {
   return ai ? { ...resto, ai } : resto;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// LA NOTA NEL RIEPILOGO
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Frasi: punto, spazio, maiuscola (anche Č Š Ž) — così «10.200,00» o «ecc.»
+// non spezzano. Stessa idea di toParagraphs() nella pagina.
+function frasi(testo: string): string[] {
+  return testo
+    .trim()
+    .split(/(?<=[.!?])\s+(?=[A-ZÀ-ÖØ-ÞČŠŽĆĐ0-9«"„“(])/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+/**
+ * La nota del CRM pronta per il riepilogo: senza la prima frase quando è
+ * l'attacco standard («Nota sull'uso dell'intelligenza artificiale nelle
+ * fotografie.»), che ripeterebbe il titolo della sezione; poi divisa in un
+ * attacco breve, sempre visibile, e il resto, che si apre a richiesta — le
+ * note vere sono lunghe 2.300-3.600 caratteri.
+ */
+export function notaPerRiepilogo(nota: string): { attacco: string; resto: string | null } {
+  let f = frasi(nota);
+  if (f.length > 1 && f[0].length <= 120 && ATTACCHI.some((a) => normAttacco(f[0]).startsWith(a))) f = f.slice(1);
+  const attacco: string[] = [];
+  let lung = 0;
+  while (f.length && (attacco.length === 0 || lung < 260)) {
+    const s = f.shift()!;
+    attacco.push(s);
+    lung += s.length + 1;
+  }
+  const resto = f.join(" ");
+  // Un resto cortissimo non vale un «leggi tutto»: si mostra tutto.
+  if (resto && resto.length < 200) return { attacco: [...attacco, resto].join(" "), resto: null };
+  return { attacco: attacco.join(" "), resto: resto || null };
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // I DOPPIONI NELLA DESCRIZIONE (SPEC §5.4)
@@ -452,17 +764,67 @@ function normAttacco(s: string): string {
     .toLowerCase();
 }
 
-/** Toglie dalla descrizione i paragrafi che aprono con un attacco della nota.
- *  Si chiama SOLO quando la nota del CRM esiste: senza, quel paragrafo è
- *  l'unica dichiarazione che il visitatore legge e deve restare. */
+const apreNota = (s: string) => {
+  const n = normAttacco(s.trim());
+  return ATTACCHI.some((a) => n.startsWith(a));
+};
+
+/**
+ * Toglie dalla descrizione la nota scritta a mano. Tre forme:
+ *  · un paragrafo che apre con un attacco («Nota sulle fotografie di questo
+ *    annuncio. Le immagini…»): via il paragrafo;
+ *  · un titolo da solo sulla sua riga («Nota sulle fotografie»): via il
+ *    titolo E il paragrafo che lo segue, che è il corpo della nota;
+ *  · la nota attaccata in coda a un paragrafo («… Classe energetica E. Nota
+ *    sulle fotografie …»): il paragrafo si tronca lì.
+ * Si chiama SOLO quando il riepilogo mostra la nota del CRM nella lingua
+ * della descrizione: senza, quel testo è l'unica dichiarazione che il
+ * visitatore legge nella sua lingua, e deve restare.
+ */
 export function senzaNotaAi(testo: string | null): string | null {
   if (!testo) return testo;
   const paragrafi = testo.split(/\n+/);
-  const tenuti = paragrafi.filter((par) => {
-    const n = normAttacco(par.trim());
-    return !ATTACCHI.some((a) => n.startsWith(a));
-  });
-  if (tenuti.length === paragrafi.length) return testo;
+  const tenuti: string[] = [];
+  let toccato = false;
+  let saltaCorpo = false;
+  for (const par of paragrafi) {
+    const p = par.trim();
+    if (!p) continue;
+    if (saltaCorpo) {
+      saltaCorpo = false;
+      toccato = true;
+      continue;
+    }
+    if (apreNota(p)) {
+      toccato = true;
+      // Titolo = corto e senza punteggiatura interna: «Nota sulle fotografie»,
+      // «Nota sull'uso dell'intelligenza artificiale nelle fotografie.»
+      if (p.length <= 90 && /^[^.:;!?]*[.:]?$/.test(p)) saltaCorpo = true;
+      continue;
+    }
+    const coda = codaNota(p);
+    if (coda !== null) {
+      toccato = true;
+      if (coda) tenuti.push(coda);
+      continue;
+    }
+    tenuti.push(par);
+  }
+  if (!toccato) return testo;
   const out = tenuti.join("\n\n").trim();
   return out || null;
+}
+
+/** La parte del paragrafo PRIMA di una nota attaccata in coda, o null. */
+function codaNota(p: string): string | null {
+  for (const m of p.matchAll(/[.!?]\s+/g)) {
+    const dopo = p.slice(m.index + m[0].length);
+    if (apreNota(dopo)) return p.slice(0, m.index + 1).trim();
+  }
+  return null;
+}
+
+/** La descrizione contiene una nota scritta a mano? */
+export function haNotaAi(testo: string | null): boolean {
+  return testo != null && senzaNotaAi(testo) !== testo;
 }

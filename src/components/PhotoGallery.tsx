@@ -83,7 +83,7 @@ export default function PhotoGallery({
                   className="object-cover transition-transform duration-300 hover:scale-105"
                 />
                 {p.ai?.glifo && (
-                  <EtichettaAi testo={p.ai.glifo} aria={p.ai.aria} className="absolute right-1.5 top-1.5" />
+                  <EtichettaAi testo={p.ai.glifo} aria={p.ai.aria} className="absolute right-2 top-2" />
                 )}
               </button>
             ))}
@@ -157,7 +157,7 @@ export default function PhotoGallery({
                     className="object-cover transition-transform duration-300 hover:scale-105"
                   />
                   {p.ai?.glifo && (
-                    <EtichettaAi testo={p.ai.glifo} aria={p.ai.aria} className="absolute right-1.5 top-1.5" />
+                    <EtichettaAi testo={p.ai.glifo} aria={p.ai.aria} className="absolute right-2 top-2" />
                   )}
                 </button>
               ))}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Item = { id: string; label: string };
 
@@ -14,6 +14,36 @@ export default function StickyNav({
   items: Item[];
 }) {
   const [active, setActive] = useState(items[0]?.id ?? "");
+  // Sul telefono, con le voci lunghe (lo sloveno, la voce «AI nelle foto»), la
+  // barra trabocca e la voce attiva finiva tagliata a metà parola. Quando
+  // trabocca: la voce attiva si porta in vista e il bordo destro sfuma, così
+  // si capisce che c'è dell'altro. Quando non trabocca non cambia niente (lo
+  // stato parte da false: l'HTML del server è quello di prima).
+  const navRef = useRef<HTMLElement>(null);
+  const [trabocca, setTrabocca] = useState(false);
+
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+    // «Trabocca» = c'è ancora qualcosa a destra: arrivati in fondo la
+    // sfumatura sparisce, o coprirebbe l'ultima voce.
+    const misura = () => setTrabocca(nav.scrollLeft + nav.clientWidth < nav.scrollWidth - 1);
+    misura();
+    const ro = new ResizeObserver(misura);
+    ro.observe(nav);
+    nav.addEventListener("scroll", misura, { passive: true });
+    return () => {
+      ro.disconnect();
+      nav.removeEventListener("scroll", misura);
+    };
+  }, [items]);
+
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav || nav.scrollWidth <= nav.clientWidth + 1) return;
+    const el = nav.querySelector<HTMLElement>(`a[href="#${CSS.escape(active)}"]`);
+    if (el) nav.scrollTo({ left: Math.max(0, el.offsetLeft - nav.offsetLeft - 16), behavior: "smooth" });
+  }, [active]);
 
   useEffect(() => {
     const sections = items
@@ -42,7 +72,12 @@ export default function StickyNav({
           <p className="truncate text-sm font-semibold text-neutral-800">{title}</p>
           <p className="truncate text-xs text-neutral-400">{reference}</p>
         </div>
-        <nav className="flex flex-1 gap-1 overflow-x-auto md:flex-none">
+        <nav
+          ref={navRef}
+          className={`flex flex-1 gap-1 overflow-x-auto md:flex-none${
+            trabocca ? " [mask-image:linear-gradient(to_right,black_88%,transparent)]" : ""
+          }`}
+        >
           {items.map((i) => (
             <a
               key={i.id}

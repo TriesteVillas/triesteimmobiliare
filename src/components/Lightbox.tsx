@@ -51,12 +51,30 @@ export default function Lightbox({
   // successiva si torna da soli alla versione pubblicata (e l'etichetta dice
   // sempre il vero su quello che si vede).
   const [origDi, setOrigDi] = useState<number | null>(null);
-  const originale = grid ? null : (photos[i]?.ai?.originale ?? null);
+  // Un originale che non si carica (ritirato dal CRM dopo l'ultima
+  // rigenerazione della pagina, vetrina giù) sparisce col suo bottone, invece
+  // di lasciare un'immagine rotta al posto della foto.
+  const [origRotti, setOrigRotti] = useState<ReadonlySet<string>>(() => new Set());
+  const candidato = grid ? null : (photos[i]?.ai?.originale ?? null);
+  const originale = candidato && !origRotti.has(candidato.m) ? candidato : null;
   const vediOriginale = originale !== null && origDi === i;
   const scambia = useCallback(
     () => setOrigDi((x) => (x === i ? null : i)),
     [i],
   );
+  const origRotto = useCallback((url: string) => {
+    setOrigRotti((s) => new Set(s).add(url));
+    setOrigDi(null);
+  }, []);
+
+  // Il fuoco non esce dalla finestra: se il bottone «Vedi l'originale» che lo
+  // aveva sparisce (foto successiva senza originale, originale che non si
+  // carica), il fuoco finirebbe sul <body> e il Tab dopo porterebbe fuori dal
+  // modale. Lo si riporta sul pannello.
+  useEffect(() => {
+    const node = panelRef.current;
+    if (!grid && node && !node.contains(document.activeElement)) node.focus();
+  }, [i, grid, originale, panelRef]);
 
   // Trascinamento col dito: sul telefono è il gesto naturale, e le frecce sono
   // comunque lì per chi le cerca. Gli handler stanno sull'intero pannello, non
@@ -156,7 +174,7 @@ export default function Lightbox({
                 {idx + 1}
               </span>
               {p.ai?.glifo && (
-                <EtichettaAi testo={p.ai.glifo} aria={p.ai.aria} className="absolute right-1.5 top-1.5" />
+                <EtichettaAi testo={p.ai.glifo} aria={p.ai.aria} className="absolute right-2 top-2" />
               )}
             </button>
           ))}
@@ -234,8 +252,10 @@ export default function Lightbox({
         <FotoConTrasparenza
           photo={photos[i]}
           indice={i}
+          originale={originale}
           vediOriginale={vediOriginale}
           onScambia={scambia}
+          onOrigRotto={origRotto}
           tx={tx}
           onFermaClick={(e) => {
             swipe.eraUnTrascinamento();
@@ -264,7 +284,14 @@ export default function Lightbox({
           />
         </div>
       )}
-      <p className="absolute bottom-4 text-sm text-white/70">
+      {/* Con la trasparenza il contatore sale in alto, fra griglia e chiudi:
+          in basso, con una didascalia lunga su un telefono basso, finiva sopra
+          il bottone «Vedi l'originale». Senza dati resta dov'era. */}
+      <p
+        className={`absolute text-sm text-white/70 ${
+          conTrasparenza ? "left-1/2 top-7 -translate-x-1/2 tabular-nums" : "bottom-4"
+        }`}
+      >
         {i + 1} / {photos.length}
       </p>
     </div>
@@ -311,27 +338,35 @@ function classeRiquadro(w: number | null | undefined, h: number | null | undefin
 function FotoConTrasparenza({
   photo,
   indice,
+  originale: orig,
   vediOriginale,
   onScambia,
+  onOrigRotto,
   tx,
   onFermaClick,
 }: {
   photo: Photo;
   indice: number;
+  originale: NonNullable<Photo["ai"]>["originale"];
   vediOriginale: boolean;
   onScambia: () => void;
+  onOrigRotto: (url: string) => void;
   tx: ReturnType<typeof testiTrasparenza>;
   onFermaClick: (e: React.MouseEvent) => void;
 }) {
   const ai = photo.ai;
-  const orig = ai?.originale ?? null;
   const etichetta = vediOriginale ? tx.originale : (ai?.etichetta ?? "");
   const aria = vediOriginale ? `${tx.originale} — ${tx.didascaliaOriginale}` : (ai?.aria ?? "");
-  const didascalia = vediOriginale ? tx.didascaliaOriginale : (ai?.didascalia ?? null);
+  const didascalia = ai?.didascalia ?? null;
 
   return (
     <figure className="relative flex max-h-full max-w-full flex-col items-center" onClick={onFermaClick}>
       <div key={indice} className="lightbox-photo relative">
+        {/* La pubblicata resta SEMPRE nel flusso (invisibile quando si guarda
+            l'originale): è lei a dare la misura al riquadro, così passando
+            all'originale la foto non salta e l'etichetta resta sull'angolo —
+            anche quando l'originale ha un'inquadratura diversa, che sta
+            dentro lo stesso riquadro con object-contain. */}
         {/* eslint-disable-next-line @next/next/no-img-element -- come PhotoImg: niente ?dpl, cache CDN stabile. */}
         <img
           src={photoSrc(photo, 2000)}
@@ -343,27 +378,29 @@ function FotoConTrasparenza({
           draggable={false}
           decoding="async"
           fetchPriority="high"
+          aria-hidden={vediOriginale || undefined}
           style={riquadro(photo.width, photo.height)}
-          className={`${classeRiquadro(photo.width, photo.height)} [-webkit-user-drag:none] ${vediOriginale ? "hidden" : ""}`}
+          className={`${classeRiquadro(photo.width, photo.height)} [-webkit-user-drag:none] ${vediOriginale ? "invisible" : ""}`}
         />
         {orig && (
-          // Dal tablet in su l'xl (2560) sugli schermi densi; sul telefono basta
-          // l'm (1600 sul lato lungo), che sta già sopra i pixel che il riquadro
-          // mostra — e l'originale si scarica comunque appena la foto si apre.
-          <picture className="contents">
-            <source media="(min-width: 1024px)" srcSet={`${orig.m} 1x, ${orig.xl} 2x`} />
-            <img
-              src={orig.m}
-              alt={`${photo.alt} — ${tx.originale}`}
-              width={orig.larghezza ?? undefined}
-              height={orig.altezza ?? undefined}
-              draggable={false}
-              loading="eager"
-              decoding="async"
-              style={riquadro(orig.larghezza, orig.altezza)}
-              className={`${classeRiquadro(orig.larghezza, orig.altezza)} [-webkit-user-drag:none] ${vediOriginale ? "" : "hidden"}`}
-            />
-          </picture>
+          // Montato insieme alla pubblicata, così lo scambio è immediato. La
+          // taglia la sceglie il browser come per la foto: l'm (1600) su uno
+          // schermo normale, l'xl (2560) solo dove servono davvero i pixel.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={orig.m}
+            srcSet={`${orig.m} 1600w, ${orig.xl} 2560w`}
+            sizes="92vw"
+            alt={`${photo.alt} — ${tx.originale}`}
+            width={orig.larghezza ?? undefined}
+            height={orig.altezza ?? undefined}
+            draggable={false}
+            loading="eager"
+            decoding="async"
+            aria-hidden={!vediOriginale || undefined}
+            onError={() => onOrigRotto(orig.m)}
+            className={`absolute inset-0 h-full w-full object-contain [-webkit-user-drag:none] ${vediOriginale ? "" : "invisible"}`}
+          />
         )}
         {etichetta && (
           <EtichettaAi
@@ -375,9 +412,26 @@ function FotoConTrasparenza({
         )}
       </div>
       {(didascalia || orig) && (
-        <figcaption className="mt-3 flex max-w-3xl flex-col items-center gap-2 px-2 text-center text-sm leading-snug text-white/85">
-          {didascalia && <span>{didascalia}</span>}
+        // Larga quanto la foto (w-0 min-w-full: non allarga la figure, ne
+        // prende la misura), allineata a sinistra come una didascalia di
+        // museo; il bottone a destra dal tablet in su, sotto sul telefono.
+        <figcaption className="mt-3 flex w-0 min-w-full flex-col items-start gap-2 px-1 text-left sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+          {/* Le due didascalie nella stessa cella: l'altezza resta quella
+              della più lunga, e lo scambio non sposta niente. */}
+          <span className="grid text-sm leading-relaxed text-pretty text-white/85">
+            <span className={`[grid-area:1/1] ${vediOriginale ? "invisible" : ""}`} aria-hidden={vediOriginale || undefined}>
+              {didascalia}
+            </span>
+            {orig && (
+              <span className={`[grid-area:1/1] ${vediOriginale ? "" : "invisible"}`} aria-hidden={!vediOriginale || undefined}>
+                {tx.didascaliaOriginale}
+              </span>
+            )}
+          </span>
           {orig && (
+            // Il testo del bottone non cambia (un bottone aria-pressed dice il
+            // suo stato con aria-pressed, non cambiando nome): lo stato si
+            // vede dall'interruttore dentro la pillola.
             <button
               type="button"
               aria-pressed={vediOriginale}
@@ -386,18 +440,18 @@ function FotoConTrasparenza({
                 e.stopPropagation();
                 onScambia();
               }}
-              className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sand ${
-                vediOriginale
-                  ? "bg-white text-ink ring-white"
-                  : "bg-white/10 text-white ring-white/40 hover:bg-white/20"
-              }`}
+              className="group inline-flex shrink-0 items-center gap-2.5 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white ring-1 ring-white/40 transition-colors hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sand aria-pressed:bg-white/20 aria-pressed:ring-white"
             >
+              <span
+                aria-hidden="true"
+                className="relative h-4 w-7 shrink-0 rounded-full bg-white/25 transition-colors group-aria-pressed:bg-brand"
+              >
+                <span className="absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform group-aria-pressed:translate-x-3" />
+              </span>
               {tx.vediOriginale}
               <kbd
                 aria-hidden="true"
-                className={`rounded px-1.5 py-0.5 font-sans text-[10px] font-semibold ${
-                  vediOriginale ? "bg-ink/10 text-ink" : "bg-white/15 text-white/80"
-                }`}
+                className="hidden rounded bg-white/15 px-1.5 py-0.5 font-sans text-[10px] font-semibold text-white/80 pointer-fine:inline-block"
                 title={tx.tasto}
               >
                 O

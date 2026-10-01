@@ -446,7 +446,7 @@
     "taxInfoTitle": "Wie wird berechnet",
     "taxCriteria": "Berechnungskriterien",
     "taxInfoAria": "Details zur Steuerberechnung",
-    "taxAiDisclaimer": "Schätzungen auf Katasterbasis (Preis-Wert), erstellt bei der Aufnahme des Inserats, auch mit Hilfe von KI: Sie können daher Rechen- oder Übertragungsfehler enthalten. Die einzige verlässliche Quelle ist das persönliche Gespräch mit dem Inhaber nach Prüfung des konkreten Einzelfalls.",
+    "taxAiDisclaimer": "Schätzungen, die bei der Aufnahme des Inserats eingetragen wurden, auch mit Hilfe von KI: Sie können daher Rechen- oder Übertragungsfehler enthalten. Die einzige verlässliche Quelle ist das persönliche Gespräch mit dem Inhaber nach Prüfung des konkreten Einzelfalls.",
     "taxGroupAcquisto": "Kaufkosten (einmalig)",
     "taxGroupGestione": "Jährliche laufende Kosten",
     "taxPlusVat": "+ MwSt.",

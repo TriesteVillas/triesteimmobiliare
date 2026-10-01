@@ -20,7 +20,12 @@ export type PhotoWidth = (typeof PHOTO_WIDTHS)[number];
  */
 export function photoSrc(photo: Photo, width: PhotoWidth): string {
   if (!photo.id) return width > 900 ? photo.url : photo.thumb;
-  return `/foto/${photo.id}/${width}.webp`;
+  // Trasparenza AI (01/10/2026): una foto che il CRM dichiara passata da un
+  // modello generativo porta la marcatura IPTC nell'XMP del file, e la marca
+  // entra nell'URL — `/foto/<att>/1200-ctam.webp` — perché lo stesso URL senza
+  // marca può essere già nella cache immutabile di un anno. Le altre foto
+  // tengono l'URL di prima, al byte.
+  return photo.xmp ? `/foto/${photo.id}/${width}-${photo.xmp}.webp` : `/foto/${photo.id}/${width}.webp`;
 }
 
 /**

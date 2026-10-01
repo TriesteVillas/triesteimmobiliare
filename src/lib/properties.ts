@@ -1,4 +1,4 @@
-import type { FotoAi, FotoTrasparenza, TrasparenzaImmobile } from "./trasparenza";
+import type { FotoAi, FotoTrasparenza, MarcaXmp, TrasparenzaImmobile } from "./trasparenza";
 // Field-ID map for the Airtable PROPRIETA table (base app1ZDay9vQNU5V2u, table tblwAUWPnX7KF8FhU).
 // We key on field IDs (stable across renames) for both the live REST fetch
 // (returnFieldsByFieldId=true) and the dev seed.
@@ -150,6 +150,11 @@ export type Photo = {
   // esattamente come prima.
   trasparenza?: FotoTrasparenza;
   ai?: FotoAi;
+  // La marcatura IPTC che il proxy /foto scrive nell'XMP del file (SPEC §5.7),
+  // dal trattamento del CRM: entra anche nell'URL (photoSrc), perché un URL
+  // già servito senza marcatura resta in cache immutabile per un anno. Solo
+  // sulle righe VERE del CRM; assente = URL e file come prima.
+  xmp?: MarcaXmp;
 };
 
 export type Property = {

@@ -35,6 +35,7 @@
 // → MISS a 1,01 s; subito dopo → HIT a 0,085 s. Da qui le foto si servono con
 // un <img> nudo (src/components/PhotoImg.tsx), non con next/image.
 import { getPhotoSources } from "@/lib/airtable";
+import { IPTC_MARCA, pacchettoXmp, type MarcaXmp } from "@/lib/trasparenza";
 
 // sharp gira solo su Node, non su Edge.
 export const runtime = "nodejs";
@@ -44,6 +45,9 @@ export const runtime = "nodejs";
 const WIDTHS = [400, 600, 800, 1200, 1600, 2000] as const;
 
 const ATT_ID = /^att[A-Za-z0-9]{14}$/;
+// `<larghezza>.webp` o, per una foto che il CRM dichiara passata dall'AI,
+// `<larghezza>-<marca>.webp` (marca = ctam | tam, vedi lib/trasparenza.ts).
+const SPEC = /^(\d+)(?:-([a-z]+))?\.webp$/;
 
 // Un anno, immutable: l'URL identifica una foto e una larghezza precise, quindi
 // il contenuto non cambia mai. Se la foto viene sostituita su Airtable cambia
@@ -65,7 +69,15 @@ export async function GET(
       headers: { "Cache-Control": CACHE_MISS },
     });
   }
-  const width = Number(spec.replace(/\.webp$/, ""));
+  const m = SPEC.exec(spec);
+  const width = m ? Number(m[1]) : NaN;
+  const marca = m?.[2] ?? null;
+  if (marca !== null && !Object.hasOwn(IPTC_MARCA, marca)) {
+    return new Response("marca non ammessa", {
+      status: 400,
+      headers: { "Cache-Control": CACHE_MISS },
+    });
+  }
   if (!(WIDTHS as readonly number[]).includes(width)) {
     return new Response(`larghezza non ammessa (${WIDTHS.join(", ")})`, {
       status: 400,
@@ -99,18 +111,18 @@ export async function GET(
     const input = Buffer.from(await upstream.arrayBuffer());
 
     const { default: sharp } = await import("sharp");
-    // keepXmp (01/10/2026, SPEC trasparenza §5.7): la marcatura IPTC
-    // `DigitalSourceType` che dichiara una foto passata dall'AI vive nell'XMP
-    // del file, e il default di sharp toglie TUTTI i metadati — sul sito
-    // arrivava sempre muta. Si tiene solo l'XMP: EXIF (GPS, data, apparecchio)
-    // e profili continuano a cadere come prima. ⚠️ Sotto i 900 px la sorgente
-    // è la miniatura `large` di Airtable, che l'XMP potrebbe non averlo più.
-    const out = await sharp(input)
+    // La marcatura AI (01/10/2026, SPEC trasparenza §5.7). Il default di sharp
+    // toglie TUTTI i metadati, e va bene così: l'XMP del file di partenza,
+    // quando c'è, porta data, apparecchio, quota e imbardata del drone, a
+    // volte il percorso delle cartelle — `keepXmp()` li lasciava passare
+    // (review del 01/10). Su una foto marcata si SCRIVE un XMP minimo, il solo
+    // `Iptc4xmpExt:DigitalSourceType`, costruito dal trattamento del CRM e non
+    // letto dal file (le foto caricate su Airtable di norma non ce l'hanno).
+    let img = sharp(input)
       .rotate() // rispetta l'orientamento EXIF prima di ridimensionare
-      .resize({ width, withoutEnlargement: true })
-      .keepXmp()
-      .webp({ quality: 78 })
-      .toBuffer();
+      .resize({ width, withoutEnlargement: true });
+    if (marca) img = img.withXmp(pacchettoXmp(marca as MarcaXmp));
+    const out = await img.webp({ quality: 78 }).toBuffer();
 
     return new Response(new Uint8Array(out), {
       headers: {
