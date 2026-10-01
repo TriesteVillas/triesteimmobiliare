@@ -49,9 +49,12 @@ export const F = {
   titleEn: "fldrTJMbSO4nNW32W", // public_tsv_name_EN_#
   titleDe: "fldXYXscxt7V8EueO", // public_tsv_name_DE_#
   // Sloveno (2026-10-01). Il nome pubblico sloveno è condiviso col gemello TSV
-  // (campo creato l'11/09, lo riempie il cron traduzioni-sl del CRM). Una
-  // descrizione TSI slovena su Airtable NON esiste: in sloveno la scheda
-  // ripiega sull'inglese — vedi localizedDescription().
+  // (campo creato l'11/09). ⚠️ Su Airtable questo campo è VUOTO: il cron
+  // traduzioni-sl del CRM scrive solo su Postgres (`immobile.public_name_sl`),
+  // quindi il nome sloveno arriva dalla vetrina, non da qui. Chi legge Airtable
+  // — le schede della Private Collection, o il catalogo se torna su Airtable —
+  // ripiega sull'inglese. Una descrizione TSI slovena non esiste in nessuna
+  // delle due banche dati: vedi localizedDescription().
   titleSl: "fldPIse8uguVRfJ1x", // public_tsv_name_SL_#
   inEvidenza: "fld3bgYTqcgnYLADd", // in_evidenza (checkbox → boolean)
   onlineDa: "fldk27y6rT8xUZ7XQ", // online_da (date ISO yyyy-mm-dd → string|null)

@@ -87,7 +87,7 @@ const BY_LOCALE: Record<CityLocale, string[]> = { it: IT, en: EN, de: DE, sl: SL
 
 /** Suggerimenti nella lingua del visitatore. Locale sconosciuto → italiano. */
 export function citySuggestions(locale: string): string[] {
-  return BY_LOCALE[(locale as CityLocale) in BY_LOCALE ? (locale as CityLocale) : "it"];
+  return BY_LOCALE[Object.hasOwn(BY_LOCALE, locale) ? (locale as CityLocale) : "it"];
 }
 
 /** id dell'elemento <datalist>, condiviso fra input e lista. */

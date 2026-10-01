@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getProperties } from "@/lib/airtable";
-import { getArticles } from "@/lib/articles";
+import { getArticles, articleLocales } from "@/lib/articles";
 import { routing } from "@/i18n/routing";
 import { absUrl, HREFLANG, localizedPath, SITE_URL } from "@/lib/seo";
 
@@ -10,10 +10,10 @@ import { absUrl, HREFLANG, localizedPath, SITE_URL } from "@/lib/seo";
 // avrebbe dato alla sitemap un hreflang `undefined`.
 
 // hreflang alternates for a path across all locales (+ x-default → it).
-function languagesFor(path: string): Record<string, string> {
+function languagesFor(path: string, vere: readonly string[] = routing.locales): Record<string, string> {
   const languages: Record<string, string> = {};
-  for (const l of routing.locales) languages[HREFLANG[l]] = absUrl(l, path);
-  languages["x-default"] = absUrl("it", path);
+  for (const l of routing.locales) if (vere.includes(l)) languages[HREFLANG[l]] = absUrl(l, path);
+  languages["x-default"] = absUrl(vere.includes("it") ? "it" : vere[0] ?? "it", path);
   return languages;
 }
 
@@ -52,11 +52,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Le guide: `lastModified` è la data VERA dell'articolo — un sitemap che
   // dichiara tutto modificato oggi non dice niente a nessuno.
+  // Solo le lingue in cui l'articolo esiste davvero (2026-10-01): una pagina di
+  // ripiego dichiara canonica la lingua che mostra, e in sitemap ci vanno solo
+  // le canoniche — vale per /sl, che sugli articoli TSI è oggi tutto inglese.
   for (const a of articles) {
     const path = `/risorse/${a.slug}`;
-    const languages = languagesFor(path);
+    const vere = articleLocales(a, routing.locales);
+    const languages = languagesFor(path, vere);
     const touched = a.updatedAt || a.publishedAt;
-    for (const locale of routing.locales) {
+    for (const locale of vere) {
       entries.push({
         url: absUrl(locale, path),
         ...(touched ? { lastModified: new Date(touched) } : {}),

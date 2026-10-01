@@ -46,17 +46,38 @@ export type Article = {
 // Qui l'italiano è la lingua master (il lettore è a Trieste) ed è anche la
 // lingua della radice del sito. Una traduzione mancante ripiega it → en → quel
 // che c'è, così un articolo tradotto a metà non rende mai una pagina vuota.
-// Lo sloveno (2026-10-01) fa eccezione: i campi *_sl li riempie la passata
-// «traduci in sloveno» dell'editoriale del CRM, e finché manca a un lettore
-// sloveno serve l'inglese — la lingua internazionale — non l'italiano. Catena
-// sl → en → it → de, la stessa del gemello triestevillas-web.
+// Lo sloveno (2026-10-01) fa eccezione: finché un articolo non ha i campi
+// *_sl, a un lettore sloveno serve l'inglese — la lingua internazionale — non
+// l'italiano. Catena sl → en → it → de, la stessa del gemello triestevillas-web.
+// ⚠️ Al 01/10 i *_sl degli articoli TSI non li riempie nessuno: la passata
+// slovena dell'editoriale del CRM traduce solo gli articoli TSV.
+function catena(locale: string): ArticleLocale[] {
+  if (locale === "sl") return ["sl", "en", "it", "de"];
+  if (locale === "en" || locale === "de") return [locale, "it", "en", "de"];
+  return ["it", "en", "de"];
+}
+
 export function articleText(
   bag: Record<ArticleLocale, string>,
   locale: string,
 ): string {
-  const l = (locale as ArticleLocale) in bag ? (locale as ArticleLocale) : "it";
-  if (l === "sl") return bag.sl || bag.en || bag.it || bag.de || "";
-  return bag[l] || bag.it || bag.en || bag.de || "";
+  for (const l of catena(locale)) if (bag[l]) return bag[l];
+  return "";
+}
+
+/** Le lingue in cui l'articolo ESISTE: corpo suo, non un ripiego. Servono a
+ *  hreflang e sitemap — dichiarare `sl` su un testo inglese di ripiego mette in
+ *  gara su Google due copie dello stesso articolo (/en e /sl). Un articolo
+ *  senza corpo in nessuna lingua le tiene tutte: niente da preferire. */
+export function articleLocales(a: Article, all: readonly string[]): string[] {
+  const vere = all.filter((l) => !!a.body[l as ArticleLocale]);
+  return vere.length ? vere : [...all];
+}
+
+/** La lingua del corpo che la pagina in `locale` mostra davvero. */
+export function articleServedLocale(a: Article, locale: string): string {
+  for (const l of catena(locale)) if (a.body[l]) return l;
+  return locale;
 }
 
 type RawRecord = { id: string; fields: Record<string, unknown> };

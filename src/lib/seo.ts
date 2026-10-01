@@ -2,6 +2,8 @@
 // (it at the root, en/de/sl prefixed) and JSON-LD builders. The site is read by
 // many German-speaking buyers, so hreflang is not cosmetic.
 
+import { routing, type Locale } from "@/i18n/routing";
+
 // `?? ` da solo non basta: una variabile d'ambiente definita ma VUOTA (è ciò che
 // restituisce `vercel env pull` per le variabili marcate Sensitive) non è null,
 // quindi passerebbe indenne e `new URL("")` in layout.tsx farebbe schiantare OGNI
@@ -9,16 +11,19 @@
 export const SITE_URL =
   (process.env.NEXT_PUBLIC_SITE_URL || "").trim() || "https://www.triesteimmobiliare.com";
 
-export const LOCALES = ["it", "en", "de", "sl"] as const;
+// L'elenco delle lingue è UNO: quello del routing. Scritto a mano qui, una lingua
+// aggiunta solo in routing.ts usciva dalle pagine senza hreflang (e viceversa).
+export const LOCALES = routing.locales;
 // hreflang SOLO-LINGUA (2026-08-11, allineato al gemello TSV): i codici
 // regionali de-DE/en-GB lasciavano fuori de-AT e l'inglese non-UK, che in SERP
 // cadevano sulla x-default. I codici lingua coprono tutte le regioni. Per lo
 // sloveno (2026-10-01) vale a maggior ragione: `sl-SI` escluderebbe la
 // minoranza slovena di Trieste e Gorizia, che è in Italia.
 // Esportata perché la sitemap deve dichiarare ESATTAMENTE gli stessi codici.
-export const HREFLANG: Record<string, string> = { it: "it", en: "en", de: "de", sl: "sl" };
+// `satisfies`: una lingua del routing senza codice non compila.
+export const HREFLANG: Record<string, string> = { it: "it", en: "en", de: "de", sl: "sl" } satisfies Record<Locale, string>;
 // og:locale vuole il formato regionale: mappa separata, usata solo da OG.
-const OG_LOCALE: Record<string, string> = { it: "it_IT", en: "en_GB", de: "de_DE", sl: "sl_SI" };
+const OG_LOCALE: Record<string, string> = { it: "it_IT", en: "en_GB", de: "de_DE", sl: "sl_SI" } satisfies Record<Locale, string>;
 
 // Path on the wire for a given locale. `path` uses "/" for home.
 export function localizedPath(locale: string, path: string): string {
@@ -37,6 +42,24 @@ export function pageAlternates(locale: string, path: string) {
   for (const l of LOCALES) languages[HREFLANG[l]] = absUrl(l, path);
   languages["x-default"] = absUrl("it", path);
   return { canonical: absUrl(locale, path), languages };
+}
+
+// Come pageAlternates, per una pagina che non esiste in tutte le lingue (un
+// articolo non ancora tradotto): hreflang solo per le lingue `vere`, e la
+// pagina di ripiego dichiara canonica quella di cui mostra il testo (`servita`).
+// Senza, /sl/risorse/x — inglese di ripiego — si presentava come sloveno e
+// gareggiava con /en/risorse/x.
+export function partialAlternates(
+  locale: string,
+  path: string,
+  vere: readonly string[],
+  servita: string,
+) {
+  const languages: Record<string, string> = {};
+  for (const l of LOCALES) if (vere.includes(l)) languages[HREFLANG[l]] = absUrl(l, path);
+  languages["x-default"] = absUrl(vere.includes("it") ? "it" : vere[0] ?? "it", path);
+  const canonica = vere.includes(locale) ? locale : servita;
+  return { canonical: absUrl(canonica, path), languages };
 }
 
 // Default OpenGraph for a page (merged into per-page metadata).

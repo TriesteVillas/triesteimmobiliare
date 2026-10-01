@@ -5,7 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { verifySession, PC_COOKIE } from "@/lib/private/session";
 import { findGrantById, isActive } from "@/lib/private/store";
 import { getPrivateProperty } from "@/lib/airtable";
-import { localizedDescription, localizedTitle, priceLabel, roomsLabel } from "@/lib/propertyView";
+import { localizedDescription, localizedTitle, localizePlaceName, priceLabel, roomsLabel } from "@/lib/propertyView";
 import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import AccessGate from "@/components/private/AccessGate";
@@ -116,7 +116,7 @@ export default async function PrivateDetail({
 
         <header className="mt-8">
           <h1 className="pc-title text-3xl sm:text-4xl">{title}</h1>
-          <p className="mt-2 text-[#93a1ae]">{[p.zona, p.comune].filter(Boolean).join(" · ")}</p>
+          <p className="mt-2 text-[#93a1ae]">{[p.zona, localizePlaceName(p.comune, locale)].filter(Boolean).join(" · ")}</p>
           <p className="mt-4 text-2xl font-semibold text-[#dfe9f3]">
             {priceLabel(p, locale, tProp)}
           </p>

@@ -18,54 +18,81 @@
 
 /** Esonimi ricondotti a una forma sola. Solo i bacini che questa agenzia serve
  *  davvero: Trieste sta su una frontiera linguistica, e lo stesso posto arriva
- *  scritto in tre lingue a seconda di chi compila il form (`lingua` nel payload).
- *  Chiave = forma normalizzata in minuscolo senza accenti; valore = forma canonica. */
+ *  scritto in quattro lingue (it/en/de/sl) a seconda di chi compila il form
+ *  (`lingua` nel payload).
+ *  Chiave = forma normalizzata in minuscolo senza accenti; valore = forma canonica.
+ *  Le forme slovene vanno scritte GIÀ spogliate dei diacritici (`trzic`, non
+ *  `tržič`): `key()` passa da NFD e toglie č/š/ž prima del confronto. Le voci
+ *  doppie («Tržič (Monfalcone)», «Videm (Udine)») sono quelle della datalist
+ *  slovena di triestevillas.com: la tabella è la stessa dei due siti (copiata
+ *  il 01/10/2026), e qui la datalist di cities.ts propone le forme semplici.
+ *  Ogni voce di cities.ts deve finire sulla forma italiana, salvo «Gorica» e
+ *  «Monaco», ambigue per scelta. */
 const ALIAS: Record<string, string> = {
   // Trieste e il suo intorno
   triest: "Trieste", trst: "Trieste", ts: "Trieste", "trieste ts": "Trieste",
   muggia: "Muggia", milje: "Muggia",
   "duino aurisina": "Duino-Aurisina", devin: "Duino-Aurisina", nabrezina: "Duino-Aurisina",
+  "devin nabrezina": "Duino-Aurisina",
   sistiana: "Sistiana", sesljan: "Sistiana",
+  opcine: "Opicina", zgonik: "Sgonico", repentabor: "Monrupino",
+  // «Dolina» (San Dorligo) resta fuori come «Gorica»: è un toponimo comune a
+  // più paesi della Slovenia, e indovinare è peggio che lasciare scritto.
   // Gorizia: attenzione, Gorizia e Nova Gorica sono DUE città in due Stati.
-  // "Gorica" da solo è ambiguo: lo lasciamo com'è scritto invece di indovinare.
+  // "Gorica" da solo è ambiguo (un goriziano sloveno lo dice anche di Nova
+  // Gorica): lo lasciamo com'è scritto invece di indovinare.
   gorz: "Gorizia", "gorizia go": "Gorizia",
-  monfalcone: "Monfalcone", trzic: "Monfalcone",
+  monfalcone: "Monfalcone", trzic: "Monfalcone", "trzic monfalcone": "Monfalcone",
+  videm: "Udine", "videm udine": "Udine",
+  gradez: "Grado",
+  cedad: "Cividale del Friuli", oglej: "Aquileia",
+  krmin: "Cormons", "krmin cormons": "Cormons",
+  "gradisce ob soci": "Gradisca d'Isonzo",
   // Slovenia / Croazia
   ljubljana: "Lubiana", laibach: "Lubiana",
   koper: "Capodistria", capodistria: "Capodistria",
   portoroz: "Portorose", portoroe: "Portorose",
   piran: "Pirano", pirano: "Pirano",
-  rijeka: "Fiume", fiume: "Fiume",
-  pula: "Pola", pola: "Pola",
+  rijeka: "Fiume", fiume: "Fiume", reka: "Fiume",
+  pula: "Pola", pola: "Pola", pulj: "Pola",
   zagreb: "Zagabria", agram: "Zagabria",
   // Austria / Germania / Svizzera
-  wien: "Vienna", vienne: "Vienna",
-  graz: "Graz",
+  wien: "Vienna", vienne: "Vienna", dunaj: "Vienna",
+  graz: "Graz", gradec: "Graz",
   klagenfurt: "Klagenfurt", celovec: "Klagenfurt",
   villach: "Villaco", beljak: "Villaco", villaco: "Villaco",
-  salzburg: "Salisburgo", salisburgo: "Salisburgo",
+  salzburg: "Salisburgo", salisburgo: "Salisburgo", solnograd: "Salisburgo",
   munchen: "Monaco di Baviera", munich: "Monaco di Baviera", muenchen: "Monaco di Baviera",
   "monaco di baviera": "Monaco di Baviera",
   koln: "Colonia", cologne: "Colonia", koeln: "Colonia",
   frankfurt: "Francoforte", "frankfurt am main": "Francoforte",
   hamburg: "Amburgo", berlin: "Berlino",
   zurich: "Zurigo", zuerich: "Zurigo", zurigo: "Zurigo",
-  genf: "Ginevra", geneva: "Ginevra", geneve: "Ginevra",
+  genf: "Ginevra", geneva: "Ginevra", geneve: "Ginevra", zeneva: "Ginevra",
   basel: "Basilea", bale: "Basilea",
   // Italia, esonimi delle città che i clienti stranieri scrivono in lingua
-  venice: "Venezia", venedig: "Venezia",
+  venice: "Venezia", venedig: "Venezia", benetke: "Venezia",
   milan: "Milano", mailand: "Milano",
-  rome: "Roma", rom: "Roma",
-  turin: "Torino", florence: "Firenze", florenz: "Firenze",
-  naples: "Napoli", neapel: "Napoli",
+  rome: "Roma", rom: "Roma", rim: "Roma",
+  turin: "Torino", florence: "Firenze", florenz: "Firenze", firence: "Firenze",
+  naples: "Napoli", neapel: "Napoli", neapelj: "Napoli",
   genoa: "Genova", genua: "Genova",
-  padua: "Padova", bozen: "Bolzano", trient: "Trento",
+  padua: "Padova", bozen: "Bolzano", bocen: "Bolzano", trient: "Trento",
+  pordenon: "Pordenone",
   // Resto d'Europa e piazze ricorrenti
-  london: "Londra", paris: "Parigi", prag: "Praga", prague: "Praga",
-  warsaw: "Varsavia", warschau: "Varsavia",
-  lisbon: "Lisbona", lissabon: "Lisbona",
+  london: "Londra", paris: "Parigi", pariz: "Parigi", prag: "Praga", prague: "Praga",
+  warsaw: "Varsavia", warschau: "Varsavia", varsava: "Varsavia",
+  lisbon: "Lisbona", lissabon: "Lisbona", lizbona: "Lisbona",
   athens: "Atene", athen: "Atene",
-  brussels: "Bruxelles", bruessel: "Bruxelles",
+  brussels: "Bruxelles", bruessel: "Bruxelles", bruselj: "Bruxelles",
+  budimpesta: "Budapest", luksemburg: "Lussemburgo",
+  // Le forme EN/DE/SL della datalist di cities.ts che prima finivano scritte in
+  // lingua (misurato il 01/10: 5 voci EN, 6 DE, 3 SL). «Monaco» resta fuori:
+  // in inglese è il Principato, in italiano è anche Monaco di Baviera.
+  luxembourg: "Lussemburgo", luxemburg: "Lussemburgo", brussel: "Bruxelles",
+  stuttgart: "Stoccarda", barcelona: "Barcellona", dublin: "Dublino",
+  monako: "Principato di Monaco",
+  dubaj: "Dubai",
   singapur: "Singapore", hongkong: "Hong Kong",
 };
 

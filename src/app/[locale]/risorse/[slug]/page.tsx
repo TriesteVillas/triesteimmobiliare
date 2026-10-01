@@ -5,6 +5,8 @@ import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import {
   getArticle,
+  articleLocales,
+  articleServedLocale,
   getArticles,
   getRelatedArticles,
   articleText,
@@ -17,7 +19,7 @@ import BuyerConcierge from "@/components/compra/BuyerConcierge";
 import JsonLd from "@/components/JsonLd";
 import { intlLocale } from "@/lib/format";
 import {
-  pageAlternates, articleOpenGraph, seoTitle, seoDescription,
+  partialAlternates, articleOpenGraph, seoTitle, seoDescription,
   absUrl, breadcrumbJsonLd, SITE_URL,
 } from "@/lib/seo";
 
@@ -47,7 +49,12 @@ export async function generateMetadata({
   return {
     title: { absolute: title },
     description,
-    alternates: pageAlternates(locale, `/risorse/${slug}`),
+    alternates: partialAlternates(
+      locale,
+      `/risorse/${slug}`,
+      articleLocales(a, routing.locales),
+      articleServedLocale(a, locale),
+    ),
     openGraph: articleOpenGraph(locale, `/risorse/${slug}`, titolo, description, {
       publishedTime: a.publishedAt ?? undefined,
       modifiedTime: a.updatedAt ?? a.publishedAt ?? undefined,
@@ -82,6 +89,11 @@ export default async function ArticlePage({
   const title = articleText(article.title, locale);
   const abstract = articleText(article.abstract, locale);
   const body = articleText(article.body, locale);
+  // Su /sl un articolo non ancora tradotto si legge in inglese: lo si dichiara
+  // sul testo, così lettori di schermo e traduttori del browser non leggono
+  // l'inglese con la pronuncia slovena della pagina.
+  const servita = articleServedLocale(article, locale);
+  const langTesto = servita !== locale ? servita : undefined;
   const related = await getRelatedArticles(article);
   // Chi legge di documenti, successioni o costi di vendita ha in mano una casa;
   // chi legge di imposte d'acquisto, zone o prezzi ne sta cercando una.
@@ -92,13 +104,18 @@ export default async function ArticlePage({
     "@type": "Article",
     headline: title,
     description: abstract,
-    inLanguage: locale,
+    // La lingua del testo mostrato, non quella dell'URL: su /sl un articolo
+    // non tradotto è inglese.
+    inLanguage: servita,
     datePublished: article.publishedAt ?? undefined,
     dateModified: article.updatedAt ?? article.publishedAt ?? undefined,
     author: { "@type": "Organization", name: "TriesteImmobiliare", "@id": `${SITE_URL}/#agency` },
     publisher: { "@id": `${SITE_URL}/#agency` },
     isPartOf: { "@id": `${SITE_URL}/#website` },
-    mainEntityOfPage: absUrl(locale, `/risorse/${article.slug}`),
+    mainEntityOfPage: absUrl(
+      articleLocales(article, routing.locales).includes(locale) ? locale : servita,
+      `/risorse/${article.slug}`,
+    ),
   };
 
   return (
@@ -125,11 +142,12 @@ export default async function ArticlePage({
         <h1
           className="mt-5 text-balance text-4xl font-semibold leading-[1.1] tracking-tight text-brand-dark sm:text-5xl"
           data-reveal
+          lang={langTesto}
         >
           {title}
         </h1>
         {abstract ? (
-          <p className="mt-5 text-lg leading-relaxed text-neutral-600" data-reveal>
+          <p className="mt-5 text-lg leading-relaxed text-neutral-600" data-reveal lang={langTesto}>
             {abstract}
           </p>
         ) : null}
@@ -152,7 +170,7 @@ export default async function ArticlePage({
         </div>
 
         {/* Corpo */}
-        <div className="mt-10">
+        <div className="mt-10" lang={langTesto}>
           <ArticleBody markdown={body} />
         </div>
 

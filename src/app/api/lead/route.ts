@@ -175,7 +175,9 @@ const RECAP = {
 // Le lingue in cui il sito scrive al cliente: le chiavi di RECAP, nient'altro.
 // Una lingua sconosciuta (o assente) ricade sull'italiano.
 type RecapLang = keyof typeof RECAP;
-const linguaRecap = (v: string): RecapLang => (v in RECAP ? (v as RecapLang) : "it");
+// `Object.hasOwn`, non `in`: «toString» o «constructor» stanno nel prototipo di
+// ogni oggetto e passerebbero per una lingua.
+const linguaRecap = (v: string): RecapLang => (Object.hasOwn(RECAP, v) ? (v as RecapLang) : "it");
 // Il bottone verso la scheda, nella lingua del cliente.
 const CTA_SCHEDA: Record<RecapLang, string> = {
   it: "Vedi l'immobile",
