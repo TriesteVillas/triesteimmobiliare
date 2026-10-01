@@ -161,7 +161,7 @@ const RECAP = {
   sl: {
     subject: "Prejeli smo vaše povpraševanje – TriesteImmobiliare",
     hello: "Pozdravljeni",
-    received: "prejeli smo vaše povpraševanje in se vam kmalu oglasimo.",
+    received: "prejeli smo vaše povpraševanje in se vam bomo kmalu oglasili.",
     recapTitle: "Povzetek povpraševanja",
     zones: "Območja zanimanja", budget: "Proračun", size: "Velikost",
     purpose: "Namen", condition: "Stanje nepremičnine", listing: "Nepremičnina",

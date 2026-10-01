@@ -165,7 +165,7 @@ const CONTENT: Record<Locale, Content> = {
     title: "Obvestilo o zasebnosti",
     updated: "Zadnja posodobitev: junij 2026",
     intro:
-      "To obvestilo opisuje, kako TriesteImmobiliare (blagovna znamka družbe TriesteVillas srl) obdeluje osebne podatke, zbrane prek te spletne strani, v skladu z Uredbo (EU) 2016/679 (GDPR).",
+      "To obvestilo opisuje, kako TriesteImmobiliare (blagovna znamka družbe TriesteVillas srl) obdeluje osebne podatke, zbrane prek te spletne strani, v skladu z Uredbo (EU) 2016/679 (Splošna uredba o varstvu podatkov – GDPR).",
     sections: [
       { h: "1. Upravljavec", p: CONTROLLER },
       {
@@ -178,7 +178,7 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         h: "4. Funkcija »Pošljite prijatelju«",
-        p: "Če s to funkcijo nepremičnino priporočite drugi osebi, nam potrjujete, da ste pridobili njeno soglasje za prejem sporočila. Naslov prejemnika uporabimo samo za pošiljanje tega posameznega priporočila.",
+        p: "Če s to funkcijo nepremičnino priporočite drugi osebi, nam potrjujete, da ste pridobili njeno privolitev za prejem sporočila. Naslov prejemnika uporabimo samo za pošiljanje tega posameznega priporočila.",
       },
       {
         h: "5. Način obdelave in hramba",
@@ -186,7 +186,7 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         h: "6. Prejemniki in obdelovalci",
-        p: "Podatke lahko obdelujejo naši pooblaščeni sodelavci in ponudniki, ki kot obdelovalci skrbijo za tehnične storitve spletne strani (zlasti Airtable za upravljanje stikov, Vercel za gostovanje in ponudnik e-pošte za pošiljanje sporočil). Podatki se ne razširjajo.",
+        p: "Podatke lahko obdelujejo naši pooblaščeni sodelavci in ponudniki, ki kot obdelovalci skrbijo za tehnične storitve spletne strani (zlasti Airtable za upravljanje stikov, Vercel za gostovanje in ponudnik e-pošte za pošiljanje sporočil). Podatkov ne objavljamo.",
       },
       {
         h: "7. Prenosi zunaj EU",
@@ -198,7 +198,7 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         h: "9. Piškotki",
-        p: "Spletna stran uporablja tehnične piškotke, potrebne za delovanje, in – samo z vašo privolitvijo – statistične piškotke Google Analytics 4 (Google Ireland Ltd), s katerimi razumemo, kako se stran uporablja. Dokler se ne odločite, se ne zapiše noben statistični piškotek; svojo odločitev lahko kadar koli spremenite prek povezave »Nastavitve piškotkov« v nogi vsake strani. Brez oglaševanja, brez profiliranja. Storitve tretjih oseb (npr. zemljevidi, videoposnetki) lahko ob aktivaciji njihove vsebine nastavijo lastne piškotke.",
+        p: "Spletna stran uporablja tehnične piškotke, potrebne za delovanje, in – samo z vašo privolitvijo – statistične piškotke Google Analytics 4 (Google Ireland Ltd), s katerimi razumemo, kako se stran uporablja. Dokler se ne odločite, se ne shrani noben statistični piškotek; svojo odločitev lahko kadar koli spremenite prek povezave »Nastavitve piškotkov« v nogi vsake strani. Brez oglaševanja, brez profiliranja. Storitve tretjih oseb (npr. zemljevidi, videoposnetki) lahko ob aktivaciji njihove vsebine nastavijo lastne piškotke.",
       },
       {
         h: "10. Uporabniški račun in prilagajanje",

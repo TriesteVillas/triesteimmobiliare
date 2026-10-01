@@ -183,7 +183,7 @@ const CRED: Record<Lang, {
     validity: (d, n) => `Velja do ${d} – ${n} ${dniSl(n)}. Po izteku lahko zaprosite za podaljšanje.`,
     enter: "Vstopite v Private Collection",
     zoomLine: "Marsikaj lahko delimo le osebno: zemljišča, stavbe, projekti, ki še niso javni.",
-    zoomCta: "Rezervirajte 30-minutni pogovor z našim specialistom",
+    zoomCta: "Rezervirajte 30-minutni pogovor z našim svetovalcem",
     contacts: `Za vsa vprašanja: ${CONTACT}`,
     closing: "Lep pozdrav,",
   },

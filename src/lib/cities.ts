@@ -78,7 +78,7 @@ const SL: string[] = [
   "Dunaj", "Gradec", "Celovec", "Beljak", "Salzburg", "Innsbruck",
   "München", "Berlin", "Hamburg", "Frankfurt", "Stuttgart", "Köln", "Düsseldorf",
   "Zürich", "Ženeva", "Lugano", "Basel",
-  "London", "Pariz", "Madrid", "Barcelona", "Amsterdam", "Bruselj", "Luxembourg",
+  "London", "Pariz", "Madrid", "Barcelona", "Amsterdam", "Bruselj", "Luksemburg",
   "Praga", "Budimpešta", "Varšava", "Dublin", "Lizbona", "Atene", "Monako",
   "Istanbul", "Dubaj", "Tel Aviv", "New York", "Miami", "Toronto", "Singapur", "Hongkong",
 ];

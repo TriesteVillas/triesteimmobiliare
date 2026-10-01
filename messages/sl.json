@@ -22,20 +22,20 @@
   },
   "seo": {
     "home": {
-      "title": "TriesteImmobiliare – nakup in prodaja v Trstu (Trieste)",
+      "title": "TriesteImmobiliare – nakup in prodaja nepremičnin v Trstu (Trieste)",
       "description": "Agencija skupine TriesteVillas za nepremičnine zunaj luksuznega segmenta: cenitev v 48 urah, objava v 7 dneh, trimesečni mandat, trženje tudi v tujini.",
       "ogTitle": "TriesteImmobiliare – trženje TriesteVillas za stanovanjske nepremičnine",
       "ogDescription": "Isto trženje kot pri TriesteVillas, za stanovanjske nepremičnine v Trstu in tržaški pokrajini do približno 500.000 €. Cenitev v 48 urah, preprost trimesečni mandat."
     },
     "sell": {
       "title": "Prodaja doma v Trstu (Trieste) – trženje TriesteVillas",
-      "description": "Prodaja doma v Trstu: cenitev v 48 urah, trimesečni mandat brez tihega podaljšanja, foto, video, dron in 3D-ogled vključeni, kupci tudi iz tujine.",
+      "description": "Prodaja doma v Trstu: cenitev v 48 urah, trimesečni mandat brez samodejnega podaljšanja, vključeni fotografije, video, posnetki z dronom in 3D-ogled, kupci tudi iz tujine.",
       "ogTitle": "Prodaja v Trstu: trženje krovne družbe, kupci iz tujine",
-      "ogDescription": "Trženje na ravni krovne družbe, pregled pred prodajo, osvežitev pred prodajo in diskretna prodaja. Urejen postopek, ki vam breme odvzame, ne doda."
+      "ogDescription": "Trženje na ravni krovne družbe, pregled pred prodajo, osvežitev pred prodajo in diskretna prodaja. Urejen postopek, ki vam breme odvzame, ne pa naloži."
     },
     "invest": {
       "title": "Naložbe v Trstu (Trieste) – nepremičnine z donosom",
-      "description": "Nepremičnine z donosom v Trstu, že oddane in v središču. Povejte nam proračun in ciljni ROI: možnosti razvrstimo po donosu, s stroški nakupa.",
+      "description": "Nepremičnine z donosom v Trstu, že oddane in v središču. Povejte nam proračun in ciljni ROI: možnosti razvrstimo po donosu, vključno s stroški nakupa.",
       "ogTitle": "Naložbe v Trstu: nepremičnine z donosom, razvrščene po ROI",
       "ogDescription": "Nekaterih priložnosti ne oglašujemo: predstavimo jih osebno. Pol ure z nami, da iskanje usmerite v pravo smer."
     },
@@ -48,7 +48,7 @@
     "group": {
       "title": "Skupina TriesteVillas – šest blagovnih znamk",
       "description": "TriesteImmobiliare v ekosistemu TriesteVillas: šest znamk za luksuzne in stanovanjske nepremičnine, najeme, FJK, poslovne nepremičnine in Lignano.",
-      "ogTitle": "Skupina TriesteVillas: različne znamke, ena sama režija",
+      "ogTitle": "Skupina TriesteVillas: različne znamke, enotno vodstvo",
       "ogDescription": "Nepremičninski ekosistem, zgrajen na specializaciji, ne splošna ponudba za vse."
     },
     "contact": {
@@ -67,7 +67,7 @@
       "eyebrow": "Nastala v skupini TriesteVillas",
       "titleLine1": "Prodaja doma v Trstu,",
       "titleKinetic": "kot je treba.",
-      "titleLine2": "Brez cene luksuza.",
+      "titleLine2": "Brez luksuznih cen.",
       "subtitle": "Agencija skupine TriesteVillas za vse, kar ni luksuz: isto trženje, ista skrbnost, proračuni, ki niso astronomski. Stanovanjske nepremičnine v Trstu in tržaški pokrajini do približno 500.000 €.",
       "videoAlt": "Posnetek Trsta iz zraka: stara meščanska stavba ob drevoredu.",
       "ctaPrimary": "Naročite cenitev",
@@ -96,7 +96,7 @@
     "positioning": {
       "eyebrow": "O nas",
       "title": "Vsa območja Trsta, vse velikosti, vsi cenovni razredi.",
-      "body": "TriesteImmobiliare je agencija skupine TriesteVillas za vse, kar ni luksuz. Smo hitri in učinkoviti, kakovost promocije pa držimo na ravni naših najvišjih standardov: ista metoda, isto trženje, drugačen obseg. Stanovanjske nepremičnine v Trstu in tržaški pokrajini do približno 500.000 €.",
+      "body": "TriesteImmobiliare je agencija skupine TriesteVillas za vse, kar ni luksuz. Smo hitri in učinkoviti, kakovost promocije pa držimo na ravni naših najvišjih standardov: ista metoda, isto trženje, drugo področje. Stanovanjske nepremičnine v Trstu in tržaški pokrajini do približno 500.000 €.",
       "routingNote": "Če gre za luksuzno nepremičnino, jo prevzame krovna družba TriesteVillas. Za preostalo Furlanijo - Julijsko krajino FriuliVillas ali LignanoVillas. Za najeme TriesteAffitti.",
       "cta": "Spoznajte skupino"
     },
@@ -114,19 +114,19 @@
     },
     "sellerValue": {
       "eyebrow": "Za prodajalce",
-      "title": "Dobro izpeljana prodaja vam breme odvzame, ne doda.",
+      "title": "Dobro izpeljana prodaja vam breme odvzame, ne pa naloži.",
       "subtitle": "Trženje, po katerem nas poznajo, kupci tudi iz tujine, jasna pogodba in zanesljivi roki. To se spremeni, ko prodajate z nami.",
       "fast": {
         "title": "Res hitra cenitev",
-        "text": "Pogovor z vodjo agencije, pošiljanje dokumentacije, ogled v 24 urah. Če dokumenti in nepremičnina to dopuščajo, gremo na splet v 7 dneh."
+        "text": "Pogovor z vodjo agencije, pošiljanje dokumentacije, ogled v 24 urah. Če dokumenti in nepremičnina to dopuščajo, nepremičnino objavimo v 7 dneh."
       },
       "estero": {
         "title": "Kupci tudi iz tujine",
-        "text": "Mnogi naši kupci niso iz Trsta: gradiva in pogajanja vodimo v italijanščini, angleščini in nemščini, z orientacijskimi pogovori, 3D-ogledi in urejanjem na daljavo. Ko pa je čas, da dom vidijo v živo, jih pospremimo po mestu."
+        "text": "Mnogi naši kupci niso iz Trsta: gradivo pripravljamo in pogajanja vodimo v italijanščini, angleščini in nemščini, z orientacijskimi pogovori, 3D-ogledi in urejanjem na daljavo. Ko pa je čas, da dom vidijo v živo, jih pospremimo po mestu."
       },
       "simpleMandate": {
         "title": "Preprosta pogodba",
-        "text": "Trimesečna ekskluziva, brez tihega podaljšanja, brez skritih stroškov. Fotografije, video, dron in 3D-ogled so vključeni. Če mandata ne podaljšate, gradivo ostane vaše."
+        "text": "Trimesečna ekskluziva, brez samodejnega podaljšanja, brez skritih stroškov. Fotografije, video, posnetki z dronom in 3D-ogled so vključeni. Če mandata ne podaljšate, gradivo ostane vaše."
       },
       "marketing": {
         "title": "Trženje, po katerem nas poznajo",
@@ -137,11 +137,11 @@
     "investorTeaser": {
       "eyebrow": "Za vlagatelje",
       "title": "Nakup v Trstu, da nepremičnina prinaša donos.",
-      "body": "Imamo že oddane enote v osrednjih, nedavno prenovljenih stavbah. Nekaterih ne oglašujemo: predstavimo jih osebno. Povejte nam proračun in pričakovani donos, mi pa vam vrnemo možnosti, razvrščene po ROI.",
+      "body": "Imamo že oddane enote v osrednjih, nedavno prenovljenih stavbah. Nekaterih ne oglašujemo: predstavimo jih osebno. Povejte nam proračun in pričakovani donos, mi pa vam pripravimo možnosti, razvrščene po ROI.",
       "cta": "Odkrijte naložbe"
     },
     "groupRouting": {
-      "eyebrow": "Različne znamke, ena sama režija",
+      "eyebrow": "Različne znamke, enotno vodstvo",
       "title": "Šest znamk, ena struktura.",
       "body": "TriesteImmobiliare je del ekosistema TriesteVillas. Vsaka znamka pokriva svoj trg: vi vstopite skozi prava vrata.",
       "luxury": "Luksuzna nepremičnina → TriesteVillas",
@@ -153,7 +153,7 @@
     "valuationCta": {
       "eyebrow": "Brez obveznosti",
       "title": "Koliko je vaš dom zares vreden?",
-      "body": "Verjamemo v svoje delo: začnimo pogovor in videli boste, da bomo vaš dom prodali kar najbolje. Povejte nam o nepremičnini in odgovorili vam bomo s pošteno cenitvijo, brez obveznosti.",
+      "body": "Verjamemo v svoje delo: začnimo pogovor in videli boste, da bomo vaš dom prodali kar najbolje. Opišite nam nepremičnino in pripravili vam bomo pošteno cenitev, brez obveznosti.",
       "cta": "Naročite cenitev",
       "secondary": "Pogovorite se z nami"
     },
@@ -175,16 +175,16 @@
     },
     "reasons": {
       "eyebrow": "Zakaj mi",
-      "title": "Trije razlogi, pred vsem drugim."
+      "title": "Najprej trije razlogi."
     },
     "blocks": {
       "velocita": {
         "title": "Hitrost",
-        "text": "Prvi stik v 24 urah, cenitev v 48 urah. Če dokumentacija in stanje nepremičnine to dopuščajo, lahko gremo na splet že v 7 dneh."
+        "text": "Prvi stik v 24 urah, cenitev v 48 urah. Če dokumentacija in stanje nepremičnine to dopuščajo, nepremičnino lahko objavimo že v 7 dneh."
       },
       "mandatoSemplice": {
         "title": "Preprost mandat",
-        "text": "Trimesečni mandat, brez tihega podaljšanja, brez skritih stroškov. Če se ob izteku odločite, da ne nadaljujete, gradivo, pripravljeno za vaš dom, ostane vaše."
+        "text": "Trimesečni mandat, brez samodejnega podaljšanja, brez skritih stroškov. Če se ob izteku odločite, da ne nadaljujete, gradivo, pripravljeno za vaš dom, ostane vaše."
       },
       "checkup": {
         "title": "Pregled pred prodajo",
@@ -241,7 +241,7 @@
         "call": {
           "n": "01",
           "title": "Pogovor z vodjo agencije",
-          "text": "Poveste nam o nepremičnini in svojih okoliščinah. Takoj ocenimo, ali in kako jo lahko dobro prodamo."
+          "text": "Predstavite nam nepremičnino in svoje okoliščine. Takoj ocenimo, ali in kako jo lahko dobro prodamo."
         },
         "docs": {
           "n": "02",
@@ -251,7 +251,7 @@
         "online": {
           "n": "03",
           "title": "Gradivo in objava",
-          "text": "Fotografije, video, dron in 3D-ogled. Če dokumenti to dopuščajo, gremo na splet v 7 dneh."
+          "text": "Fotografije, video, posnetki z dronom in 3D-ogled. Če dokumenti to dopuščajo, nepremičnino objavimo v 7 dneh."
         },
         "visits": {
           "n": "04",
@@ -267,7 +267,7 @@
     },
     "closing": {
       "title": "Poštena cenitev, brez obveznosti.",
-      "text": "Verjamemo v svoje delo: začnimo pogovor in videli boste, da bomo vaš dom prodali kar najbolje. Povejte nam vse in odgovorili vam bomo s strateško cenitvijo vaše nepremičnine.",
+      "text": "Verjamemo v svoje delo: začnimo pogovor in videli boste, da bomo vaš dom prodali kar najbolje. Povejte nam vse in pripravili vam bomo strateško cenitev vaše nepremičnine.",
       "ctaPrimary": "Naročite strateško cenitev",
       "ctaSecondary": "Rezervirajte videoklic"
     },
@@ -297,12 +297,12 @@
     },
     "ricercaLibera": {
       "title": "Prosto iskanje",
-      "text": "Povejte nam, kaj iščete: proračun, dela, ki jih sprejemate, omejitve, sestavo gospodinjstva, namen uporabe. Vrnemo vam seznam idej, ne letaka.",
+      "text": "Povejte nam, kaj iščete: proračun, obseg del, ki ste jih pripravljeni izvesti, omejitve, sestavo gospodinjstva, namen uporabe. Pošljemo vam seznam idej, ne letaka.",
       "cta": "Povejte nam, kaj iščete"
     },
     "ricercaROI": {
       "title": "Iskanje po neto donosu / ROI",
-      "text": "Želite vlagati? Povejte nam proračun in pričakovani donos. Vrnemo vam študijo primera z možnostmi, razvrščenimi po ROI, upoštevaje vse stroške nakupa.",
+      "text": "Želite vlagati? Povejte nam proračun in pričakovani donos. Pošljemo vam študijo primera z možnostmi, razvrščenimi po ROI, upoštevaje vse stroške nakupa.",
       "cta": "Določite proračun in ROI"
     },
     "teaser": {
@@ -320,7 +320,7 @@
     "howItWorks": {
       "eyebrow": "Kako poteka",
       "title": "Pol ure za usmeritev iskanja.",
-      "subtitle": "Razen če ste iz Trsta, je najboljši pristop, da z nami vložite pol ure in skupaj ugotovimo, kako usmeriti iskanje.",
+      "subtitle": "Razen če ste iz Trsta, je najbolje, da si vzamete pol ure za pogovor z nami in skupaj ugotovimo, kako usmeriti iskanje.",
       "steps": {
         "brief": {
           "n": "01",
@@ -345,7 +345,7 @@
       }
     },
     "cta": {
-      "title": "Začnite z razumevanjem, kaj vam Trst lahko ponudi.",
+      "title": "Najprej ugotovite, kaj vam lahko ponudi Trst.",
       "text": "Pošljite nam podrobno povpraševanje in lotili se bomo vašega primera. Brez obveznosti: samo jasne številke za razmislek.",
       "ctaPrimary": "Pošljite povpraševanje",
       "ctaSecondary": "Rezervirajte pogovor"
@@ -358,7 +358,7 @@
     "buyerHelp": {
       "eyebrow": "Ne najdete prave?",
       "title": "Povejte nam, kaj iščete.",
-      "text": "Povejte nam proračun, dela, ki jih sprejemate, omejitve in namen uporabe: poslali vam bomo seznam idej po meri, tudi o nepremičninah, ki še niso objavljene.",
+      "text": "Povejte nam proračun, obseg del, ki ste jih pripravljeni izvesti, omejitve in namen uporabe: poslali vam bomo seznam idej po meri, tudi o nepremičninah, ki še niso objavljene.",
       "cta": "Povejte nam, kaj iščete"
     }
   },
@@ -383,13 +383,13 @@
     "forRent": "V najem",
     "badgePrivate": "Diskretna prodaja",
     "badgeNewBuild": "Novogradnja",
-    "onlineDays": "{count, plural, =0 {ONLINE OD DANES} one {ONLINE # DAN} two {ONLINE # DNEVA} few {ONLINE # DNI} other {ONLINE # DNI}}",
+    "onlineDays": "{count, plural, =0 {NA SPLETU OD DANES} one {NA SPLETU ŽE # DAN} two {NA SPLETU ŽE # DNEVA} few {NA SPLETU ŽE # DNI} other {NA SPLETU ŽE # DNI}}",
     "badgeFeatured": "IZPOSTAVLJENO",
     "badgeSold": "Prodano",
     "priceOnRequest": "Cena na povpraševanje",
     "priceReserved": "Cena na povpraševanje",
     "yearBuilt": "Leto gradnje",
-    "floorsBuilding": "Nadstropij v stavbi",
+    "floorsBuilding": "Število nadstropij v stavbi",
     "galPhotos": "Fotografije",
     "galPlans": "Tlorisi",
     "galVideo": "Video",
@@ -453,11 +453,11 @@
     "taxPerYear": "/leto",
     "taxCondo": "Stroški upravljanja",
     "taxIlia": "Davek na nepremičnino · ILIA",
-    "taxTari": "Davek na odpadke · TARI",
+    "taxTari": "Taksa za odpadke · TARI",
     "taxCondoInfoTitle": "Stroški upravljanja stavbe",
     "taxCondoInfoBody": "Okvirni letni znesek na podlagi sporočenih rednih stroškov. Izredna dela in stroški po porabi (npr. ogrevanje) niso vključeni. Uradni podatek je obračun upravnika stavbe.",
     "taxIliaInfoTitle": "ILIA – okvirna ocena",
-    "taxIliaInfoBody": "Ocena, ustvarjena z umetno inteligenco, izračunana kot za drugo bivališče v Trstu na podlagi katastrskega donosa (rendita catastale; stopnja 10,6 ‰). Ne nadomešča uradnega izračuna: odvisna je od katastrske kategorije, lastniškega deleža in mesecev lastništva ter morebitnih olajšav. Glavno prebivališče, ki ni v luksuzni kategoriji, je davka oproščeno. Vedno preverite pri svojem davčnem svetovalcu ali pri davčnem uradu Občine Trst.",
+    "taxIliaInfoBody": "Ocena, ustvarjena z umetno inteligenco, izračunana kot za drugo bivališče v Trstu na podlagi katastrskega dohodka (rendita catastale; stopnja 10,6 ‰). Ne nadomešča uradnega izračuna: odvisna je od katastrske kategorije, lastniškega deleža in mesecev lastništva ter morebitnih olajšav. Glavno prebivališče, ki ni v luksuzni kategoriji, je davka oproščeno. Vedno preverite pri svojem davčnem svetovalcu ali pri davčnem uradu Občine Trst.",
     "taxTariInfoTitle": "TARI – okvirna ocena",
     "taxTariInfoBody": "Groba ocena (z umetno inteligenco) na podlagi tarif TARI Občine Trst za gospodinjstva v letu 2026. TARI se obračunava na neto tlorisno površino (calpestabile): ocenjujemo jo na približno 80 % komercialne površine. Spodaj lahko spremenite število stanovalcev (privzeto 2). Končni znesek je odvisen od dejanske površine, števila stanovalcev in morebitnih znižanj ter ne nadomešča računa, ki ga izda ESATTO S.p.A.",
     "taxTariInfoLink": "Natančen izračun pri ESATTO",
@@ -469,15 +469,15 @@
   },
   "group": {
     "eyebrow": "Skupina TriesteVillas",
-    "title": "Različne znamke, ena sama režija.",
+    "title": "Različne znamke, enotno vodstvo.",
     "intro": "Nepremičninski ekosistem, zgrajen na specializaciji. TriesteVillas je krovna družba, iz katere je zrasel sistem vertikalnih znamk, vsaka zasnovana tako, da z več jasnosti, osredotočenosti in doslednosti služi drugačnemu trgu.",
     "ecosystem": {
       "eyebrow": "Ne splošna ponudba za vse",
       "title": "Dobro zgrajen sistem.",
-      "body": "Vseh nepremičnin ne prodajamo, oddajamo ali upravljamo na enak način. Luksuzna nepremičnina, stanovanje, najem, poslovna nepremičnina ali vrhunska nepremičnina zunaj mesta zahtevajo različen jezik, postopke in strategije. Zato vsega nismo postavili pod eno znamko: zgradili smo ekosistem specializiranih znamk.",
+      "body": "Vseh nepremičnin ne prodajamo, oddajamo ali upravljamo na enak način. Luksuzna nepremičnina, stanovanje, najem, poslovna nepremičnina ali vrhunska nepremičnina zunaj mesta zahtevajo drugačen jezik, drugačne postopke in drugačne strategije. Zato vsega nismo postavili pod eno znamko: zgradili smo ekosistem specializiranih znamk.",
       "tagline": "Ne enaka grafika, ne ponavljajoče se ime. Ista kultura dela."
     },
-    "brandsTitle": "Šest znamk, ena sama režija",
+    "brandsTitle": "Šest znamk, enotno vodstvo",
     "brandsSubtitle": "Ena struktura za vse nepremičninske potrebe v Trstu in v vsej Furlaniji - Julijski krajini.",
     "brands": {
       "tsv": {
@@ -487,13 +487,13 @@
       },
       "tsi": {
         "name": "TriesteImmobiliare",
-        "tag": "Stanovanjske do ~500.000 €",
-        "desc": "Znamka skupine za stanovanjske nepremičnine v Trstu in tržaški pokrajini do približno 500.000 €. Urejena dokumentacija, kakovostna predstavitev, učinkovito delo, manj razpršenosti."
+        "tag": "Stanovanjske nepremičnine do ~500.000 €",
+        "desc": "Znamka skupine za stanovanjske nepremičnine v Trstu in tržaški pokrajini do približno 500.000 €. Urejena dokumentacija, kakovostna predstavitev, učinkovito delo, manj nepotrebnega dela."
       },
       "affitti": {
         "name": "TriesteAffitti",
         "tag": "Najemi od 1 do 18 mesecev",
-        "desc": "Najemi, urejeni z metodo: začasni, regulirani in klasični. Nastala je leta 2013 za turistične najeme in se razvila v zrelejši, bolj urejen sistem."
+        "desc": "Najemi, urejeni po premišljeni metodi: začasni, z regulirano najemnino in klasični. Znamka je nastala leta 2013 za turistične najeme in se razvila v zrelejši, bolj urejen sistem."
       },
       "friuli": {
         "name": "FriuliVillas",
@@ -503,7 +503,7 @@
       "business": {
         "name": "TriesteBusiness",
         "tag": "Poslovne nepremičnine in naložbe",
-        "desc": "Nepremičnine in posli s poslovno usmeritvijo: lokali, dejavnosti, zemljišča, stavbe, pisarne, hale in nastanitveni objekti. Premoženje, ki ga je treba brati z drugačno logiko kot stanovanjske nepremičnine."
+        "desc": "Nepremičnine in posli s poslovno usmeritvijo: poslovni prostori, delujoča podjetja, zemljišča, stavbe, pisarne, hale in nastanitveni objekti. Premoženje, ki ga je treba presojati drugače kot stanovanjske nepremičnine."
       },
       "lignano": {
         "name": "LignanoVillas",
@@ -521,7 +521,7 @@
       },
       "pivot": {
         "title": "Preusmeritev v prodajo",
-        "text": "Odnosi in poznavanje trga so prerasli v posredovanje pri prodaji. Najemi so dozoreli v TriesteAffitti, vrhunska prodaja v TriesteVillas."
+        "text": "Odnosi in poznavanje trga so prerasli v posredovanje pri prodaji. Dejavnost najemov je prerasla v TriesteAffitti, vrhunska prodaja v TriesteVillas."
       },
       "today": {
         "title": "Ena skupina, jasne vloge",
@@ -539,7 +539,7 @@
         "text": "Trst poznamo do potankosti, območje za območjem, ker je naš dom."
       },
       "clarity": {
-        "title": "Jasnost pred vsem",
+        "title": "Jasnost na prvem mestu",
         "text": "Urejeni dokumenti, realne cene, jasni pogoji. Brez presenečenj na pol poti."
       },
       "journey": {
@@ -559,11 +559,11 @@
       },
       "giada": {
         "name": "Giada Comelli",
-        "role": "Svetovalka · Najemi"
+        "role": "Svetovalka · najemi"
       },
       "cecile": {
         "name": "Cécile Van der Salm",
-        "role": "Svetovalka · Najemi"
+        "role": "Svetovalka · najemi"
       }
     },
     "ctaTitle": "Vstopite skozi prava vrata.",
@@ -617,7 +617,7 @@
     "privacyLink": "obvestilo o zasebnosti",
     "submit": "Pošljite povpraševanje",
     "or": "Ali",
-    "brochureNote": "Odgovorili vam bomo po e-pošti, čim prej.",
+    "brochureNote": "Po e-pošti vam bomo odgovorili čim prej.",
     "send": "Pošljite povpraševanje",
     "sending": "Pošiljanje …",
     "thanks": "Hvala! Kmalu se vam oglasimo.",
@@ -641,7 +641,7 @@
     "visitDisclaimer": "To ni potrjena rezervacija: vaša razpoložljivost bo poslana agenciji, ki se vam bo oglasila. Ogledi potekajo v italijanščini, angleščini ali nemščini.",
     "visitNext": "Naprej",
     "visitRecapDates": "Razpoložljivost",
-    "visitRecapSlots": "Ure",
+    "visitRecapSlots": "Časovni termini",
     "visitBack": "Nazaj",
     "visitSend": "Potrdite in pošljite",
     "visitThanks": "Prošnja poslana! Oglasili se vam bomo, da se dogovorimo za ogled."
@@ -739,7 +739,7 @@
   "investorForm": {
     "eyebrow": "Naložbe v Trstu",
     "title": "Povejte nam svoj naložbeni cilj",
-    "subtitle": "Povejte nam proračun in pričakovani donos: vrnemo vam možnosti, razvrščene po ROI, tudi zunaj javne ponudbe, z vsemi stroški nakupa.",
+    "subtitle": "Povejte nam proračun in pričakovani donos: poslali vam bomo možnosti, razvrščene po ROI, tudi zunaj javne ponudbe, z vsemi stroški nakupa.",
     "firstName": "Ime",
     "lastName": "Priimek",
     "phone": "Mobilni telefon",
@@ -747,7 +747,7 @@
     "budget": "Naložbeni proračun",
     "roi": "Pričakovani donos (ROI)",
     "roiOptions": {
-      "0": "Dovolj, da je stabilno",
+      "0": "Dovolj je stabilen donos",
       "1": "Okoli 4–5 %",
       "2": "5–7 %",
       "3": "Čim višji"
@@ -790,7 +790,7 @@
     "appointmentNote": "Via Torino 34, drugo nadstropje. Samo po dogovoru."
   },
   "meta": {
-    "title": "TriesteImmobiliare – nakup in prodaja doma v Trstu (Trieste)",
+    "title": "TriesteImmobiliare – nakup in prodaja nepremičnin v Trstu (Trieste)",
     "description": "Agencija skupine TriesteVillas zunaj luksuznega segmenta: cenitev v 48 urah, objava v 7 dneh, trženje skupine in kupci tudi iz tujine. Trst in pokrajina."
   },
   "ui": {
@@ -803,7 +803,7 @@
     "onRequest": "Na zahtevo",
     "ghostTitle": "Nejavna nepremičnina",
     "ghostCta": "Zaprosite za dostop",
-    "requestTitle": "Zaprosite za dostop do Private Collection",
+    "requestTitle": "Zaprosite za dostop do zbirke Private Collection",
     "requestIntro": "Izbor stanovanj, ki jih ne objavljamo: nekatera zato, ker lastnik ne želi javnega oglasa, druga zato, ker pridejo najprej sem in šele nato na spletno stran. Povejte nam, kaj iščete.",
     "renewTitle": "Podaljšajte svoj dostop",
     "renewIntro": "Vaš prejšnji dostop je potekel. Tu zaprosite za nove dostopne podatke, veljavne najmanj 15 dni.",
@@ -812,7 +812,7 @@
     "email": "E-pošta",
     "city": "V katerem mestu živite? (obvezno)",
     "phone": "Telefon",
-    "intro": "Vrstica o vas: kaj iščete, kakšno nepremičnino in v kakšnem roku.",
+    "intro": "Nekaj besed o vas: kaj iščete, kakšno nepremičnino in v kakšnem roku.",
     "introBonus": "Neobvezno, a se splača: kdor se predstavi, prejme dostopne podatke, ki veljajo dlje od najmanjših 15 dni.",
     "introBonusOk": "✓ Hvala – s to predstavitvijo bo vaš dostop že od začetka veljal dlje od osnovnih 15 dni.",
     "zonesLabel": "Območja zanimanja",
@@ -824,7 +824,7 @@
     "okTitle": "Prošnja prejeta",
     "okText": "Hvala. Prošnje pregledamo ročno, praviloma v 48 urah. Če bo odobrena, boste po e-pošti prejeli začasne dostopne podatke – veljavne najmanj 15 dni.",
     "error": "Nekaj je šlo narobe. Poskusite znova.",
-    "gateTitle": "Zaprt dostop",
+    "gateTitle": "Omejen dostop",
     "gateIntro": "Vpišite začasno geslo, ki ste ga prejeli po e-pošti.",
     "codePlaceholder": "Vaše geslo",
     "enter": "Vstopite",
@@ -837,7 +837,7 @@
     "err_rate": "Preveč poskusov. Počakajte trenutek in poskusite znova.",
     "err_config": "Vstop še ni nastavljen. Pišite nam.",
     "err_city": "Povejte nam, v katerem mestu živite.",
-    "welcome": "Pozdravljeni, {name}. Dobrodošli v TriesteImmobiliare Private Collection",
+    "welcome": "Pozdravljeni, {name}. Dobrodošli v zbirki Private Collection TriesteImmobiliare",
     "welcomeBody": "Tu so stanovanja, ki jih ne objavljamo na spletu: tista, katerih lastniki prodajajo brez javnega oglasa, tista, ki jih še urejamo, in tista, ki se tu pojavijo nekaj tednov pred objavo na spletni strani. Ni jih veliko in hitro se menjajo: če vas kaj pritegne, nas pokličite še isti dan.",
     "specialistCta": "Rezervirajte 30-minutni pogovor z našim svetovalcem",
     "logout": "Odjavite se",
@@ -861,7 +861,7 @@
   "account": {
     "metaTitle": "Moj račun",
     "eyebrow": "Vaš račun",
-    "heroTitle": "Izvedite prvi",
+    "heroTitle": "Izvedite med prvimi",
     "heroSub": "Ustvarite brezplačen račun: shranite domove, ki so vam všeč, povejte nam, kaj iščete, in obvestili vas bomo, takoj ko se pojavi prava nepremičnina – še preden pride na portale.",
     "benefits": {
       "b1": "Obvestimo vas, takoj ko se pojavi nepremičnina, ki ustreza vašemu iskanju: prej ko izveste, prej si jo ogledate.",
@@ -878,11 +878,11 @@
     "favEmpty": "Niste še shranili nobene nepremičnine. Dotaknite se srčka pri nepremičnini in našli jo boste tukaj.",
     "favEmptyCta": "Preglejte nepremičnine",
     "matchTitle": "Izbrano za vas",
-    "matchSub": "Predlogi, ki izhajajo iz tega, kar ste si ogledali in shranili – ne iz kateregakoli algoritma, ampak iz našega.",
+    "matchSub": "Predlogi, ki izhajajo iz tega, kar ste si ogledali in shranili – ne iz katerega koli algoritma, ampak iz našega.",
     "prefsTitle": "Vaše želje",
     "prefsSub": "Več ko nam poveste, natančnejši postane izbor.",
     "criteriLabel": "Kaj iščete",
-    "criteriPh": "Npr. tri sobe s teraso v Barkovljah, proračun 400–550 tisoč, po možnosti s parkirnim mestom …",
+    "criteriPh": "Npr. trisobno stanovanje s teraso v Barkovljah, proračun 400.000–550.000 €, po možnosti s parkirnim mestom …",
     "digestLabel": "Novosti po e-pošti",
     "digestWeekly": "Tedensko",
     "digestMonthly": "Mesečno",
@@ -939,8 +939,8 @@
     "resetDone": "Geslo je posodobljeno. Preusmerjamo vas v vaš račun …",
     "alertCta": "Obvestite me, če se cena zniža",
     "alertOnShort": "Obvestilo vklopljeno",
-    "alertActiveHint": "Po e-pošti vam pišemo, če se cena tega doma zniža.",
-    "alertAnon": "Obvestila o ceni so na voljo z (brezplačnim) računom: potrebujemo e-poštni naslov, na katerega vam pišemo, ko se cena zniža.",
+    "alertActiveHint": "Če se cena tega doma zniža, vam bomo pisali po e-pošti.",
+    "alertAnon": "Obvestila o ceni so na voljo z (brezplačnim) računom: potrebujemo e-poštni naslov, na katerega vam lahko pišemo, ko se cena zniža.",
     "notForMe": "Ni zame",
     "notForMeActive": "Izločeno",
     "perksTitle": "Z brezplačnim računom",
@@ -969,9 +969,9 @@
     "costColFee": "Agencija (4 % + DDV)",
     "costColWorks": "Dela / oprema",
     "costColTotal": "Skupni strošek nakupa",
-    "costColYearly": "Vzdrževanje / leto",
+    "costColYearly": "Tekoči stroški / leto",
     "costTotalRow": "Skupaj",
-    "costFootnote": "Okvirni zneski (≈): davki, kot so ocenjeni pri posamezni nepremičnini, agencija 4 % + 22 % DDV, vzdrževanje = redni stroški upravljanja stavbe plus ILIA (lokalni davek na nepremičnine; glavno prebivališče je oproščeno). Zavezujoči izračun pripravi notar.",
+    "costFootnote": "Okvirni zneski (≈): davki, kot so ocenjeni pri posamezni nepremičnini, agencija 4 % + 22 % DDV, tekoči stroški = redni stroški upravljanja stavbe plus ILIA (lokalni davek na nepremičnine; glavno prebivališče je oproščeno). Zavezujoči izračun pripravi notar.",
     "mapTitle": "Vaš zemljevid",
     "mapSub": "Samo domovi, ki ste jih shranili, na zemljevidu.",
     "mapDiscover": "Odkrijte",
@@ -1011,11 +1011,11 @@
   },
   "concierge": {
     "title": "Concierge AI",
-    "barPlaceholder": "Vprašajte karkoli o nakupu nepremičnine v Italiji …",
+    "barPlaceholder": "Vprašajte kar koli o nakupu nepremičnine v Italiji …",
     "barCta": "Vprašajte",
-    "barHint": "Odgovarja Claude, Concierge TriesteImmobiliare z umetno inteligenco. Lahko se zmoti – in to tudi pove. Pogovori se beležijo in jih pregleda naša ekipa.",
-    "disclaimer": "Sem Claude, asistent TriesteImmobiliare z umetno inteligenco – nisem nezmotljiv in nisem ne odvetnik ne davčni svetovalec. Za vse, kar je zavezujoče, prevzame ekipa. Pogovori se beležijo, da lahko človek nadaljuje tam, kjer se ustavim.",
-    "empty": "Vprašajte, kako poteka nakup, koliko stane, kako je s kreditom za nerezidente – karkoli.",
+    "barHint": "Odgovarja Claude, virtualni pomočnik TriesteImmobiliare z umetno inteligenco. Lahko se zmoti – in to tudi pove. Pogovori se beležijo in jih pregleda naša ekipa.",
+    "disclaimer": "Sem Claude, asistent TriesteImmobiliare z umetno inteligenco – nisem nezmotljiv in nisem ne odvetnik ne davčni svetovalec. Vse, kar je zavezujoče, prevzame ekipa. Pogovori se beležijo, da lahko človek nadaljuje tam, kjer se ustavim.",
+    "empty": "Vprašajte, kako poteka nakup, koliko stane, kako je s kreditom za nerezidente – kar koli.",
     "starters": [
       "Katere dokumente potrebujem za prodajo doma?",
       "Koliko stane prodaja, s provizijo in davki?",
@@ -1046,9 +1046,9 @@
     "gateErrName": "Vnesite vsaj 2 znaka.",
     "gateErrContact": "Vnesite e-poštni naslov ali telefonsko številko.",
     "gateErrConsent": "Za nadaljevanje sprejmite obvestilo o zasebnosti.",
-    "listingPlaceholder": "Vprašajte me karkoli o tem domu, o drugih domovih ali o poteku nakupa …",
-    "listingHint": "O tem domu, o katerem koli drugem na spletni strani ali o nakupu v Trstu: kar vprašajte. Odgovarja Claude, naš Concierge z umetno inteligenco – lahko se zmoti, in to tudi pove. Pogovori se beležijo in jih pregleda ekipa.",
-    "listingEmpty": "Z vami si ogledujem »{title}«: davki, tekoči stroški, okolica, drugi domovi, potek nakupa – vprašajte me karkoli.",
+    "listingPlaceholder": "Vprašajte me kar koli o tem domu, o drugih domovih ali o poteku nakupa …",
+    "listingHint": "O tem domu, o katerem koli drugem na spletni strani ali o nakupu v Trstu: kar vprašajte. Odgovarja Claude, naš virtualni pomočnik z umetno inteligenco – lahko se zmoti in to tudi pove. Pogovori se beležijo in jih pregleda ekipa.",
+    "listingEmpty": "Z vami si ogledujem »{title}«: davki, tekoči stroški, okolica, drugi domovi, potek nakupa – vprašajte me kar koli.",
     "listingStarters": [
       "Koliko znašajo davki ob nakupu tega doma?",
       "Kakšni so letni stroški tega doma?",
@@ -1088,7 +1088,7 @@
     "sources": "Viri",
     "disclaimer": "To je informativni vodnik, ne pravno ali davčno svetovanje: predpisi se spreminjajo in vsak primer je drugačen. Zadnjo besedo imata notar in davčni svetovalec. Za svoj primer nam pišite: info@triesteimmobiliare.com · +39 040 2473628.",
     "askEyebrow": "Imate še vprašanje?",
-    "askTitle": "Vprašajte, na kar ta stran ni odgovorila.",
+    "askTitle": "Vprašajte tisto, na kar ta stran ni odgovorila.",
     "relatedEyebrow": "Berite naprej",
     "chapter": {
       "eyebrow": "Naslednji korak",
@@ -1139,7 +1139,7 @@
     "d2k": "Energetski razred",
     "d2v": "A · NZEB",
     "d3k": "Konstrukcija",
-    "d3v": "Lesena X-LAM",
+    "d3v": "Križno lepljen les (X-LAM)",
     "d4k": "Predaja",
     "d4v": "do leta 2027",
     "cta": "Raziščite stran projekta",
