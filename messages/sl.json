@@ -446,7 +446,7 @@
     "taxInfoTitle": "Kako so izračunani",
     "taxCriteria": "Merila izračuna",
     "taxInfoAria": "Podrobnosti o izračunu davkov",
-    "taxAiDisclaimer": "Ocene so izračunane samodejno (z umetno inteligenco), zato lahko vsebujejo računske napake ali napake pri prepisu. Edini zanesljivi vir je osebni pogovor z vodjo agencije po preučitvi konkretnega primera.",
+    "taxAiDisclaimer": "Ocene so bile pripravljene na katastrski osnovi (prezzo-valore) ob vnosu oglasa, tudi s pomočjo umetne inteligence, zato lahko vsebujejo računske napake ali napake pri prepisu. Edini zanesljivi vir je osebni pogovor z vodjo agencije po preučitvi konkretnega primera.",
     "taxGroupAcquisto": "Stroški nakupa (enkratni)",
     "taxGroupGestione": "Letni stroški lastništva",
     "taxPlusVat": "+ DDV",
@@ -457,15 +457,15 @@
     "taxCondoInfoTitle": "Stroški upravljanja stavbe",
     "taxCondoInfoBody": "Okvirni letni znesek na podlagi sporočenih rednih stroškov. Izredna dela in stroški po porabi (npr. ogrevanje) niso vključeni. Uradni podatek je obračun upravnika stavbe.",
     "taxIliaInfoTitle": "ILIA – okvirna ocena",
-    "taxIliaInfoBody": "Ocena, ustvarjena z umetno inteligenco, izračunana kot za drugo bivališče v Trstu na podlagi katastrskega dohodka (rendita catastale; stopnja 10,6 ‰). Ne nadomešča uradnega izračuna: odvisna je od katastrske kategorije, lastniškega deleža in mesecev lastništva ter morebitnih olajšav. Glavno prebivališče, ki ni v luksuzni kategoriji, je davka oproščeno. Vedno preverite pri svojem davčnem svetovalcu ali pri davčnem uradu Občine Trst.",
+    "taxIliaInfoBody": "Ocena, samodejno izračunana s stalno formulo kot za drugo bivališče v Trstu na podlagi katastrskega dohodka (rendita catastale; stopnja 10,6 ‰). Ne nadomešča uradnega izračuna: odvisna je od katastrske kategorije, lastniškega deleža in mesecev lastništva ter morebitnih olajšav. Glavno prebivališče, ki ni v luksuzni kategoriji, je davka oproščeno. Vedno preverite pri svojem davčnem svetovalcu ali pri davčnem uradu Občine Trst.",
     "taxTariInfoTitle": "TARI – okvirna ocena",
-    "taxTariInfoBody": "Groba ocena (z umetno inteligenco) na podlagi tarif TARI Občine Trst za gospodinjstva v letu 2026. TARI se obračunava na neto tlorisno površino (calpestabile): ocenjujemo jo na približno 80 % komercialne površine. Spodaj lahko spremenite število stanovalcev (privzeto 2). Končni znesek je odvisen od dejanske površine, števila stanovalcev in morebitnih znižanj ter ne nadomešča računa, ki ga izda ESATTO S.p.A.",
+    "taxTariInfoBody": "Groba ocena, izračunana po tarifah TARI Občine Trst za gospodinjstva v letu 2026. TARI se obračunava na neto tlorisno površino (calpestabile): ocenjujemo jo na približno 80 % komercialne površine. Spodaj lahko spremenite število stanovalcev (privzeto 2). Končni znesek je odvisen od dejanske površine, števila stanovalcev in morebitnih znižanj ter ne nadomešča računa, ki ga izda ESATTO S.p.A.",
     "taxTariInfoLink": "Natančen izračun pri ESATTO",
     "taxPrimaCasa": "Glavno prebivališče",
     "taxSecondaCasa": "Drugo bivališče",
     "taxIliaEsente": "Oproščeno (glavno prebivališče)",
     "taxOccupants": "Stanovalci",
-    "taxEstimateFootnote": "Letni stroški so okvirne ocene, ustvarjene z umetno inteligenco, in ne nadomeščajo uradnega preverjanja."
+    "taxEstimateFootnote": "Letni stroški so okvirne ocene – stroški upravljanja po sporočenih zneskih, ILIA in TARI po stalnih formulah na podlagi občinskih stopenj – in ne nadomeščajo uradnega preverjanja."
   },
   "group": {
     "eyebrow": "Skupina TriesteVillas",
@@ -1013,7 +1013,7 @@
     "title": "Concierge AI",
     "barPlaceholder": "Vprašajte kar koli o nakupu nepremičnine v Italiji …",
     "barCta": "Vprašajte",
-    "barHint": "Odgovarja Claude, virtualni pomočnik TriesteImmobiliare z umetno inteligenco. Lahko se zmoti – in to tudi pove. Pogovori se beležijo in jih pregleda naša ekipa.",
+    "barHint": "Odgovarja Claude, virtualni pomočnik TriesteImmobiliare z umetno inteligenco. Lahko se zmoti – in to tudi pove. Pogovori se beležijo in naša ekipa jih lahko prebere.",
     "disclaimer": "Sem Claude, asistent TriesteImmobiliare z umetno inteligenco – nisem nezmotljiv in nisem ne odvetnik ne davčni svetovalec. Vse, kar je zavezujoče, prevzame ekipa. Pogovori se beležijo, da lahko človek nadaljuje tam, kjer se ustavim.",
     "empty": "Vprašajte, kako poteka nakup, koliko stane, kako je s kreditom za nerezidente – kar koli.",
     "starters": [
@@ -1047,7 +1047,7 @@
     "gateErrContact": "Vnesite e-poštni naslov ali telefonsko številko.",
     "gateErrConsent": "Za nadaljevanje sprejmite obvestilo o zasebnosti.",
     "listingPlaceholder": "Vprašajte me kar koli o tem domu, o drugih domovih ali o poteku nakupa …",
-    "listingHint": "O tem domu, o katerem koli drugem na spletni strani ali o nakupu v Trstu: kar vprašajte. Odgovarja Claude, naš virtualni pomočnik z umetno inteligenco – lahko se zmoti in to tudi pove. Pogovori se beležijo in jih pregleda ekipa.",
+    "listingHint": "O tem domu, o katerem koli drugem na spletni strani ali o nakupu v Trstu: kar vprašajte. Odgovarja Claude, naš virtualni pomočnik z umetno inteligenco – lahko se zmoti in to tudi pove. Pogovori se beležijo in ekipa jih lahko prebere.",
     "listingEmpty": "Z vami si ogledujem »{title}«: davki, tekoči stroški, okolica, drugi domovi, potek nakupa – vprašajte me kar koli.",
     "listingStarters": [
       "Koliko znašajo davki ob nakupu tega doma?",

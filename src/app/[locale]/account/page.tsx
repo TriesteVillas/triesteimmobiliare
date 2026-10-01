@@ -13,7 +13,8 @@ import {
 import { parseCriteriJson, emptyCriteri } from "@/lib/account/prefopts";
 import { operatorEmail, AGENCY_PHONE, AGENCY_PHONE_HREF } from "@/lib/account/team";
 import { getProperties, getPrivateProperties } from "@/lib/airtable";
-import { ZONE_ORDER, ZONE_OTHER, type Property } from "@/lib/properties";
+import { ZONE_ORDER, ZONE_OTHER, type Photo, type Property } from "@/lib/properties";
+import { fotoAi } from "@/lib/trasparenza";
 import { buildPropertyView, priceLabel } from "@/lib/propertyView";
 import { intlLocale } from "@/lib/format";
 import PropertyCard from "@/components/PropertyCard";
@@ -41,6 +42,12 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "account" });
   return { title: t("metaTitle"), robots: { index: false } };
+}
+
+// Trasparenza AI: il glifo sulla miniatura del popup della mappa dei preferiti.
+function coverAiDi(ph: Photo | null, locale: string): Pick<FavPoint, "coverAi"> {
+  const ai = fotoAi(ph?.trasparenza, locale);
+  return ai?.glifo ? { coverAi: { glifo: ai.glifo, aria: ai.aria } } : {};
 }
 
 const zoneCode = (zona: string | null): string => {
@@ -139,6 +146,7 @@ export default async function AccountPage({
       title: p.title,
       priceLabel: priceLabel(p, locale, tProp),
       cover: (p.coverPhoto ?? p.photos[0])?.thumb ?? null,
+      ...coverAiDi(p.coverPhoto ?? p.photos[0] ?? null, locale),
       url: propUrl(p.slug),
       lat: p.lat!,
       lng: p.lng!,

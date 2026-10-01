@@ -3,6 +3,8 @@
 import { useState, ViewTransition } from "react";
 import { useTranslations } from "next-intl";
 import PhotoImg from "./PhotoImg";
+import EtichettaAi from "./EtichettaAi";
+import type { CardPhoto } from "@/lib/propertyView";
 
 // Sfogliare le foto SENZA aprire la scheda: copertina + fino a 8 foto, frecce
 // e pallini, dentro la card.
@@ -27,8 +29,9 @@ export default function CardGallery({
   priority = false,
   photosComing,
   children,
+  angoloDestro,
 }: {
-  photos: { url: string; srcSet?: string; alt: string }[];
+  photos: CardPhoto[];
   /** Serve solo alla transizione morbida verso la scheda. */
   slug: string;
   /** Nome accessibile di riserva: il titolo dell'immobile, già localizzato. */
@@ -39,6 +42,8 @@ export default function CardGallery({
   photosComing: string;
   /** Sovrapposizioni: velo, badge, cuoricino. */
   children?: React.ReactNode;
+  /** Il badge in alto a destra, quando sotto deve starci l'etichetta AI. */
+  angoloDestro?: React.ReactNode;
 }) {
   const t = useTranslations("property");
   const [i, setI] = useState(0);
@@ -74,6 +79,17 @@ export default function CardGallery({
       )}
 
       {children}
+
+      {/* Trasparenza AI (01/10/2026): l'etichetta della foto che si sta
+          guardando, in alto a destra, sotto l'eventuale badge di quell'angolo.
+          Solo se almeno una foto della card ne porta una: altrimenti la card
+          resta quella di prima (il badge lo posiziona PropertyCard). */}
+      {photos.some((p) => p.ai) && (
+        <div className="pointer-events-none absolute right-3 top-3 z-[2] flex flex-col items-end gap-1.5">
+          {angoloDestro}
+          {photos[i]?.ai && <EtichettaAi testo={photos[i].ai!.glifo} aria={photos[i].ai!.aria} />}
+        </div>
+      )}
 
       {n > 1 && (
         <>

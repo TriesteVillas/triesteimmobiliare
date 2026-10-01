@@ -446,7 +446,7 @@
     "taxInfoTitle": "How these are calculated",
     "taxCriteria": "Calculation criteria",
     "taxInfoAria": "Tax calculation details",
-    "taxAiDisclaimer": "Automatically calculated (AI) estimates: as such, they may contain calculation or transcription errors. The only reliable source is an in-person discussion with the owner, after studying the specific situation.",
+    "taxAiDisclaimer": "Estimates prepared on the cadastral (price-value) basis when the listing was entered, partly with the help of AI: they may therefore contain calculation or transcription errors. The only reliable source is an in-person discussion with the owner, after studying the specific situation.",
     "taxGroupAcquisto": "Purchase costs (one-off)",
     "taxGroupGestione": "Annual running costs",
     "taxPlusVat": "+ VAT",
@@ -457,15 +457,15 @@
     "taxCondoInfoTitle": "Condominium charges",
     "taxCondoInfoBody": "Indicative annual figure based on the reported ordinary charges. Extraordinary works and metered consumption (e.g. heating) are excluded. The official figure is the administrator's statement.",
     "taxIliaInfoTitle": "ILIA — indicative estimate",
-    "taxIliaInfoBody": "AI-generated estimate, computed as a second home in Trieste on the cadastral income (rate 10.6‰). It does not replace the official calculation: it depends on the cadastral category, ownership share and months of possession, and any reliefs. A non-luxury main residence is exempt. Always check with your accountant or the Trieste Council tax office.",
+    "taxIliaInfoBody": "Estimate computed automatically with a fixed formula, as a second home in Trieste on the cadastral income (rate 10.6‰). It does not replace the official calculation: it depends on the cadastral category, ownership share and months of possession, and any reliefs. A non-luxury main residence is exempt. Always check with your accountant or the Trieste Council tax office.",
     "taxTariInfoTitle": "TARI — indicative estimate",
-    "taxTariInfoBody": "Rough AI estimate based on the City of Trieste 2026 household waste-tax rates. TARI is charged on the net floor area (calpestabile): we estimate it at about 80% of the commercial sqm. You can change the number of occupants below (default 2). The actual amount depends on the real area, the occupants and any reductions, and does not replace the bill issued by ESATTO S.p.A.",
+    "taxTariInfoBody": "Rough estimate computed from the City of Trieste 2026 household waste-tax rates. TARI is charged on the net floor area (calpestabile): we estimate it at about 80% of the commercial sqm. You can change the number of occupants below (default 2). The actual amount depends on the real area, the occupants and any reductions, and does not replace the bill issued by ESATTO S.p.A.",
     "taxTariInfoLink": "Detailed calculation on ESATTO",
     "taxPrimaCasa": "Main home",
     "taxSecondaCasa": "Second home",
     "taxIliaEsente": "Exempt (main home)",
     "taxOccupants": "Occupants",
-    "taxEstimateFootnote": "Annual costs are indicative AI estimates and do not replace an official check."
+    "taxEstimateFootnote": "Annual costs are indicative estimates — service charges from the reported figures, ILIA and TARI from fixed formulas on the council's rates — and do not replace an official check."
   },
   "group": {
     "eyebrow": "The TriesteVillas Group",
@@ -1013,8 +1013,8 @@
     "title": "Concierge AI",
     "barPlaceholder": "Ask anything about buying in Italy…",
     "barCta": "Ask",
-    "barHint": "Answers by Claude, TriesteImmobiliare' AI concierge. It can be wrong — and says so. Conversations are recorded and reviewed by our team.",
-    "disclaimer": "I'm Claude, TriesteImmobiliare' AI assistant — not infallible, and not a lawyer or tax adviser. For anything binding, the team takes over. Conversations are recorded so a human can pick up where I leave off.",
+    "barHint": "Answers by Claude, TriesteImmobiliare's AI concierge. It can be wrong — and says so. Conversations are recorded and our team can read them.",
+    "disclaimer": "I'm Claude, TriesteImmobiliare's AI assistant — not infallible, and not a lawyer or tax adviser. For anything binding, the team takes over. Conversations are recorded so a human can pick up where I leave off.",
     "empty": "Ask how buying works, what it costs, mortgages as a non-resident — anything.",
     "starters": [
       "What paperwork do I need to sell?",
@@ -1047,7 +1047,7 @@
     "gateErrContact": "Enter an email address or phone number.",
     "gateErrConsent": "Accept the privacy notice to continue.",
     "listingPlaceholder": "Ask me anything about this home, other homes, or how buying works…",
-    "listingHint": "This home, any other on the site, or buying in Trieste: fire away. Claude, our AI concierge, answers — it can be wrong, and says so. Conversations are logged and reviewed by the team.",
+    "listingHint": "This home, any other on the site, or buying in Trieste: fire away. Claude, our AI concierge, answers — it can be wrong, and says so. Conversations are logged and the team can read them.",
     "listingEmpty": "I'm looking at “{title}” with you: taxes, running costs, the area, other homes, how buying works — ask me anything.",
     "listingStarters": [
       "How much would I pay in taxes on this home?",

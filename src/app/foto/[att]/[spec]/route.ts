@@ -99,9 +99,16 @@ export async function GET(
     const input = Buffer.from(await upstream.arrayBuffer());
 
     const { default: sharp } = await import("sharp");
+    // keepXmp (01/10/2026, SPEC trasparenza §5.7): la marcatura IPTC
+    // `DigitalSourceType` che dichiara una foto passata dall'AI vive nell'XMP
+    // del file, e il default di sharp toglie TUTTI i metadati — sul sito
+    // arrivava sempre muta. Si tiene solo l'XMP: EXIF (GPS, data, apparecchio)
+    // e profili continuano a cadere come prima. ⚠️ Sotto i 900 px la sorgente
+    // è la miniatura `large` di Airtable, che l'XMP potrebbe non averlo più.
     const out = await sharp(input)
       .rotate() // rispetta l'orientamento EXIF prima di ridimensionare
       .resize({ width, withoutEnlargement: true })
+      .keepXmp()
       .webp({ quality: 78 })
       .toBuffer();
 

@@ -38,6 +38,9 @@ export default function PropertyCard({
   // un record che avesse la copertina e nient'altro (stessa guardia della card
   // della Private Collection).
   const photos = view.gallery.length ? view.gallery : view.cover ? [view.cover] : [];
+  // Con una foto AI nella card, l'angolo in alto a destra lo impagina
+  // CardGallery: badge sopra, etichetta AI sotto. Senza, tutto come prima.
+  const conAi = photos.some((p) => p.ai);
 
   return (
     <Tilt className="rounded-2xl">
@@ -57,10 +60,13 @@ export default function PropertyCard({
           sizes={sizes}
           priority={priority}
           photosComing={photosComing}
+          angoloDestro={
+            conAi && rightBadge ? <PropertyBadge {...rightBadge} className="shadow-sm" /> : undefined
+          }
         >
           <span className="card-sheen" aria-hidden />
           <PropertyBadge {...leftBadge} className="absolute left-3 top-3 z-[2] shadow-sm" />
-          {rightBadge && (
+          {rightBadge && !conAi && (
             <PropertyBadge
               {...rightBadge}
               className="absolute right-3 top-3 z-[2] shadow-sm"

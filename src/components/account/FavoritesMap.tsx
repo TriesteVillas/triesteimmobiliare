@@ -11,12 +11,18 @@ export type FavPoint = {
   title: string;
   priceLabel: string;
   cover: string | null;
+  // Trasparenza AI: il glifo («AI») e la frase per il lettore di schermo, se
+  // la copertina è passata da un modello generativo. Assente = come prima.
+  coverAi?: { glifo: string; aria: string };
   url: string;
   lat: number;
   lng: number;
 };
 
 const HEART_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" style="filter:drop-shadow(0 2px 4px rgba(0,0,0,.45))"><path fill="#e11d48" stroke="#ffffff" stroke-width="1.6" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+
+const escAttr = (v: string) =>
+  v.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 export default function FavoritesMap({ points, discoverLabel }: { points: FavPoint[]; discoverLabel: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -55,9 +61,14 @@ export default function FavoritesMap({ points, discoverLabel }: { points: FavPoi
       const latlngs: [number, number][] = [];
       for (const p of points) {
         latlngs.push([p.lat, p.lng]);
-        const img = p.cover
+        const foto = p.cover
           ? `<img src="${p.cover}" alt="" style="width:100%;height:96px;object-fit:cover;border-radius:8px;margin-bottom:8px" loading="lazy" />`
           : "";
+        // Stessa etichetta delle card (EtichettaAi), scritta a mano perché qui
+        // il popup è HTML di Leaflet, non React.
+        const img = foto && p.coverAi
+          ? `<div style="position:relative">${foto}<span role="img" aria-label="${escAttr(p.coverAi.aria)}" style="position:absolute;top:6px;right:6px;background:rgba(15,39,55,.85);color:#fff;font-weight:600;font-size:10px;line-height:1;letter-spacing:.05em;padding:4px 6px;border-radius:6px;box-shadow:0 0 0 1px rgba(255,255,255,.3)">${escAttr(p.coverAi.glifo)}</span></div>`
+          : foto;
         const html = `<a href="${p.url}" style="display:block;text-decoration:none;color:#1a1a1a;width:180px">
           ${img}
           <div style="font-weight:600;font-size:14px">${p.priceLabel}</div>

@@ -6,6 +6,7 @@ import PhotoImg from "./PhotoImg";
 import type { Photo } from "@/lib/properties";
 import { gallerySet } from "@/lib/photoSet";
 import Lightbox from "./Lightbox";
+import EtichettaAi from "./EtichettaAi";
 
 // Ladder delle miniature. Serve soprattutto al telefono: il riquadro è 50vw,
 // cioè ~195 px CSS su un 390, che a DPR 2 fa 390 px reali — chiedere 600 fissi
@@ -81,6 +82,9 @@ export default function PhotoGallery({
                   alt={p.alt}
                   className="object-cover transition-transform duration-300 hover:scale-105"
                 />
+                {p.ai?.glifo && (
+                  <EtichettaAi testo={p.ai.glifo} aria={p.ai.aria} className="absolute right-1.5 top-1.5" />
+                )}
               </button>
             ))}
           </div>
@@ -127,6 +131,14 @@ export default function PhotoGallery({
                 priority
               />
             </ViewTransition>
+            {hero.ai?.etichetta && (
+              <EtichettaAi
+                testo={hero.ai.etichetta}
+                aria={hero.ai.aria}
+                forma="estesa"
+                className="absolute right-3 top-3"
+              />
+            )}
           </button>
           {thumbs.length > 0 && (
             <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -144,6 +156,9 @@ export default function PhotoGallery({
                     alt={p.alt}
                     className="object-cover transition-transform duration-300 hover:scale-105"
                   />
+                  {p.ai?.glifo && (
+                    <EtichettaAi testo={p.ai.glifo} aria={p.ai.aria} className="absolute right-1.5 top-1.5" />
+                  )}
                 </button>
               ))}
             </div>

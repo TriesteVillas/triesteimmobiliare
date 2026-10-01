@@ -46,6 +46,8 @@ import DwellTracker from "@/components/account/DwellTracker";
 import BuyerConcierge from "@/components/compra/BuyerConcierge";
 import ElegieDuinoInvito, { ElegieChip, ElegiePlansHint } from "@/components/ElegieDuinoInvito";
 import { isElegieProgetto } from "@/lib/elegie";
+import EtichettaAi from "@/components/EtichettaAi";
+import { fotoAi, localizzaFoto, nellaLingua, senzaNotaAi, testiTrasparenza } from "@/lib/trasparenza";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.triesteimmobiliare.com";
 
@@ -181,7 +183,21 @@ export default async function PropertyPage({ params }: { params: Params }) {
   // Titolo e descrizione nella lingua del visitatore, con ritorno all'italiano
   // quando la traduzione non è ancora stata scritta (vedi localizedDescription).
   const title = localizedTitle(property, locale);
-  const description = localizedDescription(property, locale);
+  // Trasparenza AI (01/10/2026, lib/trasparenza.ts). `trasp` c'è solo quando il
+  // CRM ha dati per questo immobile; senza, ogni ramo qui sotto è quello di prima.
+  const trasp = property.trasparenza ?? null;
+  const tTrasp = testiTrasparenza(locale);
+  const notaAi = trasp ? nellaLingua(trasp.nota, locale) : null;
+  const mostraFotoAi = trasp != null && (notaAi != null || trasp.conteggi.ai > 0);
+  // SPEC §5.4: quando la nota arriva dal CRM, la nota scritta a mano dentro la
+  // descrizione si toglie — la si legge una volta sola, nel riepilogo.
+  const description = trasp?.nota
+    ? senzaNotaAi(localizedDescription(property, locale))
+    : localizedDescription(property, locale);
+  const heroFoto = property.coverPhoto ?? property.photos[0] ?? null;
+  const heroAi = fotoAi(heroFoto?.trasparenza, locale);
+  // Le foto per il browser: didascalie già nella lingua della pagina.
+  const loc = (ph: (typeof property.photos)[number]) => localizzaFoto(ph, locale);
   // Elegie Duino: la scheda è una delle otto unità del progetto → scena-ponte
   // verso elegieduino.it (chip in hero, voce nav, scena dopo le foto, hint
   // planimetrie). Decide SOLO il campo progetto, mai il cluster CANTIERI.
@@ -294,6 +310,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
     ytIds.length && { id: "video", label: t("galVideo") },
     property.matterportUrl && { id: "tour", label: t("galTour") },
     hasLocation && { id: "posizione", label: t("locationTitle") },
+    mostraFotoAi && { id: "foto-ai", label: tTrasp.nav },
   ].filter((x): x is { id: string; label: string } => Boolean(x));
 
   // Dati strutturati della scheda. Le dotazioni seguono la stessa lettura che fa
@@ -370,6 +387,12 @@ export default async function PropertyPage({ params }: { params: Params }) {
           <div className="absolute inset-0 bg-gradient-to-br from-brand-dark to-ink" />
         )}
         <div className="absolute inset-0 bg-gradient-to-b from-ink/55 via-ink/10 to-ink/90" />
+        {/* L'etichetta AI della copertina, in alto a destra sotto la testata. */}
+        {heroAi?.etichetta && (
+          <div className="pointer-events-none absolute inset-x-0 top-24 z-[1] mx-auto flex max-w-5xl justify-end px-6">
+            <EtichettaAi testo={heroAi.etichetta} aria={heroAi.aria} forma="estesa" />
+          </div>
+        )}
 
         <div className="absolute left-0 right-0 top-24 mx-auto max-w-5xl px-6">
           <Link
@@ -494,9 +517,9 @@ export default async function PropertyPage({ params }: { params: Params }) {
 
           <div className="mt-6">
             <PhotoGallery
-              cover={property.coverPhoto}
-              topPhotos={property.topPhotos}
-              allPhotos={property.photos}
+              cover={property.coverPhoto ? loc(property.coverPhoto) : null}
+              topPhotos={property.topPhotos.map(loc)}
+              allPhotos={property.photos.map(loc)}
               compact
               labels={{
                 // Il conteggio deve essere quello della lista VERA del
@@ -603,6 +626,44 @@ export default async function PropertyPage({ params }: { params: Params }) {
                 <PropertyMap lat={property.lat!} lng={property.lng!} />
               </div>
               <p className="mt-2 text-sm text-neutral-500">{t("locationApprox")}</p>
+            </section>
+          )}
+
+          {/* Riepilogo della trasparenza AI (SPEC §5.3 + §9.3): in chiusura del
+              dossier, prima dei moduli di contatto. La riga si calcola sulle foto
+              che la pagina mostra davvero (stessa lista del lightbox). */}
+          {mostraFotoAi && trasp && (
+            <section
+              id="foto-ai"
+              className="mt-8 scroll-mt-32 rounded-2xl border border-neutral-200 bg-white p-6"
+              data-reveal
+            >
+              <div className="flex items-start justify-between gap-4">
+                <h2 className="text-lg font-semibold">{tTrasp.titolo}</h2>
+                <span
+                  aria-hidden
+                  className="mt-0.5 shrink-0 rounded-md bg-ink px-1.5 py-1 text-[10px] font-semibold leading-none tracking-wider text-white"
+                >
+                  AI
+                </span>
+              </div>
+              {notaAi && (
+                <div className="mt-3 space-y-3 text-sm leading-relaxed text-neutral-700">
+                  {toParagraphs(notaAi).map((par, i) => (
+                    <p key={i}>{par}</p>
+                  ))}
+                </div>
+              )}
+              {trasp.conteggi.ai > 0 && (
+                <p className="mt-4 text-sm font-medium text-brand-dark">{tTrasp.riga(trasp.conteggi)}</p>
+              )}
+              <p className="mt-3 font-semibold text-ink">{tTrasp.chiusura}</p>
+              <Link
+                href="/ai"
+                className="mt-3 inline-block text-sm font-semibold text-brand underline-offset-4 hover:underline"
+              >
+                {tTrasp.linkAi} →
+              </Link>
             </section>
           )}
 

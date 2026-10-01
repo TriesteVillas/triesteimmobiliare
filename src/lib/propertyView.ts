@@ -1,6 +1,7 @@
 import { formatPrice } from "./format";
 import { photoSrc, photoSrcSet } from "./photoSrc";
-import type { Property } from "./properties";
+import type { Photo, Property } from "./properties";
+import { fotoAi } from "./trasparenza";
 
 export type BadgeVariant = "default" | "private" | "cantiere" | "recent" | "featured" | "sold";
 export type Badge = { label: string; variant: BadgeVariant };
@@ -27,10 +28,25 @@ export type PropertyView = {
   meta: string;
   // `srcSet` manca solo sui record PRIVATE, che restano sulla url firmata di
   // Airtable (il proxy /foto non li risolve): lì si serve una sola larghezza.
-  cover: { url: string; srcSet?: string; alt: string } | null;
+  cover: CardPhoto | null;
   // Cover + up to 8 top photos (9 total), for the in-card photo slider.
-  gallery: { url: string; srcSet?: string; alt: string }[];
+  gallery: CardPhoto[];
 };
+
+// Una foto della card. `ai` c'è solo quando la foto porta un'etichetta AI
+// (lib/trasparenza.ts): il glifo compatto e la frase per il lettore di
+// schermo, già nella lingua della pagina. Assente = foto come prima.
+export type CardPhoto = {
+  url: string;
+  srcSet?: string;
+  alt: string;
+  ai?: { glifo: string; aria: string };
+};
+
+function aiCard(ph: Photo, locale: string): Pick<CardPhoto, "ai"> {
+  const ai = fotoAi(ph.trasparenza, locale);
+  return ai?.glifo ? { ai: { glifo: ai.glifo, aria: ai.aria } } : {};
+}
 
 type Translate = (key: string, values?: Record<string, string | number>) => string;
 
@@ -191,7 +207,7 @@ export function buildPropertyView(
   // 404. Quindi i record PRIVATE restano sulla url firmata di Airtable — la
   // guardia non è teorica, senza si romperebbero le foto della collezione.
   const isPrivate = p.cluster?.toUpperCase().trim() === "PRIVATE";
-  const gallery: { url: string; srcSet?: string; alt: string }[] = [];
+  const gallery: CardPhoto[] = [];
   for (const ph of [p.coverPhoto, ...p.topPhotos]) {
     if (!ph) continue;
     const key = ph.filename ?? ph.url;
@@ -201,6 +217,7 @@ export function buildPropertyView(
       url: isPrivate ? ph.thumb : photoSrc(ph, 800),
       srcSet: isPrivate ? undefined : photoSrcSet(ph, CARD_WIDTHS),
       alt: cardTitle,
+      ...aiCard(ph, locale),
     });
     if (gallery.length >= 9) break;
   }
@@ -234,6 +251,7 @@ export function buildPropertyView(
           url: isPrivate ? p.coverPhoto.thumb : photoSrc(p.coverPhoto, 800),
           srcSet: isPrivate ? undefined : photoSrcSet(p.coverPhoto, CARD_WIDTHS),
           alt: cardTitle,
+          ...aiCard(p.coverPhoto, locale),
         }
       : null,
   };

@@ -1,6 +1,8 @@
 import "server-only";
 import { F, mapRecord, type Property } from "./properties";
 import { getPropertiesDaVetrina, VETRINA_ATTIVA } from "./vetrina";
+import { applicaTrasparenza } from "./trasparenza";
+import { BASE_ORIGINALI, getTrasparenzaSito } from "./trasparenza-vetrina";
 import { priceSlotLabel } from "./private/bands";
 import { BRAND } from "./private/brand";
 
@@ -112,7 +114,17 @@ export function compareShowcase(a: Property, b: Property): number {
   return bPrice - aPrice;
 }
 
+// Il catalogo pubblico, con la trasparenza AI sulle foto (01/10/2026). La
+// trasparenza arriva da una seconda chiamata alla vetrina del CRM, in
+// parallelo e TOLLERANTE: se manca o fallisce, `applicaTrasparenza` restituisce
+// la lista tale e quale. Vedi lib/trasparenza.ts e lib/trasparenza-vetrina.ts.
+// Solo il pubblico: la Private Collection resta fuori (SPEC §5.9, fase 2).
 export async function getProperties(): Promise<Property[]> {
+  const [lista, trasparenza] = await Promise.all([getCatalogo(), getTrasparenzaSito()]);
+  return applicaTrasparenza(lista, trasparenza, BASE_ORIGINALI);
+}
+
+async function getCatalogo(): Promise<Property[]> {
   // Fase 2 del taglio (24/08): con CATALOGO_SORGENTE=pg il catalogo pubblico
   // arriva dalla vetrina Postgres di tsv-pg — stessa regola, stessa forma,
   // stesso ordinamento. La Private Collection NON passa di là e continua sotto

@@ -12,6 +12,8 @@ import FeaturedCarousel from "@/components/FeaturedCarousel";
 import Marquee from "@/components/Marquee";
 import ClosureBanner from "@/components/ClosureBanner";
 import AutoVideo from "@/components/AutoVideo";
+import EtichettaAi from "@/components/EtichettaAi";
+import { testiTrasparenza } from "@/lib/trasparenza";
 import { BoatMark } from "@/components/Logo";
 import BuyerCta from "@/components/BuyerCta";
 import SellerCta from "@/components/SellerCta";
@@ -241,6 +243,16 @@ export default async function Home({
           lazy
         />
         <div className="absolute inset-0 bg-gradient-to-t from-brand-dark from-8% via-brand-dark/85 via-25% to-transparent to-46% sm:from-10% sm:via-20% sm:to-36%" />
+        {/* L'arredo di questo video è generato con l'AI: l'etichetta resta
+            VISIBILE per tutta la durata (e sul poster), in alto a destra — non
+            basta che lo dica l'aria-label (01/10/2026, SPEC §0 e §5.1). */}
+        <div className="pointer-events-none absolute right-4 top-4 z-[1] sm:right-6 sm:top-6">
+          <EtichettaAi
+            testo={testiTrasparenza(locale).etichetta.ai_aggiunte}
+            aria={`${testiTrasparenza(locale).etichetta.ai_aggiunte} — ${t("videoBreak.alt")}`}
+            forma="estesa"
+          />
+        </div>
         <div className="absolute inset-x-0 bottom-0">
           <div className="mx-auto max-w-6xl px-6 pb-10 sm:pb-14" data-reveal>
             <p className="eyebrow text-sand">{t("videoBreak.eyebrow")}</p>

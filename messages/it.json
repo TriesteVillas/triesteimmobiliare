@@ -446,7 +446,7 @@
     "taxInfoTitle": "Come sono calcolate",
     "taxCriteria": "Criteri di calcolo",
     "taxInfoAria": "Dettagli sul calcolo delle tasse",
-    "taxAiDisclaimer": "Stime calcolate automaticamente (AI): in quanto tali possono contenere errori di calcolo o di trascrizione. L'unica fonte certa è il confronto di persona con il titolare, dopo aver studiato la singola situazione concreta.",
+    "taxAiDisclaimer": "Stime preparate su base catastale (prezzo-valore) quando l'annuncio è stato inserito, anche con l'aiuto dell'AI: possono quindi contenere errori di calcolo o di trascrizione. L'unica fonte certa è il confronto di persona con il titolare, dopo aver studiato la singola situazione concreta.",
     "taxGroupAcquisto": "Costi di acquisto (una tantum)",
     "taxGroupGestione": "Costi di gestione annui",
     "taxPlusVat": "+ IVA",
@@ -457,15 +457,15 @@
     "taxCondoInfoTitle": "Spese condominiali",
     "taxCondoInfoBody": "Importo annuo indicativo basato sulle spese ordinarie comunicate. Sono escluse le spese straordinarie deliberate e i consumi a misura (es. riscaldamento). Il dato ufficiale è il riparto dell'amministratore.",
     "taxIliaInfoTitle": "ILIA — stima indicativa",
-    "taxIliaInfoBody": "Stima generata automaticamente (AI), calcolata come seconda casa a Trieste sulla rendita catastale (aliquota 10,6‰). Non sostituisce il calcolo ufficiale: dipende da categoria catastale, quota e mesi di possesso ed eventuali agevolazioni. L'abitazione principale non di lusso è esente. Verifica sempre con il tuo commercialista o con l'Ufficio Tributi del Comune di Trieste.",
+    "taxIliaInfoBody": "Stima calcolata automaticamente con una formula fissa, come seconda casa a Trieste sulla rendita catastale (aliquota 10,6‰). Non sostituisce il calcolo ufficiale: dipende da categoria catastale, quota e mesi di possesso ed eventuali agevolazioni. L'abitazione principale non di lusso è esente. Verifica sempre con il tuo commercialista o con l'Ufficio Tributi del Comune di Trieste.",
     "taxTariInfoTitle": "TARI — stima indicativa",
-    "taxTariInfoBody": "Stima approssimativa (AI) sulle tariffe TARI 2026 del Comune di Trieste per utenze domestiche. La TARI si calcola sulla superficie calpestabile: dal mq commerciale stimiamo il calpestabile a circa l'80%. Qui sotto puoi cambiare il numero di occupanti (di default 2). L'importo reale dipende dalla superficie effettiva, dagli occupanti e da eventuali riduzioni, e non sostituisce la bolletta di ESATTO S.p.A.",
+    "taxTariInfoBody": "Stima approssimativa calcolata con le tariffe TARI 2026 del Comune di Trieste per utenze domestiche. La TARI si calcola sulla superficie calpestabile: dal mq commerciale stimiamo il calpestabile a circa l'80%. Qui sotto puoi cambiare il numero di occupanti (di default 2). L'importo reale dipende dalla superficie effettiva, dagli occupanti e da eventuali riduzioni, e non sostituisce la bolletta di ESATTO S.p.A.",
     "taxTariInfoLink": "Calcolo puntuale su ESATTO",
     "taxPrimaCasa": "Prima casa",
     "taxSecondaCasa": "Seconda casa",
     "taxIliaEsente": "Esente (prima casa)",
     "taxOccupants": "Occupanti",
-    "taxEstimateFootnote": "I costi annui sono stime indicative generate con AI e non sostituiscono una verifica ufficiale."
+    "taxEstimateFootnote": "I costi annui sono stime indicative — condominio dalle spese comunicate, ILIA e TARI da formule fisse sulle aliquote del Comune — e non sostituiscono una verifica ufficiale."
   },
   "group": {
     "eyebrow": "Il Gruppo TriesteVillas",
@@ -1013,7 +1013,7 @@
     "title": "Concierge AI",
     "barPlaceholder": "Chiedi qualsiasi cosa sul comprare in Italia…",
     "barCta": "Chiedi",
-    "barHint": "Risponde Claude, il concierge AI di TriesteImmobiliare. Può sbagliare — e lo dice. Le conversazioni sono registrate e riviste dal nostro team.",
+    "barHint": "Risponde Claude, il concierge AI di TriesteImmobiliare. Può sbagliare — e lo dice. Le conversazioni sono registrate e il nostro team può rileggerle.",
     "disclaimer": "Sono Claude, l'assistente AI di TriesteImmobiliare — non infallibile, e non un avvocato né un fiscalista. Per tutto ciò che è vincolante subentra il team. Le conversazioni sono registrate perché un umano possa riprendere da dove mi fermo.",
     "empty": "Chiedimi come funziona l'acquisto, cosa costa, il mutuo da non residente — qualsiasi cosa.",
     "starters": [
@@ -1047,7 +1047,7 @@
     "gateErrContact": "Inserisci un’email o un numero di telefono.",
     "gateErrConsent": "Accetta l’informativa sulla privacy per continuare.",
     "listingPlaceholder": "Chiedimi qualsiasi cosa su questa casa, su altre case o sull'acquisto…",
-    "listingHint": "Su questa casa, sulle altre del sito o sul comprare a Trieste: chiedi pure. Risponde Claude, il concierge AI di TriesteImmobiliare — può sbagliare, e lo dice. Le conversazioni sono registrate e riviste dal team.",
+    "listingHint": "Su questa casa, sulle altre del sito o sul comprare a Trieste: chiedi pure. Risponde Claude, il concierge AI di TriesteImmobiliare — può sbagliare, e lo dice. Le conversazioni sono registrate e il team può rileggerle.",
     "listingEmpty": "Sto guardando «{title}» con te: imposte, spese, zona, altre case, come si compra — chiedimi qualsiasi cosa.",
     "listingStarters": [
       "Quanto pagherei di imposte su questa casa?",

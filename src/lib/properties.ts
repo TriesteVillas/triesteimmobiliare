@@ -1,3 +1,4 @@
+import type { FotoAi, FotoTrasparenza, TrasparenzaImmobile } from "./trasparenza";
 // Field-ID map for the Airtable PROPRIETA table (base app1ZDay9vQNU5V2u, table tblwAUWPnX7KF8FhU).
 // We key on field IDs (stable across renames) for both the live REST fetch
 // (returnFieldsByFieldId=true) and the dev seed.
@@ -141,6 +142,14 @@ export type Photo = {
   // upload, so the gallery can de-dupe a photo that appears in more than one
   // field (cover / topPhotos / foto) even though each field's signed url differs.
   filename: string | null;
+  // Trasparenza AI (01/10/2026, lib/trasparenza.ts). Due forme, mai insieme:
+  // `trasparenza` sono i dati grezzi del CRM in quattro lingue, attaccati da
+  // getProperties() abbinando per `filename`; `ai` è la loro resa nella lingua
+  // del visitatore, che la pagina mette al loro posto prima di passare la foto
+  // al browser (localizzaFoto). Assenti entrambi = foto senza dati: si mostra
+  // esattamente come prima.
+  trasparenza?: FotoTrasparenza;
+  ai?: FotoAi;
 };
 
 export type Property = {
@@ -226,6 +235,9 @@ export type Property = {
   iliaAnnua: number | null;
   tariAnnua: number | null;
   pcSince: string | null;
+  // Riepilogo della trasparenza AI sulle foto (lib/trasparenza.ts): presente
+  // solo quando il CRM ha dati per questo immobile.
+  trasparenza?: TrasparenzaImmobile | null;
 };
 
 type RawAttachment = {

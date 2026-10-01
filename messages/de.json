@@ -446,7 +446,7 @@
     "taxInfoTitle": "Wie wird berechnet",
     "taxCriteria": "Berechnungskriterien",
     "taxInfoAria": "Details zur Steuerberechnung",
-    "taxAiDisclaimer": "Automatisch (KI) berechnete Schätzungen: als solche können sie Rechen- oder Übertragungsfehler enthalten. Die einzige verlässliche Quelle ist das persönliche Gespräch mit dem Inhaber nach Prüfung des konkreten Einzelfalls.",
+    "taxAiDisclaimer": "Schätzungen auf Katasterbasis (Preis-Wert), erstellt bei der Aufnahme des Inserats, auch mit Hilfe von KI: Sie können daher Rechen- oder Übertragungsfehler enthalten. Die einzige verlässliche Quelle ist das persönliche Gespräch mit dem Inhaber nach Prüfung des konkreten Einzelfalls.",
     "taxGroupAcquisto": "Kaufkosten (einmalig)",
     "taxGroupGestione": "Jährliche laufende Kosten",
     "taxPlusVat": "+ MwSt.",
@@ -457,15 +457,15 @@
     "taxCondoInfoTitle": "Hausgeld",
     "taxCondoInfoBody": "Indikativer Jahresbetrag auf Basis der gemeldeten ordentlichen Kosten. Außerordentliche Maßnahmen und verbrauchsabhängige Kosten (z. B. Heizung) sind ausgeschlossen. Maßgeblich ist die Abrechnung des Verwalters.",
     "taxIliaInfoTitle": "ILIA — indikative Schätzung",
-    "taxIliaInfoBody": "KI-generierte Schätzung, berechnet als Zweitwohnsitz in Triest auf Basis des Katasterertrags (Satz 10,6‰). Sie ersetzt nicht die offizielle Berechnung: Sie hängt von der Katasterkategorie, dem Eigentumsanteil und den Besitzmonaten sowie etwaigen Vergünstigungen ab. Ein nicht luxuriöser Hauptwohnsitz ist befreit. Prüfen Sie dies stets mit Ihrem Steuerberater oder dem Steueramt der Stadt Triest.",
+    "taxIliaInfoBody": "Automatisch mit einer festen Formel berechnete Schätzung, als Zweitwohnsitz in Triest auf Basis des Katasterertrags (Satz 10,6‰). Sie ersetzt nicht die offizielle Berechnung: Sie hängt von der Katasterkategorie, dem Eigentumsanteil und den Besitzmonaten sowie etwaigen Vergünstigungen ab. Ein nicht luxuriöser Hauptwohnsitz ist befreit. Prüfen Sie dies stets mit Ihrem Steuerberater oder dem Steueramt der Stadt Triest.",
     "taxTariInfoTitle": "TARI — indikative Schätzung",
-    "taxTariInfoBody": "Grobe KI-Schätzung auf Basis der Abfallgebührentarife 2026 der Stadt Triest für Haushalte. Die TARI wird auf die Nettowohnfläche (calpestabile) berechnet: Wir schätzen sie auf etwa 80% der kommerziellen Fläche. Unten können Sie die Anzahl der Bewohner ändern (Standard 2). Der tatsächliche Betrag hängt von der realen Fläche, den Bewohnern und etwaigen Ermäßigungen ab und ersetzt nicht die von ESATTO S.p.A. ausgestellte Rechnung.",
+    "taxTariInfoBody": "Grobe Schätzung, berechnet nach den Abfallgebührentarifen 2026 der Stadt Triest für Haushalte. Die TARI wird auf die Nettowohnfläche (calpestabile) berechnet: Wir schätzen sie auf etwa 80% der kommerziellen Fläche. Unten können Sie die Anzahl der Bewohner ändern (Standard 2). Der tatsächliche Betrag hängt von der realen Fläche, den Bewohnern und etwaigen Ermäßigungen ab und ersetzt nicht die von ESATTO S.p.A. ausgestellte Rechnung.",
     "taxTariInfoLink": "Genaue Berechnung bei ESATTO",
     "taxPrimaCasa": "Hauptwohnsitz",
     "taxSecondaCasa": "Zweitwohnsitz",
     "taxIliaEsente": "Befreit (Hauptwohnsitz)",
     "taxOccupants": "Bewohner",
-    "taxEstimateFootnote": "Die jährlichen Kosten sind indikative KI-Schätzungen und ersetzen keine offizielle Prüfung."
+    "taxEstimateFootnote": "Die jährlichen Kosten sind indikative Schätzungen — Hausgeld nach den gemeldeten Kosten, ILIA und TARI nach festen Formeln auf Basis der städtischen Sätze — und ersetzen keine offizielle Prüfung."
   },
   "group": {
     "eyebrow": "Die TriesteVillas-Gruppe",
@@ -1013,7 +1013,7 @@
     "title": "Concierge AI",
     "barPlaceholder": "Fragen Sie alles zum Hauskauf in Italien…",
     "barCta": "Fragen",
-    "barHint": "Es antwortet Claude, der KI-Concierge von TriesteImmobiliare. Er kann sich irren — und sagt es. Gespräche werden aufgezeichnet und von unserem Team gelesen.",
+    "barHint": "Es antwortet Claude, der KI-Concierge von TriesteImmobiliare. Er kann sich irren — und sagt es. Gespräche werden aufgezeichnet, und unser Team kann sie nachlesen.",
     "disclaimer": "Ich bin Claude, der KI-Assistent von TriesteImmobiliare — nicht unfehlbar, und weder Anwalt noch Steuerberater. Für alles Verbindliche übernimmt das Team. Gespräche werden aufgezeichnet, damit ein Mensch dort weitermachen kann, wo ich aufhöre.",
     "empty": "Fragen Sie, wie der Kauf abläuft, was er kostet, Hypothek als Nicht-Resident — was immer Sie möchten.",
     "starters": [
@@ -1047,7 +1047,7 @@
     "gateErrContact": "Geben Sie eine E-Mail-Adresse oder Telefonnummer ein.",
     "gateErrConsent": "Akzeptieren Sie die Datenschutzerklärung, um fortzufahren.",
     "listingPlaceholder": "Fragen Sie mich alles zu diesem Haus, zu anderen oder zum Kaufprozess…",
-    "listingHint": "Zu diesem Haus, zu anderen auf der Website oder zum Kauf in Triest: fragen Sie ruhig. Es antwortet Claude, unser KI-Concierge — er kann irren, und sagt es. Gespräche werden protokolliert und vom Team gelesen.",
+    "listingHint": "Zu diesem Haus, zu anderen auf der Website oder zum Kauf in Triest: fragen Sie ruhig. Es antwortet Claude, unser KI-Concierge — er kann irren, und sagt es. Gespräche werden protokolliert, und das Team kann sie nachlesen.",
     "listingEmpty": "Ich sehe mir «{title}» mit Ihnen an: Steuern, Kosten, Lage, andere Häuser, der Kaufweg — fragen Sie mich alles.",
     "listingStarters": [
       "Wie viel Steuern würde ich für dieses Haus zahlen?",
