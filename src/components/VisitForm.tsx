@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 
 const SLOTS = ["Qualsiasi", "9-12", "12-14", "14-17", "17-20"] as const;
-const LOCALES: Record<string, string> = { it: "it-IT", en: "en-GB", de: "de-DE" };
+const LOCALES: Record<string, string> = { it: "it-IT", en: "en-GB", de: "de-DE", sl: "sl-SI" };
 
 type DayOpt = { iso: string; wd: string; day: number; mon: string };
 type Status = "idle" | "sending" | "ok" | "error";

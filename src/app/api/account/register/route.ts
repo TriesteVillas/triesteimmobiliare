@@ -15,7 +15,7 @@ const WINDOW_MS = 10 * 60 * 1000;
 const MAX_ATTEMPTS = 6;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const LANGS = new Set(["it", "en", "de"]);
+const LANGS = new Set(["it", "en", "de", "sl"]);
 
 export async function POST(request: Request) {
   if (!acctGateConfigured()) return NextResponse.json({ ok: false, error: "not_configured" }, { status: 503 });

@@ -2,10 +2,12 @@ import type { MetadataRoute } from "next";
 import { getProperties } from "@/lib/airtable";
 import { getArticles } from "@/lib/articles";
 import { routing } from "@/i18n/routing";
-import { absUrl, localizedPath, SITE_URL } from "@/lib/seo";
+import { absUrl, HREFLANG, localizedPath, SITE_URL } from "@/lib/seo";
 
-// Solo-lingua dal 2026-08-11, in coppia con lib/seo.ts (de-DE escludeva de-AT).
-const HREFLANG: Record<string, string> = { it: "it", en: "en", de: "de" };
+// Solo-lingua dal 2026-08-11 (de-DE escludeva de-AT). La mappa è quella di
+// lib/seo.ts, importata e non ricopiata: con lo sloveno (2026-10-01) le copie
+// a mano erano diventate una trappola — una lingua aggiunta in un posto solo
+// avrebbe dato alla sitemap un hreflang `undefined`.
 
 // hreflang alternates for a path across all locales (+ x-default → it).
 function languagesFor(path: string): Record<string, string> {

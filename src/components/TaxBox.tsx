@@ -53,7 +53,7 @@ const TARI_FIXED = [0.9, 1.06, 1.18, 1.28, 1.39, 1.46]; // €/sqm/yr
 const TARI_VAR = [56.92, 132.82, 170.76, 208.71, 275.12, 322.55]; // €/yr
 const TARI_TEFA = 1.04; // provincial surcharge TEFA 4% (FVG)
 
-const LOCALE_TAG: Record<string, string> = { it: "it-IT", en: "en-GB", de: "de-DE" };
+const LOCALE_TAG: Record<string, string> = { it: "it-IT", en: "en-GB", de: "de-DE", sl: "sl-SI" };
 
 // Tax & costs box with a "prima casa / seconda casa" toggle (default prima
 // casa). The toggle swaps the acquisition tax (first- vs second-home) and the

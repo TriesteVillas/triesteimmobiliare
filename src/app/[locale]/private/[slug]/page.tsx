@@ -5,7 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { verifySession, PC_COOKIE } from "@/lib/private/session";
 import { findGrantById, isActive } from "@/lib/private/store";
 import { getPrivateProperty } from "@/lib/airtable";
-import { localizedDescription, localizedTitle, priceLabel } from "@/lib/propertyView";
+import { localizedDescription, localizedTitle, priceLabel, roomsLabel } from "@/lib/propertyView";
 import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import AccessGate from "@/components/private/AccessGate";
@@ -77,7 +77,7 @@ export default async function PrivateDetail({
   const wm = `${email} · ${new Date().toISOString().slice(0, 10)}`;
   const facts = [
     p.mq ? tProp("sqm", { value: p.mq }) : null,
-    p.rooms ? `${p.rooms} ${tProp("rooms").toLowerCase()}` : null,
+    p.rooms ? roomsLabel(p.rooms, locale, tProp("rooms")) : null,
     p.floor ? `${tProp("floor")} ${p.floor}` : null,
     p.energyClass ? `APE ${p.energyClass}` : null,
   ].filter(Boolean) as string[];

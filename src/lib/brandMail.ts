@@ -10,7 +10,7 @@ const SITE = (
   "https://www.triesteimmobiliare.com"
 ).replace(/\/$/, "");
 
-export type MailLang = "it" | "en" | "de";
+export type MailLang = "it" | "en" | "de" | "sl";
 
 // Poppins arrives via @import where supported (Apple Mail); Gmail/Outlook fall
 // back to the closest geometric system fonts.
@@ -53,6 +53,7 @@ const ADDRESS: Record<MailLang, string> = {
   it: "Via Torino 34, 34123 Trieste",
   en: "Via Torino 34, 34123 Trieste, Italy",
   de: "Via Torino 34, 34123 Triest, Italien",
+  sl: "Via Torino 34, 34123 Trst, Italija",
 };
 
 /**

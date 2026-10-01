@@ -339,7 +339,7 @@ function toGrant(r: AirRecord): Grant {
     nome: str(f.nome),
     cognome: str(f.cognome),
     email: str(f.email),
-    lingua: ["it", "en", "de"].includes(lang) ? lang : "en",
+    lingua: ["it", "en", "de", "sl"].includes(lang) ? lang : "en",
     expiresAtMs: exp ? new Date(exp).getTime() : null,
     issuedAtMs: (() => { const t = Date.parse(str(f.issued_at)); return Number.isFinite(t) ? t : null; })(),
     accessi: typeof f.accessi === "number" ? f.accessi : 0,

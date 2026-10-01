@@ -22,7 +22,7 @@ const NAV = [
   { href: "/contatti", key: "contact" },
 ] as const;
 
-type GroupSiteLocale = "it" | "en" | "de";
+type GroupSiteLocale = "it" | "en" | "de" | "sl";
 const GROUP_SITES = {
   it: {
     tsv: "https://www.triestevillas.com/",
@@ -41,6 +41,15 @@ const GROUP_SITES = {
     affitti: "https://www.triesteaffitti.com/",
     friuli: "https://friulivillas.com/de/",
     lignano: "https://www.lignanovillas.com/de/",
+  },
+  // Sloveno: /sl esiste solo su triestevillas.com (verificato il 2026-10-01);
+  // gli altri gemelli portano alla versione inglese finché non lo pubblicano.
+  // Stessa tabella di gruppo/page.tsx.
+  sl: {
+    tsv: "https://www.triestevillas.com/sl",
+    affitti: "https://www.triesteaffitti.com/",
+    friuli: "https://friulivillas.com/en/",
+    lignano: "https://www.lignanovillas.com/",
   },
 } as const satisfies Record<GroupSiteLocale, Record<string, string>>;
 

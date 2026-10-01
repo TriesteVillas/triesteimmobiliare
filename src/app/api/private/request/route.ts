@@ -94,7 +94,7 @@ export async function POST(request: Request) {
     .map((b) => clean(b, 10))
     .filter((b) => BANDS.has(b));
   const immobileTrigger = clean(body.immobileTrigger, 40);
-  const lingua = (["it", "en", "de"].includes(clean(body.lingua)) ? clean(body.lingua) : "it") as Lang;
+  const lingua = (["it", "en", "de", "sl"].includes(clean(body.lingua)) ? clean(body.lingua) : "it") as Lang;
 
   if (body.privacyOk !== true) {
     return NextResponse.json({ ok: false, error: "privacy_required" }, { status: 400 });

@@ -155,7 +155,34 @@ const RECAP = {
     closing: `Antworten Sie gerne auf diese E-Mail oder rufen Sie uns an unter ${mailContact.phone}.`,
     sign: `TriesteImmobiliare · ${mailContact.email}`,
   },
+  // Sloveno (2026-10-01). La chiusura dice in che lingua rispondiamo: nessuna
+  // promessa di assistenza in sloveno (D1 del progetto sloveno). Il numero col
+  // +39: per un lettore in Slovenia «040» è un prefisso di cellulare sloveno.
+  sl: {
+    subject: "Prejeli smo vaše povpraševanje – TriesteImmobiliare",
+    hello: "Pozdravljeni",
+    received: "prejeli smo vaše povpraševanje in se vam kmalu oglasimo.",
+    recapTitle: "Povzetek povpraševanja",
+    zones: "Območja zanimanja", budget: "Proračun", size: "Velikost",
+    purpose: "Namen", condition: "Stanje nepremičnine", listing: "Nepremičnina",
+    request: "Povpraševanje", message: "Sporočilo", visit: "Razpoložljivost za ogled",
+    timing: "Časovni okvir", roi: "Pričakovani donos", horizon: "Časovni horizont", objective: "Cilj",
+    closing: `Odgovorimo vam v italijanščini, angleščini ali nemščini. Za vsa vprašanja lahko odgovorite na to sporočilo ali nas pokličete na +39 ${mailContact.phone}.`,
+    sign: `TriesteImmobiliare · ${mailContact.email}`,
+  },
 } as const;
+
+// Le lingue in cui il sito scrive al cliente: le chiavi di RECAP, nient'altro.
+// Una lingua sconosciuta (o assente) ricade sull'italiano.
+type RecapLang = keyof typeof RECAP;
+const linguaRecap = (v: string): RecapLang => (v in RECAP ? (v as RecapLang) : "it");
+// Il bottone verso la scheda, nella lingua del cliente.
+const CTA_SCHEDA: Record<RecapLang, string> = {
+  it: "Vedi l'immobile",
+  en: "View the property",
+  de: "Zur Immobilie",
+  sl: "Oglejte si nepremičnino",
+};
 
 // Customer recap on the shared brand shell: greeting, summary card, optional
 // listing CTA, closing and signature. The shell owns logo and footer contacts.
@@ -200,7 +227,7 @@ async function handleBuyer(body: Record<string, unknown>) {
   const citta = normCity(clean(body.citta, 80));
   const messaggio = clean(body.messaggio, 4000);
   const fonteCta = clean(body.fonteCta, 120);
-  const lingua = ["it", "en", "de"].includes(clean(body.lingua)) ? clean(body.lingua) : "it";
+  const lingua = linguaRecap(clean(body.lingua));
   const zone = (Array.isArray(body.zone) ? body.zone : [])
     .map((z) => clean(z, 40))
     .filter((z) => BUYER_ZONES.has(z));
@@ -342,7 +369,7 @@ async function handleValutazione(body: Record<string, unknown>) {
   const statoImmobile = SELLER_STATI.has(clean(body.statoImmobile)) ? clean(body.statoImmobile) : "";
   const tempistiche = SELLER_TEMPI.has(clean(body.tempistiche)) ? clean(body.tempistiche) : "";
   const messaggio = clean(body.messaggio, 4000);
-  const lingua = ["it", "en", "de"].includes(clean(body.lingua)) ? clean(body.lingua) : "it";
+  const lingua = linguaRecap(clean(body.lingua));
 
   if (body.privacyOk !== true) {
     return NextResponse.json({ ok: false, error: "privacy_required" }, { status: 400 });
@@ -439,7 +466,7 @@ async function handleInvestitore(body: Record<string, unknown>) {
   const email = clean(body.email, 160);
   const telefono = clean(body.telefono, 40);
   const messaggio = clean(body.messaggio, 4000);
-  const lingua = ["it", "en", "de"].includes(clean(body.lingua)) ? clean(body.lingua) : "it";
+  const lingua = linguaRecap(clean(body.lingua));
   const zone = (Array.isArray(body.zone) ? body.zone : [])
     .map((z) => clean(z, 40))
     .filter((z) => BUYER_ZONES.has(z));
@@ -599,7 +626,7 @@ export async function POST(request: Request) {
   const immobileNome = clean(body.immobileNome, 200);
   const url = clean(body.url, 500);
   const disponibilita = clean(body.disponibilita, 800);
-  const lingua = ["it", "en", "de"].includes(clean(body.lingua)) ? clean(body.lingua) : "it";
+  const lingua = linguaRecap(clean(body.lingua));
   const sito = clean(body.sito, 60) || "triesteimmobiliare.com";
   const isTI = sito === "triesteimmobiliare.com";
   const canale = isTI ? "Sito TriesteImmobiliare" : "Sito TriesteVillas";
@@ -661,12 +688,13 @@ export async function POST(request: Request) {
     : "";
 
   if (tipo === "Invia a un amico") {
-    const fl = (["it", "en", "de"].includes(lingua) ? lingua : "it") as "it" | "en" | "de";
+    const fl = lingua;
     const L = RECAP[fl];
     const FRIEND = {
       it: { subj: "Un immobile che potrebbe interessarti — TriesteImmobiliare", intro: "Ti è stato segnalato questo immobile:", card: "Immobile segnalato", cta: "Vedi l'immobile", sign: "— TriesteImmobiliare" },
       en: { subj: "A property you might like — TriesteImmobiliare", intro: "Someone wanted you to see this property:", card: "Shared property", cta: "View the property", sign: "— TriesteImmobiliare" },
       de: { subj: "Eine Immobilie für Sie — TriesteImmobiliare", intro: "Diese Immobilie wurde Ihnen empfohlen:", card: "Empfohlene Immobilie", cta: "Zur Immobilie", sign: "— TriesteImmobiliare" },
+      sl: { subj: "Nepremičnina, ki bi vas lahko zanimala – TriesteImmobiliare", intro: "Nekdo vam priporoča to nepremičnino:", card: "Priporočena nepremičnina", cta: "Oglejte si nepremičnino", sign: "— TriesteImmobiliare" },
     }[fl];
     const friendBody = `<p style="${mailText.title}">${FRIEND.intro}</p>
       ${mailRecapCard(FRIEND.card, [
@@ -720,7 +748,7 @@ export async function POST(request: Request) {
             [L.visit, disponibilita],
           ],
           url
-            ? mailCta(esc(url), lingua === "en" ? "View the property" : lingua === "de" ? "Zur Immobilie" : "Vedi l'immobile")
+            ? mailCta(esc(url), CTA_SCHEDA[lingua])
             : "",
         ),
         NOTIFY_EMAIL,

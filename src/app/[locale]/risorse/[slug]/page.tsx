@@ -15,6 +15,7 @@ import SourceList from "@/components/resources/SourceList";
 import ResourceCard from "@/components/resources/ResourceCard";
 import BuyerConcierge from "@/components/compra/BuyerConcierge";
 import JsonLd from "@/components/JsonLd";
+import { intlLocale } from "@/lib/format";
 import {
   pageAlternates, articleOpenGraph, seoTitle, seoDescription,
   absUrl, breadcrumbJsonLd, SITE_URL,
@@ -58,7 +59,7 @@ export async function generateMetadata({
 const fmtDate = (locale: string, iso: string | null): string => {
   if (!iso) return "";
   try {
-    return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : locale === "de" ? "de-DE" : "it-IT", {
+    return new Intl.DateTimeFormat(intlLocale(locale), {
       dateStyle: "long",
     }).format(new Date(iso));
   } catch {

@@ -5,7 +5,7 @@ import { useTransition } from "react";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 
-const LABELS: Record<string, string> = { it: "IT", en: "EN", de: "DE" };
+const LABELS: Record<string, string> = { it: "IT", en: "EN", de: "DE", sl: "SL" };
 
 export default function LocaleSwitcher({
   // "light" per il pannello scuro del menu mobile, dove le tinte da pillola

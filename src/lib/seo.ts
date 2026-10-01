@@ -1,5 +1,5 @@
 // SEO helpers — canonical + hreflang for next-intl `localePrefix: "as-needed"`
-// (it at the root, en/de prefixed) and JSON-LD builders. The site is read by
+// (it at the root, en/de/sl prefixed) and JSON-LD builders. The site is read by
 // many German-speaking buyers, so hreflang is not cosmetic.
 
 // `?? ` da solo non basta: una variabile d'ambiente definita ma VUOTA (è ciò che
@@ -9,13 +9,16 @@
 export const SITE_URL =
   (process.env.NEXT_PUBLIC_SITE_URL || "").trim() || "https://www.triesteimmobiliare.com";
 
-export const LOCALES = ["it", "en", "de"] as const;
+export const LOCALES = ["it", "en", "de", "sl"] as const;
 // hreflang SOLO-LINGUA (2026-08-11, allineato al gemello TSV): i codici
 // regionali de-DE/en-GB lasciavano fuori de-AT e l'inglese non-UK, che in SERP
-// cadevano sulla x-default. I codici lingua coprono tutte le regioni.
-const HREFLANG: Record<string, string> = { it: "it", en: "en", de: "de" };
+// cadevano sulla x-default. I codici lingua coprono tutte le regioni. Per lo
+// sloveno (2026-10-01) vale a maggior ragione: `sl-SI` escluderebbe la
+// minoranza slovena di Trieste e Gorizia, che è in Italia.
+// Esportata perché la sitemap deve dichiarare ESATTAMENTE gli stessi codici.
+export const HREFLANG: Record<string, string> = { it: "it", en: "en", de: "de", sl: "sl" };
 // og:locale vuole il formato regionale: mappa separata, usata solo da OG.
-const OG_LOCALE: Record<string, string> = { it: "it_IT", en: "en_GB", de: "de_DE" };
+const OG_LOCALE: Record<string, string> = { it: "it_IT", en: "en_GB", de: "de_DE", sl: "sl_SI" };
 
 // Path on the wire for a given locale. `path` uses "/" for home.
 export function localizedPath(locale: string, path: string): string {
@@ -48,7 +51,10 @@ export function pageOpenGraph(
     type: "website" as const,
     siteName: "TriesteImmobiliare",
     locale: OG_LOCALE[locale] ?? "it_IT",
-    localeAlternate: LOCALES.filter((l) => l !== locale).map(
+    // `alternateLocale` è il nome che Next legge. Fino al 2026-10-01 qui c'era
+    // `localeAlternate`, che Next ignorava in silenzio: og:locale:alternate non
+    // è mai uscito in nessuna lingua.
+    alternateLocale: LOCALES.filter((l) => l !== locale).map(
       (l) => OG_LOCALE[l] ?? "it_IT",
     ),
     url: absUrl(locale, path),
@@ -164,7 +170,7 @@ export function webSiteJsonLd() {
     "@id": `${SITE_URL}/#website`,
     url: SITE_URL,
     name: "TriesteImmobiliare",
-    inLanguage: ["it-IT", "en-GB", "de-DE"],
+    inLanguage: ["it-IT", "en-GB", "de-DE", "sl-SI"],
     publisher: { "@id": `${SITE_URL}/#agency` },
   };
 }

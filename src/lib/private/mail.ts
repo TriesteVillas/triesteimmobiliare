@@ -15,7 +15,15 @@ const FROM = MAIL_FROM;
 const ZOOM_URL = process.env.PC_ZOOM_URL ?? "";
 const CONTACT = `${mailContact.email} · WhatsApp ${mailContact.whatsapp}`;
 
-export type Lang = "it" | "en" | "de";
+export type Lang = "it" | "en" | "de" | "sl";
+
+// Il duale sloveno, fuori ICU: 1 dan, 2 dneva, 3–4 dnevi, 5+ dni — ciclico
+// sulle ultime due cifre (101 dan, 102 dneva, 111 dni). Serve solo qui, per la
+// durata del codice nella mail credenziali. Gemello di triestevillas-web.
+function dniSl(n: number): string {
+  const m = n % 100;
+  return m === 1 ? "dan" : m === 2 ? "dneva" : m === 3 || m === 4 ? "dnevi" : "dni";
+}
 
 export function mailConfigured(): boolean {
   return !!RESEND_API_KEY;
@@ -167,6 +175,18 @@ const CRED: Record<Lang, {
     contacts: `Für alles Weitere: ${CONTACT}`,
     closing: "Bis bald,",
   },
+  sl: {
+    subject: "Vaš dostop do TriesteImmobiliare Private Collection",
+    hi: "Spoštovani",
+    body: "vaš zasebni dostop do naše Private Collection je bil odobren. Spodaj je vaše začasno geslo.",
+    codeLabel: "Začasno geslo",
+    validity: (d, n) => `Velja do ${d} – ${n} ${dniSl(n)}. Po izteku lahko zaprosite za podaljšanje.`,
+    enter: "Vstopite v Private Collection",
+    zoomLine: "Marsikaj lahko delimo le osebno: zemljišča, stavbe, projekti, ki še niso javni.",
+    zoomCta: "Rezervirajte 30-minutni pogovor z našim specialistom",
+    contacts: `Za vsa vprašanja: ${CONTACT}`,
+    closing: "Lep pozdrav,",
+  },
 };
 
 // `validityDays` NON è una costante: è la durata reale del grant, calcolata dalle
@@ -216,6 +236,13 @@ const EXP: Record<Lang, { subject: string; hi: string; body: string; cta: string
     cta: "Verlängerung anfordern",
     closing: "Herzliche Grüße,",
   },
+  sl: {
+    subject: "Vaš dostop do Private Collection je potekel",
+    hi: "Spoštovani",
+    body: "vaš začasni dostop do TriesteImmobiliare Private Collection je potekel. Z veseljem ga podaljšamo, kadar koli želite.",
+    cta: "Zaprosite za podaljšanje",
+    closing: "S spoštovanjem,",
+  },
 };
 
 export function expiryEmail(lang: Lang, name: string) {
@@ -253,6 +280,13 @@ const ACK: Record<Lang, { subject: string; hi: string; body: string; note: strin
     body: "vielen Dank, wir haben Ihre Anfrage für den Zugang zur TriesteImmobiliare Private Collection erhalten.",
     note: "Anfragen werden manuell geprüft, in der Regel innerhalb von 48 Stunden. Nach Freigabe ist der Zugang mindestens 15 Tage gültig.",
     closing: "Bis bald,",
+  },
+  sl: {
+    subject: "Prejeli smo vašo prošnjo – Private Collection",
+    hi: "Spoštovani",
+    body: "hvala, prejeli smo vašo prošnjo za dostop do TriesteImmobiliare Private Collection.",
+    note: "Prošnje preverjamo ročno, praviloma v 48 urah. Po odobritvi dostop velja najmanj 15 dni.",
+    closing: "Lep pozdrav,",
   },
 };
 

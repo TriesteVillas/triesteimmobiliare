@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { pageAlternates } from "@/lib/seo";
+import type { Locale } from "@/i18n/routing";
 
 type Section = { h: string; p: string };
 type Content = { title: string; updated: string; intro: string; sections: Section[] };
@@ -9,7 +10,10 @@ const CONTROLLER =
   "TriesteVillas srl · Via Milano 5, 34132 Trieste (TS), Italia · C.F./P.IVA 01235580329 · " +
   "Email info@triesteimmobiliare.com · PEC milou@pec.emailc.it";
 
-const CONTENT: Record<string, Content> = {
+// Una voce per OGNI lingua del router, imposta dal tipo: con `Record<string,…>`
+// una lingua dimenticata faceva uscire l'informativa in italiano senza che
+// nulla lo segnalasse (lo sloveno è entrato il 2026-10-01).
+const CONTENT: Record<Locale, Content> = {
   it: {
     title: "Informativa sulla Privacy",
     updated: "Ultimo aggiornamento: giugno 2026",
@@ -157,6 +161,55 @@ const CONTENT: Record<string, Content> = {
       },
     ],
   },
+  sl: {
+    title: "Obvestilo o zasebnosti",
+    updated: "Zadnja posodobitev: junij 2026",
+    intro:
+      "To obvestilo opisuje, kako TriesteImmobiliare (blagovna znamka družbe TriesteVillas srl) obdeluje osebne podatke, zbrane prek te spletne strani, v skladu z Uredbo (EU) 2016/679 (GDPR).",
+    sections: [
+      { h: "1. Upravljavec", p: CONTROLLER },
+      {
+        h: "2. Obdelovani podatki",
+        p: "Kontaktni podatki, ki jih prostovoljno posredujete prek obrazcev (ime, e-pošta, telefon, morebitno sporočilo in nepremičnina, ki vas zanima), ter tehnični podatki o brskanju (npr. naslov IP, vrsta brskalnika), zbrani prek tehničnih piškotkov, potrebnih za delovanje spletne strani.",
+      },
+      {
+        h: "3. Nameni in pravna podlaga",
+        p: "Podatke obdelujemo, da odgovorimo na vaša povpraševanja in vodimo odnos z vami (izvajanje predpogodbenih ukrepov in vaša privolitev) ter da izpolnimo zakonske obveznosti. Posredovanje podatkov je prostovoljno, vendar brez kontaktnih podatkov povpraševanja ne moremo obravnavati.",
+      },
+      {
+        h: "4. Funkcija »Pošljite prijatelju«",
+        p: "Če s to funkcijo nepremičnino priporočite drugi osebi, nam potrjujete, da ste pridobili njeno soglasje za prejem sporočila. Naslov prejemnika uporabimo samo za pošiljanje tega posameznega priporočila.",
+      },
+      {
+        h: "5. Način obdelave in hramba",
+        p: "Podatki se obdelujejo z elektronskimi sredstvi in ustreznimi varnostnimi ukrepi ter hranijo toliko časa, kolikor je potrebno za obravnavo povpraševanja in za poznejše zakonske obveznosti; nato se izbrišejo ali anonimizirajo.",
+      },
+      {
+        h: "6. Prejemniki in obdelovalci",
+        p: "Podatke lahko obdelujejo naši pooblaščeni sodelavci in ponudniki, ki kot obdelovalci skrbijo za tehnične storitve spletne strani (zlasti Airtable za upravljanje stikov, Vercel za gostovanje in ponudnik e-pošte za pošiljanje sporočil). Podatki se ne razširjajo.",
+      },
+      {
+        h: "7. Prenosi zunaj EU",
+        p: "Nekateri ponudniki lahko podatke obdelujejo zunaj Evropske unije; v tem primeru prenos temelji na ustreznih zaščitnih ukrepih (npr. standardnih pogodbenih klavzulah Evropske komisije).",
+      },
+      {
+        h: "8. Vaše pravice",
+        p: "Kadar koli lahko uveljavljate pravice do dostopa, popravka, izbrisa, omejitve obdelave, ugovora in prenosljivosti podatkov ter prekličete privolitev, tako da pišete na info@triesteimmobiliare.com. Prav tako imate pravico vložiti pritožbo pri italijanskem nadzornem organu za varstvo osebnih podatkov (Garante per la protezione dei dati personali).",
+      },
+      {
+        h: "9. Piškotki",
+        p: "Spletna stran uporablja tehnične piškotke, potrebne za delovanje, in – samo z vašo privolitvijo – statistične piškotke Google Analytics 4 (Google Ireland Ltd), s katerimi razumemo, kako se stran uporablja. Dokler se ne odločite, se ne zapiše noben statistični piškotek; svojo odločitev lahko kadar koli spremenite prek povezave »Nastavitve piškotkov« v nogi vsake strani. Brez oglaševanja, brez profiliranja. Storitve tretjih oseb (npr. zemljevidi, videoposnetki) lahko ob aktivaciji njihove vsebine nastavijo lastne piškotke.",
+      },
+      {
+        h: "10. Uporabniški račun in prilagajanje",
+        p: "Če ustvarite račun, obdelujemo podatke vašega profila (ime, e-pošta, telefon, navedene želje) in beležimo vašo dejavnost na strani kot prijavljenega uporabnika – odprte nepremičnine, čas, preživet na predstavitvah, priljubljene, ocene in iskanja –, da vam zagotovimo storitev (shranjene priljubljene, osebno območje) in da na podlagi našega zakonitega interesa interno organiziramo nadaljnjo obravnavo povpraševanj. Prilagojeni predlogi in komercialna sporočila po e-pošti se pošiljajo samo na podlagi neobveznih privolitev, ki jih lahko kadar koli podate in prekličete v svojem računu. Neobdelani dogodki brskanja se hranijo 18 mesecev, nato se izbrišejo ali združijo v zbirne podatke. Izbris računa lahko zahtevate neposredno v osebnem območju.",
+      },
+      {
+        h: "11. Spremembe",
+        p: "To obvestilo lahko posodobimo; veljavna različica je vedno objavljena na tej strani.",
+      },
+    ],
+  },
 };
 
 export async function generateMetadata({
@@ -180,7 +233,7 @@ export default async function PrivacyPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const c = CONTENT[locale] ?? CONTENT.it;
+  const c = CONTENT[locale as Locale] ?? CONTENT.it;
 
   return (
     <article className="mx-auto max-w-3xl px-4 pb-14 pt-32">

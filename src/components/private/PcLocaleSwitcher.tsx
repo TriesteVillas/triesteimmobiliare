@@ -26,7 +26,10 @@ import { useTransition } from "react";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 
-const LABELS: Record<string, string> = { it: "IT", en: "EN", de: "DE" };
+const LABELS: Record<string, string> = { it: "IT", en: "EN", de: "DE", sl: "SL" };
+// Il nome del comando per i lettori di schermo, nella lingua della pagina
+// (fino al 2026-10-01 era «Lingua» in tutte).
+const ARIA: Record<string, string> = { it: "Lingua", en: "Language", de: "Sprache", sl: "Jezik" };
 
 export default function PcLocaleSwitcher() {
   const locale = useLocale();
@@ -41,7 +44,7 @@ export default function PcLocaleSwitcher() {
       // nasconde l'header, così chi tocca l'una vede l'altra.
       className="pc-lang"
       aria-busy={isPending}
-      aria-label="Lingua"
+      aria-label={ARIA[locale] ?? ARIA.en}
     >
       {routing.locales.map((loc) => (
         <button

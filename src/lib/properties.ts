@@ -48,6 +48,11 @@ export const F = {
   // dell'immobile è lo stesso su entrambi i siti (è public_tsv_name).
   titleEn: "fldrTJMbSO4nNW32W", // public_tsv_name_EN_#
   titleDe: "fldXYXscxt7V8EueO", // public_tsv_name_DE_#
+  // Sloveno (2026-10-01). Il nome pubblico sloveno è condiviso col gemello TSV
+  // (campo creato l'11/09, lo riempie il cron traduzioni-sl del CRM). Una
+  // descrizione TSI slovena su Airtable NON esiste: in sloveno la scheda
+  // ripiega sull'inglese — vedi localizedDescription().
+  titleSl: "fldPIse8uguVRfJ1x", // public_tsv_name_SL_#
   inEvidenza: "fld3bgYTqcgnYLADd", // in_evidenza (checkbox → boolean)
   onlineDa: "fldk27y6rT8xUZ7XQ", // online_da (date ISO yyyy-mm-dd → string|null)
   tags: "fldVdulUcA3uTtx5v",
@@ -145,6 +150,7 @@ export type Property = {
   // Titolo pubblico tradotto; null quando la traduzione non c'è ancora.
   titleEn: string | null;
   titleDe: string | null;
+  titleSl: string | null;
   inEvidenza: boolean;
   onlineDa: string | null;
   contratto: "VENDITA" | "AFFITTO" | null;
@@ -174,6 +180,9 @@ export type Property = {
   // passa da localizedDescription(), che garantisce il ritorno all'italiano.
   descriptionEn: string | null;
   descriptionDe: string | null;
+  // Sloveno: arriva solo dalla vetrina del CRM (`descrizione_tsi_sl`, colonna
+  // ancora da creare al 2026-10-01). Da Airtable è sempre null.
+  descriptionSl: string | null;
   oneliner: string | null;
   tags: string[];
   photos: Photo[];
@@ -350,6 +359,7 @@ export function mapRecord(recordId: string, f: Fields): Property {
     title,
     titleEn: str(f[F.titleEn]),
     titleDe: str(f[F.titleDe]),
+    titleSl: str(f[F.titleSl]),
     inEvidenza: f[F.inEvidenza] === true,
     onlineDa: typeof f[F.onlineDa] === "string" ? (f[F.onlineDa] as string) : null,
     contratto,
@@ -372,6 +382,7 @@ export function mapRecord(recordId: string, f: Fields): Property {
     description: str(f[F.descrizioneTsi]) || str(f[F.descrizione]),
     descriptionEn: str(f[F.descrizioneTsiEn]),
     descriptionDe: str(f[F.descrizioneTsiDe]),
+    descriptionSl: null,
     oneliner: str(f[F.onelinerTsi]) || str(f[F.oneliner]),
     tags,
     photos,

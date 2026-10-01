@@ -11,7 +11,7 @@ import { brandMailShell, mailCta, mailText, type MailLang } from "@/lib/brandMai
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM = process.env.RESEND_FROM_ACCOUNT ?? process.env.RESEND_FROM ?? "";
 
-export type Lang = "it" | "en" | "de";
+export type Lang = "it" | "en" | "de" | "sl";
 
 export function acctMailConfigured(): boolean {
   return !!(RESEND_API_KEY && FROM);
@@ -57,6 +57,14 @@ const RESET_COPY: Record<Lang, { subject: string; hi: (n: string) => string; bod
     body: "wir haben eine Anfrage zum Zurücksetzen Ihres Passworts erhalten. Der Link ist 2 Stunden gültig.",
     cta: "Passwort zurücksetzen",
     ignore: "Falls Sie das nicht angefordert haben, ignorieren Sie diese E-Mail: Ihr Passwort bleibt gültig.",
+  },
+  // Stesso testo del gemello triestevillas-web (2026-09-11).
+  sl: {
+    subject: "Ponastavite svoje geslo",
+    hi: (n) => `Pozdravljeni${n ? ` ${esc(n)}` : ""},`,
+    body: "prejeli smo zahtevo za ponastavitev gesla vašega računa. Povezava velja 2 uri.",
+    cta: "Ponastavite geslo",
+    ignore: "Če spremembe niste zahtevali vi, to sporočilo prezrite: vaše trenutno geslo ostane veljavno.",
   },
 };
 

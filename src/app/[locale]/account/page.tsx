@@ -15,6 +15,7 @@ import { operatorEmail, AGENCY_PHONE, AGENCY_PHONE_HREF } from "@/lib/account/te
 import { getProperties, getPrivateProperties } from "@/lib/airtable";
 import { ZONE_ORDER, ZONE_OTHER, type Property } from "@/lib/properties";
 import { buildPropertyView, priceLabel } from "@/lib/propertyView";
+import { intlLocale } from "@/lib/format";
 import PropertyCard from "@/components/PropertyCard";
 import AuthPanel from "@/components/account/AuthPanel";
 import PrefsForm from "@/components/account/PrefsForm";
@@ -157,7 +158,7 @@ export default async function AccountPage({
   // riappare come nota, pronto da raffinare.
   if (!acc.criteriJsonRaw && acc.criteri) criteri.note = acc.criteri.slice(0, 600);
 
-  const dateFmt = new Intl.DateTimeFormat(locale === "de" ? "de-DE" : locale === "en" ? "en-GB" : "it-IT", {
+  const dateFmt = new Intl.DateTimeFormat(intlLocale(locale), {
     weekday: "long",
     day: "numeric",
     month: "long",

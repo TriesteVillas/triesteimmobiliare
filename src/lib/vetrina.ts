@@ -48,6 +48,10 @@ type RigaVetrina = {
   public_name: string | null;
   public_name_en: string | null;
   public_name_de: string | null;
+  // Sloveno (2026-10-01): public_name_sl la vetrina la espone dall'11/09;
+  // descrizione_tsi_sl NON esiste ancora al 01/10 — chiave opzionale, letta se
+  // c'è. Quando arriva, /sl smette da sola di ripiegare sull'inglese.
+  public_name_sl?: string | null;
   status: string | null;
   contratto: string | null;
   tipologia: string | null;
@@ -69,6 +73,7 @@ type RigaVetrina = {
   descrizione_tsi: string | null;
   descrizione_tsi_en: string | null;
   descrizione_tsi_de: string | null;
+  descrizione_tsi_sl?: string | null;
   oneliner: string | null;
   oneliner_tsi: string | null;
   online_da: string | null;
@@ -196,6 +201,7 @@ function mapRiga(r: RigaVetrina): Property {
     title,
     titleEn: str(r.public_name_en),
     titleDe: str(r.public_name_de),
+    titleSl: str(r.public_name_sl),
     inEvidenza: r.in_evidenza === true,
     onlineDa: giorno(r.online_da),
     contratto: str(r.contratto) as Property["contratto"],
@@ -218,6 +224,7 @@ function mapRiga(r: RigaVetrina): Property {
     description: str(r.descrizione_tsi) || str(r.descrizione),
     descriptionEn: str(r.descrizione_tsi_en),
     descriptionDe: str(r.descrizione_tsi_de),
+    descriptionSl: str(r.descrizione_tsi_sl),
     oneliner: str(r.oneliner_tsi) || str(r.oneliner),
     tags: Array.isArray(r.tags) ? r.tags : [],
     photos,

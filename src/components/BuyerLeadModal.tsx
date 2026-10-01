@@ -23,6 +23,15 @@ const ZONE_LABELS: Record<string, string> = {
   "SISTIANA-DUINO": "Sistiana-Duino", PORTOPICCOLO: "Portopiccolo",
   MUGGIA: "Muggia", ALTE: "Carso", FVG: "FVG",
 };
+// Sloveno (2026-10-01): i nomi che un lettore sloveno usa davvero (Barkovlje,
+// Grljan, Obalna cesta, Sesljan–Devin, Milje, Kras). Le altre lingue restano
+// sui nomi italiani, come prima. I valori inviati al CRM non cambiano.
+const ZONE_LABELS_SL: Record<string, string> = {
+  CENTRO: "Središče", SEMICENTRO: "Širše središče", BARCOLA: "Barkovlje",
+  MIRAMARE: "Miramar", GRIGNANO: "Grljan", COSTIERA: "Obalna cesta",
+  "SISTIANA-DUINO": "Sesljan–Devin", PORTOPICCOLO: "Portopiccolo",
+  MUGGIA: "Milje", ALTE: "Kras", FVG: "FJK",
+};
 // Canonical Airtable values; display labels come from i18n.
 const SCOPI = ["Abitazione principale", "Investimento / rendita", "Casa vacanze"] as const;
 const CONDIZIONI = [
@@ -203,7 +212,7 @@ export default function BuyerLeadModal({
               {ZONES.map((z) => (
                 <button key={z} type="button" onClick={() => toggleZone(z)}
                   aria-pressed={zone.includes(z)} className={chip(zone.includes(z))}>
-                  {ZONE_LABELS[z]}
+                  {(locale === "sl" ? ZONE_LABELS_SL : ZONE_LABELS)[z]}
                 </button>
               ))}
             </div>

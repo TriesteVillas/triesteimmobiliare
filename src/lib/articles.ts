@@ -21,7 +21,7 @@ const TOKEN = process.env.AIRTABLE_TOKEN;
 const REVALIDATE_SECONDS = 600;
 const ARTICLE_BRAND = "TSI";
 
-export type ArticleLocale = "it" | "en" | "de";
+export type ArticleLocale = "it" | "en" | "de" | "sl";
 
 export type Article = {
   id: string;
@@ -46,11 +46,16 @@ export type Article = {
 // Qui l'italiano è la lingua master (il lettore è a Trieste) ed è anche la
 // lingua della radice del sito. Una traduzione mancante ripiega it → en → quel
 // che c'è, così un articolo tradotto a metà non rende mai una pagina vuota.
+// Lo sloveno (2026-10-01) fa eccezione: i campi *_sl li riempie la passata
+// «traduci in sloveno» dell'editoriale del CRM, e finché manca a un lettore
+// sloveno serve l'inglese — la lingua internazionale — non l'italiano. Catena
+// sl → en → it → de, la stessa del gemello triestevillas-web.
 export function articleText(
   bag: Record<ArticleLocale, string>,
   locale: string,
 ): string {
   const l = (locale as ArticleLocale) in bag ? (locale as ArticleLocale) : "it";
+  if (l === "sl") return bag.sl || bag.en || bag.it || bag.de || "";
   return bag[l] || bag.it || bag.en || bag.de || "";
 }
 
@@ -78,18 +83,21 @@ function mapArticle(r: RawRecord): Article {
     ordine: typeof f["ordine"] === "number" ? f["ordine"] : 0,
     fonti: strOrNull(f["fonti"]),
     aggiornamenti: strOrNull(f["aggiornamenti_pubblici"]),
-    title: { it: str(f["titolo_it"]), en: str(f["titolo_en"]), de: str(f["titolo_de"]) },
-    abstract: { it: str(f["abstract_it"]), en: str(f["abstract_en"]), de: str(f["abstract_de"]) },
-    body: { it: str(f["corpo_it"]), en: str(f["corpo_en"]), de: str(f["corpo_de"]) },
+    title: { it: str(f["titolo_it"]), en: str(f["titolo_en"]), de: str(f["titolo_de"]), sl: str(f["titolo_sl"]) },
+    abstract: { it: str(f["abstract_it"]), en: str(f["abstract_en"]), de: str(f["abstract_de"]), sl: str(f["abstract_sl"]) },
+    body: { it: str(f["corpo_it"]), en: str(f["corpo_en"]), de: str(f["corpo_de"]), sl: str(f["corpo_sl"]) },
   };
 }
 
 const FIELD_NAMES = [
   "slug", "categoria", "paesi", "journey_stage", "cover_url", "autore",
   "pubblicato_il", "aggiornato_il", "verificato_il", "in_evidenza", "ordine",
-  "fonti", "aggiornamenti_pubblici", "titolo_it", "titolo_en", "titolo_de", "abstract_it", "abstract_en",
-  "abstract_de", "corpo_it", "corpo_en", "corpo_de",
+  "fonti", "aggiornamenti_pubblici", "titolo_it", "titolo_en", "titolo_de", "titolo_sl", "abstract_it", "abstract_en",
+  "abstract_de", "abstract_sl", "corpo_it", "corpo_en", "corpo_de", "corpo_sl",
 ];
+// I tre campi *_sl (titolo_sl fld90Or5GUMAtiAGw, abstract_sl fldaTNKldxO5b7xPG,
+// corpo_sl fldgrs4XJaOwT5gGz) esistono su WEB_ARTICLES dall'11/09/2026, creati
+// per triestevillas.com: la tabella è condivisa, quindi valgono anche qui.
 
 // stato e brand stanno nella formula; la data di pubblicazione si ri-controlla
 // in memoria (un articolo datato domani non deve passare da una pagina in cache).

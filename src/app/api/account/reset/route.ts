@@ -51,7 +51,7 @@ export async function POST(request: Request) {
     const token = randomToken();
     await setResetToken(acc.id, await sha256Hex(token), new Date(now + 2 * 3600_000).toISOString());
     if (acctMailConfigured()) {
-      const lang = (["it", "en", "de"].includes(acc.lingua) ? acc.lingua : "it") as Lang;
+      const lang = (["it", "en", "de", "sl"].includes(acc.lingua) ? acc.lingua : "it") as Lang;
       const m = resetEmail(lang, acc.nome.split(" ")[0] ?? "", token);
       await sendAcctMail(acc.email, m.subject, m.html);
     }

@@ -27,8 +27,10 @@ const ALLOW_INDEX = process.env.NEXT_PUBLIC_ALLOW_INDEX === "true";
 // html[data-reveal-armed]) so content stays visible when JS never runs.
 const REVEAL_ARM_SCRIPT = `if(!matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.setAttribute("data-reveal-armed","");`;
 
+// `latin-ext` dal 2026-10-01 (sloveno): senza, č š ž escono dal font di
+// sistema in mezzo a una parola in Poppins. Stessa scelta del gemello TSV.
 const poppins = Poppins({
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-poppins",
 });

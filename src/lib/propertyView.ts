@@ -34,11 +34,15 @@ export type PropertyView = {
 
 type Translate = (key: string, values?: Record<string, string | number>) => string;
 
-// Titolo pubblico nella lingua del visitatore: il nome EN/DE quando c'è, altrimenti
-// quello italiano. Mai una stringa vuota: `title` è sempre valorizzato (mapRecord).
+// Titolo pubblico nella lingua del visitatore: il nome EN/DE/SL quando c'è,
+// altrimenti quello italiano. Mai una stringa vuota: `title` è sempre
+// valorizzato (mapRecord). Per lo sloveno la catena è titleSl → titleEn →
+// title: a chi legge in sloveno serve l'inglese, la lingua internazionale,
+// prima dell'italiano (come sul gemello triestevillas-web).
 export function localizedTitle(p: Property, locale: string): string {
   if (locale === "de") return p.titleDe ?? p.title;
   if (locale === "en") return p.titleEn ?? p.title;
+  if (locale === "sl") return p.titleSl ?? p.titleEn ?? p.title;
   return p.title;
 }
 
@@ -46,6 +50,7 @@ export function localizedTitle(p: Property, locale: string): string {
 // finisce SEMPRE sull'italiano — meglio una scheda in italiano che una vuota:
 //   EN → descrizione_TSI_EN_# → descrizione_TSI_# → descrizione
 //   DE → descrizione_TSI_DE_# → descrizione_TSI_# → descrizione
+//   SL → descrizione_tsi_sl (vetrina) → descrizione_TSI_EN_# → descrizione_TSI_# → descrizione
 //   IT →                        descrizione_TSI_# → descrizione
 // (gli ultimi due gradini sono già risolti in `p.description` da mapRecord).
 export function localizedDescription(p: Property, locale: string): string | null {
@@ -57,10 +62,59 @@ export function localizedDescription(p: Property, locale: string): string | null
 // casi — la meta description, che con una traduzione assente preferisce
 // l'one-liner curato (italiano ma corto e scritto per la SERP) al primo pezzo
 // della descrizione italiana tagliato a metà. Vedi generateMetadata.
+//
+// Lo sloveno (2026-10-01) ripiega sull'INGLESE: è una traduzione vera, solo in
+// un'altra lingua, e per un lettore sloveno vale più dell'italiano. Per la meta
+// description è comunque meglio di un one-liner italiano.
 export function translatedDescription(p: Property, locale: string): string | null {
   if (locale === "de") return p.descriptionDe;
   if (locale === "en") return p.descriptionEn;
+  if (locale === "sl") return p.descriptionSl ?? p.descriptionEn;
   return null;
+}
+
+// Esonimi sloveni dei comuni (2026-10-01), applicati SOLO in resa sl e SOLO
+// alla riga località (card) e al luogo della scheda. Tabella copiata dal
+// gemello triestevillas-web (src/lib/listingI18n.ts, forme verificate nella
+// guida di stile dello sloveno): dove l'esonimo è ambiguo o poco noto in
+// Slovenia l'italiano resta tra parentesi, perché il compratore lo cerca su
+// Maps e lo ritrova nell'atto. Le vie NON si toccano mai.
+const SL_EXONYMS: Record<string, string> = {
+  Trieste: "Trst",
+  Muggia: "Milje",
+  Duino: "Devin",
+  Aurisina: "Nabrežina",
+  "Duino-Aurisina": "Devin-Nabrežina",
+  "Duino Aurisina": "Devin-Nabrežina",
+  Sistiana: "Sesljan",
+  Opicina: "Opčine",
+  "Villa Opicina": "Opčine",
+  Sgonico: "Zgonik",
+  Monrupino: "Repentabor",
+  "San Dorligo della Valle": "Dolina (San Dorligo della Valle)",
+  Gorizia: "Gorica",
+  Monfalcone: "Tržič (Monfalcone)",
+  Udine: "Videm (Udine)",
+  Grado: "Gradež",
+  Venezia: "Benetke",
+};
+export function localizePlaceName(name: string | null, locale: string): string | null {
+  if (!name || locale !== "sl") return name;
+  return SL_EXONYMS[name.trim()] ?? name;
+}
+
+// «N locali» nella lingua del visitatore. In sloveno il sostantivo si accorda
+// col numero — 1 soba, 2 sobi, 3–4 sobe, 5 sob — e «3 sobe» scritto per tutti
+// darebbe «2 sobe» e «5 sobe», sbagliati (2026-10-01). Le altre lingue restano
+// com'erano: numero + etichetta in minuscolo.
+const SOBE: Record<string, string> = { one: "soba", two: "sobi", few: "sobe", other: "sob" };
+export function roomsLabel(rooms: string, locale: string, label: string): string {
+  if (locale !== "sl") return `${rooms} ${label.toLowerCase()}`;
+  const intero = rooms.trim().match(/^(\d+)$/);
+  if (intero) return `${intero[1]} ${SOBE[new Intl.PluralRules("sl").select(Number(intero[1]))]}`;
+  const almeno = rooms.trim().match(/^(?:>\s*(\d+)|(\d+)\s*\+)$/);
+  if (almeno) return `${almeno[1] ?? almeno[2]}+ sob`;
+  return `${label}: ${rooms}`;
 }
 
 // Taglio per la meta description: mai a metà parola e con l'ellissi, perché
@@ -123,7 +177,7 @@ export function buildPropertyView(
   const meta = [
     p.tipologia,
     p.mq ? t("sqm", { value: p.mq }) : null,
-    p.rooms ? `${p.rooms} ${t("rooms").toLowerCase()}` : null,
+    p.rooms ? roomsLabel(p.rooms, locale, t("rooms")) : null,
   ]
     .filter(Boolean)
     .join(" · ");
@@ -156,7 +210,7 @@ export function buildPropertyView(
     title: localizedTitle(p, locale),
     gallery,
     zona: p.zona,
-    place: [zonaLabel, p.comune].filter(Boolean).join(" · "),
+    place: [zonaLabel, localizePlaceName(p.comune, locale)].filter(Boolean).join(" · "),
     priceLabel: priceLabel(p, locale, t),
     badge: contractBadge(p, t),
     clusterBadge: clusterBadge(p, t),

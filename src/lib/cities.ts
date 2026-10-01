@@ -18,7 +18,7 @@
 // L'ordine è deliberato: il browser mostra la datalist nell'ordine dell'array quando
 // il campo è vuoto, quindi Trieste e il suo intorno vengono per primi.
 
-export type CityLocale = "it" | "en" | "de";
+export type CityLocale = "it" | "en" | "de" | "sl";
 
 const IT: string[] = [
   "Trieste", "Muggia", "Duino-Aurisina", "Sistiana", "Monfalcone", "Grado", "Gorizia",
@@ -65,7 +65,25 @@ const DE: string[] = [
   "Istanbul", "Dubai", "Tel Aviv", "New York", "Miami", "Toronto", "Singapur", "Hongkong",
 ];
 
-const BY_LOCALE: Record<CityLocale, string[]> = { it: IT, en: EN, de: DE };
+// Sloveno (2026-10-01): gli esonimi che un lettore sloveno scrive davvero —
+// Trst, Milje, Devin-Nabrežina, Sesljan, Tržič, Gradež, Gorica, Videm, Dunaj,
+// Celovec, Beljak — e il nome locale dove l'esonimo non è in uso corrente.
+const SL: string[] = [
+  "Trst", "Milje", "Devin-Nabrežina", "Sesljan", "Tržič", "Gradež", "Gorica",
+  "Videm", "Lignano Sabbiadoro", "Pordenon",
+  "Benetke", "Padova", "Treviso", "Verona", "Vicenza", "Trento", "Bocen", "Bologna",
+  "Milano", "Rim", "Torino", "Genova", "Firence", "Neapelj", "Bari", "Palermo",
+  "Bergamo", "Brescia", "Parma", "Rimini",
+  "Ljubljana", "Koper", "Portorož", "Nova Gorica", "Zagreb", "Reka", "Pulj",
+  "Dunaj", "Gradec", "Celovec", "Beljak", "Salzburg", "Innsbruck",
+  "München", "Berlin", "Hamburg", "Frankfurt", "Stuttgart", "Köln", "Düsseldorf",
+  "Zürich", "Ženeva", "Lugano", "Basel",
+  "London", "Pariz", "Madrid", "Barcelona", "Amsterdam", "Bruselj", "Luxembourg",
+  "Praga", "Budimpešta", "Varšava", "Dublin", "Lizbona", "Atene", "Monako",
+  "Istanbul", "Dubaj", "Tel Aviv", "New York", "Miami", "Toronto", "Singapur", "Hongkong",
+];
+
+const BY_LOCALE: Record<CityLocale, string[]> = { it: IT, en: EN, de: DE, sl: SL };
 
 /** Suggerimenti nella lingua del visitatore. Locale sconosciuto → italiano. */
 export function citySuggestions(locale: string): string[] {

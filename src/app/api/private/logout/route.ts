@@ -6,7 +6,7 @@ import { PC_COOKIE } from "@/lib/private/session";
 // sempre a "/private": un utente DE o EN che si disconnetteva si ritrovava sulla
 // versione italiana. La lingua arriva dal link (?l=), non dal referer, perché il
 // referer può mancare.
-const LOCALES = new Set(["it", "en", "de"]);
+const LOCALES = new Set(["it", "en", "de", "sl"]);
 
 export async function GET(request: Request) {
   const jar = await cookies();

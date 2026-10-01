@@ -28,7 +28,10 @@ const STEPS = ["brief", "shortlist", "call", "close"] as const;
 // Abstract, anonymised teasers of a real inventory category — typology + zone
 // only, no price and no yield (those are shared privately, per the brief).
 // Typology labels are localized (invest.teaser.ghosts); zones are proper nouns.
-const GHOST_ZONES = ["Centro", "Semicentro", "Barcola"] as const;
+// Codici zona, non nomi: l'etichetta arriva dal namespace «zones» nella lingua
+// della pagina (fino al 2026-10-01 erano nomi italiani in tutte le lingue —
+// in sloveno sono Mestno središče, Širše središče, Barkovlje).
+const GHOST_ZONES = ["CENTRO", "SEMICENTRO", "BARCOLA"] as const;
 
 // I teaser reali arrivano con il codice zona di Airtable; qui serve la label
 // tradotta, con lo stesso fallback ALTRE usato dalla griglia /immobili.
@@ -156,7 +159,7 @@ export default async function InvestPage({
                 <path d="M8 11V8a4 4 0 0 1 8 0v3" />
               </svg>
               <p className="mt-4 font-semibold text-brand-dark">{t(`teaser.ghosts.${i}`)}</p>
-              <p className="text-sm text-neutral-500">{zone} · {t("teaser.alreadyLet")}</p>
+              <p className="text-sm text-neutral-500">{tZones(zone)} · {t("teaser.alreadyLet")}</p>
               <div className="mt-3 h-2 w-2/3 rounded-full bg-neutral-200" />
               <div className="mt-2 h-2 w-1/2 rounded-full bg-neutral-200" />
             </div>

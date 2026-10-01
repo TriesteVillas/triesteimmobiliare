@@ -30,6 +30,7 @@ import {
   clusterBadge,
   localizedDescription,
   localizedTitle,
+  localizePlaceName,
   metaClamp,
   priceLabel,
   soldBadge,
@@ -80,6 +81,7 @@ export async function generateMetadata({
   // il ripiego, ma è corto, scritto a mano e pensato per lo snippet, invece del
   // primo pezzo di una descrizione da 1000 caratteri tagliata a metà frase.
   //   en/de → descrizione tradotta → one-liner → descrizione italiana
+  //   sl    → descrizione slovena → inglese → one-liner → descrizione italiana
   //   it    →                        one-liner → descrizione italiana
   const title = localizedTitle(property, locale);
   const description =
@@ -165,12 +167,12 @@ export default async function PropertyPage({ params }: { params: Params }) {
   // "Prenota una visita" vive nel namespace lead (usato da VisitForm), non property.
   const tLead = await getTranslations("lead");
   const fsLabel =
-    ({ it: "Schermo intero", en: "Fullscreen", de: "Vollbild" } as Record<
+    ({ it: "Schermo intero", en: "Fullscreen", de: "Vollbild", sl: "Celozaslonski način" } as Record<
       string,
       string
     >)[locale] ?? "Fullscreen";
   const similar = similarProperties(property, all);
-  const place = [property.via, property.zona, property.comune]
+  const place = [property.via, property.zona, localizePlaceName(property.comune, locale)]
     .filter(Boolean)
     .join(", ");
   const hasLocation = property.lat != null && property.lng != null;

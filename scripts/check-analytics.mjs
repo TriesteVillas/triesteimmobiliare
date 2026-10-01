@@ -3,7 +3,7 @@
 // tag legge. Nato il 2026-09-18, dopo che tre siti del gruppo sono andati online
 // senza tag e le proprietà GA4 sono rimaste vuote per settimane senza che nessuno
 // se ne accorgesse. Non si spegne per «sbloccare» la build: si ripara il layout.
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 
 const errori = [];
 const analytics = readFileSync("src/components/Analytics.tsx", "utf8");
@@ -17,7 +17,14 @@ const banner = readFileSync("src/components/CookieBanner.tsx", "utf8");
 const chiave = banner.match(/CHIAVE_CONSENSO = "([a-z0-9_]+)"/)?.[1];
 if (!chiave) errori.push("CookieBanner.tsx: CHIAVE_CONSENSO mancante");
 else if (!analytics.includes(`'${chiave}'`)) errori.push(`Analytics.tsx non legge la chiave '${chiave}' del banner: un consenso dato non arriverebbe mai a GA`);
-for (const l of ["it", "en", "de"]) {
+// Le lingue si leggono da routing.ts, non si ricopiano: con lo sloveno
+// (2026-10-01) una lista a mano qui avrebbe lasciato passare un sl.json senza
+// il banner dei cookie.
+const routing = readFileSync("src/i18n/routing.ts", "utf8");
+const lingue = [...(routing.match(/locales:\s*\[([^\]]*)\]/)?.[1] ?? "").matchAll(/"([a-z]{2})"/g)].map((m) => m[1]);
+if (lingue.length < 4) errori.push(`routing.ts: lette ${lingue.length} lingue (${lingue.join(", ")}), attese almeno quattro`);
+for (const l of lingue) {
+  if (!existsSync(`messages/${l}.json`)) { errori.push(`messages/${l}.json: manca il dizionario di una lingua dichiarata in routing.ts`); continue; }
   const m = JSON.parse(readFileSync(`messages/${l}.json`, "utf8"));
   for (const k of ["testo", "accetta", "rifiuta", "privacy", "preferenze", "aria"]) if (!m.cookie?.[k]) errori.push(`messages/${l}.json: manca cookie.${k}`);
 }

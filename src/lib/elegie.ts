@@ -19,7 +19,8 @@ export const ELEGIE_BASE = "https://elegieduino.it";
 export type ElegieSito = "triestevillas.com" | "triesteimmobiliare.com";
 export type ElegieAnchor = "planimetrie" | "capitolato" | "contatti";
 
-const PATH: Record<string, string> = { it: "/", en: "/en/", de: "/en/" };
+// /sl/ come /de/ non esiste (404 verificato il 2026-10-01): lo sloveno va su /en/.
+const PATH: Record<string, string> = { it: "/", en: "/en/", de: "/en/", sl: "/en/" };
 const ANCHOR: Record<ElegieAnchor, [it: string, en: string]> = {
   planimetrie: ["planimetrie", "plans"],
   capitolato: ["capitolato", "spec"],

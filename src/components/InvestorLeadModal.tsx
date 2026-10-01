@@ -22,6 +22,15 @@ const ZONE_LABELS: Record<string, string> = {
   MIRAMARE: "Miramare", COSTIERA: "Costiera", "SISTIANA-DUINO": "Sistiana-Duino",
   MUGGIA: "Muggia", ALTE: "Carso", FVG: "FVG",
 };
+// Sloveno (2026-10-01): i nomi che un lettore sloveno usa davvero (Barkovlje,
+// Grljan, Obalna cesta, Sesljan–Devin, Milje, Kras). Le altre lingue restano
+// sui nomi italiani, come prima. I valori inviati al CRM non cambiano.
+const ZONE_LABELS_SL: Record<string, string> = {
+  CENTRO: "Središče", SEMICENTRO: "Širše središče", BARCOLA: "Barkovlje",
+  MIRAMARE: "Miramar", GRIGNANO: "Grljan", COSTIERA: "Obalna cesta",
+  "SISTIANA-DUINO": "Sesljan–Devin", PORTOPICCOLO: "Portopiccolo",
+  MUGGIA: "Milje", ALTE: "Kras", FVG: "FJK",
+};
 // Canonical Airtable values (must match the API's INVEST_* sets); labels via i18n
 // (roiOptions / horizonOptions / purposeOptions), aligned by index.
 const ROI = ["Conservativo (basta che tenga)", "≈ 4–5%", "≈ 5–7%", "Massimizzare"] as const;
@@ -207,7 +216,7 @@ export default function InvestorLeadModal({
               {ZONES.map((z) => (
                 <button key={z} type="button" onClick={() => toggleZone(z)}
                   aria-pressed={zone.includes(z)} className={chip(zone.includes(z))}>
-                  {ZONE_LABELS[z]}
+                  {(locale === "sl" ? ZONE_LABELS_SL : ZONE_LABELS)[z]}
                 </button>
               ))}
             </div>

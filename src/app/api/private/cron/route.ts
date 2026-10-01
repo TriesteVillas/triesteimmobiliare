@@ -47,7 +47,7 @@ function daysUntil(ms: number): number {
 }
 
 function fmtDate(ms: number, lang: string): string {
-  const loc = lang === "it" ? "it-IT" : lang === "de" ? "de-DE" : "en-GB";
+  const loc = lang === "it" ? "it-IT" : lang === "de" ? "de-DE" : lang === "sl" ? "sl-SI" : "en-GB";
   return new Date(ms).toLocaleDateString(loc, { day: "2-digit", month: "long", year: "numeric" });
 }
 
