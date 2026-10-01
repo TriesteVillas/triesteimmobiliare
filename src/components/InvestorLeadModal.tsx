@@ -89,7 +89,8 @@ export default function InvestorLeadModal({
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!emailRe.test(email) && telefono.trim().length < 6) {
+    // 6 CIFRE, non 6 caratteri: la regola di /api/lead e del CRM (01/10/2026).
+    if (!emailRe.test(email) && telefono.replace(/\D/g, "").length < 6) {
       setErrKey("errorContact");
       setState("error");
       return;

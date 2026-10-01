@@ -38,6 +38,10 @@ const isEmail = (v: unknown): v is string =>
   typeof v === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 const clean = (v: unknown, max = 2000): string =>
   typeof v === "string" ? v.trim().slice(0, max) : "";
+/** Un telefono vale se ha almeno 6 CIFRE — la regola del CRM che crea il lead
+ *  (tsv-pg web/lib/ingresso/moduli-siti.ts). Fino al 01/10 qui si contavano i
+ *  caratteri: «+39 12» passava il sito e veniva scartato dal CRM. */
+const telefonoOk = (t: string) => t.replace(/\D/g, "").length >= 6;
 
 /** "45.64951, 13.77681" from a geocoded pick, or "" — never a partial pair. */
 const geoPoint = (lat: unknown, lon: unknown): string =>
@@ -65,7 +69,8 @@ async function airtableCreate(fields: Record<string, unknown>) {
   // variabile, senza toccare il codice. La bussata alla porta resta SEMPRE
   // attiva, anche col flag spento: il fondo `ingresso` è append-only e non
   // perde niente nemmeno se il motore del v4 è fermo — cosa che questa
-  // scrittura, se Airtable non risponde, non garantisce.
+  // scrittura, se Airtable non risponde, non garantisce. Dal 01/10 la sua
+  // risposta conta: v. `senzaDeposito` qui sotto.
   if (process.env.LEAD_SU_AIRTABLE === "no") return null;
 
   // Il chiamante che ha già deciso la provenienza comanda: qui si riempie un vuoto.
@@ -80,6 +85,25 @@ async function airtableCreate(fields: Record<string, unknown>) {
   });
   if (!res.ok) throw new Error(`Airtable ${res.status}: ${await res.text()}`);
   return res.json();
+}
+
+/**
+ * DOVE STA LA RICHIESTA (01/10/2026). Con `LEAD_SU_AIRTABLE=no` — in produzione
+ * dal 25/08 — `airtableCreate` non scrive e il lead lo crea SOLO il CRM, dalla
+ * porta `ingresso`: se la porta non ha accettato (firma rifiutata, CRM giù,
+ * timeout) la richiesta non è da nessuna parte. Fino al 01/10 la rotta
+ * rispondeva `{ok:true}` lo stesso, e il cliente leggeva «vi ricontatteremo»
+ * per una richiesta che nessuno avrebbe mai visto. Ora risponde 502
+ * `save_failed` e il modulo mostra il suo messaggio d'errore.
+ *
+ * Con Airtable acceso la porta torna un'ombra: il deposito è Airtable, e
+ * l'errore lo dà il suo `catch`. Si chiama DOPO la validazione — chi ha
+ * sbagliato un campo deve leggere quello, non un guasto nostro.
+ */
+function senzaDeposito(posata: boolean, modulo: string): NextResponse | null {
+  if (posata || process.env.LEAD_SU_AIRTABLE !== "no") return null;
+  console.error(`[lead] ${modulo} NON salvata: la porta del CRM non ha accettato e LEAD_SU_AIRTABLE=no`);
+  return NextResponse.json({ ok: false, error: "save_failed" }, { status: 502 });
 }
 
 // L'invio resta best-effort — il lead su Airtable è la fonte di verità e una
@@ -219,7 +243,7 @@ const eur = (n: number) => `${n.toLocaleString("it-IT")} €`;
 
 // Buyer-profile intake from the site-wide popup (Parla con noi / Diteci
 // cosa cercate / House Tour Days). Same table, richer profile fields.
-async function handleBuyer(body: Record<string, unknown>) {
+async function handleBuyer(body: Record<string, unknown>, posata: boolean) {
   const nome = clean(body.nome, 120);
   const cognome = clean(body.cognome, 120);
   const email = clean(body.email, 160);
@@ -246,7 +270,7 @@ async function handleBuyer(body: Record<string, unknown>) {
     return NextResponse.json({ ok: false, error: "privacy_required" }, { status: 400 });
   }
   // Agile form: one reachable contact is enough.
-  if (!isEmail(email) && telefono.length < 6) {
+  if (!isEmail(email) && !telefonoOk(telefono)) {
     return NextResponse.json({ ok: false, error: "contact_info" }, { status: 400 });
   }
 
@@ -255,6 +279,9 @@ async function handleBuyer(body: Record<string, unknown>) {
       ? `${budgetMin ? eur(budgetMin) : "—"} – ${budgetMax ? eur(budgetMax) : "—"}`
       : "";
   const mqText = mqMin || mqMax ? `${mqMin ?? "—"} – ${mqMax ?? "—"} mq` : "";
+
+  const persa = senzaDeposito(posata, "buyer");
+  if (persa) return persa;
 
   try {
     await airtableCreate({
@@ -352,7 +379,7 @@ const INVEST_OBIETTIVI = new Set([
   "Messa a reddito", "Rivalutazione", "Diversificazione", "Uso + reddito",
 ]);
 
-async function handleValutazione(body: Record<string, unknown>) {
+async function handleValutazione(body: Record<string, unknown>, posata: boolean) {
   const nome = clean(body.nome, 120);
   const cognome = clean(body.cognome, 120);
   const email = clean(body.email, 160);
@@ -376,7 +403,7 @@ async function handleValutazione(body: Record<string, unknown>) {
   if (body.privacyOk !== true) {
     return NextResponse.json({ ok: false, error: "privacy_required" }, { status: 400 });
   }
-  if (!isEmail(email) && telefono.length < 6) {
+  if (!isEmail(email) && !telefonoOk(telefono)) {
     return NextResponse.json({ ok: false, error: "contact_info" }, { status: 400 });
   }
 
@@ -389,6 +416,9 @@ async function handleValutazione(body: Record<string, unknown>) {
     taglia && `Dimensioni: ${taglia}`,
     statoImmobile && `Stato: ${statoImmobile}`,
   ].filter(Boolean).join("\n");
+
+  const persa = senzaDeposito(posata, "valutazione");
+  if (persa) return persa;
 
   try {
     await airtableCreate({
@@ -462,7 +492,7 @@ async function handleValutazione(body: Record<string, unknown>) {
   return NextResponse.json({ ok: true });
 }
 
-async function handleInvestitore(body: Record<string, unknown>) {
+async function handleInvestitore(body: Record<string, unknown>, posata: boolean) {
   const nome = clean(body.nome, 120);
   const cognome = clean(body.cognome, 120);
   const email = clean(body.email, 160);
@@ -483,7 +513,7 @@ async function handleInvestitore(body: Record<string, unknown>) {
   if (body.privacyOk !== true) {
     return NextResponse.json({ ok: false, error: "privacy_required" }, { status: 400 });
   }
-  if (!isEmail(email) && telefono.length < 6) {
+  if (!isEmail(email) && !telefonoOk(telefono)) {
     return NextResponse.json({ ok: false, error: "contact_info" }, { status: 400 });
   }
 
@@ -497,6 +527,9 @@ async function handleInvestitore(body: Record<string, unknown>) {
     orizzonte && `orizzonte ${orizzonte}`,
     obiettivo && `obiettivo ${obiettivo}`,
   ].filter(Boolean).join(" · ");
+
+  const persa = senzaDeposito(posata, "investitore");
+  if (persa) return persa;
 
   try {
     await airtableCreate({
@@ -577,11 +610,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
   }
 
-  // Fase ombra v1↔v4 (12/08): la submission si POSA nel fondo `ingresso` del
-  // CRM nuovo PRIMA della validazione — accanto ad Airtable, non al suo posto,
-  // così «nessuno ha compilato» e «la porta è rotta» smettono di sembrare
-  // uguali. Spenta senza INGRESSO_HMAC; mai bloccante (src/lib/ingressoPorta.ts).
-  await bussaIngresso(
+  // La submission si POSA nel fondo `ingresso` del CRM PRIMA della validazione
+  // («prima si posa, poi si capisce»): una richiesta che questa rotta rifiuta
+  // ci arriva lo stesso, e il CRM la scarta con la stessa regola. Nata il 12/08
+  // come ombra accanto ad Airtable; con `LEAD_SU_AIRTABLE=no` è l'unico
+  // deposito, e dal 01/10 la risposta si tiene e passa ai gestori, che con la
+  // porta che dice di no rispondono 502 (`senzaDeposito` qui sopra;
+  // la porta è src/lib/ingressoPorta.ts).
+  const posata = await bussaIngresso(
     String(body.tipo ?? "info"),
     { nome: body.nome, cognome: body.cognome, email: body.email, telefono: body.telefono },
     body,
@@ -606,9 +642,9 @@ export async function POST(request: Request) {
     console.error("[lead] account event failed:", e);
   }
 
-  if (body.tipo === "buyer") return handleBuyer(body);
-  if (body.tipo === "valutazione") return handleValutazione(body);
-  if (body.tipo === "investitore") return handleInvestitore(body);
+  if (body.tipo === "buyer") return handleBuyer(body, posata);
+  if (body.tipo === "valutazione") return handleValutazione(body, posata);
+  if (body.tipo === "investitore") return handleInvestitore(body, posata);
 
   const tipo =
     body.tipo === "amico"
@@ -653,6 +689,10 @@ export async function POST(request: Request) {
   // client in cache, e chi incolla "Mario Rossi" nel primo campo, passano di qui.
   const spNome = cognome ? null : splitNomeCerta(nome);
   const nomeCompleto = [nome, cognome].filter(Boolean).join(" ");
+  // Vale anche per «Invia a un amico»: il CRM ne esegue la riga come per gli
+  // altri moduli, e con la porta che dice di no la richiesta non esiste.
+  const persa = senzaDeposito(posata, String(body.tipo ?? "info"));
+  if (persa) return persa;
   try {
     await airtableCreate({
       nome_completo: nomeCompleto,
