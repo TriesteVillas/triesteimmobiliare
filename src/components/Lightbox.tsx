@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { photoSrc, photoSrcSet } from "@/lib/photoSrc";
 import { useSwipe } from "@/lib/useSwipe";
 import PhotoImg from "./PhotoImg";
@@ -125,12 +126,19 @@ export default function Lightbox({
     }
   }, [i, grid, photos]);
 
+  // Il lightbox va montato su <body>: dentro la scheda finiva nel contesto di
+  // impilamento del pannello `relative z-10`, e l'header fisso (z-50, alla
+  // radice) gli passava SOPRA — copriva il contatore, i bottoni in alto sul
+  // telefono e, con la foto alta o il telefono in orizzontale, l'etichetta AI
+  // in alto a destra della foto (review del 01/10). Si monta solo dopo un
+  // click, quindi `document` c'è sempre. E sta a z-[60], sopra lo z-50
+  // dell'header anche se un giorno qualcosa venisse montato dopo di lui.
   if (grid) {
-    return (
+    return createPortal(
       <div
         ref={panelRef}
         tabIndex={-1}
-        className="lightbox-enter fixed inset-0 z-50 overflow-y-auto bg-black/95 outline-none backdrop-blur-sm"
+        className="lightbox-enter fixed inset-0 z-[60] overflow-y-auto bg-black/95 outline-none backdrop-blur-sm"
         role="dialog"
         aria-modal="true"
       >
@@ -179,15 +187,22 @@ export default function Lightbox({
             </button>
           ))}
         </div>
-      </div>
+      </div>,
+      document.body,
     );
   }
 
-  return (
+  return createPortal(
     <div
       ref={panelRef}
       tabIndex={-1}
-      className="lightbox-enter fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 outline-none backdrop-blur-sm"
+      // Con la trasparenza la fascia in alto (4rem) è dei comandi: griglia,
+      // contatore, chiudi. La foto parte sotto, così il contatore non le cade
+      // mai sopra — sul telefono in orizzontale finiva sull'etichetta AI.
+      // Senza dati resta il p-4 di prima.
+      className={`lightbox-enter fixed inset-0 z-[60] flex items-center justify-center bg-black/90 outline-none backdrop-blur-sm ${
+        conTrasparenza ? "px-4 pb-4 pt-16" : "p-4"
+      }`}
       // Uno swipe che finisce sullo sfondo non deve chiudere la galleria.
       onClick={() => {
         if (swipe.eraUnTrascinamento()) return;
@@ -284,9 +299,10 @@ export default function Lightbox({
           />
         </div>
       )}
-      {/* Con la trasparenza il contatore sale in alto, fra griglia e chiudi:
-          in basso, con una didascalia lunga su un telefono basso, finiva sopra
-          il bottone «Vedi l'originale». Senza dati resta dov'era. */}
+      {/* Con la trasparenza il contatore sale in alto, fra griglia e chiudi,
+          nella fascia dei comandi (pt-16 sopra): in basso, con una didascalia
+          lunga su un telefono basso, finiva sopra il bottone «Vedi
+          l'originale». Senza dati resta dov'era. */}
       <p
         className={`absolute text-sm text-white/70 ${
           conTrasparenza ? "left-1/2 top-7 -translate-x-1/2 tabular-nums" : "bottom-4"
@@ -294,30 +310,40 @@ export default function Lightbox({
       >
         {i + 1} / {photos.length}
       </p>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
 // Il riquadro della foto nella vista con la trasparenza: largo quanto basta
 // perché la foto stia intera nello schermo (92vw, al massimo 72rem, e in
-// altezza lo schermo meno lo spazio per didascalia, bottone e contatore),
+// altezza lo schermo meno lo spazio per comandi, didascalia e bottone),
 // con le proporzioni VERE dell'immagine. Così il riquadro coincide con la
 // foto e l'etichetta cade sul suo angolo, qualunque risoluzione arrivi.
 // Senza misure note si ripiega sulla misura naturale dell'<img>.
-const SPAZIO_SOTTO = "12rem";
-function riquadro(w: number | null | undefined, h: number | null | undefined): React.CSSProperties | undefined {
-  if (!w || !h) return undefined;
+//
+// Con un PAVIMENTO, come sul gemello TriesteAffitti (30f89ca). Sugli schermi
+// bassi 100svh − 12rem lascia alla foto ~200 px (telefono in orizzontale,
+// 844×390: una foto verticale larga 148 px) e la didascalia usciva dallo
+// schermo in basso, senza modo di leggerla — Battera in 11 foto su 20
+// (review del 01/10). Ora la foto tiene almeno min(55svh, 100svh − 8rem) e
+// la didascalia scorre sotto, DENTRO la figura (max-h-full overflow-y-auto).
+// Il pavimento supera la formula solo sotto i ~427 px d'altezza: dal portatile
+// in su, e col telefono in verticale, la foto ha la misura di prima.
+const ALTEZZA_FOTO = "max(100svh - 12rem, min(55svh, 100svh - 8rem))";
+function riquadro(w: number | null | undefined, h: number | null | undefined): React.CSSProperties {
+  if (!w || !h) return { maxHeight: ALTEZZA_FOTO };
   const r = (w / h).toFixed(5);
   return {
     aspectRatio: `${w} / ${h}`,
-    width: `min(92vw, 72rem, calc((100svh - ${SPAZIO_SOTTO}) * ${r}))`,
+    width: `min(92vw, 72rem, calc(${ALTEZZA_FOTO} * ${r}))`,
     height: "auto",
   };
 }
 function classeRiquadro(w: number | null | undefined, h: number | null | undefined): string {
   return w && h
     ? "block object-contain"
-    : "block h-auto w-auto max-h-[calc(100svh-12rem)] max-w-[92vw] object-contain lg:max-w-6xl";
+    : "block h-auto w-auto max-w-[92vw] object-contain lg:max-w-6xl";
 }
 
 // ── La vista singola con la trasparenza AI ─────────────────────────────────
@@ -355,12 +381,22 @@ function FotoConTrasparenza({
   onFermaClick: (e: React.MouseEvent) => void;
 }) {
   const ai = photo.ai;
+  // La figura scorre (didascalia lunga, schermo basso): passando alla foto
+  // dopo si riparte dall'alto, o la nuova foto resterebbe mezza fuori.
+  const figRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    figRef.current?.scrollTo(0, 0);
+  }, [indice]);
   const etichetta = vediOriginale ? tx.originale : (ai?.etichetta ?? "");
   const aria = vediOriginale ? `${tx.originale} — ${tx.didascaliaOriginale}` : (ai?.aria ?? "");
   const didascalia = ai?.didascalia ?? null;
 
   return (
-    <figure className="relative flex max-h-full max-w-full flex-col items-center" onClick={onFermaClick}>
+    <figure
+      ref={figRef}
+      className="relative flex max-h-full max-w-full flex-col items-center overflow-y-auto overscroll-contain"
+      onClick={onFermaClick}
+    >
       <div key={indice} className="lightbox-photo relative">
         {/* La pubblicata resta SEMPRE nel flusso (invisibile quando si guarda
             l'originale): è lei a dare la misura al riquadro, così passando
@@ -412,10 +448,13 @@ function FotoConTrasparenza({
         )}
       </div>
       {(didascalia || orig) && (
-        // Larga quanto la foto (w-0 min-w-full: non allarga la figure, ne
-        // prende la misura), allineata a sinistra come una didascalia di
+        // Larga quanto la foto (w-0 + min-width 100%: non allarga la figure,
+        // ne prende la misura), allineata a sinistra come una didascalia di
         // museo; il bottone a destra dal tablet in su, sotto sul telefono.
-        <figcaption className="mt-3 flex w-0 min-w-full flex-col items-start gap-2 px-1 text-left sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+        // Mai sotto i 16rem, però: una foto verticale sul telefono in
+        // orizzontale è larga ~140 px, e la didascalia diventava una colonna
+        // di una parola per riga. Dove la foto è più larga non cambia niente.
+        <figcaption className="mt-3 flex w-0 min-w-[max(100%,16rem)] flex-col items-start gap-2 px-1 text-left sm:flex-row sm:items-start sm:justify-between sm:gap-6">
           {/* Le due didascalie nella stessa cella: l'altezza resta quella
               della più lunga, e lo scambio non sposta niente. */}
           <span className="grid text-sm leading-relaxed text-pretty text-white/85">

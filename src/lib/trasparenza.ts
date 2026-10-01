@@ -396,14 +396,12 @@ export function nellaLingua(t: Testi | null | undefined, locale: string): string
   return t[locale as Locale] ?? t.en ?? t.it ?? null;
 }
 
-/**
- * La pagina /ai («AI a carte scoperte», SPEC §6) su questo sito NON esiste
- * ancora: finché non c'è, il riepilogo non la linka (un link morto proprio nel
- * riquadro della trasparenza toglierebbe fiducia). Quando la pagina arriva —
- * e la SPEC §9.2 la tiene in anteprima finché il legale non la rilegge —
- * basta mettere `true` qui.
- */
-export const PAGINA_AI_PRONTA = false;
+// La pagina /ai («AI a carte scoperte», SPEC §6) su questo sito NON esiste
+// ancora: il riepilogo linka quella del gruppo su triestevillas.com, solo
+// nelle lingue in cui risponde 200 (lib/pagina-ai.ts, server-only: qui
+// dentro niente I/O). Quando arriverà la pagina di TriesteImmobiliare — la
+// SPEC §9.2 la tiene in anteprima finché il legale non la rilegge — il link
+// si sposta lì.
 
 // ═══════════════════════════════════════════════════════════════════════════
 // L'ABBINAMENTO — i dati del CRM sulle foto del sito.
@@ -744,11 +742,18 @@ export function notaPerRiepilogo(nota: string): { attacco: string; resto: string
 // Gli attacchi standard della nota (nuovi e vecchi). Un paragrafo che inizia
 // così è la nota scritta a mano nel testo: quando la nota arriva dal CRM, la
 // si mostra una volta sola, nel riepilogo.
-const ATTACCHI = [
+//
+// I nuovi nominano l'AI da soli. I vecchi («Nota sulle fotografie») no: sono
+// la nota AI solo se il testo che aprono parla di modifiche o di AI — «Nota
+// sulle fotografie: la vista dal terrazzo è reale.» è un'informazione vera
+// sull'immobile, e la toglieva (review del 01/10).
+const ATTACCHI_AI = [
   "Nota sull'uso dell'intelligenza artificiale",
   "Note on the use of artificial intelligence",
   "Hinweis zum Einsatz künstlicher Intelligenz",
   "Opomba o uporabi umetne inteligence",
+].map((s) => normAttacco(s));
+const ATTACCHI_FOTO = [
   "Nota sulle fotografie",
   "A note on the photographs",
   "Note on the images",
@@ -756,6 +761,7 @@ const ATTACCHI = [
   "Hinweis zu den Fotografien",
   "Opomba o fotografijah",
 ].map((s) => normAttacco(s));
+const ATTACCHI = [...ATTACCHI_AI, ...ATTACCHI_FOTO];
 
 function normAttacco(s: string): string {
   return s
@@ -764,10 +770,51 @@ function normAttacco(s: string): string {
     .toLowerCase();
 }
 
-const apreNota = (s: string) => {
+const apre = (s: string, attacchi: readonly string[]) => {
   const n = normAttacco(s.trim());
-  return ATTACCHI.some((a) => n.startsWith(a));
+  return attacchi.some((a) => n.startsWith(a));
 };
+
+// Il lessico della nota, nelle quattro lingue. Le sigle sono a parte e
+// sensibili alle maiuscole: «ai» minuscolo è una preposizione italiana.
+const SIGLE_AI = /(?<![\p{L}\p{N}])(?:AI|KI|UI)(?![\p{L}\p{N}])/u;
+const PAROLE_AI =
+  /intelligenza artificiale|artificial intelligence|künstliche\w* intelligenz|umetn\w* inteligenc|generativ|nano banana|higgsfield|ritocc|retouch|nachbearbeit/i;
+// Modifiche alla foto: valgono solo dove si sa già che si parla di foto (un
+// paragrafo aperto da «Nota sulle fotografie», o che nomina le foto).
+const MODIFICHE =
+  /elaborat|modificat|modified|edited|processed|bearbeit|veränder|urejen|obdelan|spremenjen|simula|rendering|ricostrui|reconstruct|rekonstru/i;
+const TOLTO = /\b(?:tolt|rimoss|removed|entfernt|odstranj)/i;
+const FOTO = /\b(?:foto|immagin|photo|image|picture|bild|aufnahme|slik|posnet)/i;
+const RICHIESTA = /su richiesta|on request|upon request|auf anfrage|na zahtevo/i;
+const VISITA = /visita resta|viewing remains|visit remains|besichtigung bleibt|ogled ostaja/i;
+
+const parlaDiAi = (s: string) => SIGLE_AI.test(s) || PAROLE_AI.test(s);
+
+/** Un testo aperto da un attacco è la nota AI? Sempre, se l'attacco è uno
+ *  dei nuovi; con un attacco vecchio, solo se il testo parla di AI o di
+ *  modifiche (la foto c'è già, nell'attacco). */
+function eNotaAi(s: string): boolean {
+  if (apre(s, ATTACCHI_AI)) return true;
+  return apre(s, ATTACCHI_FOTO) && (parlaDiAi(s) || MODIFICHE.test(s) || TOLTO.test(s));
+}
+
+/** Un paragrafo che, subito dopo la nota, ne è il seguito: il corpo in più
+ *  paragrafi («Sono stati tolti: …», «Gli originali sono disponibili su
+ *  richiesta.»). Prudente: un paragrafo che parla d'altro chiude la nota. */
+function seguitoNota(p: string): boolean {
+  if (apre(p, ATTACCHI)) return false; // un'altra nota: la decide il giro principale
+  return (
+    parlaDiAi(p) ||
+    TOLTO.test(p) ||
+    VISITA.test(p) ||
+    (FOTO.test(p) && (MODIFICHE.test(p) || RICHIESTA.test(p)))
+  );
+}
+
+// Titolo = corto e senza punteggiatura interna: «Nota sulle fotografie»,
+// «Nota sull'uso dell'intelligenza artificiale nelle fotografie.»
+const eTitolo = (p: string) => p.length <= 90 && /^[^.:;!?]*[.:]?$/.test(p);
 
 /**
  * Toglie dalla descrizione la nota scritta a mano. Tre forme:
@@ -777,29 +824,36 @@ const apreNota = (s: string) => {
  *    titolo E il paragrafo che lo segue, che è il corpo della nota;
  *  · la nota attaccata in coda a un paragrafo («… Classe energetica E. Nota
  *    sulle fotografie …»): il paragrafo si tronca lì.
+ * Dopo la nota, nelle prime due forme, se ne vanno anche i paragrafi che ne
+ * sono il seguito (`seguitoNota`): un corpo in due paragrafi lasciava orfano
+ * il secondo. Con un attacco vecchio, la nota è tale solo se parla di AI o di
+ * modifiche (`eNotaAi`): altrimenti è testo dell'annuncio, e resta.
  * Si chiama SOLO quando il riepilogo mostra la nota del CRM nella lingua
  * della descrizione: senza, quel testo è l'unica dichiarazione che il
  * visitatore legge nella sua lingua, e deve restare.
  */
 export function senzaNotaAi(testo: string | null): string | null {
   if (!testo) return testo;
-  const paragrafi = testo.split(/\n+/);
+  const paragrafi = testo
+    .split(/\n+/)
+    .map((par) => ({ par, p: par.trim() }))
+    .filter((x) => x.p);
   const tenuti: string[] = [];
   let toccato = false;
-  let saltaCorpo = false;
-  for (const par of paragrafi) {
-    const p = par.trim();
-    if (!p) continue;
-    if (saltaCorpo) {
-      saltaCorpo = false;
-      toccato = true;
-      continue;
-    }
-    if (apreNota(p)) {
-      toccato = true;
-      // Titolo = corto e senza punteggiatura interna: «Nota sulle fotografie»,
-      // «Nota sull'uso dell'intelligenza artificiale nelle fotografie.»
-      if (p.length <= 90 && /^[^.:;!?]*[.:]?$/.test(p)) saltaCorpo = true;
+  for (let i = 0; i < paragrafi.length; i++) {
+    const { par, p } = paragrafi[i];
+    if (apre(p, ATTACCHI)) {
+      // Un titolo si giudica col suo corpo: «Nota sulle fotografie» sopra
+      // «La vista dal terrazzo è reale.» non è la nota AI.
+      const corpo = eTitolo(p) ? paragrafi[i + 1]?.p : undefined;
+      const nota = corpo !== undefined ? eNotaAi(`${p} ${corpo}`) : eNotaAi(p);
+      if (nota) {
+        toccato = true;
+        if (corpo !== undefined) i++;
+        while (i + 1 < paragrafi.length && seguitoNota(paragrafi[i + 1].p)) i++;
+        continue;
+      }
+      tenuti.push(par);
       continue;
     }
     const coda = codaNota(p);
@@ -815,11 +869,11 @@ export function senzaNotaAi(testo: string | null): string | null {
   return out || null;
 }
 
-/** La parte del paragrafo PRIMA di una nota attaccata in coda, o null. */
+/** La parte del paragrafo PRIMA di una nota AI attaccata in coda, o null. */
 function codaNota(p: string): string | null {
   for (const m of p.matchAll(/[.!?]\s+/g)) {
     const dopo = p.slice(m.index + m[0].length);
-    if (apreNota(dopo)) return p.slice(0, m.index + 1).trim();
+    if (apre(dopo, ATTACCHI) && eNotaAi(dopo)) return p.slice(0, m.index + 1).trim();
   }
   return null;
 }

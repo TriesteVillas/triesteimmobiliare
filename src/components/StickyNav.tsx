@@ -72,11 +72,21 @@ export default function StickyNav({
           <p className="truncate text-sm font-semibold text-neutral-800">{title}</p>
           <p className="truncate text-xs text-neutral-400">{reference}</p>
         </div>
+        {/* ⚠️ Ogni classe deve stare INTERA dentro una stringa: con la classe
+            del tablet incollata a un `${…}`, Tailwind non la riconosceva e non
+            la generava — dal tablet in su la barra si prendeva metà riga (488 px
+            a 1440) e «AI in the photos» / «KI in den Fotos» restavano tagliate
+            e sfumate (review del 01/10), su tutte le schede.
+            md:flex-initial e non flex-none: larga quanto le voci, ma se un
+            giorno non bastasse la riga si stringe e scorre, invece di uscire
+            dalla barra. */}
         <nav
           ref={navRef}
-          className={`flex flex-1 gap-1 overflow-x-auto md:flex-none${
-            trabocca ? " [mask-image:linear-gradient(to_right,black_88%,transparent)]" : ""
-          }`}
+          className={
+            trabocca
+              ? "flex flex-1 gap-1 overflow-x-auto md:flex-initial [mask-image:linear-gradient(to_right,black_88%,transparent)]"
+              : "flex flex-1 gap-1 overflow-x-auto md:flex-initial"
+          }
         >
           {items.map((i) => (
             <a

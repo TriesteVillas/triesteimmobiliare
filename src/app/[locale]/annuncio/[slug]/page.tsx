@@ -47,13 +47,13 @@ import BuyerConcierge from "@/components/compra/BuyerConcierge";
 import ElegieDuinoInvito, { ElegieChip, ElegiePlansHint } from "@/components/ElegieDuinoInvito";
 import { isElegieProgetto } from "@/lib/elegie";
 import EtichettaAi from "@/components/EtichettaAi";
+import { linkPaginaAi } from "@/lib/pagina-ai";
 import {
   fotoAi,
   fotoPerAnteprima,
   localizzaFoto,
   nellaLingua,
   notaPerRiepilogo,
-  PAGINA_AI_PRONTA,
   senzaNotaAi,
   testiTrasparenza,
 } from "@/lib/trasparenza";
@@ -202,6 +202,10 @@ export default async function PropertyPage({ params }: { params: Params }) {
   const notaRiepilogo = notaAi ? notaPerRiepilogo(notaAi) : null;
   const mostraFotoAi =
     trasp != null && (notaAi != null || trasp.conteggi.ai > 0 || trasp.conteggi.ricontrollo > 0);
+  // La pagina «Come usiamo l'AI» del gruppo (triestevillas.com), solo nelle
+  // lingue in cui risponde 200 — vedi lib/pagina-ai.ts. Si prova solo dove il
+  // riepilogo c'è.
+  const linkAi = mostraFotoAi ? await linkPaginaAi(locale) : null;
   // SPEC §5.4: quando la nota arriva dal CRM, la nota scritta a mano dentro la
   // descrizione si toglie — la si legge una volta sola, nel riepilogo. Solo se
   // il CRM ce l'ha NELLA LINGUA DELLA PAGINA: se l'ha trattenuta (guardia dei
@@ -682,7 +686,10 @@ export default async function PropertyPage({ params }: { params: Params }) {
                       : []),
                   ] as const
                 ).map(([k, n]) => (
-                  <div key={k} className="flex flex-col-reverse rounded-xl border border-neutral-200 bg-white p-4">
+                  // justify-end: in colonna rovesciata spinge in ALTO, così i
+                  // numeri stanno alla stessa altezza anche quando l'etichetta
+                  // di una tessera va a capo e quella accanto no.
+                  <div key={k} className="flex flex-col-reverse justify-end rounded-xl border border-neutral-200 bg-white p-4">
                     <dt className="mt-1 text-xs leading-snug text-neutral-500">{tTrasp.tessere[k]}</dt>
                     <dd className="text-2xl font-semibold tabular-nums text-ink">{n}</dd>
                   </div>
@@ -720,13 +727,16 @@ export default async function PropertyPage({ params }: { params: Params }) {
                   )}
                 </div>
               )}
-              {PAGINA_AI_PRONTA && (
-                <Link
-                  href="/ai"
+              {linkAi && (
+                // Un altro sito del gruppo: si apre accanto, la scheda resta.
+                <a
+                  href={linkAi}
+                  target="_blank"
+                  rel="noopener"
                   className="mt-5 inline-block text-sm font-semibold text-brand underline-offset-4 hover:underline"
                 >
-                  {tTrasp.linkAi} →
-                </Link>
+                  {tTrasp.linkAi} ↗
+                </a>
               )}
               <p className="mt-5 font-semibold text-ink">{tTrasp.chiusura}</p>
             </section>
