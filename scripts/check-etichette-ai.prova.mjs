@@ -2,7 +2,8 @@
 //
 // Un cancello che non morde è peggio di nessuno: dà verde e fa credere che le
 // regole tengano. Qui lo si AGGIRA apposta, su una copia dei tre sorgenti che
-// guarda (la regola, la home, la scheda), una manomissione alla volta: ogni
+// guarda (la regola, la home, la scheda, la card, il video), una manomissione
+// alla volta: ogni
 // manomissione è un modo realistico di rompere la SPEC v1.3 §11 — rimettere
 // la pillola in home, etichettare di nuovo la sola luce, snellire TROPPO
 // togliendo l'etichetta alla sostanza, riaprire il dettaglio, rimettere le
@@ -19,6 +20,9 @@ const FILE = {
   regola: "src/lib/trasparenza.ts",
   home: "src/app/[locale]/page.tsx",
   scheda: "src/app/[locale]/annuncio/[slug]/page.tsx",
+  vista: "src/lib/propertyView.ts",
+  galleria: "src/components/CardGallery.tsx",
+  video: "src/components/VideoSito.tsx",
 };
 const originali = Object.fromEntries(Object.entries(FILE).map(([k, f]) => [k, readFileSync(f, "utf8")]));
 
@@ -35,20 +39,33 @@ const MANOMISSIONI = [
   ["l'og:image torna a scartare la sola luce", "regola", "const etichettata = (ph: Photo) => !!ph.trasparenza && !eStile(ph.trasparenza.trattamento);", "const etichettata = (ph: Photo) => !!ph.trasparenza;"],
   ["un plurale sloveno sbagliato", "regola", "two: `Med njimi sta ${k} simulaciji.`,", "two: `Med njimi so ${k} simulacije.`,"],
   ["un segnaposto rimasto nella riga", "regola", "`${k} sono simulazioni.`", "`{K} sono simulazioni.`"],
-  ["il dettaglio aperto di default", "scheda", '<details className="mt-4 max-w-prose">', '<details open className="mt-4 max-w-prose">'],
+  ["il dettaglio aperto di default", "scheda", '<details className="mt-3 max-w-prose">', '<details open className="mt-3 max-w-prose">'],
   [
     "le tessere coi numeri grandi tornano",
     "scheda",
-    "                {rigaAi && <p>{rigaAi}</p>}",
-    '                {rigaAi && <p>{rigaAi}</p>}\n                <p className="text-2xl font-semibold">{trasp.conteggi.ai} / {trasp.conteggi.pubblicate}</p>',
+    "                {chiusuraAi}\n              </p>",
+    '                {chiusuraAi}\n              </p>\n              <p className="text-2xl font-semibold">{trasp.conteggi.ai} / {trasp.conteggi.pubblicate}</p>',
   ],
   [
     "la nota del CRM di nuovo in vista",
     "scheda",
-    "                {rigaAi && <p>{rigaAi}</p>}",
-    "                {rigaAi && <p>{rigaAi}</p>}\n                {notaDettaglio && <p>{notaDettaglio}</p>}",
+    "                {chiusuraAi}\n              </p>",
+    "                {chiusuraAi}\n              </p>\n              {notaDettaglio && <p>{notaDettaglio}</p>}",
   ],
-  ["il link a /ai fuori dal dettaglio", "scheda", "              <details className=\"mt-4 max-w-prose\">", "              {linkAi && <a href={linkAi}>ai</a>}\n              <details className=\"mt-4 max-w-prose\">"],
+  ["il link a /ai fuori dal dettaglio", "scheda", '              <details className="mt-3 max-w-prose">', '              {linkAi && <a href={linkAi}>ai</a>}\n              <details className="mt-3 max-w-prose">'],
+  ["la chiusura tolta dalla parte visibile", "scheda", "                {chiusuraAi}\n              </p>", "              </p>"],
+  // la riga deve dire il VERO di ogni gruppo (review del 02/10)
+  ["una generica torna «con le modifiche indicate»", "regola", "const s = c.pulizia + c.aggiunte;", "const s = c.pulizia + c.aggiunte + c.generiche;"],
+  ["i render contati fra le foto «su M»", "regola", "const m = Math.max(c.pubblicate - immagini, tutteLeFoto);", "const m = Math.max(c.pubblicate, tutteLeFoto);"],
+  ["la chiusura sparisce anche dove ci sono foto", "regola", "return soloImmagini(c) ? null : testiTrasparenza(locale).chiusura;", "return null;"],
+  ["il comando promette una nota che non c'è", "regola", "return conNota ? tx.dettaglioNota : tx.dettaglioBreve;", "return tx.dettaglioNota;"],
+  ["il video di staging torna «simulazione»", "regola", 'if (t === "ai_generato" || t === "ai_animato" || t === null) return "video";', 'if (t === "ai_generato") return "simulazione" as never;\n  if (t === "ai_animato" || t === null) return "video";'],
+  // la card della home: la regola e chi la chiama
+  ["il glifo torna nelle card della home", "regola", "  if (home) {\n    const s = segnoHome(d?.trattamento);", "  if (home && d?.trattamento === \"rendering\") {\n    const s = segnoHome(d?.trattamento);"],
+  ["propertyView salta etichettaCard", "vista", "return etichettaCard(ph.trasparenza, locale, home);", "void home;\n  const ai = fotoAi(ph.trasparenza, locale);\n  return ai?.glifo ? { ai: { glifo: ai.glifo, aria: ai.aria } } : {};"],
+  ["propertyView perde il `home` della card", "vista", "return etichettaCard(ph.trasparenza, locale, home);", "return etichettaCard(ph.trasparenza, locale, false);"],
+  ["CardGallery mostra il glifo dal segno", "galleria", "<EtichettaAi testo={photos[i].ai!.glifo}", "<EtichettaAi testo={photos[i].segno?.testo ?? photos[i].ai!.glifo}"],
+  ["la pillola nel video discreto della home", "video", "          {ai?.segno && (", "          <EtichettaVideo ai={ai} />\n          {ai?.segno && ("],
 ];
 
 const base = mkdtempSync(join(tmpdir(), "prova-etichette-ai-"));

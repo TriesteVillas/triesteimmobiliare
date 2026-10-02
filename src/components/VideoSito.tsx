@@ -16,7 +16,7 @@ import type { VideoAi } from "@/lib/trasparenza-video";
 //
 // `discreto` = un video della HOME (SPEC v1.3 §11.1, 02/10/2026): niente
 // pillola e niente didascalia sotto il riquadro, solo un testo piccolo in alto
-// a destra («video AI», «simulazione») quando il video è animato o generato
+// a destra («video AI») quando il video è animato o generato
 // con l'AI. La didascalia intera resta nell'aria-label e nel `title` del segno.
 // Fuori dalla home (vendi, investimenti, contatti) tutto come prima.
 export default async function VideoSito({

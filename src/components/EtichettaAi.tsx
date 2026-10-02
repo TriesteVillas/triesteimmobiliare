@@ -10,6 +10,9 @@
 // didascalia, non la sola sigla; `title` dà la stessa frase a chi passa col
 // mouse. Niente hook: si usa da componenti server e client.
 //
+// Piatta (v1.3, 02/10): niente ombra, anello o sfocatura — il contrasto lo dà
+// già il fondo `ink/85`, e il resto era peso visivo senza informazione.
+//
 // `passante`: i clic attraversano l'etichetta (pointer-events: none). Serve
 // sopra un player YouTube, dove l'angolo in alto a destra è dei suoi controlli:
 // l'etichetta si vede, ma non li blocca (niente `title` al passaggio, allora:
@@ -33,7 +36,7 @@ export default function EtichettaAi({
       role="img"
       aria-label={aria}
       title={passante ? undefined : aria}
-      className={`${passante ? "pointer-events-none" : "pointer-events-auto"} inline-flex select-none items-center whitespace-nowrap rounded-md bg-ink/85 font-semibold leading-none text-white shadow-md ring-1 ring-white/30 backdrop-blur-sm ${
+      className={`${passante ? "pointer-events-none" : "pointer-events-auto"} inline-flex select-none items-center whitespace-nowrap rounded-md bg-ink/85 font-semibold leading-none text-white ${
         forma === "estesa" ? "px-2 py-1.5 text-xs tracking-wide" : "px-1.5 py-1 text-[11px] tracking-wider"
       } ${className}`}
     >

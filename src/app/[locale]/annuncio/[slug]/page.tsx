@@ -56,8 +56,10 @@ import {
   fotoPerAnteprima,
   localizzaFoto,
   nellaLingua,
+  chiusuraRiepilogo,
+  comandoDettaglio,
   notaSenzaAttacco,
-  ORDINE_TIPI,
+  righeDettaglio,
   rigaRiepilogo,
   senzaNotaAi,
   testiTrasparenza,
@@ -215,6 +217,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
   const notaAi = trasp ? nellaLingua(trasp.nota, locale) : null;
   const notaDettaglio = notaAi ? notaSenzaAttacco(notaAi) : null;
   const rigaAi = trasp ? rigaRiepilogo(trasp.conteggi, locale) : null;
+  const chiusuraAi = trasp ? chiusuraRiepilogo(trasp.conteggi, locale) : null;
   const mostraFotoAi =
     trasp != null && (notaAi != null || trasp.conteggi.ai > 0 || trasp.conteggi.ricontrollo > 0);
   // La pagina «Come usiamo l'AI» del gruppo (triestevillas.com), solo nelle
@@ -345,7 +348,10 @@ export default async function PropertyPage({ params }: { params: Params }) {
     ytIds.length && { id: "video", label: t("galVideo") },
     property.matterportUrl && { id: "tour", label: t("galTour") },
     hasLocation && { id: "posizione", label: t("locationTitle") },
-    mostraFotoAi && { id: "foto-ai", label: tTrasp.nav },
+    // Niente voce «AI» qui (v1.3, review di misura del 02/10): restava
+    // accesa per tutto lo scorrimento, il segno AI più persistente della
+    // pagina. Il riepilogo resta in fondo al dossier, e la pillola della
+    // copertina, quando c'è, ci porta.
   ].filter((x): x is { id: string; label: string } => Boolean(x));
 
   // Dati strutturati della scheda. Le dotazioni seguono la stessa lettura che fa
@@ -704,13 +710,17 @@ export default async function PropertyPage({ params }: { params: Params }) {
           {mostraFotoAi && trasp && (
             <section id="foto-ai" className="mt-10 scroll-mt-32 border-t border-neutral-200 pt-8" data-reveal>
               <h2 className="text-lg font-semibold">{tTrasp.titolo}</h2>
-              <div className="mt-3 max-w-prose space-y-1.5 leading-relaxed text-neutral-700">
-                {rigaAi && <p>{rigaAi}</p>}
-                <p className="font-semibold text-ink">{tTrasp.chiusura}</p>
-              </div>
-              <details className="mt-4 max-w-prose">
+              {/* La riga e la chiusura nello stesso paragrafo, di peso normale:
+                  in grassetto «La visita resta…» era la riga più forte del
+                  blocco e suonava come una clausola (review del 02/10). */}
+              <p className="mt-3 max-w-prose leading-relaxed text-neutral-700">
+                {rigaAi}
+                {rigaAi && chiusuraAi && " "}
+                {chiusuraAi}
+              </p>
+              <details className="mt-3 max-w-prose">
                 <summary className="cursor-pointer text-sm font-semibold text-brand underline-offset-4 hover:underline">
-                  {tTrasp.dettaglio}
+                  {comandoDettaglio(trasp.conteggi, locale, notaDettaglio != null)}
                 </summary>
                 <div className="mt-3 space-y-5 leading-relaxed text-neutral-700">
                   {notaDettaglio && (
@@ -723,44 +733,19 @@ export default async function PropertyPage({ params }: { params: Params }) {
                   <div>
                     <h3 className="text-sm font-semibold text-neutral-800">{tTrasp.tipiTitolo}</h3>
                     <ul className="mt-2 space-y-1.5 text-sm">
-                      {(
-                        [
-                          ["pubblicate", trasp.conteggi.pubblicate] as const,
-                          ...ORDINE_TIPI.map((k) => [k, trasp.perTipo[k] ?? 0] as const),
-                          ["ricontrollo", trasp.conteggi.ricontrollo] as const,
-                          ["conOriginale", trasp.conteggi.conOriginale] as const,
-                          ["bloccoDifetti", trasp.conteggi.bloccoDifetti] as const,
-                        ] as const
-                      )
-                        .filter(([, n]) => n > 0)
-                        .map(([k, n]) => {
-                          // L'etichetta come si vede sulla foto, accanto al
-                          // numero: spiega le pillole che si incontrano nella
-                          // galleria. Lo stile (luce, tecnico) non ne ha.
-                          const pillola =
-                            k === "ricontrollo"
-                              ? tTrasp.etichetta.ai
-                              : k === "pubblicate" ||
-                                  k === "conOriginale" ||
-                                  k === "bloccoDifetti" ||
-                                  k === "ai_luce" ||
-                                  k === "tecnico"
-                                ? null
-                                : tTrasp.etichetta[k];
-                          return (
-                            <li key={k} className="flex items-baseline gap-2.5">
-                              <span className="w-7 shrink-0 text-right font-semibold tabular-nums text-ink">{n}</span>
-                              <span>
-                                {pillola && (
-                                  <span className="mr-2 inline-flex select-none items-center whitespace-nowrap rounded bg-ink/85 px-1.5 py-0.5 text-[11px] font-semibold leading-none tracking-wide text-white">
-                                    {pillola}
-                                  </span>
-                                )}
-                                {tTrasp.tipi[k]}
+                      {righeDettaglio(trasp, locale).map((r) => (
+                        <li key={r.chiave} className="flex items-baseline gap-2.5">
+                          <span className="w-7 shrink-0 text-right font-semibold tabular-nums text-ink">{r.n}</span>
+                          <span>
+                            {r.pillola && (
+                              <span className="mr-2 inline-flex select-none items-center whitespace-nowrap rounded bg-ink/85 px-1.5 py-0.5 text-[11px] font-semibold leading-none tracking-wide text-white">
+                                {r.pillola}
                               </span>
-                            </li>
-                          );
-                        })}
+                            )}
+                            {r.testo}
+                          </span>
+                        </li>
+                      ))}
                     </ul>
                   </div>
                   {linkAi && (

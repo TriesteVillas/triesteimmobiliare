@@ -99,15 +99,18 @@ export function segnoHome(t: Trattamento | null | undefined): SegnoHome | null {
 }
 
 /** Lo stesso per i video della home (registro dei video del CRM, §10.1):
- *  `ai_generato` — un video sintetico, l'arredo virtuale della mansarda — è
- *  una simulazione; `ai_animato` — una foto mossa dal modello — è «video AI».
- *  Un montaggio di foto o la sola voce sintetica in home non hanno segno (la
- *  SPEC §11.1 elenca solo i due trattamenti generativi); un trattamento che il
- *  sito non conosce (null) vale «video AI»: meglio un segno di troppo. */
-export type SegnoVideoHome = "simulazione" | "video";
+ *  `ai_generato` (un video sintetico, l'arredo virtuale della mansarda) e
+ *  `ai_animato` (una foto mossa dal modello) portano tutti e due «video AI».
+ *  Fino al 02/10 mattina lo staging diceva «simulazione»: a 10 px, su un
+ *  video, senza la parola «AI», non diceva da dove veniva — e la SPEC §11.1
+ *  abbina «video AI» ai video («simulazione» alle immagini), come fa già
+ *  FriuliVillas. Un montaggio di foto o la sola voce sintetica in home non
+ *  hanno segno (la SPEC elenca solo i due trattamenti generativi); un
+ *  trattamento che il sito non conosce (null) vale «video AI»: meglio un segno
+ *  di troppo. */
+export type SegnoVideoHome = "video";
 export function segnoVideoHome(t: string | null | undefined): SegnoVideoHome | null {
-  if (t === "ai_generato") return "simulazione";
-  if (t === "ai_animato" || t === null) return "video";
+  if (t === "ai_generato" || t === "ai_animato" || t === null) return "video";
   return null;
 }
 
@@ -184,12 +187,31 @@ export type TrasparenzaImmobile = {
     pubblicate: number;
     /** foto con una riga del CRM e un trattamento AI */
     ai: number;
-    /** di quelle, `ai_luce`: lo stile, senza etichetta sulla foto (v1.3) */
-    luce: number;
-    /** di quelle, `ai_aggiunte` + `ai_rendering`: cose che non esistono */
-    simulazioni: number;
-    /** foto senza riga con l'etichetta generica precauzionale */
+    /** foto SENZA riga del CRM con un'etichetta (dal nome del file o
+     *  precauzionale): decide, con `ai`, se il riepilogo compare */
     ricontrollo: number;
+    // ── i gruppi della riga del riepilogo (v1.3 §11.2, rivista il 02/10) ──
+    // Ogni foto etichettata sta in UN gruppo solo, e ogni gruppo dice il vero
+    // di sé: lo stile non è «modificata», una generica non è «con le modifiche
+    // indicate», un render non è una «foto ritoccata».
+    /** riga del CRM `ai_luce`: lo stile, senza etichetta sulla foto */
+    luce: number;
+    /** riga del CRM `ai_pulizia`: oggetti tolti, indicati sulla foto */
+    pulizia: number;
+    /** riga del CRM `ai_aggiunte`: simulazioni, indicate sulla foto */
+    aggiunte: number;
+    /** `ai` dal CRM o dal nome di un generatore: passata da un modello, cosa
+     *  è cambiato non lo sappiamo ancora (SPEC §11.4) */
+    generiche: number;
+    /** «AI» precauzionale: non sappiamo nemmeno se è passata da un modello */
+    precauzione: number;
+    /** riga del CRM `ai_rendering`: immagine generata per intero, non una foto */
+    aiRendering: number;
+    /** `rendering` dal CRM (render di progetto, senza AI) o dal nome del file
+     *  (render, come sia stato prodotto è in verifica): non una foto */
+    rendering: number;
+    /** di `rendering`, quelli riconosciuti dal solo nome del file */
+    renderingDalNome: number;
     bloccoDifetti: number;
     conOriginale: number;
   };
@@ -249,14 +271,18 @@ type TestiTrasparenza = {
   originale: string;
   didascaliaOriginale: string;
   titolo: string;
-  /** La voce nella barra di navigazione della scheda: corta (v1.3). */
-  nav: string;
   /** Il comando che apre il resto del riepilogo (v1.3 §11.2), chiuso di default. */
   dettaglio: string;
+  /** Lo stesso comando quando nell'annuncio non c'è nessuna FOTO passata da
+   *  un modello, solo immagini che non sono fotografie (i render): «come le
+   *  abbiamo ritoccate» lì sarebbe falso. È la stringa di prima della v1.3. */
+  dettaglioNota: string;
+  /** …e quando non c'è nemmeno la nota: il dettaglio ha solo i conteggi. */
+  dettaglioBreve: string;
   /** Dentro il dettaglio: il titoletto dei conteggi per tipo. */
   tipiTitolo: string;
   /** Una riga per tipo nel dettaglio: cosa vuol dire, accanto al numero. */
-  tipi: Record<Trattamento | "pubblicate" | "ricontrollo" | "conOriginale" | "bloccoDifetti", string>;
+  tipi: Record<RigaDettaglio["chiave"], string>;
   chiusura: string;
   linkAi: string;
   /** Il segno DISCRETO della home (v1.3 §11.1): testo piccolo, non la pillola. */
@@ -275,7 +301,7 @@ export const TESTI_TRASPARENZA = {
     },
     glifo: { ai: "AI", rendering: "Rendering" },
     ariaGenerica: "Foto modificata con AI, in ricontrollo",
-    didascaliaAi: "Foto passata da un modello generativo. La descrizione di cosa è cambiato è in preparazione.",
+    didascaliaAi: "Foto passata da un modello generativo.",
     didascaliaGenerica:
       "Etichetta precauzionale: stiamo ricontrollando quali foto di questo annuncio sono passate da un modello generativo, e nel dubbio l'etichetta resta.",
     ariaRenderNome: "Rendering, non una fotografia: in ricontrollo",
@@ -286,9 +312,10 @@ export const TESTI_TRASPARENZA = {
     originale: "Originale",
     didascaliaOriginale: "Foto originale, prima dell'intervento. Volti e dati personali sfocati.",
     titolo: "Come abbiamo usato l'AI in queste foto",
-    nav: "AI",
     dettaglio: "Leggi come le abbiamo ritoccate",
-    tipiTitolo: "Le foto, per tipo di intervento",
+    dettaglioNota: "Leggi la nota completa",
+    dettaglioBreve: "Dettagli",
+    tipiTitolo: "Le immagini, per tipo di intervento",
     tipi: {
       pubblicate: "in tutto, nell'annuncio",
       ai_luce: "solo luce e colori: senza etichetta sulla foto",
@@ -298,6 +325,7 @@ export const TESTI_TRASPARENZA = {
       ai_rendering: "immagini generate per intero con l'AI",
       ai: "passate da un modello generativo, dettagli in ricontrollo",
       rendering: "immagini di progetto, senza AI",
+      renderingDalNome: "rendering, non fotografie: come sono stati prodotti è in verifica",
       ricontrollo: "etichetta «AI» precauzionale, in attesa di verifica",
       conOriginale: "con l'originale a un clic",
       bloccoDifetti: "con i difetti lasciati visibili",
@@ -317,7 +345,7 @@ export const TESTI_TRASPARENZA = {
     },
     glifo: { ai: "AI", rendering: "Rendering" },
     ariaGenerica: "Photo edited with AI, under review",
-    didascaliaAi: "This photo was processed by a generative model. A description of what changed is being prepared.",
+    didascaliaAi: "This photo was processed by a generative model.",
     didascaliaGenerica:
       "Precautionary label: we are re-checking which photos in this listing went through a generative model, and until we are sure the label stays.",
     ariaRenderNome: "Rendering, not a photograph: under review",
@@ -328,9 +356,10 @@ export const TESTI_TRASPARENZA = {
     originale: "Original",
     didascaliaOriginale: "Original photo, before editing. Faces and personal data blurred.",
     titolo: "How we used AI in these photos",
-    nav: "AI",
     dettaglio: "How we edited them",
-    tipiTitolo: "The photos, by type of edit",
+    dettaglioNota: "Read the full note",
+    dettaglioBreve: "Details",
+    tipiTitolo: "The images, by type of edit",
     tipi: {
       pubblicate: "in total, in this listing",
       ai_luce: "light and colour only: no label on the photo",
@@ -340,6 +369,7 @@ export const TESTI_TRASPARENZA = {
       ai_rendering: "images generated entirely with AI",
       ai: "processed by a generative model, details being re-checked",
       rendering: "design visualisations, no AI",
+      renderingDalNome: "renderings, not photographs: how they were made is being checked",
       ricontrollo: "precautionary “AI” label, pending review",
       conOriginale: "original one click away",
       bloccoDifetti: "defects left visible",
@@ -359,7 +389,7 @@ export const TESTI_TRASPARENZA = {
     },
     glifo: { ai: "AI", rendering: "Rendering" },
     ariaGenerica: "Mit KI bearbeitetes Foto, wird erneut geprüft",
-    didascaliaAi: "Dieses Foto wurde von einem generativen Modell bearbeitet. Eine Beschreibung der Änderungen folgt.",
+    didascaliaAi: "Dieses Foto wurde von einem generativen Modell bearbeitet.",
     didascaliaGenerica:
       "Vorsorgliche Kennzeichnung: Wir prüfen gerade, welche Fotos dieses Inserats ein generatives Modell durchlaufen haben; bis dahin bleibt die Kennzeichnung.",
     ariaRenderNome: "Rendering, kein Foto: wird erneut geprüft",
@@ -370,9 +400,10 @@ export const TESTI_TRASPARENZA = {
     originale: "Original",
     didascaliaOriginale: "Originalfoto vor der Bearbeitung. Gesichter und persönliche Daten unkenntlich gemacht.",
     titolo: "Wie wir KI in diesen Fotos eingesetzt haben",
-    nav: "KI",
     dettaglio: "Wie wir sie bearbeitet haben",
-    tipiTitolo: "Die Fotos nach Art der Bearbeitung",
+    dettaglioNota: "Vollständigen Hinweis lesen",
+    dettaglioBreve: "Details",
+    tipiTitolo: "Die Bilder nach Art der Bearbeitung",
     tipi: {
       pubblicate: "insgesamt im Inserat",
       ai_luce: "nur Licht und Farben: ohne Kennzeichnung auf dem Foto",
@@ -382,6 +413,7 @@ export const TESTI_TRASPARENZA = {
       ai_rendering: "vollständig mit KI erzeugte Bilder",
       ai: "von einem generativen Modell bearbeitet, Details in Prüfung",
       rendering: "Projektvisualisierungen, ohne KI",
+      renderingDalNome: "Renderings, keine Fotos: Wie sie entstanden sind, wird geprüft",
       ricontrollo: "vorsorgliche Kennzeichnung „AI“, die Prüfung läuft",
       conOriginale: "Original mit einem Klick",
       bloccoDifetti: "Mängel sichtbar belassen",
@@ -401,7 +433,7 @@ export const TESTI_TRASPARENZA = {
     },
     glifo: { ai: "AI", rendering: "Vizualizacija" },
     ariaGenerica: "Fotografija, urejena z umetno inteligenco, v ponovnem pregledu",
-    didascaliaAi: "Fotografijo je obdelal generativni model. Opis sprememb je v pripravi.",
+    didascaliaAi: "Fotografijo je obdelal generativni model.",
     didascaliaGenerica:
       "Previdnostna oznaka: preverjamo, katere fotografije v tem oglasu je obdelal generativni model; do takrat oznaka ostane.",
     ariaRenderNome: "Vizualizacija, ne fotografija: v ponovnem pregledu",
@@ -412,9 +444,10 @@ export const TESTI_TRASPARENZA = {
     originale: "Izvirnik",
     didascaliaOriginale: "Izvirna fotografija pred posegom. Obrazi in osebni podatki so zabrisani.",
     titolo: "Kako smo pri teh fotografijah uporabili umetno inteligenco",
-    nav: "AI",
     dettaglio: "Kako smo jih uredili",
-    tipiTitolo: "Fotografije po vrsti posega",
+    dettaglioNota: "Preberite celotno opombo",
+    dettaglioBreve: "Podrobnosti",
+    tipiTitolo: "Slike po vrsti posega",
     // Število stoji ločeno pred opisom, zato se opis ne sklanja.
     tipi: {
       pubblicate: "skupaj v oglasu",
@@ -425,6 +458,7 @@ export const TESTI_TRASPARENZA = {
       ai_rendering: "slike, v celoti ustvarjene z umetno inteligenco",
       ai: "obdelal jih je generativni model, podrobnosti v ponovnem pregledu",
       rendering: "projektne vizualizacije, brez umetne inteligence",
+      renderingDalNome: "vizualizacije, ne fotografije: kako so nastale, še preverjamo",
       ricontrollo: "previdnostna oznaka »AI«, čaka na preverjanje",
       conOriginale: "izvirnik na en klik",
       bloccoDifetti: "pomanjkljivosti ostale vidne",
@@ -548,12 +582,6 @@ export function applicaTrasparenza(
   });
 }
 
-/** L'ordine dei tipi nel dettaglio del riepilogo: dallo stile alla sostanza,
- *  poi le etichette generiche e i render di progetto. */
-export const ORDINE_TIPI: readonly Trattamento[] = [
-  "ai_luce", "tecnico", "ai_pulizia", "ai_aggiunte", "ai_rendering", "ai", "rendering",
-];
-
 const dalNome = (ph: Photo): FotoTrasparenza | null => {
   const t = trattamentoDalNome(ph.filename);
   return t ? { trattamento: t, fonte: "nome", bloccoDifetti: false, didascalia: null, originale: null } : null;
@@ -665,10 +693,20 @@ function conTrasparenza(p: Property, t: TrasparenzaVetrina, base: string): Prope
     // contarle farebbe dire «3 foto su 3 modificate» a un annuncio che ne ha
     // una. Si dichiarano a parte («in ricontrollo»).
     ai: mostrate.filter((ph) => dalCrm(ph) && eAi(ph.trasparenza!.trattamento)).length,
-    luce: perTipo.ai_luce ?? 0,
-    simulazioni: (perTipo.ai_aggiunte ?? 0) + (perTipo.ai_rendering ?? 0),
     ricontrollo: mostrate.filter((ph) => ph.trasparenza && !dalCrm(ph) && ph.trasparenza.trattamento !== "tecnico")
       .length,
+    luce: perTipo.ai_luce ?? 0,
+    pulizia: perTipo.ai_pulizia ?? 0,
+    aggiunte: perTipo.ai_aggiunte ?? 0,
+    generiche: mostrate.filter(
+      (ph) => ph.trasparenza?.trattamento === "ai" && (ph.trasparenza.fonte === "crm" || ph.trasparenza.fonte === "nome"),
+    ).length,
+    precauzione: mostrate.filter((ph) => ph.trasparenza?.fonte === "precauzione").length,
+    aiRendering: perTipo.ai_rendering ?? 0,
+    rendering: mostrate.filter((ph) => ph.trasparenza?.trattamento === "rendering").length,
+    renderingDalNome: mostrate.filter(
+      (ph) => ph.trasparenza?.trattamento === "rendering" && ph.trasparenza.fonte !== "crm",
+    ).length,
     bloccoDifetti: mostrate.filter((ph) => dalCrm(ph) && ph.trasparenza!.bloccoDifetti).length,
     conOriginale: mostrate.filter((ph) => dalCrm(ph) && ph.trasparenza!.originale).length,
   };
@@ -747,6 +785,26 @@ export function fotoAi(d: FotoTrasparenza | null | undefined, locale: string): F
   };
 }
 
+/** Ciò che una foto porta in una CARD (home, /immobili, simili, preferiti):
+ *  fuori dalla home il glifo compatto, in HOME solo il segno discreto su ciò
+ *  che mostra cose che non esistono (SPEC v1.3 §11.1) — mai tutti e due. La
+ *  regola sta qui, nella parte pura, perché il cancello del prebuild la esegua
+ *  davvero (scripts/check-etichette-ai.mjs); propertyView.ts la chiama e basta. */
+export function etichettaCard(
+  d: FotoTrasparenza | null | undefined,
+  locale: string,
+  home: boolean,
+): { ai?: { glifo: string; aria: string }; segno?: { testo: string; aria: string } } {
+  const ai = fotoAi(d, locale);
+  if (home) {
+    const s = segnoHome(d?.trattamento);
+    if (!s) return {};
+    const testo = testiTrasparenza(locale).segno[s];
+    return { segno: { testo, aria: ai?.aria ? `${testo} — ${ai.aria}` : testo } };
+  }
+  return ai?.glifo ? { ai: { glifo: ai.glifo, aria: ai.aria } } : {};
+}
+
 /** La foto pronta per il browser: la vista localizzata al posto dei dati
  *  grezzi (le altre tre lingue non viaggiano). Senza dati: la foto com'è. */
 export function localizzaFoto(ph: Photo, locale: string): Photo {
@@ -789,32 +847,57 @@ export function notaSenzaAttacco(nota: string): string {
 // LA RIGA DEL RIEPILOGO (v1.3 §11.2) — calcolata dai conteggi, mai a mano
 // ═══════════════════════════════════════════════════════════════════════════
 //
-// Le forme della SPEC (it), con lo stesso schema nelle altre lingue:
-//   · solo luce: «Foto ritoccate con l'AI solo nella luce e nei colori: niente
-//     è stato aggiunto o tolto.» (con «N foto su M» davanti se non sono tutte);
-//   · misto: «N foto su M ritoccate con l'AI: L solo nella luce e nei colori,
-//     S con modifiche indicate sulla foto.»;
-//   · nessuna di sola luce: «N foto su M ritoccate con l'AI, con le modifiche
-//     indicate sulla foto.»;
-//   · poi «K sono simulazioni.», «I difetti sono lasciati visibili.», e — solo
-//     se ci sono — le etichette precauzionali.
-// La chiusura («La visita resta l'unico riferimento.») la stampa la pagina,
-// sempre. null = niente da dire (nessuna foto AI: c'è solo la nota).
-// I plurali sloveni passano da Intl.PluralRules (one/two/few/other): «Med
-// njimi je 1 simulacija / sta 2 simulaciji / so 3 simulacije / je 5 simulacij».
+// Ogni foto etichettata sta in UN gruppo, e ogni gruppo dice di sé solo ciò
+// che sappiamo (review del 02/10: la prima versione chiamava «foto ritoccate,
+// con le modifiche indicate sulla foto» anche le `ai` generiche — di cui non
+// sappiamo cosa è cambiato — e i render generati per intero, che non sono
+// fotografie: falso in 15 annunci TSI su 16).
+//   1. le foto CLASSIFICATE (luce, pulizia, aggiunte) — le forme della SPEC:
+//      · solo luce: «Foto ritoccate con l'AI solo nella luce e nei colori:
+//        niente è stato aggiunto o tolto.» («N foto su M» se non sono tutte);
+//      · misto: «N foto su M ritoccate con l'AI: L solo nella luce e nei
+//        colori, S con modifiche indicate sulla foto.» + «K sono simulazioni.»;
+//      · senza luce: «S foto su M ritoccate con l'AI, con le modifiche indicate
+//        sulla foto.» + «K sono simulazioni.»;
+//      · solo simulazioni: «K foto su M sono simulazioni create con l'AI,
+//        indicate sulla foto.»;
+//   2. le GENERICHE (`ai`, §11.4): «G foto su M sono passate da un modello
+//      generativo: cosa è cambiato, foto per foto, è in verifica.» — «Altre G…»
+//      dopo il gruppo 1;
+//   3. le IMMAGINI che non sono fotografie (render, con o senza AI): «Nessuna
+//      immagine è una fotografia: R immagini generate per intero con l'AI e P
+//      rendering di progetto.», o «…: non sono fotografie.» se ce ne sono altre;
+//   4. «I difetti sono lasciati visibili.» e l'«AI» precauzionale.
+// M conta le FOTO (le pubblicate meno i render). La chiusura («La visita resta
+// l'unico riferimento.») la stampa la pagina, sempre. null = niente da dire.
+// I plurali sloveni passano da Intl.PluralRules (one/two/few/other).
 
 type ConteggiRiga = Pick<
   TrasparenzaImmobile["conteggi"],
-  "pubblicate" | "ai" | "luce" | "simulazioni" | "ricontrollo" | "bloccoDifetti"
+  | "pubblicate"
+  | "luce"
+  | "pulizia"
+  | "aggiunte"
+  | "generiche"
+  | "precauzione"
+  | "aiRendering"
+  | "rendering"
+  | "bloccoDifetti"
 >;
 
 type Frasi = {
   soloLuce: (n: number, m: number) => string;
-  soloSostanza: (n: number, m: number) => string;
+  sostanza: (s: number, m: number) => string;
   misto: (n: number, m: number, l: number, s: number) => string;
   simulazioni: (k: number) => string;
+  soloSimulazioni: (k: number, m: number) => string;
+  generiche: (g: number, m: number) => string;
+  genericheAltre: (g: number) => string;
+  /** r = generate per intero con l'AI, p = render di progetto; `tutte` = non
+   *  c'è nessuna fotografia nell'annuncio. */
+  immagini: (r: number, p: number, tutte: boolean) => string;
   difetti: string;
-  ricontrollo: (r: number) => string;
+  precauzione: (r: number) => string;
 };
 
 const PLURALE_SL = new Intl.PluralRules("sl");
@@ -824,6 +907,7 @@ const sl = (n: number, forme: Record<"one" | "two" | "few" | "other", string>) =
 // plurale con tutto il resto (il duale ha le stesse forme del plurale).
 const fotografijGen = (m: number) => (PLURALE_SL.select(m) === "one" ? "fotografije" : "fotografij");
 const fotografijLoc = (m: number) => (PLURALE_SL.select(m) === "one" ? "fotografiji" : "fotografijah");
+const unite = (pezzi: (string | false)[], e: string) => pezzi.filter((x): x is string => !!x).join(e);
 
 const FRASI = {
   it: {
@@ -831,46 +915,120 @@ const FRASI = {
       n === m
         ? "Foto ritoccate con l'AI solo nella luce e nei colori: niente è stato aggiunto o tolto."
         : `${n} foto su ${m} ${n === 1 ? "ritoccata" : "ritoccate"} con l'AI solo nella luce e nei colori: niente è stato aggiunto o tolto.`,
-    soloSostanza: (n, m) =>
-      `${n} foto su ${m} ${n === 1 ? "ritoccata" : "ritoccate"} con l'AI, con le modifiche indicate sulla foto.`,
+    sostanza: (s, m) =>
+      `${s} foto su ${m} ${s === 1 ? "ritoccata" : "ritoccate"} con l'AI, con le modifiche indicate sulla foto.`,
     misto: (n, m, l, s) =>
       `${n} foto su ${m} ritoccate con l'AI: ${l} solo nella luce e nei colori, ${s} con modifiche indicate sulla foto.`,
     simulazioni: (k) => (k === 1 ? "1 è una simulazione." : `${k} sono simulazioni.`),
+    soloSimulazioni: (k, m) =>
+      k === 1
+        ? `1 foto su ${m} è una simulazione creata con l'AI, indicata sulla foto.`
+        : `${k} foto su ${m} sono simulazioni create con l'AI, indicate sulla foto.`,
+    generiche: (g, m) =>
+      g === m && m > 1
+        ? "Tutte le foto sono passate da un modello generativo: cosa è cambiato, foto per foto, è in verifica."
+        : g === 1
+          ? `1 foto su ${m} è passata da un modello generativo: cosa è cambiato è in verifica.`
+          : `${g} foto su ${m} sono passate da un modello generativo: cosa è cambiato, foto per foto, è in verifica.`,
+    genericheAltre: (g) =>
+      g === 1
+        ? "Un'altra è passata da un modello generativo: cosa è cambiato è in verifica."
+        : `Altre ${g} sono passate da un modello generativo: cosa è cambiato è in verifica.`,
+    immagini: (r, p, tutte) => {
+      const pezzi = unite(
+        [
+          r > 0 && (r === 1 ? "1 immagine generata per intero con l'AI" : `${r} immagini generate per intero con l'AI`),
+          p > 0 && `${p} rendering di progetto`,
+        ],
+        " e ",
+      );
+      return tutte
+        ? `Nessuna immagine è una fotografia: ${pezzi}.`
+        : `${pezzi}: ${r + p === 1 ? "non è una fotografia" : "non sono fotografie"}.`;
+    },
     difetti: "I difetti sono lasciati visibili.",
-    ricontrollo: (r) => `Su ${r} foto l'etichetta «AI» è precauzionale, in attesa di verifica.`,
+    precauzione: (r) => `Su ${r} foto l'etichetta «AI» è precauzionale, in attesa di verifica.`,
   },
   en: {
     soloLuce: (n, m) =>
       n === m
         ? "Photos edited with AI in light and colour only: nothing was added or removed."
-        : `${n} of ${m} photos edited with AI in light and colour only: nothing was added or removed.`,
-    soloSostanza: (n, m) => `${n} of ${m} ${m === 1 ? "photo" : "photos"} edited with AI, with the changes marked on the photo.`,
+        : `${n} of ${m} ${m === 1 ? "photo" : "photos"} edited with AI in light and colour only: nothing was added or removed.`,
+    sostanza: (s, m) =>
+      `${s} of ${m} ${m === 1 ? "photo" : "photos"} edited with AI, with the changes marked on the photo.`,
     misto: (n, m, l, s) =>
       `${n} of ${m} photos edited with AI: ${l} in light and colour only, ${s} with changes marked on the photo.`,
     simulazioni: (k) => (k === 1 ? "1 is a simulation." : `${k} are simulations.`),
+    soloSimulazioni: (k, m) =>
+      `${k} of ${m} ${m === 1 ? "photo" : "photos"} ${k === 1 ? "is a simulation" : "are simulations"} created with AI, marked on the photo.`,
+    generiche: (g, m) =>
+      g === m && m > 1
+        ? "All the photos have been through a generative model: what changed is being checked photo by photo."
+        : `${g} of ${m} ${m === 1 ? "photo" : "photos"} ${g === 1 ? "has" : "have"} been through a generative model: what changed is being checked${g > 1 ? " photo by photo" : ""}.`,
+    genericheAltre: (g) =>
+      g === 1
+        ? "One more has been through a generative model: what changed is being checked."
+        : `Another ${g} have been through a generative model: what changed is being checked.`,
+    immagini: (r, p, tutte) => {
+      const pezzi = unite(
+        [
+          r > 0 && (r === 1 ? "1 image generated entirely with AI" : `${r} images generated entirely with AI`),
+          p > 0 && (p === 1 ? "1 design rendering" : `${p} design renderings`),
+        ],
+        " and ",
+      );
+      return tutte
+        ? `None of the images is a photograph: ${pezzi}.`
+        : `${pezzi}: ${r + p === 1 ? "not a photograph" : "not photographs"}.`;
+    },
     difetti: "Defects have been left visible.",
-    ricontrollo: (r) => `On ${r} ${r === 1 ? "photo" : "photos"} the “AI” label is precautionary, pending review.`,
+    precauzione: (r) => `On ${r} ${r === 1 ? "photo" : "photos"} the “AI” label is precautionary, pending review.`,
   },
   de: {
     soloLuce: (n, m) =>
       n === m
         ? "Fotos mit KI nur bei Licht und Farben bearbeitet: Nichts wurde hinzugefügt oder entfernt."
-        : `${n} von ${m} Fotos mit KI nur bei Licht und Farben bearbeitet: Nichts wurde hinzugefügt oder entfernt.`,
-    soloSostanza: (n, m) =>
-      `${n} von ${m} ${m === 1 ? "Foto" : "Fotos"} mit KI bearbeitet, die Änderungen sind auf dem Foto gekennzeichnet.`,
+        : `${n} von ${m} ${m === 1 ? "Foto" : "Fotos"} mit KI nur bei Licht und Farben bearbeitet: Nichts wurde hinzugefügt oder entfernt.`,
+    sostanza: (s, m) =>
+      `${s} von ${m} ${m === 1 ? "Foto" : "Fotos"} mit KI bearbeitet, die Änderungen sind auf dem Foto gekennzeichnet.`,
     misto: (n, m, l, s) =>
       `${n} von ${m} Fotos mit KI bearbeitet: ${l} nur bei Licht und Farben, ${s} mit auf dem Foto gekennzeichneten Änderungen.`,
     simulazioni: (k) => (k === 1 ? "1 davon ist eine Simulation." : `${k} davon sind Simulationen.`),
+    soloSimulazioni: (k, m) =>
+      k === 1
+        ? `1 von ${m} ${m === 1 ? "Foto" : "Fotos"} ist eine mit KI erstellte Simulation, auf dem Foto gekennzeichnet.`
+        : `${k} von ${m} Fotos sind mit KI erstellte Simulationen, auf dem Foto gekennzeichnet.`,
+    generiche: (g, m) =>
+      g === m && m > 1
+        ? "Alle Fotos wurden von einem generativen Modell bearbeitet: Was sich geändert hat, wird Foto für Foto geprüft."
+        : `${g} von ${m} ${m === 1 ? "Foto" : "Fotos"} ${g === 1 ? "wurde" : "wurden"} von einem generativen Modell bearbeitet: Was sich geändert hat, wird${g > 1 ? " Foto für Foto" : ""} geprüft.`,
+    genericheAltre: (g) =>
+      g === 1
+        ? "Ein weiteres wurde von einem generativen Modell bearbeitet: Was sich geändert hat, wird geprüft."
+        : `Weitere ${g} wurden von einem generativen Modell bearbeitet: Was sich geändert hat, wird geprüft.`,
+    immagini: (r, p, tutte) => {
+      const pezzi = unite(
+        [
+          r > 0 && (r === 1 ? "1 vollständig mit KI erzeugtes Bild" : `${r} vollständig mit KI erzeugte Bilder`),
+          p > 0 && (p === 1 ? "1 Projektvisualisierung" : `${p} Projektvisualisierungen`),
+        ],
+        " und ",
+      );
+      return tutte
+        ? `Keines der Bilder ist ein Foto: ${pezzi}.`
+        : `${pezzi}: ${r + p === 1 ? "kein Foto" : "keine Fotos"}.`;
+    },
     difetti: "Mängel wurden sichtbar belassen.",
-    ricontrollo: (r) => `Bei ${r} ${r === 1 ? "Foto" : "Fotos"} ist die Kennzeichnung „AI“ vorsorglich, die Prüfung läuft.`,
+    precauzione: (r) => `Bei ${r} ${r === 1 ? "Foto" : "Fotos"} ist die Kennzeichnung „AI“ vorsorglich, die Prüfung läuft.`,
   },
+  // ⚠️ Lo sloveno di questo blocco va riletto da un madrelingua.
   sl: {
     soloLuce: (n, m) =>
       n === m
         ? "Pri fotografijah smo z umetno inteligenco popravili le svetlobo in barve: nič ni bilo dodano ali odstranjeno."
         : `Pri ${n} od ${m} ${fotografijGen(m)} smo z umetno inteligenco popravili le svetlobo in barve: nič ni bilo dodano ali odstranjeno.`,
-    soloSostanza: (n, m) =>
-      `Z umetno inteligenco smo uredili ${n} od ${m} ${fotografijGen(m)}, spremembe so označene na fotografiji.`,
+    sostanza: (s, m) =>
+      `Z umetno inteligenco smo uredili ${s} od ${m} ${fotografijGen(m)}, spremembe so označene na fotografiji.`,
     misto: (n, m, l, s) =>
       `Z umetno inteligenco smo uredili ${n} od ${m} ${fotografijGen(m)}: pri ${l} le svetlobo in barve, pri ${s} so spremembe označene na fotografiji.`,
     simulazioni: (k) =>
@@ -880,26 +1038,139 @@ const FRASI = {
         few: `Med njimi so ${k} simulacije.`,
         other: `Med njimi je ${k} simulacij.`,
       }),
+    soloSimulazioni: (k, m) =>
+      `${k === 1 ? "Simulacija, ustvarjena z umetno inteligenco in označena" : "Simulacije, ustvarjene z umetno inteligenco in označene"} na fotografiji: ${k} od ${m} ${fotografijGen(m)}.`,
+    generiche: (g, m) =>
+      g === m && m > 1
+        ? "Generativni model je obdelal vse fotografije: kaj se je spremenilo, preverjamo za vsako posebej."
+        : `Generativni model je obdelal ${g} od ${m} ${fotografijGen(m)}: kaj se je spremenilo, ${g > 1 ? "preverjamo za vsako posebej" : "še preverjamo"}.`,
+    genericheAltre: (g) =>
+      `Generativni model je obdelal še ${sl(g, {
+        one: `${g} fotografijo`,
+        two: `${g} fotografiji`,
+        few: `${g} fotografije`,
+        other: `${g} fotografij`,
+      })}: kaj se je spremenilo, še preverjamo.`,
+    immagini: (r, p, tutte) => {
+      const pezzi = unite(
+        [
+          r > 0 &&
+            sl(r, {
+              one: `${r} slika, v celoti ustvarjena z umetno inteligenco`,
+              two: `${r} sliki, v celoti ustvarjeni z umetno inteligenco`,
+              few: `${r} slike, v celoti ustvarjene z umetno inteligenco`,
+              other: `${r} slik, v celoti ustvarjenih z umetno inteligenco`,
+            }),
+          p > 0 &&
+            sl(p, {
+              one: `${p} projektna vizualizacija`,
+              two: `${p} projektni vizualizaciji`,
+              few: `${p} projektne vizualizacije`,
+              other: `${p} projektnih vizualizacij`,
+            }),
+        ],
+        ", in ",
+      );
+      return tutte
+        ? `Nobena slika v oglasu ni fotografija: ${pezzi}.`
+        : `${pezzi}: ${r + p === 1 ? "to ni fotografija" : "to niso fotografije"}.`;
+    },
     difetti: "Pomanjkljivosti so ostale vidne.",
-    ricontrollo: (r) => `Pri ${r} ${fotografijLoc(r)} je oznaka »AI« previdnostna, čaka na preverjanje.`,
+    precauzione: (r) => `Pri ${r} ${fotografijLoc(r)} je oznaka »AI« previdnostna, čaka na preverjanje.`,
   },
 } as const satisfies Record<Locale, Frasi>;
+
+/** Quante FOTO dell'annuncio sono passate (o forse passate) da un modello:
+ *  classificate, generiche, precauzionali. 0 = ci sono solo render. */
+const fotoDaModello = (c: ConteggiRiga) => c.luce + c.pulizia + c.aggiunte + c.generiche + c.precauzione;
+/** Nessuna immagine dell'annuncio è una fotografia: sono tutte render (un
+ *  edificio in costruzione, i cantieri di Duino). */
+const soloImmagini = (c: ConteggiRiga) =>
+  fotoDaModello(c) === 0 && c.aiRendering + c.rendering > 0 && c.aiRendering + c.rendering >= c.pubblicate;
 
 /** La riga visibile del riepilogo, nella lingua della pagina (v1.3 §11.2). */
 export function rigaRiepilogo(c: ConteggiRiga, locale: string): string | null {
   const f: Frasi = (FRASI as Record<string, Frasi>)[locale] ?? FRASI.it;
-  const n = c.ai;
-  const m = Math.max(c.pubblicate, n);
-  const l = Math.min(c.luce, n);
-  const s = n - l;
+  const immagini = c.aiRendering + c.rendering;
+  const tutteLeFoto = fotoDaModello(c);
+  // M = le FOTO dell'annuncio: un render non è una foto, e non si conta fra le
+  // foto «su M». Mai meno delle foto che si stanno dichiarando.
+  const m = Math.max(c.pubblicate - immagini, tutteLeFoto);
+  const s = c.pulizia + c.aggiunte;
+  const n = c.luce + s;
   const parti: string[] = [];
   if (n > 0) {
-    parti.push(s === 0 ? f.soloLuce(n, m) : l === 0 ? f.soloSostanza(n, m) : f.misto(n, m, l, s));
-    if (c.simulazioni > 0) parti.push(f.simulazioni(c.simulazioni));
-    if (c.bloccoDifetti > 0) parti.push(f.difetti);
+    if (s === 0) parti.push(f.soloLuce(n, m));
+    else if (c.luce === 0 && c.pulizia === 0) parti.push(f.soloSimulazioni(c.aggiunte, m));
+    else {
+      parti.push(c.luce === 0 ? f.sostanza(s, m) : f.misto(n, m, c.luce, s));
+      if (c.aggiunte > 0) parti.push(f.simulazioni(c.aggiunte));
+    }
   }
-  if (c.ricontrollo > 0) parti.push(f.ricontrollo(c.ricontrollo));
+  if (c.generiche > 0) parti.push(n > 0 ? f.genericheAltre(c.generiche) : f.generiche(c.generiche, m));
+  if (immagini > 0) parti.push(f.immagini(c.aiRendering, c.rendering, soloImmagini(c)));
+  if (n + c.generiche > 0 && c.bloccoDifetti > 0) parti.push(f.difetti);
+  if (c.precauzione > 0) parti.push(f.precauzione(c.precauzione));
   return parti.length ? parti.join(" ") : null;
+}
+
+/** Il comando che apre il dettaglio: «Leggi come le abbiamo ritoccate» se
+ *  almeno una FOTO è passata da un modello; altrimenti (solo render, solo
+ *  l'«AI» precauzionale) «ritoccate» sarebbe falso: «Leggi la nota completa»
+ *  se il CRM ha la nota, «Dettagli» se il dettaglio ha solo i conteggi. */
+export function comandoDettaglio(c: ConteggiRiga, locale: string, conNota: boolean): string {
+  const tx = testiTrasparenza(locale);
+  if (c.luce + c.pulizia + c.aggiunte + c.generiche > 0) return tx.dettaglio;
+  return conNota ? tx.dettaglioNota : tx.dettaglioBreve;
+}
+
+/** «La visita resta l'unico riferimento.» — sempre (SPEC §5.3, §11.2), tranne
+ *  quando nessuna immagine è una fotografia: un edificio in costruzione non si
+ *  visita, e lì la riga dice già «Nessuna immagine è una fotografia» (review
+ *  del 02/10). null = niente chiusura. */
+export function chiusuraRiepilogo(c: ConteggiRiga, locale: string): string | null {
+  return soloImmagini(c) ? null : testiTrasparenza(locale).chiusura;
+}
+
+/** Una riga dei conteggi per tipo, dentro il dettaglio (v1.3 §11.2). */
+export type RigaDettaglio = {
+  chiave:
+    | "pubblicate"
+    | Trattamento
+    | "renderingDalNome"
+    | "ricontrollo"
+    | "conOriginale"
+    | "bloccoDifetti";
+  n: number;
+  /** L'etichetta come la si vede sulla foto, accanto al numero: spiega le
+   *  pillole della galleria. null = quel tipo non ne porta (lo stile, i totali). */
+  pillola: string | null;
+  testo: string;
+};
+
+/** I conteggi per tipo, nella lingua della pagina: gli stessi gruppi della
+ *  riga, dallo stile alla sostanza, poi le immagini che non sono foto. Solo i
+ *  tipi presenti. */
+export function righeDettaglio(t: TrasparenzaImmobile, locale: string): RigaDettaglio[] {
+  const tx = testiTrasparenza(locale);
+  const c = t.conteggi;
+  const righe: [RigaDettaglio["chiave"], number, string | null][] = [
+    ["pubblicate", c.pubblicate, null],
+    ["ai_luce", c.luce, null],
+    ["tecnico", t.perTipo.tecnico ?? 0, null],
+    ["ai_pulizia", c.pulizia, tx.etichetta.ai_pulizia],
+    ["ai_aggiunte", c.aggiunte, tx.etichetta.ai_aggiunte],
+    ["ai", c.generiche, tx.etichetta.ai],
+    ["ricontrollo", c.precauzione, tx.etichetta.ai],
+    ["ai_rendering", c.aiRendering, tx.etichetta.ai_rendering],
+    ["rendering", c.rendering - c.renderingDalNome, tx.etichetta.rendering],
+    ["renderingDalNome", c.renderingDalNome, tx.etichetta.rendering],
+    ["conOriginale", c.conOriginale, null],
+    ["bloccoDifetti", c.bloccoDifetti, null],
+  ];
+  return righe
+    .filter(([, n]) => n > 0)
+    .map(([chiave, n, pillola]) => ({ chiave, n, pillola, testo: tx.tipi[chiave] }));
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

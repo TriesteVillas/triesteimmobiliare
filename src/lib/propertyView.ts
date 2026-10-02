@@ -1,7 +1,7 @@
 import { formatPrice } from "./format";
 import { photoSrc, photoSrcSet } from "./photoSrc";
 import type { Photo, Property } from "./properties";
-import { fotoAi, segnoHome, testiTrasparenza } from "./trasparenza";
+import { etichettaCard } from "./trasparenza";
 
 export type BadgeVariant = "default" | "private" | "cantiere" | "recent" | "featured" | "sold";
 export type Badge = { label: string; variant: BadgeVariant };
@@ -49,15 +49,10 @@ export type CardPhoto = {
   segno?: { testo: string; aria: string };
 };
 
+// La regola (glifo fuori dalla home, segno discreto in home) è in
+// lib/trasparenza.ts → etichettaCard, dove il cancello del prebuild la esegue.
 function aiCard(ph: Photo, locale: string, home: boolean): Pick<CardPhoto, "ai" | "segno"> {
-  const ai = fotoAi(ph.trasparenza, locale);
-  if (home) {
-    const s = segnoHome(ph.trasparenza?.trattamento);
-    if (!s) return {};
-    const testo = testiTrasparenza(locale).segno[s];
-    return { segno: { testo, aria: ai?.aria ? `${testo} — ${ai.aria}` : testo } };
-  }
-  return ai?.glifo ? { ai: { glifo: ai.glifo, aria: ai.aria } } : {};
+  return etichettaCard(ph.trasparenza, locale, home);
 }
 
 type Translate = (key: string, values?: Record<string, string | number>) => string;

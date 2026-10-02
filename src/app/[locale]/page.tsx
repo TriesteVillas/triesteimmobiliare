@@ -72,8 +72,8 @@ export default async function Home({
 
   // Il video dell'arredo virtuale: dal registro dei video del CRM. In home
   // (SPEC v1.3 §11.1) non porta più la pillola né la didascalia sotto: solo il
-  // segno discreto — il registro lo dà `ai_generato`, quindi «simulazione» —
-  // con la didascalia intera nell'aria-label e nel `title`. Prima del registro
+  // segno discreto «video AI» (il registro lo dà `ai_generato`) con la
+  // didascalia intera nell'aria-label e nel `title`. Prima del registro
   // l'etichetta era scritta qui a mano: resta come ripiego quando la riga non
   // c'è, o il registro non si legge.
   const txStaging = testiTrasparenza(locale);
@@ -81,7 +81,7 @@ export default async function Home({
     etichetta: txStaging.etichetta.ai_aggiunte,
     aria: `${txStaging.etichetta.ai_aggiunte} — ${t("videoBreak.alt")}`,
     didascalia: null,
-    segno: txStaging.segno.simulazione,
+    segno: txStaging.segno.video,
   });
 
   // Il marquee ricompone le celle della strip in frasi brevi — «Valutazione
@@ -263,7 +263,7 @@ export default async function Home({
         <div className="absolute inset-0 bg-gradient-to-t from-brand-dark from-8% via-brand-dark/85 via-25% to-transparent to-46% sm:from-10% sm:via-20% sm:to-36%" />
         {/* L'arredo di questo video è generato con l'AI: il segno resta
             VISIBILE per tutta la durata (e sul poster), in alto a destra — ma
-            dalla v1.3 (§11.1) è quello DISCRETO della home, «simulazione», non
+            dalla v1.3 (§11.1) è quello DISCRETO della home, «video AI», non
             la pillola. La didascalia intera è nel suo aria-label e `title`. */}
         {staging?.segno && (
           <div className="pointer-events-none absolute right-4 top-4 z-[1] sm:right-6 sm:top-6">

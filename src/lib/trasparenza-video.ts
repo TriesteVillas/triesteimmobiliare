@@ -44,7 +44,7 @@ export type VideoAi = {
   aria: string;
   didascalia: string | null;
   /** Il segno DISCRETO della home (SPEC v1.3 §11.1): «video AI» per un video
-   *  animato, «simulazione» per uno generato; "" = in home nessun segno. Fuori
+   *  animato o generato con l'AI; "" = in home nessun segno. Fuori
    *  dalla home vale l'etichetta, come prima. */
   segno: string;
 };
