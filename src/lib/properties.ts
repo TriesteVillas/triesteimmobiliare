@@ -444,33 +444,7 @@ export function mapRecord(recordId: string, f: Fields): Property {
   };
 }
 
-// Suggest similar listings: same contract type, prioritising the same zona and
-// a nearby price (±30% best, ±60% ok), then closest price wins.
-export function similarProperties(
-  current: Property,
-  all: Property[],
-  limit = 4,
-): Property[] {
-  const price = current.priceSale ?? current.priceRent ?? null;
-  return all
-    .filter((p) => p.slug !== current.slug && p.contratto === current.contratto)
-    .map((p) => {
-      const pp = p.priceSale ?? p.priceRent ?? null;
-      let score = 0;
-      if (current.zona && p.zona === current.zona) score += 3;
-      else if (current.comune && p.comune === current.comune) score += 1;
-      let dist = Number.POSITIVE_INFINITY;
-      if (price && pp) {
-        dist = Math.abs(pp - price) / price;
-        if (dist <= 0.3) score += 2;
-        else if (dist <= 0.6) score += 1;
-      }
-      return { p, score, dist };
-    })
-    .sort((a, b) => b.score - a.score || a.dist - b.dist)
-    .slice(0, limit)
-    .map((x) => x.p);
-}
+// Gli «immobili simili» della scheda vivono in lib/simili.ts (dal 02/10/2026).
 
 // Normalize a property's zona to a known ZONE_ORDER code, or the "other" bucket.
 export function zoneKey(p: Property): string {

@@ -6,7 +6,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { getProperties, getProperty } from "@/lib/airtable";
-import { similarProperties, zoneKey } from "@/lib/properties";
+import { zoneKey } from "@/lib/properties";
+import { scegliSimili } from "@/lib/simili";
 import PropertyCharacteristics, {
   type Characteristic,
 } from "@/components/PropertyCharacteristics";
@@ -186,7 +187,9 @@ export default async function PropertyPage({ params }: { params: Params }) {
       string,
       string
     >)[locale] ?? "Fullscreen";
-  const similar = similarProperties(property, all);
+  // Quattro scelte, mostrate tre o quattro secondo la griglia (v. la sezione
+  // «simili» in fondo): la regola sta in lib/simili.ts, gemello di TSV.
+  const similar = scegliSimili(property, all, 4);
   const place = [property.via, property.zona, localizePlaceName(property.comune, locale)]
     .filter(Boolean)
     .join(", ");
@@ -799,7 +802,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
                 {t("similarTitle")}
               </h2>
               <div
-                className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+                className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 max-sm:[&>*:nth-child(4)]:hidden lg:[&>*:nth-child(4)]:hidden"
                 data-reveal-stagger
               >
                 {similar.map((p) => (
