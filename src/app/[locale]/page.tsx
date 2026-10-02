@@ -12,7 +12,7 @@ import FeaturedCarousel from "@/components/FeaturedCarousel";
 import Marquee from "@/components/Marquee";
 import ClosureBanner from "@/components/ClosureBanner";
 import AutoVideo from "@/components/AutoVideo";
-import EtichettaVideo from "@/components/EtichettaVideo";
+import SegnoAi from "@/components/SegnoAi";
 import VideoSito from "@/components/VideoSito";
 import { testiTrasparenza } from "@/lib/trasparenza";
 import { videoDelSito } from "@/lib/video-sito";
@@ -60,23 +60,28 @@ export default async function Home({
   // decide getArticles). Se la Biblioteca è vuota la fascia sparisce.
   const articoli = (await getArticles().catch(() => [])).slice(0, 3);
 
-  // La strip conserva l'ordine di vetrina deciso nel CRM.
+  // La strip conserva l'ordine di vetrina deciso nel CRM. `home: true`: in
+  // home le card non portano pillole AI, solo il segno discreto sulle
+  // simulazioni (SPEC v1.3 §11.1) — la dichiarazione intera è nella scheda.
   const reelItems = properties
     .filter((p) => p.coverPhoto)
     .slice(0, 8)
-    .map((p) => buildPropertyView(p, locale, tProp, tZones(zoneKey(p))));
+    .map((p) => buildPropertyView(p, locale, tProp, tZones(zoneKey(p)), { home: true }));
 
   const heroWords = t("hero.titleKinetic").split(" ");
 
-  // Il video dell'arredo virtuale: etichetta e didascalia dal registro dei
-  // video del CRM. Prima del registro l'etichetta era scritta qui a mano
-  // («AI · simulazione», il trattamento delle foto con elementi aggiunti):
-  // resta come ripiego quando la riga non c'è, o il registro non si legge.
-  const etichettaStaging = testiTrasparenza(locale).etichetta.ai_aggiunte;
+  // Il video dell'arredo virtuale: dal registro dei video del CRM. In home
+  // (SPEC v1.3 §11.1) non porta più la pillola né la didascalia sotto: solo il
+  // segno discreto — il registro lo dà `ai_generato`, quindi «simulazione» —
+  // con la didascalia intera nell'aria-label e nel `title`. Prima del registro
+  // l'etichetta era scritta qui a mano: resta come ripiego quando la riga non
+  // c'è, o il registro non si legge.
+  const txStaging = testiTrasparenza(locale);
   const staging = await videoDelSito("/video/staging-mansarda.mp4", locale, {
-    etichetta: etichettaStaging,
-    aria: `${etichettaStaging} — ${t("videoBreak.alt")}`,
+    etichetta: txStaging.etichetta.ai_aggiunte,
+    aria: `${txStaging.etichetta.ai_aggiunte} — ${t("videoBreak.alt")}`,
     didascalia: null,
+    segno: txStaging.segno.simulazione,
   });
 
   // Il marquee ricompone le celle della strip in frasi brevi — «Valutazione
@@ -135,9 +140,11 @@ export default async function Home({
               la src e si porta via ~0,9 MB proprio mentre la pagina sta
               dipingendo. Con lazy si vede il poster all'istante e il filmato
               parte appena dopo l'hydration — l'occhio non se ne accorge, la
-              rete sì. Etichetta e didascalia AI dal registro dei video del
-              CRM (VideoSito). */}
+              rete sì. Il video è animato con l'AI: in home niente pillola né
+              didascalia, solo il segno discreto «video AI» dal registro dei
+              video del CRM (VideoSito `discreto`, SPEC v1.3 §11.1). */}
           <VideoSito
+            discreto
             percorso="/video/trieste-aerea.mp4"
             poster="/video/trieste-aerea.jpg"
             ariaLabel={t("hero.videoAlt")}
@@ -254,12 +261,18 @@ export default async function Home({
           lazy
         />
         <div className="absolute inset-0 bg-gradient-to-t from-brand-dark from-8% via-brand-dark/85 via-25% to-transparent to-46% sm:from-10% sm:via-20% sm:to-36%" />
-        {/* L'arredo di questo video è generato con l'AI: l'etichetta resta
-            VISIBILE per tutta la durata (e sul poster), in alto a destra — non
-            basta che lo dica l'aria-label (01/10/2026, SPEC §0 e §5.1). Dal
-            registro dei video del CRM; senza la riga, quella scritta a mano
-            prima del registro (`stagingRipiego`). */}
-        <EtichettaVideo ai={staging} className="right-4 top-4 sm:right-6 sm:top-6" />
+        {/* L'arredo di questo video è generato con l'AI: il segno resta
+            VISIBILE per tutta la durata (e sul poster), in alto a destra — ma
+            dalla v1.3 (§11.1) è quello DISCRETO della home, «simulazione», non
+            la pillola. La didascalia intera è nel suo aria-label e `title`. */}
+        {staging?.segno && (
+          <div className="pointer-events-none absolute right-4 top-4 z-[1] sm:right-6 sm:top-6">
+            <SegnoAi
+              testo={staging.segno}
+              aria={`${staging.segno} — ${staging.didascalia ?? staging.etichetta}`}
+            />
+          </div>
+        )}
         <div className="absolute inset-x-0 bottom-0">
           <div className="mx-auto max-w-6xl px-6 pb-10 sm:pb-14" data-reveal>
             <p className="eyebrow text-sand">{t("videoBreak.eyebrow")}</p>
@@ -269,14 +282,6 @@ export default async function Home({
           </div>
         </div>
       </section>
-      {/* La didascalia del registro, subito sotto il video, sullo stesso
-          fondo della sezione che segue: sopra il video coprirebbe l'arredo
-          che spiega. */}
-      {staging?.didascalia && (
-        <p className="bg-brand-dark text-white/75">
-          <span className="mx-auto block max-w-6xl px-6 pt-4 text-xs leading-snug">{staging.didascalia}</span>
-        </p>
-      )}
 
       {/* ── Seller value (job #1) ─────────────────────────────────── */}
       <section className="bg-brand-dark text-white">

@@ -1,4 +1,4 @@
-import { LINGUE, nellaLingua, type Testi } from "./trasparenza";
+import { LINGUE, nellaLingua, segnoVideoHome, testiTrasparenza, type Testi } from "./trasparenza";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // LA TRASPARENZA AI SUI VIDEO — la parte PURA (SPEC v1.2 §10.1, 01/10/2026).
@@ -43,6 +43,10 @@ export type VideoAi = {
   /** Nome accessibile dell'etichetta: etichetta + didascalia. */
   aria: string;
   didascalia: string | null;
+  /** Il segno DISCRETO della home (SPEC v1.3 §11.1): «video AI» per un video
+   *  animato, «simulazione» per uno generato; "" = in home nessun segno. Fuori
+   *  dalla home vale l'etichetta, come prima. */
+  segno: string;
 };
 
 /** Il prefisso dei file di QUESTO sito nel registro (SPEC §10.1). */
@@ -105,9 +109,11 @@ export function videoAi(r: VideoRegistro | null | undefined, locale: string): Vi
     "";
   const didascalia = nellaLingua(r.didascalia, locale);
   if (!etichetta && !didascalia) return null;
+  const s = segnoVideoHome(r.trattamento);
   return {
     etichetta,
     aria: etichetta && didascalia ? `${etichetta} — ${didascalia}` : etichetta || didascalia || "",
     didascalia,
+    segno: s ? testiTrasparenza(locale).segno[s] : "",
   };
 }

@@ -21,6 +21,18 @@ import type { Photo, Property } from "./properties";
 // testi. Le didascalie in quattro lingue NON arrivano al browser: la pagina
 // le risolve nella lingua del visitatore (`localizzaFoto`) prima di passarle.
 //
+// ── v1.3 (02/10/2026, SPEC §11): lo SNELLIMENTO ──────────────────────────
+// Martino, guardando i siti: «Bellissima… ma in certi punti mi sembra quasi
+// troppo». La regola che ne discende: l'etichetta sulla foto si mette dove
+// l'AI ha cambiato la SOSTANZA (cosa si vede), non lo STILE (luce, colore,
+// inquadratura). `ai_luce` e `tecnico` non portano etichetta né didascalia da
+// nessuna parte (`eStile`); lo stile si dichiara nel riepilogo in fondo alla
+// scheda, che diventa corto (`rigaRiepilogo`) con il resto dentro un
+// «Leggi come le abbiamo ritoccate». In HOME nessuna pillola: solo un segno
+// discreto su ciò che mostra cose che non esistono (`segnoHome`,
+// `segnoVideoHome`). La marcatura IPTC nel file resta su ogni foto passata da
+// un modello, `ai_luce` compresa (`marcaXmp`): è invisibile ed è vera.
+//
 // ⛔ Additività. Un immobile senza dati di trasparenza esce IDENTICO a prima:
 // nessuna etichetta, nessuna sezione, nessun cambio d'ordine, la stessa
 // impaginazione del lightbox, gli stessi URL delle foto. Ogni funzione qui
@@ -61,6 +73,42 @@ export function eSimulazione(t: Trattamento | null | undefined): boolean {
  *  regola di TRATTAMENTI_AI nel CRM (lib/trasparenza-regole.mjs). */
 export function eAi(t: Trattamento | null | undefined): boolean {
   return t === "ai" || t === "ai_luce" || t === "ai_pulizia" || t === "ai_aggiunte" || t === "ai_rendering";
+}
+
+/** SPEC v1.3 §11.1: lo STILE — luce, colore, inquadratura (`ai_luce`) o un
+ *  ritocco senza modello (`tecnico`) — non porta etichetta né didascalia sulla
+ *  foto, in nessuna superficie: si dichiara nel riepilogo della scheda. Resta
+ *  il bottone «Vedi l'originale», se l'originale c'è.
+ *  ⚠️ Vale perché il CRM assegna `ai_luce` solo DOPO il controllo foto per foto
+ *  (§11.4): una `ai` generica, che potrebbe essere solo luce ma non lo
+ *  sappiamo, tiene la sua etichetta. */
+export function eStile(t: Trattamento | null | undefined): boolean {
+  return t === "ai_luce" || t === "tecnico";
+}
+
+/** Il segno discreto della HOME (SPEC v1.3 §11.1): in home nessuna pillola;
+ *  solo un'immagine che mostra cose che non esistono porta un testo piccolo.
+ *  «simulazione» per `ai_aggiunte`/`ai_rendering`; «rendering» per il render
+ *  di progetto (con o senza AI non lo sappiamo dire «AI», ma non è una
+ *  fotografia, e in una card lo si deve capire). Tutto il resto: niente. */
+export type SegnoHome = "simulazione" | "rendering";
+export function segnoHome(t: Trattamento | null | undefined): SegnoHome | null {
+  if (t === "ai_aggiunte" || t === "ai_rendering") return "simulazione";
+  if (t === "rendering") return "rendering";
+  return null;
+}
+
+/** Lo stesso per i video della home (registro dei video del CRM, §10.1):
+ *  `ai_generato` — un video sintetico, l'arredo virtuale della mansarda — è
+ *  una simulazione; `ai_animato` — una foto mossa dal modello — è «video AI».
+ *  Un montaggio di foto o la sola voce sintetica in home non hanno segno (la
+ *  SPEC §11.1 elenca solo i due trattamenti generativi); un trattamento che il
+ *  sito non conosce (null) vale «video AI»: meglio un segno di troppo. */
+export type SegnoVideoHome = "simulazione" | "video";
+export function segnoVideoHome(t: string | null | undefined): SegnoVideoHome | null {
+  if (t === "ai_generato") return "simulazione";
+  if (t === "ai_animato" || t === null) return "video";
+  return null;
 }
 
 // ── La marcatura nei metadati (SPEC §5.7) ─────────────────────────────────
@@ -136,13 +184,18 @@ export type TrasparenzaImmobile = {
     pubblicate: number;
     /** foto con una riga del CRM e un trattamento AI */
     ai: number;
+    /** di quelle, `ai_luce`: lo stile, senza etichetta sulla foto (v1.3) */
+    luce: number;
+    /** di quelle, `ai_aggiunte` + `ai_rendering`: cose che non esistono */
+    simulazioni: number;
     /** foto senza riga con l'etichetta generica precauzionale */
     ricontrollo: number;
     bloccoDifetti: number;
     conOriginale: number;
   };
-  /** Le etichette che compaiono sulle foto di questo annuncio, per la legenda. */
-  etichette: ConEtichetta[];
+  /** Le foto con una riga del CRM, per trattamento (solo i tipi presenti):
+   *  è il «conteggio per tipo» dentro il dettaglio del riepilogo (v1.3 §11.2). */
+  perTipo: Partial<Record<Trattamento, number>>;
 };
 
 // ── La vista per il browser, già nella lingua del visitatore ──────────────
@@ -171,7 +224,7 @@ export type FotoAi = {
 // I TESTI — dizionario inline tipizzato: `satisfies Record<Locale, …>` rende
 // obbligatorio il ramo di OGNI lingua di routing.ts (lo sloveno compreso). Le
 // etichette sono quelle della SPEC §5.1 e §9.3, lettera per lettera.
-// ⚠️ Le frasi slovene nuove (tessere, legenda, ripieghi) vanno fatte
+// ⚠️ Le frasi slovene nuove (riga del riepilogo, tipi, segni, ripieghi) vanno fatte
 // rileggere a un madrelingua, come il resto dello sloveno del sito.
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -195,15 +248,19 @@ type TestiTrasparenza = {
   tasto: string;
   originale: string;
   didascaliaOriginale: string;
-  eyebrow: string;
   titolo: string;
+  /** La voce nella barra di navigazione della scheda: corta (v1.3). */
   nav: string;
-  tessere: { pubblicate: string; ai: string; ricontrollo: string; conOriginale: string; bloccoDifetti: string };
-  legendaTitolo: string;
-  legenda: Record<ConEtichetta, string>;
+  /** Il comando che apre il resto del riepilogo (v1.3 §11.2), chiuso di default. */
   dettaglio: string;
+  /** Dentro il dettaglio: il titoletto dei conteggi per tipo. */
+  tipiTitolo: string;
+  /** Una riga per tipo nel dettaglio: cosa vuol dire, accanto al numero. */
+  tipi: Record<Trattamento | "pubblicate" | "ricontrollo" | "conOriginale" | "bloccoDifetti", string>;
   chiusura: string;
   linkAi: string;
+  /** Il segno DISCRETO della home (v1.3 §11.1): testo piccolo, non la pillola. */
+  segno: Record<SegnoHome | SegnoVideoHome, string>;
 };
 
 export const TESTI_TRASPARENZA = {
@@ -228,28 +285,26 @@ export const TESTI_TRASPARENZA = {
     tasto: "tasto O",
     originale: "Originale",
     didascaliaOriginale: "Foto originale, prima dell'intervento. Volti e dati personali sfocati.",
-    eyebrow: "Trasparenza",
     titolo: "Come abbiamo usato l'AI in queste foto",
-    nav: "AI nelle foto",
-    tessere: {
-      pubblicate: "Foto pubblicate",
-      ai: "Modificate con l'AI",
-      ricontrollo: "In ricontrollo",
-      conOriginale: "Con l'originale a un clic",
-      bloccoDifetti: "Con i difetti lasciati visibili",
-    },
-    legendaTitolo: "Le etichette sulle foto",
-    legenda: {
-      ai: "modello generativo, dettagli in ricontrollo",
-      ai_luce: "solo luce e colore",
+    nav: "AI",
+    dettaglio: "Leggi come le abbiamo ritoccate",
+    tipiTitolo: "Le foto, per tipo di intervento",
+    tipi: {
+      pubblicate: "in tutto, nell'annuncio",
+      ai_luce: "solo luce e colori: senza etichetta sulla foto",
+      tecnico: "ritocco tecnico senza AI: senza etichetta",
       ai_pulizia: "oggetti tolti, le parti nascoste ricostruite dal modello",
-      ai_aggiunte: "elementi aggiunti o ricostruiti: è una simulazione",
-      ai_rendering: "immagine generata per intero con l'AI",
-      rendering: "immagine di progetto, senza AI",
+      ai_aggiunte: "elementi aggiunti o ricostruiti: simulazioni",
+      ai_rendering: "immagini generate per intero con l'AI",
+      ai: "passate da un modello generativo, dettagli in ricontrollo",
+      rendering: "immagini di progetto, senza AI",
+      ricontrollo: "etichetta «AI» precauzionale, in attesa di verifica",
+      conOriginale: "con l'originale a un clic",
+      bloccoDifetti: "con i difetti lasciati visibili",
     },
-    dettaglio: "Leggi la nota completa",
     chiusura: "La visita resta l'unico riferimento.",
     linkAi: "Come usiamo l'AI",
+    segno: { simulazione: "simulazione", rendering: "rendering", video: "video AI" },
   },
   en: {
     etichetta: {
@@ -272,28 +327,26 @@ export const TESTI_TRASPARENZA = {
     tasto: "key O",
     originale: "Original",
     didascaliaOriginale: "Original photo, before editing. Faces and personal data blurred.",
-    eyebrow: "Transparency",
     titolo: "How we used AI in these photos",
-    nav: "AI in the photos",
-    tessere: {
-      pubblicate: "Photos published",
-      ai: "Edited with AI",
-      ricontrollo: "Being re-checked",
-      conOriginale: "Original one click away",
-      bloccoDifetti: "With defects left visible",
-    },
-    legendaTitolo: "The labels on the photos",
-    legenda: {
-      ai: "generative model, details being re-checked",
-      ai_luce: "light and colour only",
+    nav: "AI",
+    dettaglio: "How we edited them",
+    tipiTitolo: "The photos, by type of edit",
+    tipi: {
+      pubblicate: "in total, in this listing",
+      ai_luce: "light and colour only: no label on the photo",
+      tecnico: "technical retouch without AI: no label",
       ai_pulizia: "objects removed, hidden areas filled in by the model",
-      ai_aggiunte: "elements added or rebuilt: a simulation",
-      ai_rendering: "image generated entirely with AI",
-      rendering: "design visualisation, no AI",
+      ai_aggiunte: "elements added or rebuilt: simulations",
+      ai_rendering: "images generated entirely with AI",
+      ai: "processed by a generative model, details being re-checked",
+      rendering: "design visualisations, no AI",
+      ricontrollo: "precautionary “AI” label, pending review",
+      conOriginale: "original one click away",
+      bloccoDifetti: "defects left visible",
     },
-    dettaglio: "Read the full note",
     chiusura: "The viewing remains the only reference.",
     linkAi: "How we use AI",
+    segno: { simulazione: "simulation", rendering: "rendering", video: "AI video" },
   },
   de: {
     etichetta: {
@@ -316,28 +369,26 @@ export const TESTI_TRASPARENZA = {
     tasto: "Taste O",
     originale: "Original",
     didascaliaOriginale: "Originalfoto vor der Bearbeitung. Gesichter und persönliche Daten unkenntlich gemacht.",
-    eyebrow: "Transparenz",
     titolo: "Wie wir KI in diesen Fotos eingesetzt haben",
-    nav: "KI in den Fotos",
-    tessere: {
-      pubblicate: "Veröffentlichte Fotos",
-      ai: "Mit KI bearbeitet",
-      ricontrollo: "In Prüfung",
+    nav: "KI",
+    dettaglio: "Wie wir sie bearbeitet haben",
+    tipiTitolo: "Die Fotos nach Art der Bearbeitung",
+    tipi: {
+      pubblicate: "insgesamt im Inserat",
+      ai_luce: "nur Licht und Farben: ohne Kennzeichnung auf dem Foto",
+      tecnico: "technische Nachbearbeitung ohne KI: ohne Kennzeichnung",
+      ai_pulizia: "Gegenstände entfernt, verdeckte Stellen vom Modell ergänzt",
+      ai_aggiunte: "Elemente hinzugefügt oder rekonstruiert: Simulationen",
+      ai_rendering: "vollständig mit KI erzeugte Bilder",
+      ai: "von einem generativen Modell bearbeitet, Details in Prüfung",
+      rendering: "Projektvisualisierungen, ohne KI",
+      ricontrollo: "vorsorgliche Kennzeichnung „AI“, die Prüfung läuft",
       conOriginale: "Original mit einem Klick",
       bloccoDifetti: "Mängel sichtbar belassen",
     },
-    legendaTitolo: "Die Kennzeichnungen auf den Fotos",
-    legenda: {
-      ai: "generatives Modell, Details in Prüfung",
-      ai_luce: "nur Licht und Farbe",
-      ai_pulizia: "Gegenstände entfernt, verdeckte Stellen vom Modell ergänzt",
-      ai_aggiunte: "Elemente hinzugefügt oder rekonstruiert: eine Simulation",
-      ai_rendering: "vollständig mit KI erzeugtes Bild",
-      rendering: "Projektvisualisierung, ohne KI",
-    },
-    dettaglio: "Vollständigen Hinweis lesen",
     chiusura: "Die Besichtigung bleibt der einzige Maßstab.",
     linkAi: "Wie wir KI einsetzen",
+    segno: { simulazione: "Simulation", rendering: "Rendering", video: "AI-Video" },
   },
   sl: {
     etichetta: {
@@ -360,29 +411,27 @@ export const TESTI_TRASPARENZA = {
     tasto: "tipka O",
     originale: "Izvirnik",
     didascaliaOriginale: "Izvirna fotografija pred posegom. Obrazi in osebni podatki so zabrisani.",
-    eyebrow: "Preglednost",
     titolo: "Kako smo pri teh fotografijah uporabili umetno inteligenco",
-    nav: "AI na fotografijah",
-    // Naslovi ploščic: število stoji ločeno, zato se ne sklanja.
-    tessere: {
-      pubblicate: "Objavljene fotografije",
-      ai: "Urejene z umetno inteligenco",
-      ricontrollo: "V ponovnem pregledu",
-      conOriginale: "Izvirnik na en klik",
-      bloccoDifetti: "Pomanjkljivosti ostale vidne",
-    },
-    legendaTitolo: "Oznake na fotografijah",
-    legenda: {
-      ai: "generativni model, podrobnosti v ponovnem pregledu",
-      ai_luce: "le svetloba in barve",
+    nav: "AI",
+    dettaglio: "Kako smo jih uredili",
+    tipiTitolo: "Fotografije po vrsti posega",
+    // Število stoji ločeno pred opisom, zato se opis ne sklanja.
+    tipi: {
+      pubblicate: "skupaj v oglasu",
+      ai_luce: "le svetloba in barve: brez oznake na fotografiji",
+      tecnico: "tehnična obdelava brez umetne inteligence: brez oznake",
       ai_pulizia: "predmeti odstranjeni, zakrite dele je dopolnil model",
-      ai_aggiunte: "dodani ali rekonstruirani elementi: simulacija",
-      ai_rendering: "slika, v celoti ustvarjena z umetno inteligenco",
-      rendering: "projektna vizualizacija, brez umetne inteligence",
+      ai_aggiunte: "dodani ali rekonstruirani elementi: simulacije",
+      ai_rendering: "slike, v celoti ustvarjene z umetno inteligenco",
+      ai: "obdelal jih je generativni model, podrobnosti v ponovnem pregledu",
+      rendering: "projektne vizualizacije, brez umetne inteligence",
+      ricontrollo: "previdnostna oznaka »AI«, čaka na preverjanje",
+      conOriginale: "izvirnik na en klik",
+      bloccoDifetti: "pomanjkljivosti ostale vidne",
     },
-    dettaglio: "Preberite celotno opombo",
     chiusura: "Ogled ostaja edino merilo.",
     linkAi: "Kako uporabljamo umetno inteligenco",
+    segno: { simulazione: "simulacija", rendering: "vizualizacija", video: "AI video" },
   },
 } as const satisfies Record<Locale, TestiTrasparenza>;
 
@@ -499,8 +548,10 @@ export function applicaTrasparenza(
   });
 }
 
-const ORDINE_ETICHETTE: readonly ConEtichetta[] = [
-  "ai_luce", "ai_pulizia", "ai_aggiunte", "ai_rendering", "ai", "rendering",
+/** L'ordine dei tipi nel dettaglio del riepilogo: dallo stile alla sostanza,
+ *  poi le etichette generiche e i render di progetto. */
+export const ORDINE_TIPI: readonly Trattamento[] = [
+  "ai_luce", "tecnico", "ai_pulizia", "ai_aggiunte", "ai_rendering", "ai", "rendering",
 ];
 
 const dalNome = (ph: Photo): FotoTrasparenza | null => {
@@ -598,14 +649,14 @@ function conTrasparenza(p: Property, t: TrasparenzaVetrina, base: string): Prope
   const finale: Property = { ...p, coverPhoto, topPhotos, photos };
   const mostrate = listaSito(finale);
   const dalCrm = (ph: Photo) => ph.trasparenza?.fonte === "crm";
-  const presenti = new Set<ConEtichetta>();
+  // Il conteggio per tipo (dettaglio del riepilogo, v1.3 §11.2): solo le righe
+  // del CRM. Le etichette dal nome del file e quelle precauzionali stanno a
+  // parte (`ricontrollo`): un render riconosciuto dal nome non è un «render di
+  // progetto senza AI», e di quello non lo sappiamo.
+  const perTipo: Partial<Record<Trattamento, number>> = {};
   for (const ph of mostrate) {
     const d = ph.trasparenza;
-    if (!d || d.trattamento === "tecnico") continue;
-    // La legenda spiega le etichette del CRM, più la «AI» generica. Un render
-    // riconosciuto dal nome no: la voce «Rendering» dice «senza AI», e di
-    // quello non lo sappiamo (lo spiega la sua didascalia).
-    if (d.fonte === "crm" || d.trattamento === "ai") presenti.add(d.trattamento);
+    if (d?.fonte === "crm") perTipo[d.trattamento] = (perTipo[d.trattamento] ?? 0) + 1;
   }
   const conteggi = {
     pubblicate: mostrate.length,
@@ -614,6 +665,8 @@ function conTrasparenza(p: Property, t: TrasparenzaVetrina, base: string): Prope
     // contarle farebbe dire «3 foto su 3 modificate» a un annuncio che ne ha
     // una. Si dichiarano a parte («in ricontrollo»).
     ai: mostrate.filter((ph) => dalCrm(ph) && eAi(ph.trasparenza!.trattamento)).length,
+    luce: perTipo.ai_luce ?? 0,
+    simulazioni: (perTipo.ai_aggiunte ?? 0) + (perTipo.ai_rendering ?? 0),
     ricontrollo: mostrate.filter((ph) => ph.trasparenza && !dalCrm(ph) && ph.trasparenza.trattamento !== "tecnico")
       .length,
     bloccoDifetti: mostrate.filter((ph) => dalCrm(ph) && ph.trasparenza!.bloccoDifetti).length,
@@ -627,25 +680,24 @@ function conTrasparenza(p: Property, t: TrasparenzaVetrina, base: string): Prope
       `[trasparenza] ${p.recId}: ${conteggi.ai} foto AI contate dal sito, ${t.conteggi.ai} dal CRM (foto ${conteggi.pubblicate}/${t.conteggi.foto_pubblicate ?? "?"})`,
     );
   }
-  finale.trasparenza = {
-    nota: t.nota,
-    conteggi,
-    etichette: ORDINE_ETICHETTE.filter((e) => presenti.has(e)),
-  };
+  finale.trasparenza = { nota: t.nota, conteggi, perTipo };
   return finale;
 }
 
 /**
  * La foto dell'anteprima social (og:image). Le anteprime di WhatsApp e
  * Facebook non portano etichette: lì va la prima foto, nell'ordine della
- * scheda, che non ne porterebbe una sul sito (niente AI, niente render, niente
- * etichetta precauzionale). Se ce l'hanno tutte, null: resta l'immagine del
- * sito. Senza nessuna etichetta: la copertina, come prima.
+ * scheda, che non ne porterebbe una sul sito (niente AI di sostanza, niente
+ * render, niente etichetta precauzionale). Se ce l'hanno tutte, null: resta
+ * l'immagine del sito. Senza nessuna etichetta: la copertina, come prima.
+ * Dalla v1.3 (§11.1) una foto di sola luce (`ai_luce`, `tecnico`) è una foto
+ * normale anche qui: non porta etichetta sul sito, e va bene come anteprima.
  */
 export function fotoPerAnteprima(p: Property): Photo | null {
   const lista = listaSito(p);
-  if (!lista.some((ph) => ph.trasparenza)) return p.coverPhoto;
-  return lista.find((ph) => !ph.trasparenza || ph.trasparenza.trattamento === "tecnico") ?? null;
+  const etichettata = (ph: Photo) => !!ph.trasparenza && !eStile(ph.trasparenza.trattamento);
+  if (!lista.some(etichettata)) return p.coverPhoto;
+  return lista.find((ph) => !etichettata(ph)) ?? null;
 }
 
 
@@ -656,11 +708,19 @@ export function fotoPerAnteprima(p: Property): Photo | null {
 /** Da dati grezzi a vista localizzata. null se la foto non ha niente da dire. */
 export function fotoAi(d: FotoTrasparenza | null | undefined, locale: string): FotoAi | null {
   if (!d) return null;
+  // v1.3 §11.1: lo stile non si dichiara sulla foto — niente etichetta, niente
+  // glifo, niente didascalia, da nessuna parte. Resta solo l'originale, se il
+  // CRM ce l'ha: il bottone «Vedi l'originale» non è rumore, è una prova.
+  if (eStile(d.trattamento)) {
+    return d.originale
+      ? { trattamento: d.trattamento, etichetta: "", glifo: "", aria: "", didascalia: null, originale: d.originale }
+      : null;
+  }
   const tx = testiTrasparenza(locale);
   const propria = nellaLingua(d.didascalia, locale);
-  const etichetta = d.trattamento === "tecnico" ? "" : tx.etichetta[d.trattamento];
-  const glifo =
-    d.trattamento === "tecnico" ? "" : d.trattamento === "rendering" ? tx.glifo.rendering : tx.glifo.ai;
+  // Qui `tecnico` non arriva più (è stile, sopra): ogni trattamento ha la sua etichetta.
+  const etichetta = tx.etichetta[d.trattamento as ConEtichetta];
+  const glifo = d.trattamento === "rendering" ? tx.glifo.rendering : tx.glifo.ai;
   const renderDalNome = d.fonte === "nome" && d.trattamento === "rendering";
   const base = d.trattamento === "ai" ? tx.ariaGenerica : renderDalNome ? tx.ariaRenderNome : etichetta;
   const aria = propria ? (base ? `${base} — ${propria}` : propria) : base;
@@ -677,8 +737,6 @@ export function fotoAi(d: FotoTrasparenza | null | undefined, locale: string): F
           ? tx.didascaliaGenerica
           : tx.didascaliaAi
         : null);
-  // Una foto «tecnico» senza didascalia né originale non ha niente da mostrare.
-  if (!etichetta && !didascalia && !d.originale) return null;
   return {
     trattamento: d.trattamento,
     etichetta,
@@ -713,26 +771,135 @@ function frasi(testo: string): string[] {
 }
 
 /**
- * La nota del CRM pronta per il riepilogo: senza la prima frase quando è
- * l'attacco standard («Nota sull'uso dell'intelligenza artificiale nelle
- * fotografie.»), che ripeterebbe il titolo della sezione; poi divisa in un
- * attacco breve, sempre visibile, e il resto, che si apre a richiesta — le
- * note vere sono lunghe 2.300-3.600 caratteri.
+ * La nota del CRM pronta per il dettaglio del riepilogo: intera, senza la
+ * prima frase quando è l'attacco standard («Nota sull'uso dell'intelligenza
+ * artificiale nelle fotografie.»), che ripeterebbe il titolo della sezione.
+ * Dalla v1.3 (§11.2) la nota sta TUTTA dentro «Leggi come le abbiamo
+ * ritoccate», chiuso di default: non serve più tagliarla in attacco e resto.
  */
-export function notaPerRiepilogo(nota: string): { attacco: string; resto: string | null } {
-  let f = frasi(nota);
-  if (f.length > 1 && f[0].length <= 120 && ATTACCHI.some((a) => normAttacco(f[0]).startsWith(a))) f = f.slice(1);
-  const attacco: string[] = [];
-  let lung = 0;
-  while (f.length && (attacco.length === 0 || lung < 260)) {
-    const s = f.shift()!;
-    attacco.push(s);
-    lung += s.length + 1;
+export function notaSenzaAttacco(nota: string): string {
+  const f = frasi(nota);
+  if (f.length > 1 && f[0].length <= 120 && ATTACCHI.some((a) => normAttacco(f[0]).startsWith(a))) {
+    return f.slice(1).join(" ");
   }
-  const resto = f.join(" ");
-  // Un resto cortissimo non vale un «leggi tutto»: si mostra tutto.
-  if (resto && resto.length < 200) return { attacco: [...attacco, resto].join(" "), resto: null };
-  return { attacco: attacco.join(" "), resto: resto || null };
+  return nota.trim();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LA RIGA DEL RIEPILOGO (v1.3 §11.2) — calcolata dai conteggi, mai a mano
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// Le forme della SPEC (it), con lo stesso schema nelle altre lingue:
+//   · solo luce: «Foto ritoccate con l'AI solo nella luce e nei colori: niente
+//     è stato aggiunto o tolto.» (con «N foto su M» davanti se non sono tutte);
+//   · misto: «N foto su M ritoccate con l'AI: L solo nella luce e nei colori,
+//     S con modifiche indicate sulla foto.»;
+//   · nessuna di sola luce: «N foto su M ritoccate con l'AI, con le modifiche
+//     indicate sulla foto.»;
+//   · poi «K sono simulazioni.», «I difetti sono lasciati visibili.», e — solo
+//     se ci sono — le etichette precauzionali.
+// La chiusura («La visita resta l'unico riferimento.») la stampa la pagina,
+// sempre. null = niente da dire (nessuna foto AI: c'è solo la nota).
+// I plurali sloveni passano da Intl.PluralRules (one/two/few/other): «Med
+// njimi je 1 simulacija / sta 2 simulaciji / so 3 simulacije / je 5 simulacij».
+
+type ConteggiRiga = Pick<
+  TrasparenzaImmobile["conteggi"],
+  "pubblicate" | "ai" | "luce" | "simulazioni" | "ricontrollo" | "bloccoDifetti"
+>;
+
+type Frasi = {
+  soloLuce: (n: number, m: number) => string;
+  soloSostanza: (n: number, m: number) => string;
+  misto: (n: number, m: number, l: number, s: number) => string;
+  simulazioni: (k: number) => string;
+  difetti: string;
+  ricontrollo: (r: number) => string;
+};
+
+const PLURALE_SL = new Intl.PluralRules("sl");
+const sl = (n: number, forme: Record<"one" | "two" | "few" | "other", string>) =>
+  forme[PLURALE_SL.select(n) as keyof typeof forme] ?? forme.other;
+// Il genitivo dopo «od M» e il locativo dopo «pri N»: singolare con 1 (e 101…),
+// plurale con tutto il resto (il duale ha le stesse forme del plurale).
+const fotografijGen = (m: number) => (PLURALE_SL.select(m) === "one" ? "fotografije" : "fotografij");
+const fotografijLoc = (m: number) => (PLURALE_SL.select(m) === "one" ? "fotografiji" : "fotografijah");
+
+const FRASI = {
+  it: {
+    soloLuce: (n, m) =>
+      n === m
+        ? "Foto ritoccate con l'AI solo nella luce e nei colori: niente è stato aggiunto o tolto."
+        : `${n} foto su ${m} ${n === 1 ? "ritoccata" : "ritoccate"} con l'AI solo nella luce e nei colori: niente è stato aggiunto o tolto.`,
+    soloSostanza: (n, m) =>
+      `${n} foto su ${m} ${n === 1 ? "ritoccata" : "ritoccate"} con l'AI, con le modifiche indicate sulla foto.`,
+    misto: (n, m, l, s) =>
+      `${n} foto su ${m} ritoccate con l'AI: ${l} solo nella luce e nei colori, ${s} con modifiche indicate sulla foto.`,
+    simulazioni: (k) => (k === 1 ? "1 è una simulazione." : `${k} sono simulazioni.`),
+    difetti: "I difetti sono lasciati visibili.",
+    ricontrollo: (r) => `Su ${r} foto l'etichetta «AI» è precauzionale, in attesa di verifica.`,
+  },
+  en: {
+    soloLuce: (n, m) =>
+      n === m
+        ? "Photos edited with AI in light and colour only: nothing was added or removed."
+        : `${n} of ${m} photos edited with AI in light and colour only: nothing was added or removed.`,
+    soloSostanza: (n, m) => `${n} of ${m} ${m === 1 ? "photo" : "photos"} edited with AI, with the changes marked on the photo.`,
+    misto: (n, m, l, s) =>
+      `${n} of ${m} photos edited with AI: ${l} in light and colour only, ${s} with changes marked on the photo.`,
+    simulazioni: (k) => (k === 1 ? "1 is a simulation." : `${k} are simulations.`),
+    difetti: "Defects have been left visible.",
+    ricontrollo: (r) => `On ${r} ${r === 1 ? "photo" : "photos"} the “AI” label is precautionary, pending review.`,
+  },
+  de: {
+    soloLuce: (n, m) =>
+      n === m
+        ? "Fotos mit KI nur bei Licht und Farben bearbeitet: Nichts wurde hinzugefügt oder entfernt."
+        : `${n} von ${m} Fotos mit KI nur bei Licht und Farben bearbeitet: Nichts wurde hinzugefügt oder entfernt.`,
+    soloSostanza: (n, m) =>
+      `${n} von ${m} ${m === 1 ? "Foto" : "Fotos"} mit KI bearbeitet, die Änderungen sind auf dem Foto gekennzeichnet.`,
+    misto: (n, m, l, s) =>
+      `${n} von ${m} Fotos mit KI bearbeitet: ${l} nur bei Licht und Farben, ${s} mit auf dem Foto gekennzeichneten Änderungen.`,
+    simulazioni: (k) => (k === 1 ? "1 davon ist eine Simulation." : `${k} davon sind Simulationen.`),
+    difetti: "Mängel wurden sichtbar belassen.",
+    ricontrollo: (r) => `Bei ${r} ${r === 1 ? "Foto" : "Fotos"} ist die Kennzeichnung „AI“ vorsorglich, die Prüfung läuft.`,
+  },
+  sl: {
+    soloLuce: (n, m) =>
+      n === m
+        ? "Pri fotografijah smo z umetno inteligenco popravili le svetlobo in barve: nič ni bilo dodano ali odstranjeno."
+        : `Pri ${n} od ${m} ${fotografijGen(m)} smo z umetno inteligenco popravili le svetlobo in barve: nič ni bilo dodano ali odstranjeno.`,
+    soloSostanza: (n, m) =>
+      `Z umetno inteligenco smo uredili ${n} od ${m} ${fotografijGen(m)}, spremembe so označene na fotografiji.`,
+    misto: (n, m, l, s) =>
+      `Z umetno inteligenco smo uredili ${n} od ${m} ${fotografijGen(m)}: pri ${l} le svetlobo in barve, pri ${s} so spremembe označene na fotografiji.`,
+    simulazioni: (k) =>
+      sl(k, {
+        one: `Med njimi je ${k} simulacija.`,
+        two: `Med njimi sta ${k} simulaciji.`,
+        few: `Med njimi so ${k} simulacije.`,
+        other: `Med njimi je ${k} simulacij.`,
+      }),
+    difetti: "Pomanjkljivosti so ostale vidne.",
+    ricontrollo: (r) => `Pri ${r} ${fotografijLoc(r)} je oznaka »AI« previdnostna, čaka na preverjanje.`,
+  },
+} as const satisfies Record<Locale, Frasi>;
+
+/** La riga visibile del riepilogo, nella lingua della pagina (v1.3 §11.2). */
+export function rigaRiepilogo(c: ConteggiRiga, locale: string): string | null {
+  const f: Frasi = (FRASI as Record<string, Frasi>)[locale] ?? FRASI.it;
+  const n = c.ai;
+  const m = Math.max(c.pubblicate, n);
+  const l = Math.min(c.luce, n);
+  const s = n - l;
+  const parti: string[] = [];
+  if (n > 0) {
+    parti.push(s === 0 ? f.soloLuce(n, m) : l === 0 ? f.soloSostanza(n, m) : f.misto(n, m, l, s));
+    if (c.simulazioni > 0) parti.push(f.simulazioni(c.simulazioni));
+    if (c.bloccoDifetti > 0) parti.push(f.difetti);
+  }
+  if (c.ricontrollo > 0) parti.push(f.ricontrollo(c.ricontrollo));
+  return parti.length ? parti.join(" ") : null;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

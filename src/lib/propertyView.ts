@@ -1,7 +1,7 @@
 import { formatPrice } from "./format";
 import { photoSrc, photoSrcSet } from "./photoSrc";
 import type { Photo, Property } from "./properties";
-import { fotoAi } from "./trasparenza";
+import { fotoAi, segnoHome, testiTrasparenza } from "./trasparenza";
 
 export type BadgeVariant = "default" | "private" | "cantiere" | "recent" | "featured" | "sold";
 export type Badge = { label: string; variant: BadgeVariant };
@@ -35,16 +35,28 @@ export type PropertyView = {
 
 // Una foto della card. `ai` c'è solo quando la foto porta un'etichetta AI
 // (lib/trasparenza.ts): il glifo compatto e la frase per il lettore di
-// schermo, già nella lingua della pagina. Assente = foto come prima.
+// schermo, già nella lingua della pagina. Assente = foto come prima — e dalla
+// v1.3 (§11.1) anche per le foto di sola luce (`ai_luce`, `tecnico`), che non
+// portano etichetta da nessuna parte.
+// `segno` c'è solo nelle card della HOME, al posto di `ai`: in home niente
+// pillole, solo un testo discreto («simulazione», «rendering») su ciò che
+// mostra cose che non esistono. Mai tutti e due sulla stessa foto.
 export type CardPhoto = {
   url: string;
   srcSet?: string;
   alt: string;
   ai?: { glifo: string; aria: string };
+  segno?: { testo: string; aria: string };
 };
 
-function aiCard(ph: Photo, locale: string): Pick<CardPhoto, "ai"> {
+function aiCard(ph: Photo, locale: string, home: boolean): Pick<CardPhoto, "ai" | "segno"> {
   const ai = fotoAi(ph.trasparenza, locale);
+  if (home) {
+    const s = segnoHome(ph.trasparenza?.trattamento);
+    if (!s) return {};
+    const testo = testiTrasparenza(locale).segno[s];
+    return { segno: { testo, aria: ai?.aria ? `${testo} — ${ai.aria}` : testo } };
+  }
   return ai?.glifo ? { ai: { glifo: ai.glifo, aria: ai.aria } } : {};
 }
 
@@ -186,7 +198,11 @@ export function buildPropertyView(
   locale: string,
   t: Translate,
   zonaLabel: string | null,
+  /** `home: true` = card della home: niente pillole AI, solo il segno
+   *  discreto sulle simulazioni (SPEC v1.3 §11.1). */
+  opzioni: { home?: boolean } = {},
 ): PropertyView {
+  const home = opzioni.home === true;
   const onlineDays = p.onlineDa
     ? Math.max(0, Math.floor((Date.now() - Date.parse(p.onlineDa)) / 86400000))
     : null;
@@ -217,7 +233,7 @@ export function buildPropertyView(
       url: isPrivate ? ph.thumb : photoSrc(ph, 800),
       srcSet: isPrivate ? undefined : photoSrcSet(ph, CARD_WIDTHS),
       alt: cardTitle,
-      ...aiCard(ph, locale),
+      ...aiCard(ph, locale, home),
     });
     if (gallery.length >= 9) break;
   }
@@ -251,7 +267,7 @@ export function buildPropertyView(
           url: isPrivate ? p.coverPhoto.thumb : photoSrc(p.coverPhoto, 800),
           srcSet: isPrivate ? undefined : photoSrcSet(p.coverPhoto, CARD_WIDTHS),
           alt: cardTitle,
-          ...aiCard(p.coverPhoto, locale),
+          ...aiCard(p.coverPhoto, locale, home),
         }
       : null,
   };

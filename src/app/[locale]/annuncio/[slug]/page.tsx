@@ -56,7 +56,9 @@ import {
   fotoPerAnteprima,
   localizzaFoto,
   nellaLingua,
-  notaPerRiepilogo,
+  notaSenzaAttacco,
+  ORDINE_TIPI,
+  rigaRiepilogo,
   senzaNotaAi,
   testiTrasparenza,
 } from "@/lib/trasparenza";
@@ -118,6 +120,7 @@ export async function generateMetadata({
         canonical: `https://triestevillas.com${locale === "it" ? "" : `/${locale}`}/annuncio/${slug}`,
       }
     : pageAlternates(locale, `/annuncio/${slug}`);
+  const ogFoto = fotoPerAnteprima(property);
   return {
     title: { absolute: `${title} · TriesteImmobiliare` },
     description,
@@ -127,9 +130,13 @@ export async function generateMetadata({
       `/annuncio/${slug}`,
       title,
       description,
-      // Le anteprime social non portano etichette: mai una foto AI lì
-      // (lib/trasparenza.ts → fotoPerAnteprima). Senza dati: la copertina.
-      fotoPerAnteprima(property)?.url,
+      // Le anteprime social non portano etichette: mai una foto AI di
+      // sostanza lì (lib/trasparenza.ts → fotoPerAnteprima). Senza dati: la
+      // copertina. Dalla v1.3 può essere una foto di sola luce: passa da
+      // photoSrc, così il file dell'anteprima porta la sua marcatura IPTC
+      // (`-ctam`) come in galleria. Una foto senza marca ha lo stesso URL di
+      // prima (`/foto/<att>/2000.webp`).
+      ogFoto ? photoSrc(ogFoto, 2000) : undefined,
     ),
   };
 }
@@ -206,7 +213,8 @@ export default async function PropertyPage({ params }: { params: Params }) {
   const trasp = property.trasparenza ?? null;
   const tTrasp = testiTrasparenza(locale);
   const notaAi = trasp ? nellaLingua(trasp.nota, locale) : null;
-  const notaRiepilogo = notaAi ? notaPerRiepilogo(notaAi) : null;
+  const notaDettaglio = notaAi ? notaSenzaAttacco(notaAi) : null;
+  const rigaAi = trasp ? rigaRiepilogo(trasp.conteggi, locale) : null;
   const mostraFotoAi =
     trasp != null && (notaAi != null || trasp.conteggi.ai > 0 || trasp.conteggi.ricontrollo > 0);
   // La pagina «Come usiamo l'AI» del gruppo (triestevillas.com), solo nelle
@@ -683,86 +691,91 @@ export default async function PropertyPage({ params }: { params: Params }) {
             </section>
           )}
 
-          {/* Riepilogo della trasparenza AI (SPEC §5.3 + §9.3): in chiusura del
-              dossier, prima dei moduli di contatto, nella grafica delle altre
-              sezioni della scheda (non in un riquadro: sembrava il modulo di
-              contatto che lo segue). I numeri si contano sulle foto che la
-              pagina mostra davvero (stessa lista del lightbox); la nota si apre
-              a richiesta, perché è lunga; l'ultima riga è sempre «La visita
-              resta l'unico riferimento.» */}
+          {/* Riepilogo della trasparenza AI (SPEC §5.3 + §9.3, snellito dalla
+              v1.3 §11.2 del 02/10): in chiusura del dossier, prima dei moduli
+              di contatto, nella grafica delle altre sezioni della scheda.
+              Visibili solo il titolo, UNA riga calcolata dai conteggi (mai
+              scritta a mano: rigaRiepilogo) e «La visita resta l'unico
+              riferimento.»; il resto — la nota completa del CRM, i conteggi per
+              tipo, il link a /ai — sta dentro «Leggi come le abbiamo
+              ritoccate», chiuso di default. Niente tessere coi numeri grandi:
+              «40 / 40» in evidenza era rumore. I numeri si contano sulle foto
+              che la pagina mostra davvero (stessa lista del lightbox). */}
           {mostraFotoAi && trasp && (
             <section id="foto-ai" className="mt-10 scroll-mt-32 border-t border-neutral-200 pt-8" data-reveal>
-              <p className="eyebrow">{tTrasp.eyebrow}</p>
-              <h2 className="mt-2 text-lg font-semibold">{tTrasp.titolo}</h2>
-              <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                {(
-                  [
-                    ["pubblicate", trasp.conteggi.pubblicate],
-                    ["ai", trasp.conteggi.ai],
-                    ...(trasp.conteggi.ricontrollo > 0
-                      ? ([["ricontrollo", trasp.conteggi.ricontrollo]] as const)
-                      : []),
-                    ...(trasp.conteggi.conOriginale > 0
-                      ? ([["conOriginale", trasp.conteggi.conOriginale]] as const)
-                      : []),
-                    ...(trasp.conteggi.bloccoDifetti > 0
-                      ? ([["bloccoDifetti", trasp.conteggi.bloccoDifetti]] as const)
-                      : []),
-                  ] as const
-                ).map(([k, n]) => (
-                  // justify-end: in colonna rovesciata spinge in ALTO, così i
-                  // numeri stanno alla stessa altezza anche quando l'etichetta
-                  // di una tessera va a capo e quella accanto no.
-                  <div key={k} className="flex flex-col-reverse justify-end rounded-xl border border-neutral-200 bg-white p-4">
-                    <dt className="mt-1 text-xs leading-snug text-neutral-500">{tTrasp.tessere[k]}</dt>
-                    <dd className="text-2xl font-semibold tabular-nums text-ink">{n}</dd>
+              <h2 className="text-lg font-semibold">{tTrasp.titolo}</h2>
+              <div className="mt-3 max-w-prose space-y-1.5 leading-relaxed text-neutral-700">
+                {rigaAi && <p>{rigaAi}</p>}
+                <p className="font-semibold text-ink">{tTrasp.chiusura}</p>
+              </div>
+              <details className="mt-4 max-w-prose">
+                <summary className="cursor-pointer text-sm font-semibold text-brand underline-offset-4 hover:underline">
+                  {tTrasp.dettaglio}
+                </summary>
+                <div className="mt-3 space-y-5 leading-relaxed text-neutral-700">
+                  {notaDettaglio && (
+                    <div className="space-y-3">
+                      {toParagraphs(notaDettaglio).map((par, i) => (
+                        <p key={i}>{par}</p>
+                      ))}
+                    </div>
+                  )}
+                  <div>
+                    <h3 className="text-sm font-semibold text-neutral-800">{tTrasp.tipiTitolo}</h3>
+                    <ul className="mt-2 space-y-1.5 text-sm">
+                      {(
+                        [
+                          ["pubblicate", trasp.conteggi.pubblicate] as const,
+                          ...ORDINE_TIPI.map((k) => [k, trasp.perTipo[k] ?? 0] as const),
+                          ["ricontrollo", trasp.conteggi.ricontrollo] as const,
+                          ["conOriginale", trasp.conteggi.conOriginale] as const,
+                          ["bloccoDifetti", trasp.conteggi.bloccoDifetti] as const,
+                        ] as const
+                      )
+                        .filter(([, n]) => n > 0)
+                        .map(([k, n]) => {
+                          // L'etichetta come si vede sulla foto, accanto al
+                          // numero: spiega le pillole che si incontrano nella
+                          // galleria. Lo stile (luce, tecnico) non ne ha.
+                          const pillola =
+                            k === "ricontrollo"
+                              ? tTrasp.etichetta.ai
+                              : k === "pubblicate" ||
+                                  k === "conOriginale" ||
+                                  k === "bloccoDifetti" ||
+                                  k === "ai_luce" ||
+                                  k === "tecnico"
+                                ? null
+                                : tTrasp.etichetta[k];
+                          return (
+                            <li key={k} className="flex items-baseline gap-2.5">
+                              <span className="w-7 shrink-0 text-right font-semibold tabular-nums text-ink">{n}</span>
+                              <span>
+                                {pillola && (
+                                  <span className="mr-2 inline-flex select-none items-center whitespace-nowrap rounded bg-ink/85 px-1.5 py-0.5 text-[11px] font-semibold leading-none tracking-wide text-white">
+                                    {pillola}
+                                  </span>
+                                )}
+                                {tTrasp.tipi[k]}
+                              </span>
+                            </li>
+                          );
+                        })}
+                    </ul>
                   </div>
-                ))}
-              </dl>
-              {trasp.etichette.length > 0 && (
-                <div className="mt-5">
-                  <h3 className="text-sm font-semibold text-neutral-800">{tTrasp.legendaTitolo}</h3>
-                  <ul className="mt-2 space-y-2 text-sm text-neutral-700">
-                    {trasp.etichette.map((e) => (
-                      <li key={e} className="flex items-start gap-3">
-                        <span className="mt-0.5 inline-flex shrink-0 select-none items-center whitespace-nowrap rounded-md bg-ink/85 px-2 py-1 text-xs font-semibold leading-none tracking-wide text-white">
-                          {tTrasp.etichetta[e]}
-                        </span>
-                        <span className="leading-relaxed">{tTrasp.legenda[e]}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              {notaRiepilogo && (
-                <div className="mt-5 max-w-prose space-y-3 leading-relaxed text-neutral-700">
-                  <p>{notaRiepilogo.attacco}</p>
-                  {notaRiepilogo.resto && (
-                    <details className="group">
-                      <summary className="cursor-pointer text-sm font-semibold text-brand underline-offset-4 hover:underline">
-                        {tTrasp.dettaglio}
-                      </summary>
-                      <div className="mt-3 space-y-3">
-                        {toParagraphs(notaRiepilogo.resto).map((par, i) => (
-                          <p key={i}>{par}</p>
-                        ))}
-                      </div>
-                    </details>
+                  {linkAi && (
+                    // Un altro sito del gruppo: si apre accanto, la scheda resta.
+                    <a
+                      href={linkAi}
+                      target="_blank"
+                      rel="noopener"
+                      className="inline-block text-sm font-semibold text-brand underline-offset-4 hover:underline"
+                    >
+                      {tTrasp.linkAi} ↗
+                    </a>
                   )}
                 </div>
-              )}
-              {linkAi && (
-                // Un altro sito del gruppo: si apre accanto, la scheda resta.
-                <a
-                  href={linkAi}
-                  target="_blank"
-                  rel="noopener"
-                  className="mt-5 inline-block text-sm font-semibold text-brand underline-offset-4 hover:underline"
-                >
-                  {tTrasp.linkAi} ↗
-                </a>
-              )}
-              <p className="mt-5 font-semibold text-ink">{tTrasp.chiusura}</p>
+              </details>
             </section>
           )}
 

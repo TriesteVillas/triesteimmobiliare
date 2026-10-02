@@ -4,6 +4,7 @@ import { useState, ViewTransition } from "react";
 import { useTranslations } from "next-intl";
 import PhotoImg from "./PhotoImg";
 import EtichettaAi from "./EtichettaAi";
+import SegnoAi from "./SegnoAi";
 import type { CardPhoto } from "@/lib/propertyView";
 
 // Sfogliare le foto SENZA aprire la scheda: copertina + fino a 8 foto, frecce
@@ -88,6 +89,15 @@ export default function CardGallery({
         <div className="pointer-events-none absolute right-3 top-3 z-[2] flex flex-col items-end gap-1.5">
           {angoloDestro}
           {photos[i]?.ai && <EtichettaAi testo={photos[i].ai!.glifo} aria={photos[i].ai!.aria} />}
+        </div>
+      )}
+
+      {/* In HOME niente pillole (SPEC v1.3 §11.1): sulla foto che mostra cose
+          che non esistono, un testo piccolo in basso a sinistra — l'unico
+          angolo libero (badge in alto, pallini al centro, cuore a destra). */}
+      {photos[i]?.segno && (
+        <div className="pointer-events-none absolute bottom-2.5 left-3 z-[2]">
+          <SegnoAi testo={photos[i].segno!.testo} aria={photos[i].segno!.aria} />
         </div>
       )}
 
