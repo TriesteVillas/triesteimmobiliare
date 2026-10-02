@@ -66,8 +66,18 @@ export type VideoAnnuncio = {
 };
 
 export const ANNUNCI_VIDEO: Readonly<Record<string, VideoAnnuncio>> = {
-  // Nessun video ancora. Il primo previsto: "TSV-PROP-CAPODISTRIA-41"
-  // (Via Capodistria 41, /annuncio/bilocale-al-quinto-piano-con-due-poggioli-41).
+  // Via Capodistria 41 (/annuncio/bilocale-al-quinto-piano-con-due-poggioli-41),
+  // 02/10/2026: 12 clip Kling 3.0 dalle foto della galleria (28 su 30 ritoccate
+  // con AI), primi 2,6 s di ognuna con dissolvenze da 0,6 s: loop di 24,6 s,
+  // muto. Riga nel registro dei video del CRM: ai_animato, foto_ai.
+  "TSV-PROP-CAPODISTRIA-41": {
+    mp4: "/media/annunci/tsv-prop-capodistria-41/hero-d9b75ed9-1080.mp4",
+    mp4Sm: "/media/annunci/tsv-prop-capodistria-41/hero-d9b75ed9-720.mp4",
+    poster: "/media/annunci/tsv-prop-capodistria-41/hero-d9b75ed9-poster.webp",
+    posterSm: "/media/annunci/tsv-prop-capodistria-41/hero-d9b75ed9-poster-sm.webp",
+    ai: true,
+    fotoRitoccate: true,
+  },
 };
 
 const MEDIA = "/media/annunci/";
