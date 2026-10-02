@@ -26,7 +26,8 @@ import LeadForm from "@/components/LeadForm";
 import VisitForm from "@/components/VisitForm";
 import TourFrame from "@/components/TourFrame";
 import VideoYoutube from "@/components/VideoYoutube";
-import { videoYoutube } from "@/lib/video-sito";
+import SfondoVideo from "@/components/media/SfondoVideo";
+import { videoDelSito, videoYoutube } from "@/lib/video-sito";
 import {
   buildPropertyView,
   contractBadge,
@@ -224,6 +225,22 @@ export default async function PropertyPage({ params }: { params: Params }) {
   // lingue in cui risponde 200 — vedi lib/pagina-ai.ts. Si prova solo dove il
   // riepilogo c'è.
   const linkAi = mostraFotoAi ? await linkPaginaAi(locale) : null;
+
+  // Video di testata mp4 (registro content/annunciVideo.ts, 02/10/2026): se
+  // l'immobile ne ha uno, l'hero lo mostra sopra la copertina (SfondoVideo);
+  // gli YouTube restano in #video. Senza, la scheda è identica a prima: niente
+  // letture in più, niente classi in più nell'hero.
+  const heroMp4 = property.heroVideo ?? null;
+  // L'etichetta del video dal registro dei video del CRM (`tsi:<percorso del
+  // 1080>`), come per ogni altro file del sito (VideoSito): senza riga, null.
+  const heroMp4Ai = heroMp4 ? await videoDelSito(heroMp4.mp4, locale) : null;
+  // La frase AI sul video porta il link alla pagina del gruppo, se oggi
+  // risponde nella lingua (lib/pagina-ai.ts); senza, la frase resta da sola.
+  const heroMp4LinkAi = heroMp4?.ai ? await linkPaginaAi(locale) : null;
+  // La pillola del registro prende il posto di quella della copertina, che
+  // sparisce mentre il video si vede: stessa colonna (max-w-5xl, px-6), stessa
+  // quota — sotto la riga del «← Torna», dove stanno i tasti del video.
+  const POSTO_ETICHETTA_VIDEO = "right-6 min-[64rem]:right-[calc((100%-64rem)/2+1.5rem)] top-[9.25rem]";
   // SPEC §5.4: quando la nota arriva dal CRM, la nota scritta a mano dentro la
   // descrizione si toglie — la si legge una volta sola, nel riepilogo. Solo se
   // il CRM ce l'ha NELLA LINGUA DELLA PAGINA: se l'ha trattenuta (guardia dei
@@ -427,11 +444,42 @@ export default async function PropertyPage({ params }: { params: Params }) {
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-brand-dark to-ink" />
         )}
+        {/* Video di testata mp4 (content/annunciVideo.ts): layer client-only,
+            fratello della copertina e PRIMA del velo di gradiente — la foto
+            resta opaca sotto (LCP e snapshot del morph al «← Torna»), il velo
+            resta sopra il video a tenere leggibile il testo. Sale sulla
+            copertina solo quando il filmato suona davvero; fascia 16:9 sotto
+            i 640 px, pausa, frase AI sul video quando `ai`, etichetta del
+            registro del CRM. Nell'HTML iniziale non c'è nessun <video>. */}
+        {heroMp4 && (
+          <SfondoVideo
+            video={heroMp4}
+            locale={locale}
+            title={title}
+            fascia
+            velo
+            layerClassName="par-zoom"
+            etichetta={heroMp4Ai}
+            etichettaClassName={POSTO_ETICHETTA_VIDEO}
+            linkAi={heroMp4LinkAi ? { href: heroMp4LinkAi, testo: tTrasp.linkAi } : null}
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-b from-ink/55 via-ink/10 to-ink/90" />
         {/* L'etichetta AI della copertina, in alto a destra sotto la testata.
-            Con il riepilogo in pagina è anche la scorciatoia per leggerlo. */}
+            Con il riepilogo in pagina è anche la scorciatoia per leggerlo.
+            Con un video di testata: scende sotto la riga dei tasti del video
+            (top-24 + h-11) e sparisce mentre il video si vede — il
+            `[data-video-visibile]` di SfondoVideo, fratello PRECEDENTE, la
+            nasconde col combinatore `~`: l'etichetta parla della foto, non
+            del filmato. Senza video, la classe di sempre. */}
         {heroAi?.etichetta && (
-          <div className="pointer-events-none absolute inset-x-0 top-24 z-[1] mx-auto flex max-w-5xl justify-end px-6">
+          <div
+            className={
+              heroMp4
+                ? "pointer-events-none absolute inset-x-0 top-[9.25rem] z-[1] mx-auto flex max-w-5xl justify-end px-6 [[data-video-visibile]~&]:hidden"
+                : "pointer-events-none absolute inset-x-0 top-24 z-[1] mx-auto flex max-w-5xl justify-end px-6"
+            }
+          >
             {mostraFotoAi ? (
               <a
                 href="#foto-ai"
@@ -463,7 +511,17 @@ export default async function PropertyPage({ params }: { params: Params }) {
             un'altezza fissa, su un telefono da 320 px la riga dei badge finiva
             sotto la testata (misurato l'11/09). Da sm in su torna assoluto in
             fondo all'hero, com'era. Stessa correzione del gemello TSV. */}
-        <div className="relative mx-auto max-w-5xl px-6 pb-12 pt-40 sm:absolute sm:inset-x-0 sm:bottom-0 sm:pt-0">
+        {/* Con un video di testata, sotto 640px il padding fa posto anche alla
+            sua fascia 16:9: top-36 (9rem) + 56.25vw di altezza + 0.75rem di
+            respiro — la stessa aritmetica di triestevillas.com. Riservato già
+            dal server: niente salto di layout quando il video si accende. */}
+        <div
+          className={
+            heroMp4
+              ? "relative mx-auto max-w-5xl px-6 pb-12 pt-[calc(9.75rem+56.25vw)] sm:absolute sm:inset-x-0 sm:bottom-0 sm:pt-0"
+              : "relative mx-auto max-w-5xl px-6 pb-12 pt-40 sm:absolute sm:inset-x-0 sm:bottom-0 sm:pt-0"
+          }
+        >
           <div className="flex flex-wrap items-center gap-2" data-reveal="now">
             {soldBadge(property, t) && <PropertyBadge {...soldBadge(property, t)!} />}
             <PropertyBadge {...contractBadge(property, t)} />

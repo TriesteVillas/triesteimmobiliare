@@ -1,5 +1,6 @@
 import "server-only";
 import { matterportEmbed, slugify, type Photo, type Property } from "./properties";
+import { videoAnnuncio } from "../content/annunciVideo";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // IL CATALOGO DA POSTGRES — fase 2 del taglio Airtable → Postgres (24/08/2026).
@@ -261,6 +262,7 @@ function mapRiga(r: RigaVetrina): Property {
     iliaAnnua: num(r.ilia_annua),
     tariAnnua: num(r.tari_annua_stima_eur),
     pcSince: giorno(r.pc_data_ingresso),
+    heroVideo: videoAnnuncio(id),
   };
 }
 

@@ -1,4 +1,5 @@
 import type { FotoAi, FotoTrasparenza, MarcaXmp, TrasparenzaImmobile } from "./trasparenza";
+import { videoAnnuncio, type VideoAnnuncio } from "../content/annunciVideo";
 // Field-ID map for the Airtable PROPRIETA table (base app1ZDay9vQNU5V2u, table tblwAUWPnX7KF8FhU).
 // We key on field IDs (stable across renames) for both the live REST fetch
 // (returnFieldsByFieldId=true) and the dev seed.
@@ -240,6 +241,10 @@ export type Property = {
   iliaAnnua: number | null;
   tariAnnua: number | null;
   pcSince: string | null;
+  // Video di testata della scheda (content/annunciVideo.ts, 02/10/2026): dal
+  // registro del sito per codice di catalogo (`id`), null se l'immobile non
+  // ne ha uno — e allora l'hero è la sola copertina, come prima.
+  heroVideo: VideoAnnuncio | null;
   // Riepilogo della trasparenza AI sulle foto (lib/trasparenza.ts): presente
   // solo quando il CRM ha dati per questo immobile.
   trasparenza?: TrasparenzaImmobile | null;
@@ -441,6 +446,7 @@ export function mapRecord(recordId: string, f: Fields): Property {
     iliaAnnua: num(f[F.iliaAnnua]),
     tariAnnua: num(f[F.tariAnnua]),
     pcSince: typeof f[F.pcSince] === "string" ? (f[F.pcSince] as string) : null,
+    heroVideo: videoAnnuncio(id),
   };
 }
 
