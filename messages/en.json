@@ -465,7 +465,8 @@
     "taxSecondaCasa": "Second home",
     "taxIliaEsente": "Exempt (main home)",
     "taxOccupants": "Occupants",
-    "taxEstimateFootnote": "Annual costs are indicative estimates — service charges from the reported figures, ILIA and TARI from fixed formulas on the council's rates — and do not replace an official check."
+    "taxEstimateFootnote": "Annual costs are indicative estimates — service charges from the reported figures, ILIA and TARI from fixed formulas on the council's rates — and do not replace an official check.",
+    "highlightsLabel": "Worth knowing about this property"
   },
   "group": {
     "eyebrow": "The TriesteVillas Group",

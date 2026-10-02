@@ -465,7 +465,8 @@
     "taxSecondaCasa": "Drugo bivališče",
     "taxIliaEsente": "Oproščeno (glavno prebivališče)",
     "taxOccupants": "Stanovalci",
-    "taxEstimateFootnote": "Letni stroški so okvirne ocene – stroški upravljanja po sporočenih zneskih, ILIA in TARI po stalnih formulah na podlagi občinskih stopenj – in ne nadomeščajo uradnega preverjanja."
+    "taxEstimateFootnote": "Letni stroški so okvirne ocene – stroški upravljanja po sporočenih zneskih, ILIA in TARI po stalnih formulah na podlagi občinskih stopenj – in ne nadomeščajo uradnega preverjanja.",
+    "highlightsLabel": "Dobro je vedeti o tej nepremičnini"
   },
   "group": {
     "eyebrow": "Skupina TriesteVillas",

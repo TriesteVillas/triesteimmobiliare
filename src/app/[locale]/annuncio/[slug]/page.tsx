@@ -27,6 +27,8 @@ import VisitForm from "@/components/VisitForm";
 import TourFrame from "@/components/TourFrame";
 import VideoYoutube from "@/components/VideoYoutube";
 import SfondoVideo from "@/components/media/SfondoVideo";
+import RiquadriEvidenza from "@/components/RiquadriEvidenza";
+import { riquadriAnnuncio } from "@/content/annunciRiquadri";
 import { videoDelSito, videoYoutube } from "@/lib/video-sito";
 import {
   buildPropertyView,
@@ -231,6 +233,8 @@ export default async function PropertyPage({ params }: { params: Params }) {
   // gli YouTube restano in #video. Senza, la scheda è identica a prima: niente
   // letture in più, niente classi in più nell'hero.
   const heroMp4 = property.heroVideo ?? null;
+  // I riquadri in evidenza (content/annunciRiquadri.ts): in alto sul foglio.
+  const riquadri = riquadriAnnuncio(property.id, locale);
   // L'etichetta del video dal registro dei video del CRM (`tsi:<percorso del
   // 1080>`), come per ogni altro file del sito (VideoSito): senza riga, null.
   const heroMp4Ai = heroMp4 ? await videoDelSito(heroMp4.mp4, locale) : null;
@@ -609,6 +613,11 @@ export default async function PropertyPage({ params }: { params: Params }) {
               items={nav}
             />
           )}
+
+          {/* I riquadri in evidenza (content/annunciRiquadri.ts): i due o tre
+              fatti che contano più della tabella, subito sotto prezzo e
+              titolo. Senza voce nel registro non c'è niente. */}
+          <RiquadriEvidenza riquadri={riquadri} etichetta={t("highlightsLabel")} />
 
           {/* Concierge AI subito sotto il hero, ben visibile — non più sepolto
               in fondo. Col contesto della scheda: "questa casa" per lui È
