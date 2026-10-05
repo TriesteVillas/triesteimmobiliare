@@ -91,6 +91,28 @@ export const ANNUNCI_VIDEO: Readonly<Record<string, VideoAnnuncio>> = {
     ai: true,
     fotoRitoccate: true,
   },
+  // Bilocale con terrazza sul tetto e vista sul golfo, Muggia (Largo Amulia 6, Muggia), 05/10/2026: clip Kling 3.0 (solo carrello in avanti)
+  // dalle foto finali ritoccate con l'AI, primi 2,6 s con dissolvenze da 0,6 s, loop muto.
+  // Riga nel registro dei video del CRM: ai_animato, foto_ai.
+  "TSV-PROP-0181": {
+    mp4: "/media/annunci/tsv-prop-0181/hero-6b3c6412-1080.mp4",
+    mp4Sm: "/media/annunci/tsv-prop-0181/hero-6b3c6412-720.mp4",
+    poster: "/media/annunci/tsv-prop-0181/hero-6b3c6412-poster.webp",
+    posterSm: "/media/annunci/tsv-prop-0181/hero-6b3c6412-poster-sm.webp",
+    ai: true,
+    fotoRitoccate: true,
+  },
+  // Monolocale affacciato sul Mandracchio di Muggia (Largo Amulia 6, Muggia), 05/10/2026: clip Kling 3.0 (solo carrello in avanti)
+  // dalle foto finali ritoccate con l'AI, primi 2,6 s con dissolvenze da 0,6 s, loop muto.
+  // Riga nel registro dei video del CRM: ai_animato, foto_ai.
+  "TSV-PROP-0186": {
+    mp4: "/media/annunci/tsv-prop-0186/hero-6fdf42fc-1080.mp4",
+    mp4Sm: "/media/annunci/tsv-prop-0186/hero-6fdf42fc-720.mp4",
+    poster: "/media/annunci/tsv-prop-0186/hero-6fdf42fc-poster.webp",
+    posterSm: "/media/annunci/tsv-prop-0186/hero-6fdf42fc-poster-sm.webp",
+    ai: true,
+    fotoRitoccate: true,
+  },
 };
 
 const MEDIA = "/media/annunci/";
