@@ -139,10 +139,10 @@ export const ANNUNCI_VIDEO: Readonly<Record<string, VideoAnnuncio>> = {
   // dalle foto finali ritoccate con l'AI, primi 2,6 s con dissolvenze da 0,6 s, loop muto.
   // Riga nel registro dei video del CRM: ai_animato, foto_ai.
   "TSV-PROP-0185": {
-    mp4: "/media/annunci/tsv-prop-0185/hero-a7bac3a9-1080.mp4",
-    mp4Sm: "/media/annunci/tsv-prop-0185/hero-a7bac3a9-720.mp4",
-    poster: "/media/annunci/tsv-prop-0185/hero-a7bac3a9-poster.webp",
-    posterSm: "/media/annunci/tsv-prop-0185/hero-a7bac3a9-poster-sm.webp",
+    mp4: "/media/annunci/tsv-prop-0185/hero-004f8adc-1080.mp4",
+    mp4Sm: "/media/annunci/tsv-prop-0185/hero-004f8adc-720.mp4",
+    poster: "/media/annunci/tsv-prop-0185/hero-004f8adc-poster.webp",
+    posterSm: "/media/annunci/tsv-prop-0185/hero-004f8adc-poster-sm.webp",
     ai: true,
     fotoRitoccate: true,
   },
