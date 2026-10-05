@@ -135,6 +135,17 @@ export const ANNUNCI_VIDEO: Readonly<Record<string, VideoAnnuncio>> = {
     ai: true,
     fotoRitoccate: true,
   },
+  // Monolocale sul porticciolo di Muggia, con vista su Trieste (Largo Amulia 6, Muggia), 05/10/2026: clip Kling 3.0 (solo carrello in avanti)
+  // dalle foto finali ritoccate con l'AI, primi 2,6 s con dissolvenze da 0,6 s, loop muto.
+  // Riga nel registro dei video del CRM: ai_animato, foto_ai.
+  "TSV-PROP-0185": {
+    mp4: "/media/annunci/tsv-prop-0185/hero-a7bac3a9-1080.mp4",
+    mp4Sm: "/media/annunci/tsv-prop-0185/hero-a7bac3a9-720.mp4",
+    poster: "/media/annunci/tsv-prop-0185/hero-a7bac3a9-poster.webp",
+    posterSm: "/media/annunci/tsv-prop-0185/hero-a7bac3a9-poster-sm.webp",
+    ai: true,
+    fotoRitoccate: true,
+  },
 };
 
 const MEDIA = "/media/annunci/";
