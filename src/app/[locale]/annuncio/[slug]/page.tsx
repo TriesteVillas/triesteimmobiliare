@@ -8,6 +8,7 @@ import { routing } from "@/i18n/routing";
 import { getProperties, getProperty } from "@/lib/airtable";
 import { zoneKey } from "@/lib/properties";
 import { scegliSimili } from "@/lib/simili";
+import { stessoPalazzo } from "@/lib/stesso-palazzo";
 import PropertyCharacteristics, {
   type Characteristic,
 } from "@/components/PropertyCharacteristics";
@@ -201,7 +202,16 @@ export default async function PropertyPage({ params }: { params: Params }) {
     >)[locale] ?? "Fullscreen";
   // Quattro scelte, mostrate tre o quattro secondo la griglia (v. la sezione
   // «simili» in fondo): la regola sta in lib/simili.ts, gemello di TSV.
-  const similar = scegliSimili(property, all, 4);
+  // «Nello stesso palazzo» (lib/stesso-palazzo.ts): le altre unità dello stesso
+  // progetto, tutte. Non per Elegie, che ha la sua scena-ponte. Quelle mostrate
+  // lì escono dai simili, o la stessa casa comparirebbe due volte.
+  const palazzo = isElegieProgetto(property.progetto) ? [] : stessoPalazzo(property, all);
+  const inPalazzo = new Set(palazzo.map((p) => p.slug));
+  const similar = scegliSimili(
+    property,
+    all.filter((p) => !inPalazzo.has(p.slug)),
+    4,
+  );
   const place = [property.via, property.zona, localizePlaceName(property.comune, locale)]
     .filter(Boolean)
     .join(", ");
@@ -368,6 +378,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
     property.planimetrie.length && { id: "planimetrie", label: t("galPlans") },
     ytIds.length && { id: "video", label: t("galVideo") },
     property.matterportUrl && { id: "tour", label: t("galTour") },
+    palazzo.length && { id: "stesso-palazzo", label: t("sameBuildingNav") },
     hasLocation && { id: "posizione", label: t("locationTitle") },
     // Niente voce «AI» qui (v1.3, review di misura del 02/10): restava
     // accesa per tutto lo scorrimento, il segno AI più persistente della
@@ -735,6 +746,24 @@ export default async function PropertyPage({ params }: { params: Params }) {
                 title={t("galTour")}
                 fsLabel={fsLabel}
               />
+            </section>
+          )}
+
+          {palazzo.length > 0 && (
+            <section id="stesso-palazzo" className="mt-10 scroll-mt-32" data-reveal>
+              <h2 className="text-lg font-semibold">{t("sameBuildingTitle")}</h2>
+              <p className="mt-1 text-sm text-neutral-500">
+                {t("sameBuildingLead", { n: palazzo.length })}
+              </p>
+              <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2" data-reveal-stagger>
+                {palazzo.map((p) => (
+                  <PropertyCard
+                    key={p.slug}
+                    view={buildPropertyView(p, locale, t, tZones(zoneKey(p)))}
+                    photosComing={t("photosComing")}
+                  />
+                ))}
+              </div>
             </section>
           )}
 
