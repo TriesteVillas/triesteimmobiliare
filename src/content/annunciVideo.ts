@@ -78,20 +78,19 @@ export const ANNUNCI_VIDEO: Readonly<Record<string, VideoAnnuncio>> = {
     ai: true,
     fotoRitoccate: true,
   },
-  // ⏳ Casa di borgo a Contovello (scheda del 02/10/2026): lo slot è pronto, i
-  // file no. Quando arrivano (10–12 clip image-to-video, solo carrello in
-  // avanti, dalle foto della galleria ritoccate con l'AI) vanno in
-  // public/media/annunci/tsv-prop-contovello-62/ (l'hash = le prime 8 cifre
-  // dello sha256 del 1080p), si toglie il commento e si aggiunge la riga nel
-  // registro dei video del CRM (ai_animato, foto_ai).
-  // "TSV-PROP-CONTOVELLO-62": {
-  //   mp4: "/media/annunci/tsv-prop-contovello-62/hero-XXXXXXXX-1080.mp4",
-  //   mp4Sm: "/media/annunci/tsv-prop-contovello-62/hero-XXXXXXXX-720.mp4",
-  //   poster: "/media/annunci/tsv-prop-contovello-62/hero-XXXXXXXX-poster.webp",
-  //   posterSm: "/media/annunci/tsv-prop-contovello-62/hero-XXXXXXXX-poster-sm.webp",
-  //   ai: true,
-  //   fotoRitoccate: true,
-  // },
+  // Casa di borgo a Contovello, 05/10/2026: 12 clip Kling 3.0 (solo carrello in
+  // avanti) dalle foto finali ritoccate con l'AI — 11 della galleria più una
+  // veduta aerea del borgo tenuta per il solo video — primi 2,6 s di ognuna con
+  // dissolvenze da 0,6 s: loop di 24,6 s, muto. Riga nel registro dei video del
+  // CRM: ai_animato, foto_ai.
+  "TSV-PROP-CONTOVELLO-62": {
+    mp4: "/media/annunci/tsv-prop-contovello-62/hero-8d15d444-1080.mp4",
+    mp4Sm: "/media/annunci/tsv-prop-contovello-62/hero-8d15d444-720.mp4",
+    poster: "/media/annunci/tsv-prop-contovello-62/hero-8d15d444-poster.webp",
+    posterSm: "/media/annunci/tsv-prop-contovello-62/hero-8d15d444-poster-sm.webp",
+    ai: true,
+    fotoRitoccate: true,
+  },
 };
 
 const MEDIA = "/media/annunci/";
