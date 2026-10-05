@@ -358,6 +358,15 @@ function idNumber(tsvId: string | null): string {
   return m ? m[1] : "0";
 }
 
+// Le stime ILIA e TARI (formule di Airtable) e la scheda TARI interattiva usano
+// l'aliquota e le tariffe del Comune di Trieste. Fuori Trieste — Muggia,
+// Duino-Aurisina… — stampavano l'importo di un altro Comune: si spengono, come su
+// triestevillas.com (1221d6c, 01/10/2026) e FriuliVillas. Comune vuoto = record
+// storico triestino, si lascia com'era.
+export function aTrieste(comune: string | null | undefined): boolean {
+  return !comune || comune.trim().toLowerCase() === "trieste";
+}
+
 export function mapRecord(recordId: string, f: Fields): Property {
   const id = str(f[F.id]) ?? recordId;
   const contratto = str(f[F.contratto]) as Property["contratto"];
@@ -443,8 +452,8 @@ export function mapRecord(recordId: string, f: Fields): Property {
     noteImposte: str(f[F.noteImposte]),
     soggettoIva: f[F.soggettoIva] === true,
     condoMensile: num(f[F.speseCondoMensili]),
-    iliaAnnua: num(f[F.iliaAnnua]),
-    tariAnnua: num(f[F.tariAnnua]),
+    iliaAnnua: aTrieste(str(f[F.comune])) ? num(f[F.iliaAnnua]) : null,
+    tariAnnua: aTrieste(str(f[F.comune])) ? num(f[F.tariAnnua]) : null,
     pcSince: typeof f[F.pcSince] === "string" ? (f[F.pcSince] as string) : null,
     heroVideo: videoAnnuncio(id),
   };

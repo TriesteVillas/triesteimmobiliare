@@ -6,7 +6,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { getProperties, getProperty } from "@/lib/airtable";
-import { zoneKey } from "@/lib/properties";
+import { aTrieste, zoneKey } from "@/lib/properties";
 import { scegliSimili } from "@/lib/simili";
 import { stessoPalazzo } from "@/lib/stesso-palazzo";
 import PropertyCharacteristics, {
@@ -289,7 +289,8 @@ export default async function PropertyPage({ params }: { params: Params }) {
         commission: feeNet != null ? ca(feeNet) : null,
         condo: condoAnnuo != null ? ca(condoAnnuo) : null,
         ilia: property.iliaAnnua != null ? ca(property.iliaAnnua) : null,
-        mqCalp: property.mq != null ? Math.round(property.mq * 0.8) : null,
+        // La scheda TARI calcola con le tariffe di Trieste: fuori Trieste non c'è.
+        mqCalp: aTrieste(property.comune) && property.mq != null ? Math.round(property.mq * 0.8) : null,
       }
     : null;
   const hasCosts =

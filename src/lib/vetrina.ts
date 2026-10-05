@@ -1,5 +1,5 @@
 import "server-only";
-import { matterportEmbed, slugify, type Photo, type Property } from "./properties";
+import { aTrieste, matterportEmbed, slugify, type Photo, type Property } from "./properties";
 import { videoAnnuncio } from "../content/annunciVideo";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -259,8 +259,10 @@ function mapRiga(r: RigaVetrina): Property {
     noteImposte: str(r.note_imposte),
     soggettoIva: flag(r.soggetto_iva),
     condoMensile: num(r.spese_condo_mensili),
-    iliaAnnua: num(r.ilia_annua),
-    tariAnnua: num(r.tari_annua_stima_eur),
+    // ILIA e TARI stimate con aliquota e tariffe di Trieste: fuori Trieste
+    // sono il numero di un altro Comune e non si mostrano (aTrieste).
+    iliaAnnua: aTrieste(str(r.comune)) ? num(r.ilia_annua) : null,
+    tariAnnua: aTrieste(str(r.comune)) ? num(r.tari_annua_stima_eur) : null,
     pcSince: giorno(r.pc_data_ingresso),
     heroVideo: videoAnnuncio(id),
   };
