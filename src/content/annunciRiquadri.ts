@@ -44,22 +44,81 @@ export type Riquadro = {
 export const MAX_RIQUADRI = 3;
 
 export const ANNUNCI_RIQUADRI: Readonly<Record<string, readonly Riquadro[]>> = {
-  // ⏳ Casa di borgo a Contovello: struttura pronta, testi in arrivo da
-  // Martino. Si toglie il commento e si riempiono le quattro lingue.
-  // "TSV-PROP-CONTOVELLO-62": [
-  //   {
-  //     tipo: "rendita",
-  //     cifra: { it: "32.600 €", en: "€32,600", de: "32.600 €", sl: "32.600 €" },
-  //     titolo: { it: "…", en: "…", de: "…", sl: "…" },
-  //     testo: { it: "…", en: "…", de: "…", sl: "…" },
-  //     nota: { it: "…", en: "…", de: "…", sl: "…" },
-  //   },
-  //   {
-  //     tipo: "fisco",
-  //     titolo: { it: "…", en: "…", de: "…", sl: "…" },
-  //     testo: { it: "…", en: "…", de: "…", sl: "…" },
-  //   },
-  // ],
+  // Casa di borgo a Contovello (02/10/2026). Fonti: la rendita 2025 è il
+  // dato dichiarato da chi vende e confermato da Martino («dichiarato, tutto
+  // in regola, pubblicabile»); le detrazioni da Martino, con la regola dell'art.
+  // 16-bis c. 8 TUIR (le quote residue passano a chi compra salvo diverso
+  // accordo; la quota dell'anno spetta a chi possiede la casa al 31/12) e il
+  // limite dell'IRPEF dovuta in Italia (guida Agenzia delle Entrate). Airbnb
+  // non trasferisce annunci né recensioni fra account (Help Center): qui non
+  // lo si promette.
+  "TSV-PROP-CONTOVELLO-62": [
+    {
+      tipo: "rendita",
+      cifra: { it: "32.600 €", en: "€32,600", de: "32.600 €", sl: "32.600 €" },
+      titolo: {
+        it: "Incassati in affitto breve nel 2025",
+        en: "Earned from short lets in 2025",
+        de: "Einnahmen aus Kurzzeitvermietung 2025",
+        sl: "Prihodki od kratkoročnega najema v letu 2025",
+      },
+      testo: {
+        it: "Da anni è una casa vacanze molto amata: 4,86 su 5 su Airbnb con 85 recensioni, 9,5 su 10 su Booking. Ricavi dichiarati e attività in regola.",
+        en: "A much-loved holiday home for years: 4.86 out of 5 on Airbnb from 85 reviews, 9.5 out of 10 on Booking. Declared income, fully compliant.",
+        de: "Seit Jahren ein sehr beliebtes Ferienhaus: 4,86 von 5 bei Airbnb aus 85 Bewertungen, 9,5 von 10 bei Booking. Erklärte Einnahmen, alles ordnungsgemäß.",
+        sl: "Že leta zelo priljubljena počitniška hiša: 4,86 od 5 na Airbnbju (85 ocen) in 9,5 od 10 na Bookingu. Prijavljeni prihodki, dejavnost v skladu s predpisi.",
+      },
+      nota: {
+        it: "Ricavi lordi, prima di spese e imposte.",
+        en: "Gross revenue, before costs and taxes.",
+        de: "Bruttoeinnahmen, vor Kosten und Steuern.",
+        sl: "Bruto prihodki, pred stroški in davki.",
+      },
+    },
+    {
+      tipo: "fisco",
+      cifra: { it: "≈ 4.500 € l'anno", en: "≈ €4,500 a year", de: "≈ 4.500 € pro Jahr", sl: "≈ 4.500 € na leto" },
+      titolo: {
+        it: "Detrazioni fiscali che passano a chi compra",
+        en: "Tax deductions that pass to the buyer",
+        de: "Steuerabzüge, die auf den Käufer übergehen",
+        sl: "Davčne olajšave, ki preidejo na kupca",
+      },
+      testo: {
+        it: "I lavori di recupero danno diritto a una detrazione in dieci anni: restano quattro annualità, di circa 4.500 € ciascuna. I dettagli li diamo di persona.",
+        en: "The renovation qualifies for a ten-year tax deduction: four yearly instalments remain, of about €4,500 each. We share the details in person.",
+        de: "Die Sanierung berechtigt zu einem auf zehn Jahre verteilten Steuerabzug: Es bleiben vier Jahresraten von je rund 4.500 €. Die Einzelheiten besprechen wir persönlich.",
+        sl: "Obnova daje pravico do davčne olajšave, razdeljene na deset let: ostajajo štirje letni obroki, vsak približno 4.500 €. Podrobnosti povemo osebno.",
+      },
+      nota: {
+        it: "Per chi paga l'IRPEF in Italia, entro l'imposta dovuta. Le quattro annualità valgono con rogito entro il 31/12/2026.",
+        en: "For buyers who pay income tax (IRPEF) in Italy, up to the tax due. Four instalments apply if completion is by 31/12/2026.",
+        de: "Für Käufer, die in Italien Einkommensteuer (IRPEF) zahlen, bis zur Höhe der geschuldeten Steuer. Vier Raten bei Beurkundung bis 31.12.2026.",
+        sl: "Za kupce, ki plačujejo dohodnino (IRPEF) v Italiji, do višine dolgovanega davka. Štirje obroki veljajo ob podpisu pogodbe do 31. 12. 2026.",
+      },
+    },
+    {
+      tipo: "chiave",
+      titolo: {
+        it: "Se la vivi solo una parte dell'anno",
+        en: "If you live here only part of the year",
+        de: "Wenn Sie nur einen Teil des Jahres hier sind",
+        sl: "Če boste tu živeli le del leta",
+      },
+      testo: {
+        it: "Ti aiutiamo a portare avanti l'affitto breve nei mesi in cui non ci sei: la casa arriva con un'attività avviata, ospiti soddisfatti e una reputazione costruita in questi anni.",
+        en: "We help you keep the short lets going in the months you are away: the house comes with an established business, happy guests and a reputation built over the years.",
+        de: "Wir helfen Ihnen, die Kurzzeitvermietung in den Monaten Ihrer Abwesenheit weiterzuführen: Das Haus kommt mit einem eingespielten Betrieb, zufriedenen Gästen und einem über Jahre aufgebauten Ruf.",
+        sl: "Pomagamo vam nadaljevati kratkoročni najem v mesecih, ko vas ni: hiša prihaja z utečeno dejavnostjo, zadovoljnimi gosti in ugledom, zgrajenim v teh letih.",
+      },
+      nota: {
+        it: "Chi compra registra l'attività a proprio nome (CIN compreso).",
+        en: "The buyer registers the business in their own name (including the CIN).",
+        de: "Der Käufer meldet die Tätigkeit auf eigenen Namen an (einschließlich CIN).",
+        sl: "Kupec dejavnost registrira na svoje ime (vključno s CIN).",
+      },
+    },
+  ],
 };
 
 /** Un riquadro nella lingua della pagina. */
