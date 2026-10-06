@@ -702,6 +702,7 @@
     "address": "Dove si trova l'immobile?",
     "addressPlaceholder": "Via e civico, comune (es. Strada Costiera 28, Trieste)",
     "addressFound": "Posizione riconosciuta",
+    "sloveniaHint": "Casa in Slovenia? Lì oggi non facciamo mediazione: c'è la <link>pagina per i proprietari di SloveniaVillas</link>.",
     "type": "Tipologia",
     "typeOptions": {
       "0": "Appartamento",

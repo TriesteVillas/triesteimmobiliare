@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
 import Timeline from "@/components/Timeline";
 import Tilt from "@/components/motion/Tilt";
 import SellerCta from "@/components/SellerCta";

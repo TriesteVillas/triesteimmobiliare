@@ -44,7 +44,7 @@ export function sloveniaVillasUrl(locale: string, pagina: Pagina = "home"): stri
  *  i link esterni del sito escono con `noreferrer`, e senza UTM il GA4 di
  *  SloveniaVillas non saprebbe che il clic è partito da qui. Stesso schema
  *  dei rimandi a Elegie Duino (src/lib/elegie.ts). */
-export function sloveniaVillasHref(locale: string, pagina: Pagina, collocazione: "home" | "vendi" | "routing"): string {
+export function sloveniaVillasHref(locale: string, pagina: Pagina, collocazione: "home" | "vendi" | "routing" | "modulo"): string {
   const u = new URL(sloveniaVillasUrl(locale, pagina));
   u.searchParams.set("utm_source", "triesteimmobiliare");
   u.searchParams.set("utm_medium", collocazione);

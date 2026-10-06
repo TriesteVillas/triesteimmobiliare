@@ -702,6 +702,7 @@
     "address": "Wo befindet sich die Immobilie?",
     "addressPlaceholder": "Straße und Hausnummer, Gemeinde (z. B. Strada Costiera 28, Triest)",
     "addressFound": "Adresse erkannt",
+    "sloveniaHint": "Liegt die Immobilie in Slowenien? Dort vermitteln wir heute nicht – siehe die <link>Seite für Eigentümer auf SloveniaVillas</link>.",
     "type": "Typ",
     "typeOptions": {
       "0": "Wohnung",

@@ -702,6 +702,7 @@
     "address": "Where is the property?",
     "addressPlaceholder": "Street and number, town (e.g. Strada Costiera 28, Trieste)",
     "addressFound": "Location matched",
+    "sloveniaHint": "Is the property in Slovenia? We do not act as agents there today – see the <link>owners' page on SloveniaVillas</link>.",
     "type": "Type",
     "typeOptions": {
       "0": "Apartment",

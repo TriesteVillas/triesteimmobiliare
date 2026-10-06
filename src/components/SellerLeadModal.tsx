@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useFocusTrap } from "@/lib/useFocusTrap";
 import { CITY_LIST_ID, citySuggestions } from "@/lib/cities";
 import AddressAutocomplete from "./AddressAutocomplete";
+import { sloveniaVillasHref } from "@/lib/sloveniavillas";
 import type { AddressSuggestion } from "@/lib/geocode";
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -230,6 +231,22 @@ export default function SellerLeadModal({
                 {luogo.city ? ` · ${luogo.city}` : ""}
               </p>
             )}
+            {/* Casa in Slovenia (06/10/2026): lì oggi non facciamo mediazione, e
+                il modulo non lo impedisce — si dice soltanto dove guardare. */}
+            <p className="mt-1.5 text-xs text-neutral-500">
+              {t.rich("sloveniaHint", {
+                link: (c) => (
+                  <a
+                    href={sloveniaVillasHref(locale, "proprietari", "modulo")}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-brand underline underline-offset-2 hover:text-brand-dark"
+                  >
+                    {c}
+                  </a>
+                ),
+              })}
+            </p>
 
             {chipRow(t("type"), TIPOLOGIE, tipologia, setTipologia, "typeOptions")}
             {chipRow(t("size"), TAGLIE, taglia, setTaglia, "sizeOptions")}

@@ -23,7 +23,7 @@
   "seo": {
     "home": {
       "title": "TriesteImmobiliare – nakup in prodaja nepremičnin v Trstu (Trieste)",
-      "description": "Agencija skupine TriesteVillas za nepremičnine zunaj luksuznega segmenta: cenitev v 48 urah, objava v 7 dneh, trimesečni mandat, trženje tudi v tujini.",
+      "description": "Agencija skupine TriesteVillas za nepremičnine zunaj luksuznega segmenta v Trstu in tržaški pokrajini: cenitev v 48 urah, objava v 7 dneh, trimesečni mandat, trženje tudi v tujini.",
       "ogTitle": "TriesteImmobiliare – trženje TriesteVillas za stanovanjske nepremičnine",
       "ogDescription": "Isto trženje kot pri TriesteVillas, za stanovanjske nepremičnine v Trstu in tržaški pokrajini do približno 500.000 €. Cenitev v 48 urah, preprost trimesečni mandat."
     },
@@ -118,7 +118,7 @@
       "subtitle": "Trženje, po katerem nas poznajo, kupci tudi iz tujine, jasna pogodba in zanesljivi roki. To se spremeni, ko prodajate z nami.",
       "fast": {
         "title": "Res hitra cenitev",
-        "text": "Pogovor z vodjo agencije, pošiljanje dokumentacije, ogled v 24 urah. Če dokumenti in nepremičnina to dopuščajo, nepremičnino objavimo v 7 dneh."
+        "text": "Za nepremičnine v Trstu in tržaški pokrajini: pogovor z vodjo agencije, pošiljanje dokumentacije, ogled v 24 urah. Če dokumenti in nepremičnina to dopuščajo, nepremičnino objavimo v 7 dneh."
       },
       "estero": {
         "title": "Kupci tudi iz tujine",
@@ -153,8 +153,8 @@
     },
     "valuationCta": {
       "eyebrow": "Brez obveznosti",
-      "title": "Koliko je vaš dom zares vreden?",
-      "body": "Verjamemo v svoje delo: začnimo pogovor in videli boste, da bomo vaš dom prodali kar najbolje. Opišite nam nepremičnino in pripravili vam bomo pošteno cenitev, brez obveznosti.",
+      "title": "Koliko je vaš dom v Trstu zares vreden?",
+      "body": "Verjamemo v svoje delo: začnimo pogovor in videli boste, da bomo vaš dom prodali kar najbolje. Opišite nam nepremičnino v Trstu ali tržaški pokrajini in pripravili vam bomo pošteno cenitev, brez obveznosti.",
       "cta": "Naročite cenitev",
       "secondary": "Pogovorite se z nami"
     },
@@ -169,7 +169,7 @@
     "hero": {
       "eyebrow": "Prodaja s TriesteImmobiliare",
       "title": "Prodajte svoj dom v Trstu s strategijo in trženjem TriesteVillas.",
-      "intro": "Prvi stik v 24 urah, cenitev v 48 urah, na spletu že v 7 dneh, če je dom pripravljen na dober začetek. Združujemo hitrost, pregled dokumentacije, močno trženje in postopek, zasnovan tako, da prodajalca čim manj obremeni.",
+      "intro": "Za domove v Trstu in tržaški pokrajini: prvi stik v 24 urah, cenitev v 48 urah, na spletu že v 7 dneh, če je dom pripravljen na dober začetek. Združujemo hitrost, pregled dokumentacije, močno trženje in postopek, zasnovan tako, da prodajalca čim manj obremeni.",
       "videoAlt": "Svetla dnevna soba, ki se odpira na teraso.",
       "ctaPrimary": "Naročite strateško cenitev",
       "ctaSecondary": "Rezervirajte videoklic"
@@ -181,7 +181,7 @@
     "blocks": {
       "velocita": {
         "title": "Hitrost",
-        "text": "Prvi stik v 24 urah, cenitev v 48 urah. Če dokumentacija in stanje nepremičnine to dopuščajo, nepremičnino lahko objavimo že v 7 dneh."
+        "text": "Za nepremičnine v Trstu in tržaški pokrajini: prvi stik v 24 urah, cenitev v 48 urah. Če dokumentacija in stanje nepremičnine to dopuščajo, nepremičnino lahko objavimo že v 7 dneh."
       },
       "mandatoSemplice": {
         "title": "Preprost mandat",
@@ -267,8 +267,8 @@
       }
     },
     "closing": {
-      "title": "Poštena cenitev, brez obveznosti.",
-      "text": "Verjamemo v svoje delo: začnimo pogovor in videli boste, da bomo vaš dom prodali kar najbolje. Povejte nam vse in pripravili vam bomo strateško cenitev vaše nepremičnine.",
+      "title": "Poštena cenitev doma v Trstu, brez obveznosti.",
+      "text": "Verjamemo v svoje delo: začnimo pogovor in videli boste, da bomo vaš dom prodali kar najbolje. Povejte nam vse in pripravili vam bomo strateško cenitev vaše nepremičnine v Trstu ali tržaški pokrajini.",
       "ctaPrimary": "Naročite strateško cenitev",
       "ctaSecondary": "Rezervirajte videoklic"
     },
@@ -693,7 +693,7 @@
   "sellerForm": {
     "eyebrow": "Prodaja s TriesteImmobiliare",
     "title": "Naročite cenitev",
-    "subtitle": "Brez obveznosti: samo poštena cenitev vaše nepremičnine.",
+    "subtitle": "Brez obveznosti: samo poštena cenitev vaše nepremičnine v Trstu ali tržaški pokrajini.",
     "firstName": "Ime",
     "lastName": "Priimek",
     "phone": "Mobilni telefon",
@@ -702,6 +702,7 @@
     "address": "Kje je nepremičnina?",
     "addressPlaceholder": "Ulica in hišna številka, kraj (npr. Strada Costiera 28, Trst)",
     "addressFound": "Lokacija prepoznana",
+    "sloveniaHint": "Je vaša nepremičnina v Sloveniji? Tam še ne posredujemo – oglejte si <link>stran za lastnike na SloveniaVillas</link>.",
     "type": "Vrsta",
     "typeOptions": {
       "0": "Stanovanje",
@@ -1103,12 +1104,12 @@
     "relatedEyebrow": "Berite naprej",
     "chapter": {
       "eyebrow": "Naslednji korak",
-      "title": "Koliko je vaš dom zares vreden? Cenitev v 48 urah.",
+      "title": "Koliko je vaš dom v Trstu zares vreden? Cenitev v 48 urah.",
       "cta": "Prodajte z nami"
     },
     "updatesTitle": "Posodobitve tega vodnika",
     "ctaSellTitle": "Razmišljate o prodaji?",
-    "ctaSellText": "Cenitev v 48 urah, nepremičnina na spletu v 7 dneh, preprost trimesečni mandat. In trženje skupine TriesteVillas, tudi za kupce iz tujine.",
+    "ctaSellText": "Za domove v Trstu in tržaški pokrajini: cenitev v 48 urah, nepremičnina na spletu v 7 dneh, preprost trimesečni mandat. In trženje skupine TriesteVillas, tudi za kupce iz tujine.",
     "ctaSellCta": "Prodaja doma v Trstu",
     "ctaBuyTitle": "Iščete dom v Trstu?",
     "ctaBuyText": "Stanovanjske nepremičnine v Trstu in tržaški pokrajini, pri vsaki s podatki o dokumentih, stroških in energetskem razredu.",
