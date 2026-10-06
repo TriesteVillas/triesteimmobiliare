@@ -7,6 +7,7 @@ import Timeline from "@/components/Timeline";
 import JsonLd from "@/components/JsonLd";
 import VideoSito from "@/components/VideoSito";
 import ResourceCard from "@/components/resources/ResourceCard";
+import SloveniaVillasRiquadro from "@/components/SloveniaVillasRiquadro";
 import { getArticle, readingMinutes } from "@/lib/articles";
 import { pageAlternates, pageOpenGraph, faqJsonLd } from "@/lib/seo";
 
@@ -175,6 +176,11 @@ export default async function SellPage({
           ))}
         </div>
       </section>
+
+      {/* SloveniaVillas (06/10/2026) — subito dopo «perché noi», per chi ha la
+          casa di là dal confine: noi vendiamo Trieste, per la costa slovena e
+          il Carso c'è l'atlante del gruppo. In tutte e quattro le lingue. */}
+      <SloveniaVillasRiquadro misura="vendi" />
 
       {/* Process timeline */}
       <section className="mx-auto max-w-3xl px-6 py-20">

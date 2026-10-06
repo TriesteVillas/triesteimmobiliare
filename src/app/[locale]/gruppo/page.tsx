@@ -7,6 +7,7 @@ import Tilt from "@/components/motion/Tilt";
 import SellerCta from "@/components/SellerCta";
 import BuyerCta from "@/components/BuyerCta";
 import { pageAlternates, pageOpenGraph } from "@/lib/seo";
+import { sloveniaVillasUrl } from "@/lib/sloveniavillas";
 
 export async function generateMetadata({
   params,
@@ -23,7 +24,7 @@ export async function generateMetadata({
   };
 }
 
-const BRANDS = ["tsv", "tsi", "affitti", "friuli", "business", "lignano"] as const;
+const BRANDS = ["tsv", "tsi", "affitti", "friuli", "business", "lignano", "slovenia"] as const;
 type BrandSiteLocale = "it" | "en" | "de" | "sl";
 type BrandSites = Partial<Record<(typeof BRANDS)[number], string>>;
 // URLs verified live on 2026-07-23. TriesteBusiness stays unlinked because it has no website.
@@ -78,7 +79,12 @@ export default async function GroupPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("group");
-  const brandSites = BRAND_SITES[locale as BrandSiteLocale] ?? BRAND_SITES.it;
+  // SloveniaVillas (06/10/2026) ha /sl suo: l'indirizzo per lingua viene da
+  // lib/sloveniavillas.ts, non da questa tabella.
+  const brandSites: BrandSites = {
+    ...(BRAND_SITES[locale as BrandSiteLocale] ?? BRAND_SITES.it),
+    slovenia: sloveniaVillasUrl(locale),
+  };
 
   return (
     <>
@@ -103,7 +109,7 @@ export default async function GroupPage({
         </p>
       </section>
 
-      {/* The 6 brands */}
+      {/* The 7 brands (SloveniaVillas dal 06/10/2026) */}
       <section className="border-y border-neutral-200 bg-paper">
         <div className="mx-auto max-w-6xl px-6 py-16">
           <h2 className="display-chapter text-brand-dark">{t("brandsTitle")}</h2>

@@ -46,8 +46,8 @@
       "ogDescription": "Stanovanjska ponudba TriesteImmobiliare, območje za območjem."
     },
     "group": {
-      "title": "Skupina TriesteVillas – šest blagovnih znamk",
-      "description": "TriesteImmobiliare v ekosistemu TriesteVillas: šest znamk za luksuzne in stanovanjske nepremičnine, najeme, FJK, poslovne nepremičnine in Lignano.",
+      "title": "Skupina TriesteVillas – sedem blagovnih znamk",
+      "description": "TriesteImmobiliare v ekosistemu TriesteVillas: sedem znamk za luksuzne in stanovanjske nepremičnine, najeme, FJK, poslovne nepremičnine, Lignano in slovensko obalo.",
       "ogTitle": "Skupina TriesteVillas: različne znamke, enotno vodstvo",
       "ogDescription": "Nepremičninski ekosistem, zgrajen na specializaciji, ne splošna ponudba za vse."
     },
@@ -142,12 +142,13 @@
     },
     "groupRouting": {
       "eyebrow": "Različne znamke, enotno vodstvo",
-      "title": "Šest znamk, ena struktura.",
+      "title": "Sedem znamk, ena struktura.",
       "body": "TriesteImmobiliare je del ekosistema TriesteVillas. Vsaka znamka pokriva svoj trg: vi vstopite skozi prava vrata.",
       "luxury": "Luksuzna nepremičnina → TriesteVillas",
       "fvg": "Preostala FJK → FriuliVillas / LignanoVillas",
       "rent": "Najemi → TriesteAffitti",
       "business": "Poslovne nepremičnine → TriesteBusiness",
+      "slovenia": "Slovenska obala in Kras → SloveniaVillas (atlas in orodja)",
       "cta": "Spoznajte skupino"
     },
     "valuationCta": {
@@ -482,8 +483,8 @@
       "body": "Vseh nepremičnin ne prodajamo, oddajamo ali upravljamo na enak način. Luksuzna nepremičnina, stanovanje, najem, poslovna nepremičnina ali vrhunska nepremičnina zunaj mesta zahtevajo drugačen jezik, drugačne postopke in drugačne strategije. Zato vsega nismo postavili pod eno znamko: zgradili smo ekosistem specializiranih znamk.",
       "tagline": "Ne enaka grafika, ne ponavljajoče se ime. Ista kultura dela."
     },
-    "brandsTitle": "Šest znamk, enotno vodstvo",
-    "brandsSubtitle": "Ena struktura za vse nepremičninske potrebe v Trstu in v vsej Furlaniji - Julijski krajini.",
+    "brandsTitle": "Sedem znamk, enotno vodstvo",
+    "brandsSubtitle": "Ena struktura za vse nepremičninske potrebe v Trstu in v vsej Furlaniji - Julijski krajini ter atlas slovenske obale in Krasa.",
     "brands": {
       "tsv": {
         "name": "TriesteVillas",
@@ -514,6 +515,11 @@
         "name": "LignanoVillas",
         "tag": "Vrhunske nepremičnine v Lignanu",
         "desc": "Vrhunski posli v Lignanu, z bolj mednarodnim pogledom. Za tuje kupce in lastnike, ki iščejo strukturo, kontekst in kakovost upravljanja."
+      },
+      "slovenia": {
+        "name": "SloveniaVillas",
+        "tag": "Atlas · slovenska obala in Kras",
+        "desc": "Atlas slovenske obale in Krasa, izmerjen iz Trsta: kraji, vodniki in orodja za kupce in lastnike. V Sloveniji še ne posredujemo; začnemo v letu 2027."
       }
     },
     "story": {
@@ -530,7 +536,7 @@
       },
       "today": {
         "title": "Ena skupina, jasne vloge",
-        "text": "TriesteImmobiliare pokriva stanovanjske nepremičnine v Trstu in tržaški pokrajini; TriesteVillas ostaja pri vrhunskih, TriesteAffitti pri najemih, FriuliVillas in LignanoVillas na širšem ozemlju, TriesteBusiness pri poslovnih. Manj razpršenosti, več jasnosti."
+        "text": "TriesteImmobiliare pokriva stanovanjske nepremičnine v Trstu in tržaški pokrajini; TriesteVillas ostaja pri vrhunskih, TriesteAffitti pri najemih, FriuliVillas in LignanoVillas na širšem ozemlju, TriesteBusiness pri poslovnih, SloveniaVillas pa – zaenkrat kot atlas – na slovenski obali in na Krasu. Manj razpršenosti, več jasnosti."
       }
     },
     "valuesTitle": "Ena in ista kultura dela",
@@ -1152,5 +1158,37 @@
     "micro": "Odpre se v novem zavihku · elegieduino.it · v angleščini",
     "newTab": "(odpre se v novem zavihku na elegieduino.it, v angleščini)",
     "plansHint": "Interaktivni tlorisi razpoložljivih enot so na strani projekta:"
+  },
+  "sloveniavillas": {
+    "home": {
+      "eyebrow": "Slovenija · obala in Kras",
+      "title": "Imate hišo na obali ali na Krasu?",
+      "body": "TriesteImmobiliare je agencija v Trstu. Kupci, ki iščejo dom v Trstu, gledajo tudi čez mejo – zlasti tisti iz Avstrije in Nemčije. Zanje je skupina TriesteVillas pripravila SloveniaVillas: atlas slovenske obale in Krasa, izmerjen iz Trsta. Lastniki tam najdejo vodnike in orodja: neto izkupiček prodaje, pot od vrednosti GURS do trga, dokumente za prodajo.",
+      "driveLabel": "Vožnja od Trga Unità, brez prometa (OSRM)",
+      "places": {
+        "sezana": "Sežana",
+        "koper": "Koper",
+        "izola": "Izola",
+        "piran": "Piran"
+      },
+      "owners": {
+        "title": "Za lastnike",
+        "text": "Kako hišo predstavimo kupcem iz tujine ter kaj lahko naredimo danes in česa ne."
+      },
+      "tools": {
+        "title": "Orodja",
+        "text": "Sedem orodij za izračune, od stroškov nakupa do neto izkupička prodaje."
+      },
+      "guide": {
+        "title": "Prodaja nepremičnine tujcu",
+        "text": "Vodnik: dokumenti, pogodba, davki."
+      },
+      "cta": "Obiščite SloveniaVillas",
+      "limit": "V Sloveniji še ne posredujemo – nepremičninsko posredovanje je regulirana dejavnost. Začnemo v letu 2027."
+    },
+    "vendi": {
+      "title": "Je vaša hiša na slovenski obali ali na Krasu?",
+      "text": "TriesteImmobiliare posreduje pri prodaji v Trstu in tržaški pokrajini. V Sloveniji še ne posredujemo, začnemo v letu 2027. Kupcem, ki iščejo v Trstu in gledajo tudi čez mejo, obalo in Kras predstavlja SloveniaVillas, atlas skupine TriesteVillas, z vodniki in orodji tudi za lastnike."
+    }
   }
 }

@@ -19,6 +19,8 @@ import { videoDelSito } from "@/lib/video-sito";
 import { BoatMark } from "@/components/Logo";
 import BuyerCta from "@/components/BuyerCta";
 import SellerCta from "@/components/SellerCta";
+import SloveniaVillasRiquadro from "@/components/SloveniaVillasRiquadro";
+import { sloveniaVillasHref } from "@/lib/sloveniavillas";
 
 // L'ordine racconta perché ci scelgono, e l'ordine è cambiato il 03/09/2026:
 // prima c'era `zeroFee` in seconda posizione, la promo «0% al venditore».
@@ -26,7 +28,7 @@ import SellerCta from "@/components/SellerCta";
 // il marketing e i compratori che arrivano da fuori. Quelli vanno per primi.
 const SELLER_CARDS = ["marketing", "estero", "fast", "simpleMandate"] as const;
 const PROMISES = ["valuation", "online", "mandate", "reach"] as const;
-const ROUTING = ["luxury", "fvg", "rent", "business"] as const;
+const ROUTING = ["luxury", "fvg", "rent", "business", "slovenia"] as const;
 
 export async function generateMetadata({
   params,
@@ -251,6 +253,12 @@ export default async function Home({
         </Link>
       </section>
 
+      {/* ── SloveniaVillas — solo in sloveno ──────────────────────────
+          Chi legge la home in sloveno ha spesso la casa sulla costa o sul
+          Carso: qui gli si dice, subito dopo «chi siamo», che noi vendiamo
+          Trieste e che per l'altra parte c'è l'atlante del gruppo. */}
+      {locale === "sl" && <SloveniaVillasRiquadro misura="home" />}
+
       {/* ── Marketing video break ─────────────────────────────────── */}
       <section className="relative h-[62vh] min-h-[420px] max-h-[680px] overflow-hidden bg-brand-dark">
         <AutoVideo
@@ -386,7 +394,18 @@ export default async function Home({
                 className="flex items-center gap-3 py-4 text-lg font-medium text-brand-dark"
               >
                 <span className="text-brand">→</span>
-                {t(`groupRouting.${r}`)}
+                {r === "slovenia" ? (
+                  <a
+                    href={sloveniaVillasHref(locale, "home", "routing")}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline-offset-4 transition-colors hover:text-brand hover:underline"
+                  >
+                    {t(`groupRouting.${r}`)} ↗
+                  </a>
+                ) : (
+                  t(`groupRouting.${r}`)
+                )}
               </li>
             ))}
           </ul>

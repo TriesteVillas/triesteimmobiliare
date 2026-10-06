@@ -2,6 +2,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import Logo from "./Logo";
 import CookiePrefsButton from "./CookiePrefsButton";
+import { sloveniaVillasUrl } from "@/lib/sloveniavillas";
 
 // TriesteImmobiliare's own channel (the flagship's socials stay on TSV).
 const SOCIALS = [
@@ -59,6 +60,9 @@ const GROUP = [
   { label: "TriesteAffitti", site: "affitti", external: true },
   { label: "FriuliVillas", site: "friuli", external: true },
   { label: "LignanoVillas", site: "lignano", external: true },
+  // SloveniaVillas (06/10/2026): l'indirizzo per lingua viene da
+  // lib/sloveniavillas.ts, l'unica tabella dei suoi percorsi.
+  { label: "SloveniaVillas", site: "slovenia", external: true },
   { label: "TriesteBusiness", href: "/gruppo", external: false },
 ] as const;
 
@@ -71,7 +75,10 @@ export default async function Footer() {
   const year = new Date().getFullYear();
   const phone = tContact("phone");
   const telHref = `tel:+39${phone.replace(/\s+/g, "")}`;
-  const groupSites = GROUP_SITES[locale as GroupSiteLocale] ?? GROUP_SITES.it;
+  const groupSites = {
+    ...(GROUP_SITES[locale as GroupSiteLocale] ?? GROUP_SITES.it),
+    slovenia: sloveniaVillasUrl(locale),
+  };
 
   return (
     <footer className="mt-16 bg-brand-dark text-white">

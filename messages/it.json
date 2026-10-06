@@ -46,8 +46,8 @@
       "ogDescription": "Il portfolio residenziale di TriesteImmobiliare, zona per zona."
     },
     "group": {
-      "title": "Il Gruppo TriesteVillas — sei brand",
-      "description": "TriesteImmobiliare nell'ecosistema TriesteVillas: sei brand per luxury, residenziale, affitti, FVG, business e Lignano. Una regia sola.",
+      "title": "Il Gruppo TriesteVillas — sette brand",
+      "description": "TriesteImmobiliare nell'ecosistema TriesteVillas: sette brand per luxury, residenziale, affitti, FVG, business, Lignano e la costa slovena. Una regia sola.",
       "ogTitle": "Il Gruppo TriesteVillas: brand diversi, una regia sola",
       "ogDescription": "Un ecosistema immobiliare costruito per specializzazione, non un contenitore generico."
     },
@@ -142,12 +142,13 @@
     },
     "groupRouting": {
       "eyebrow": "Brand diversi, una regia sola",
-      "title": "Sei brand, un'unica struttura.",
+      "title": "Sette brand, un'unica struttura.",
       "body": "TriesteImmobiliare fa parte dell'ecosistema TriesteVillas. Ogni brand presidia un mercato: tu entri dalla porta giusta.",
       "luxury": "Immobile di lusso → TriesteVillas",
       "fvg": "Resto del FVG → FriuliVillas / LignanoVillas",
       "rent": "Affitti → TriesteAffitti",
       "business": "Commerciale → TriesteBusiness",
+      "slovenia": "Costa slovena e Carso → SloveniaVillas (atlante e strumenti)",
       "cta": "Scopri il Gruppo"
     },
     "valuationCta": {
@@ -482,8 +483,8 @@
       "body": "Non tutti gli immobili si vendono, si affittano o si gestiscono nello stesso modo. Un immobile luxury, un appartamento residenziale, una locazione, un asset commerciale o una proprietà premium fuori città richiedono linguaggi, processi e strategie diverse. Per questo non abbiamo messo tutto sotto un solo marchio: abbiamo costruito un ecosistema di brand specializzati.",
       "tagline": "Non una grafica uguale, non un nome ripetuto. La stessa cultura del lavoro."
     },
-    "brandsTitle": "Sei brand, un'unica regia",
-    "brandsSubtitle": "Una sola struttura per coprire ogni esigenza immobiliare a Trieste e in tutto il Friuli-Venezia Giulia.",
+    "brandsTitle": "Sette brand, un'unica regia",
+    "brandsSubtitle": "Una sola struttura per coprire ogni esigenza immobiliare a Trieste e in tutto il Friuli-Venezia Giulia, più un atlante della costa slovena e del Carso.",
     "brands": {
       "tsv": {
         "name": "TriesteVillas",
@@ -514,6 +515,11 @@
         "name": "LignanoVillas",
         "tag": "Premium a Lignano",
         "desc": "Compravendite premium a Lignano, lette con una lente più internazionale. Per compratori e proprietari esteri che cercano struttura, contesto e qualità nella gestione."
+      },
+      "slovenia": {
+        "name": "SloveniaVillas",
+        "tag": "Atlante · costa slovena e Carso",
+        "desc": "L'atlante della costa slovena e del Carso misurato da Trieste: luoghi, guide e strumenti per chi compra e per chi possiede. In Slovenia oggi non facciamo mediazione: l'avvio è previsto nel corso del 2027."
       }
     },
     "story": {
@@ -530,7 +536,7 @@
       },
       "today": {
         "title": "Un gruppo, ruoli chiari",
-        "text": "TriesteImmobiliare presidia il residenziale di Trieste e Provincia; TriesteVillas resta sul premium, TriesteAffitti sugli affitti, FriuliVillas e LignanoVillas sul territorio, TriesteBusiness sul commerciale. Meno dispersione, più chiarezza."
+        "text": "TriesteImmobiliare presidia il residenziale di Trieste e Provincia; TriesteVillas resta sul premium, TriesteAffitti sugli affitti, FriuliVillas e LignanoVillas sul territorio, TriesteBusiness sul commerciale e SloveniaVillas, per ora come atlante, sulla costa slovena e sul Carso. Meno dispersione, più chiarezza."
       }
     },
     "valuesTitle": "Una stessa cultura del lavoro",
@@ -1152,5 +1158,37 @@
     "micro": "Si apre in una nuova scheda · elegieduino.it",
     "newTab": "(si apre in una nuova scheda su elegieduino.it)",
     "plansHint": "Le planimetrie delle unità disponibili, interattive, le trovi sul sito del progetto:"
+  },
+  "sloveniavillas": {
+    "home": {
+      "eyebrow": "Slovenia · costa e Carso",
+      "title": "Una casa sulla costa slovena o sul Carso?",
+      "body": "TriesteImmobiliare è un'agenzia di Trieste. Chi cerca casa a Trieste guarda anche oltre il confine, soprattutto chi arriva dall'Austria e dalla Germania. Per loro il gruppo TriesteVillas ha creato SloveniaVillas: l'atlante della costa slovena e del Carso, misurato da Trieste. I proprietari ci trovano guide e strumenti: il ricavato netto di una vendita, dal valore GURS al mercato, i documenti per vendere.",
+      "driveLabel": "In auto da Piazza Unità, senza traffico (OSRM)",
+      "places": {
+        "sezana": "Sesana",
+        "koper": "Capodistria",
+        "izola": "Isola",
+        "piran": "Pirano"
+      },
+      "owners": {
+        "title": "Per i proprietari",
+        "text": "Come si presenta una casa a chi compra dall'estero, e cosa oggi si può fare e cosa no."
+      },
+      "tools": {
+        "title": "Gli strumenti",
+        "text": "Sette strumenti di calcolo, dai costi d'acquisto al ricavato netto di una vendita."
+      },
+      "guide": {
+        "title": "Le guide",
+        "text": "Per chi compra e per chi vende."
+      },
+      "cta": "Apri SloveniaVillas",
+      "limit": "In Slovenia oggi non facciamo mediazione: è un'attività regolata. L'avvio è previsto nel corso del 2027."
+    },
+    "vendi": {
+      "title": "La casa è sulla costa slovena o sul Carso?",
+      "text": "TriesteImmobiliare vende a Trieste e Provincia. In Slovenia oggi non facciamo mediazione: l'avvio è previsto nel corso del 2027. A chi cerca a Trieste e guarda anche oltre confine, la costa e il Carso li presenta SloveniaVillas, l'atlante del gruppo TriesteVillas, con guide e strumenti anche per i proprietari."
+    }
   }
 }
