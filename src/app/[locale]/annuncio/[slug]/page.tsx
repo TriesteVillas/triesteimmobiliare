@@ -30,6 +30,8 @@ import VideoYoutube from "@/components/VideoYoutube";
 import SfondoVideo from "@/components/media/SfondoVideo";
 import RiquadriEvidenza from "@/components/RiquadriEvidenza";
 import { riquadriAnnuncio } from "@/content/annunciRiquadri";
+import ApprofondimentoAnnuncio from "@/components/ApprofondimentoAnnuncio";
+import { approfondimentoAnnuncio } from "@/content/annunciApprofondimenti";
 import { videoDelSito, videoYoutube } from "@/lib/video-sito";
 import {
   buildPropertyView,
@@ -245,6 +247,8 @@ export default async function PropertyPage({ params }: { params: Params }) {
   const heroMp4 = property.heroVideo ?? null;
   // I riquadri in evidenza (content/annunciRiquadri.ts): in alto sul foglio.
   const riquadri = riquadriAnnuncio(property.id, locale);
+  // L'approfondimento (content/annunciApprofondimenti.ts): dopo la descrizione.
+  const approfondimento = approfondimentoAnnuncio(property.id, locale);
   // L'etichetta del video dal registro dei video del CRM (`tsi:<percorso del
   // 1080>`), come per ogni altro file del sito (VideoSito): senza riga, null.
   const heroMp4Ai = heroMp4 ? await videoDelSito(heroMp4.mp4, locale) : null;
@@ -376,6 +380,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
     (property.coverPhoto || property.photos.length) && { id: "foto", label: t("galPhotos") },
     isElegie && tElegie && { id: "elegie", label: tElegie("nav") },
     description && { id: "descrizione", label: t("descriptionTitle") },
+    approfondimento && { id: "approfondimento", label: approfondimento.voce },
     property.planimetrie.length && { id: "planimetrie", label: t("galPlans") },
     ytIds.length && { id: "video", label: t("galVideo") },
     property.matterportUrl && { id: "tour", label: t("galTour") },
@@ -688,6 +693,8 @@ export default async function PropertyPage({ params }: { params: Params }) {
               </div>
             </section>
           )}
+
+          <ApprofondimentoAnnuncio approfondimento={approfondimento} altro={t("deepDiveMore")} />
 
           {hasCosts && taxData && <TaxBox data={taxData} labels={taxLabels} locale={locale} />}
 
