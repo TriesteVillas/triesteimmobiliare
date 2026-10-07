@@ -21,6 +21,7 @@ import BuyerCta from "@/components/BuyerCta";
 import SellerCta from "@/components/SellerCta";
 import SloveniaVillasRiquadro from "@/components/SloveniaVillasRiquadro";
 import { sloveniaVillasHref } from "@/lib/sloveniavillas";
+import { sappadaVillasHref } from "@/lib/sappadavillas";
 
 // L'ordine racconta perché ci scelgono, e l'ordine è cambiato il 03/09/2026:
 // prima c'era `zeroFee` in seconda posizione, la promo «0% al venditore».
@@ -28,7 +29,13 @@ import { sloveniaVillasHref } from "@/lib/sloveniavillas";
 // il marketing e i compratori che arrivano da fuori. Quelli vanno per primi.
 const SELLER_CARDS = ["marketing", "estero", "fast", "simpleMandate"] as const;
 const PROMISES = ["valuation", "online", "mandate", "reach"] as const;
-const ROUTING = ["luxury", "fvg", "rent", "business", "slovenia"] as const;
+// Le due righe coi siti nuovi, che hanno il link: `sappada` (07/10/2026) prima
+// di `slovenia` (06/10/2026), l'Italia prima del confine.
+const ROUTING = ["luxury", "fvg", "rent", "business", "sappada", "slovenia"] as const;
+const ROUTING_HREF = {
+  sappada: (locale: string) => sappadaVillasHref(locale, "home", "routing"),
+  slovenia: (locale: string) => sloveniaVillasHref(locale, "home", "routing"),
+} as const;
 
 export async function generateMetadata({
   params,
@@ -394,9 +401,9 @@ export default async function Home({
                 className="flex items-center gap-3 py-4 text-lg font-medium text-brand-dark"
               >
                 <span className="text-brand">→</span>
-                {r === "slovenia" ? (
+                {r === "sappada" || r === "slovenia" ? (
                   <a
-                    href={sloveniaVillasHref(locale, "home", "routing")}
+                    href={ROUTING_HREF[r](locale)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="underline-offset-4 transition-colors hover:text-brand hover:underline"

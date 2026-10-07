@@ -8,6 +8,7 @@ import JsonLd from "@/components/JsonLd";
 import VideoSito from "@/components/VideoSito";
 import ResourceCard from "@/components/resources/ResourceCard";
 import SloveniaVillasRiquadro from "@/components/SloveniaVillasRiquadro";
+import SappadaVillasRiquadro from "@/components/SappadaVillasRiquadro";
 import { getArticle, readingMinutes } from "@/lib/articles";
 import { pageAlternates, pageOpenGraph, faqJsonLd } from "@/lib/seo";
 
@@ -181,6 +182,11 @@ export default async function SellPage({
           casa di là dal confine: noi vendiamo Trieste, per la costa slovena e
           il Carso c'è l'atlante del gruppo. In tutte e quattro le lingue. */}
       <SloveniaVillasRiquadro misura="vendi" />
+
+      {/* SappadaVillas (07/10/2026) — l'altra casa che non è a Trieste: in
+          montagna, a Sappada. Stessa forma del riquadro qui sopra, e il
+          pulsante porta alla pagina per chi vende, nella lingua di chi legge. */}
+      <SappadaVillasRiquadro />
 
       {/* Process timeline */}
       <section className="mx-auto max-w-3xl px-6 py-20">

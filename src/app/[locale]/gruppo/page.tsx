@@ -8,6 +8,7 @@ import BuyerCta from "@/components/BuyerCta";
 import LastraLogo from "@/components/LoghiGruppo";
 import { pageAlternates, pageOpenGraph } from "@/lib/seo";
 import { sloveniaVillasUrl } from "@/lib/sloveniavillas";
+import { sappadaVillasUrl } from "@/lib/sappadavillas";
 
 export async function generateMetadata({
   params,
@@ -24,7 +25,7 @@ export async function generateMetadata({
   };
 }
 
-const BRANDS = ["tsv", "tsi", "affitti", "friuli", "business", "lignano", "slovenia"] as const;
+const BRANDS = ["tsv", "tsi", "affitti", "friuli", "business", "lignano", "sappada", "slovenia"] as const;
 type BrandSiteLocale = "it" | "en" | "de" | "sl";
 type BrandSites = Partial<Record<(typeof BRANDS)[number], string>>;
 // URLs verified live on 2026-07-23. TriesteBusiness stays unlinked because it has no website.
@@ -80,10 +81,12 @@ export default async function GroupPage({
   setRequestLocale(locale);
   const t = await getTranslations("group");
   // SloveniaVillas (06/10/2026) ha /sl suo: l'indirizzo per lingua viene da
-  // lib/sloveniavillas.ts, non da questa tabella.
+  // lib/sloveniavillas.ts, non da questa tabella. Lo stesso per SappadaVillas
+  // (07/10/2026), che ha le quattro lingue: lib/sappadavillas.ts.
   const brandSites: BrandSites = {
     ...(BRAND_SITES[locale as BrandSiteLocale] ?? BRAND_SITES.it),
     slovenia: sloveniaVillasUrl(locale),
+    sappada: sappadaVillasUrl(locale),
   };
 
   return (
@@ -109,7 +112,7 @@ export default async function GroupPage({
         </p>
       </section>
 
-      {/* The 7 brands (SloveniaVillas dal 06/10/2026) */}
+      {/* The 8 brands (SloveniaVillas dal 06/10/2026, SappadaVillas dal 07/10/2026) */}
       <section className="border-y border-neutral-200 bg-paper">
         <div className="mx-auto max-w-6xl px-6 py-16">
           <h2 className="display-chapter text-brand-dark">{t("brandsTitle")}</h2>

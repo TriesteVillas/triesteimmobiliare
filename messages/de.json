@@ -46,8 +46,8 @@
       "ogDescription": "Das Wohnimmobilien-Portfolio von TriesteImmobiliare, Zone für Zone."
     },
     "group": {
-      "title": "Die TriesteVillas-Gruppe — sieben Marken",
-      "description": "TriesteImmobiliare im TriesteVillas-Ökosystem: sieben Marken für Luxus, Wohnen, Vermietung, FVG, Business, Lignano und die slowenische Küste. Eine Regie.",
+      "title": "Die TriesteVillas-Gruppe — acht Marken",
+      "description": "TriesteImmobiliare im TriesteVillas-Ökosystem: acht Marken für Luxus, Wohnen, Vermietung, FVG, Business, Lignano, Sappada und die slowenische Küste. Eine Regie.",
       "ogTitle": "Die TriesteVillas-Gruppe: verschiedene Marken, eine einzige Regie",
       "ogDescription": "Ein Immobilien-Ökosystem, aufgebaut nach Spezialisierung, kein beliebiger Sammelbehälter."
     },
@@ -142,12 +142,13 @@
     },
     "groupRouting": {
       "eyebrow": "Verschiedene Marken, eine einzige Regie",
-      "title": "Sieben Marken, eine einzige Struktur.",
+      "title": "Acht Marken, eine einzige Struktur.",
       "body": "TriesteImmobiliare gehört zum Ökosystem von TriesteVillas. Jede Marke deckt einen Markt ab: Sie kommen durch die richtige Tür.",
       "luxury": "Luxusimmobilie → TriesteVillas",
       "fvg": "Übriges Friaul-Julisch Venetien → FriuliVillas / LignanoVillas",
       "rent": "Vermietung → TriesteAffitti",
       "business": "Gewerbe → TriesteBusiness",
+      "sappada": "Sappada, in den Bergen → SappadaVillas (Weiler, Sonnenstunden, Markt)",
       "slovenia": "Slowenische Küste und Karst → SloveniaVillas (Atlas und Werkzeuge)",
       "cta": "Die Gruppe entdecken"
     },
@@ -484,7 +485,7 @@
       "body": "Nicht alle Immobilien werden auf dieselbe Weise verkauft, vermietet oder verwaltet. Eine Luxusimmobilie, eine Wohnimmobilie, eine Vermietung, ein Gewerbeobjekt oder eine Premium-Immobilie außerhalb der Stadt erfordern unterschiedliche Sprachen, Prozesse und Strategien. Deshalb haben wir nicht alles unter eine einzige Marke gestellt: Wir haben ein Ökosystem spezialisierter Marken aufgebaut.",
       "tagline": "Keine gleiche Grafik, kein wiederholter Name. Dieselbe Arbeitskultur."
     },
-    "brandsTitle": "Sieben Marken, eine einzige Regie",
+    "brandsTitle": "Acht Marken, eine einzige Regie",
     "brandsSubtitle": "Eine einzige Struktur, um jeden Immobilienbedarf in Triest und im gesamten Friaul-Julisch Venetien abzudecken, dazu ein Atlas der slowenischen Küste und des Karsts.",
     "brands": {
       "tsv": {
@@ -517,6 +518,11 @@
         "tag": "Premium in Lignano",
         "desc": "Premium-Verkäufe in Lignano, gelesen mit einer internationaleren Linse. Für ausländische Käufer und Eigentümer, die Struktur, Kontext und Qualität in der Abwicklung suchen."
       },
+      "sappada": {
+        "name": "SappadaVillas",
+        "tag": "Berge · Sappada / Plodn",
+        "desc": "Sappada/Plodn in den Bergen: die fünfzehn Weiler, einer nach dem anderen, mit den am Geländemodell berechneten Sonnenstunden, der Markt mit den Zahlen der italienischen Finanzverwaltung, die ersten Häuser und die Seiten für Verkäufer und für Bauträger. Unser Büro ist in Triest: Nach Sappada kommen wir nach Vereinbarung."
+      },
       "slovenia": {
         "name": "SloveniaVillas",
         "tag": "Atlas · slowenische Küste und Karst",
@@ -537,7 +543,7 @@
       },
       "today": {
         "title": "Eine Gruppe, klare Rollen",
-        "text": "TriesteImmobiliare betreut Wohnimmobilien in Triest und Provinz; TriesteVillas bleibt beim Premium, TriesteAffitti bei den Vermietungen, FriuliVillas und LignanoVillas in der Region, TriesteBusiness beim Gewerbe und SloveniaVillas, vorerst als Atlas, an der slowenischen Küste und im Karst. Weniger Streuverlust, mehr Klarheit."
+        "text": "TriesteImmobiliare betreut Wohnimmobilien in Triest und Provinz; TriesteVillas bleibt beim Premium, TriesteAffitti bei den Vermietungen, FriuliVillas, LignanoVillas und SappadaVillas in der Region, TriesteBusiness beim Gewerbe und SloveniaVillas, vorerst als Atlas, an der slowenischen Küste und im Karst. Weniger Streuverlust, mehr Klarheit."
       }
     },
     "valuesTitle": "Ein und dieselbe Arbeitskultur",
@@ -1191,6 +1197,16 @@
     "vendi": {
       "title": "Liegt Ihr Haus an der slowenischen Küste oder im Karst?",
       "text": "TriesteImmobiliare verkauft in Triest und Provinz. In Slowenien vermitteln wir heute nicht; der Start ist im Laufe des Jahres 2027 geplant. Käufern, die in Triest suchen und auch über die Grenze schauen, stellt SloveniaVillas – der Atlas der TriesteVillas-Gruppe – Küste und Karst vor, mit Ratgebern und Werkzeugen auch für Eigentümer."
+    }
+  },
+  "sappadavillas": {
+    "vendi": {
+      "eyebrow": "Sappada · Berge",
+      "title": "Haben Sie ein Haus in den Bergen, in Sappada?",
+      "text": "Für Sappada hat die TriesteVillas-Gruppe eine eigene Website, SappadaVillas: die fünfzehn Weiler, einer nach dem anderen, mit den am Geländemodell berechneten Sonnenstunden, und der Markt mit den Zahlen der italienischen Finanzverwaltung. Die Seite für Verkäufer erklärt den Ablauf Schritt für Schritt. Unser Büro ist in Triest: Nach Sappada kommen wir nach Vereinbarung, und wir antworten Ihnen auf Italienisch oder Englisch.",
+      "cta": "Verkaufen in Sappada",
+      "hamlets": "Die fünfzehn Weiler",
+      "market": "Der Markt"
     }
   }
 }

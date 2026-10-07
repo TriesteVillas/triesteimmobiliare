@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import Logo from "./Logo";
 import CookiePrefsButton from "./CookiePrefsButton";
 import { sloveniaVillasUrl } from "@/lib/sloveniavillas";
+import { sappadaVillasUrl } from "@/lib/sappadavillas";
 
 // TriesteImmobiliare's own channel (the flagship's socials stay on TSV).
 const SOCIALS = [
@@ -60,6 +61,10 @@ const GROUP = [
   { label: "TriesteAffitti", site: "affitti", external: true },
   { label: "FriuliVillas", site: "friuli", external: true },
   { label: "LignanoVillas", site: "lignano", external: true },
+  // SappadaVillas (07/10/2026): dopo il mare di Lignano, la montagna. Come per
+  // SloveniaVillas l'indirizzo per lingua viene dalla sua tabella,
+  // lib/sappadavillas.ts.
+  { label: "SappadaVillas", site: "sappada", external: true },
   // SloveniaVillas (06/10/2026): l'indirizzo per lingua viene da
   // lib/sloveniavillas.ts, l'unica tabella dei suoi percorsi.
   { label: "SloveniaVillas", site: "slovenia", external: true },
@@ -78,6 +83,7 @@ export default async function Footer() {
   const groupSites = {
     ...(GROUP_SITES[locale as GroupSiteLocale] ?? GROUP_SITES.it),
     slovenia: sloveniaVillasUrl(locale),
+    sappada: sappadaVillasUrl(locale),
   };
 
   return (

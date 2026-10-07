@@ -46,8 +46,8 @@
       "ogDescription": "Stanovanjska ponudba TriesteImmobiliare, območje za območjem."
     },
     "group": {
-      "title": "Skupina TriesteVillas – sedem blagovnih znamk",
-      "description": "TriesteImmobiliare v ekosistemu TriesteVillas: sedem znamk za luksuzne in stanovanjske nepremičnine, najeme, FJK, poslovne nepremičnine, Lignano in slovensko obalo.",
+      "title": "Skupina TriesteVillas – osem blagovnih znamk",
+      "description": "TriesteImmobiliare v ekosistemu TriesteVillas: osem znamk za luksuzne in stanovanjske nepremičnine, najeme, FJK, poslovne nepremičnine, Lignano, Sappado in slovensko obalo.",
       "ogTitle": "Skupina TriesteVillas: različne znamke, enotno vodstvo",
       "ogDescription": "Nepremičninski ekosistem, zgrajen na specializaciji, ne splošna ponudba za vse."
     },
@@ -142,12 +142,13 @@
     },
     "groupRouting": {
       "eyebrow": "Različne znamke, enotno vodstvo",
-      "title": "Sedem znamk, ena struktura.",
+      "title": "Osem znamk, ena struktura.",
       "body": "TriesteImmobiliare je del ekosistema TriesteVillas. Vsaka znamka pokriva svoj trg: vi vstopite skozi prava vrata.",
       "luxury": "Luksuzna nepremičnina → TriesteVillas",
       "fvg": "Preostala FJK → FriuliVillas / LignanoVillas",
       "rent": "Najemi → TriesteAffitti",
       "business": "Poslovne nepremičnine → TriesteBusiness",
+      "sappada": "Sappada, v gorah → SappadaVillas (zaselki, ure sonca, trg)",
       "slovenia": "Slovenska obala in Kras → SloveniaVillas (atlas in orodja)",
       "cta": "Spoznajte skupino"
     },
@@ -484,7 +485,7 @@
       "body": "Vseh nepremičnin ne prodajamo, oddajamo ali upravljamo na enak način. Luksuzna nepremičnina, stanovanje, najem, poslovna nepremičnina ali vrhunska nepremičnina zunaj mesta zahtevajo drugačen jezik, drugačne postopke in drugačne strategije. Zato vsega nismo postavili pod eno znamko: zgradili smo ekosistem specializiranih znamk.",
       "tagline": "Ne enaka grafika, ne ponavljajoče se ime. Ista kultura dela."
     },
-    "brandsTitle": "Sedem znamk, enotno vodstvo",
+    "brandsTitle": "Osem znamk, enotno vodstvo",
     "brandsSubtitle": "Ena struktura za vse nepremičninske potrebe v Trstu in v vsej Furlaniji - Julijski krajini ter atlas slovenske obale in Krasa.",
     "brands": {
       "tsv": {
@@ -517,6 +518,11 @@
         "tag": "Vrhunske nepremičnine v Lignanu",
         "desc": "Vrhunski posli v Lignanu, z bolj mednarodnim pogledom. Za tuje kupce in lastnike, ki iščejo strukturo, kontekst in kakovost upravljanja."
       },
+      "sappada": {
+        "name": "SappadaVillas",
+        "tag": "Gore · Sappada / Plodn",
+        "desc": "Sappada/Plodn v gorah: petnajst zaselkov, zaselek za zaselkom, z urami sonca, izračunanimi na modelu terena, trg s podatki italijanske davčne uprave, prve nepremičnine ter strani za prodajalce in za investitorje. Naša pisarna je v Trstu: v Sappado pridemo po dogovoru."
+      },
       "slovenia": {
         "name": "SloveniaVillas",
         "tag": "Atlas · slovenska obala in Kras",
@@ -537,7 +543,7 @@
       },
       "today": {
         "title": "Ena skupina, jasne vloge",
-        "text": "TriesteImmobiliare pokriva stanovanjske nepremičnine v Trstu in tržaški pokrajini; TriesteVillas ostaja pri vrhunskih, TriesteAffitti pri najemih, FriuliVillas in LignanoVillas na širšem ozemlju, TriesteBusiness pri poslovnih, SloveniaVillas pa – zaenkrat kot atlas – na slovenski obali in na Krasu. Manj razpršenosti, več jasnosti."
+        "text": "TriesteImmobiliare pokriva stanovanjske nepremičnine v Trstu in tržaški pokrajini; TriesteVillas ostaja pri vrhunskih, TriesteAffitti pri najemih, FriuliVillas, LignanoVillas in SappadaVillas na širšem ozemlju, TriesteBusiness pri poslovnih, SloveniaVillas pa – zaenkrat kot atlas – na slovenski obali in na Krasu. Manj razpršenosti, več jasnosti."
       }
     },
     "valuesTitle": "Ena in ista kultura dela",
@@ -1191,6 +1197,16 @@
     "vendi": {
       "title": "Je vaša hiša na slovenski obali ali na Krasu?",
       "text": "TriesteImmobiliare posreduje pri prodaji v Trstu in tržaški pokrajini. V Sloveniji še ne posredujemo, začnemo v letu 2027. Kupcem, ki iščejo v Trstu in gledajo tudi čez mejo, obalo in Kras predstavlja SloveniaVillas, atlas skupine TriesteVillas, z vodniki in orodji tudi za lastnike."
+    }
+  },
+  "sappadavillas": {
+    "vendi": {
+      "eyebrow": "Sappada · gore",
+      "title": "Imate hišo v gorah, v Sappadi?",
+      "text": "Za Sappado ima skupina TriesteVillas svojo spletno stran, SappadaVillas: petnajst zaselkov, zaselek za zaselkom, z urami sonca, izračunanimi na modelu terena, in trg s podatki italijanske davčne uprave. Stran za prodajalce korak za korakom pojasni postopek. Naša pisarna je v Trstu: v Sappado pridemo po dogovoru, odgovarjamo pa vam v italijanščini ali angleščini.",
+      "cta": "Prodaja v Sappadi",
+      "hamlets": "Petnajst zaselkov",
+      "market": "Trg"
     }
   }
 }

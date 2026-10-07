@@ -46,8 +46,8 @@
       "ogDescription": "The TriesteImmobiliare residential portfolio, area by area."
     },
     "group": {
-      "title": "The TriesteVillas Group — seven brands",
-      "description": "TriesteImmobiliare in the TriesteVillas ecosystem: seven brands for luxury, residential, rentals, FVG, business, Lignano and the Slovenian coast. One direction.",
+      "title": "The TriesteVillas Group — eight brands",
+      "description": "TriesteImmobiliare in the TriesteVillas ecosystem: eight brands for luxury, residential, rentals, FVG, business, Lignano, Sappada and the Slovenian coast. One direction.",
       "ogTitle": "The TriesteVillas Group: different brands, a single direction",
       "ogDescription": "A property ecosystem built around specialisation — not a one-size-fits-all container."
     },
@@ -142,12 +142,13 @@
     },
     "groupRouting": {
       "eyebrow": "Different brands, a single direction",
-      "title": "Seven brands, one structure.",
+      "title": "Eight brands, one structure.",
       "body": "TriesteImmobiliare is part of the TriesteVillas ecosystem. Each brand owns a market: you come in through the right door.",
       "luxury": "Luxury property → TriesteVillas",
       "fvg": "Rest of FVG → FriuliVillas / LignanoVillas",
       "rent": "Rentals → TriesteAffitti",
       "business": "Commercial → TriesteBusiness",
+      "sappada": "Sappada, in the mountains → SappadaVillas (hamlets, hours of sunlight, market)",
       "slovenia": "Slovenian coast and Karst → SloveniaVillas (atlas and tools)",
       "cta": "Discover the Group"
     },
@@ -484,7 +485,7 @@
       "body": "Not every property is sold, let or managed the same way. A luxury home, a residential apartment, a rental, a commercial asset or a premium property out of town each call for different language, processes and strategies. That's why we didn't put everything under one badge: we built an ecosystem of specialised brands.",
       "tagline": "Not the same look, not a repeated name. The same working culture."
     },
-    "brandsTitle": "Seven brands, a single direction",
+    "brandsTitle": "Eight brands, a single direction",
     "brandsSubtitle": "One structure covering every property need across Trieste and the whole of Friuli Venezia Giulia, plus an atlas of the Slovenian coast and the Karst.",
     "brands": {
       "tsv": {
@@ -517,6 +518,11 @@
         "tag": "Premium in Lignano",
         "desc": "Premium transactions in Lignano, read through a more international lens. For foreign buyers and owners who want structure, context and quality in how their asset is handled."
       },
+      "sappada": {
+        "name": "SappadaVillas",
+        "tag": "Mountains · Sappada / Plodn",
+        "desc": "Sappada/Plodn, in the mountains: the fifteen hamlets one by one, with the hours of sunlight worked out on the terrain model, the market with the Italian tax agency's figures, the first homes and the pages for sellers and for developers. Our office is in Trieste: we come to Sappada by appointment."
+      },
       "slovenia": {
         "name": "SloveniaVillas",
         "tag": "Atlas · Slovenian coast and Karst",
@@ -537,7 +543,7 @@
       },
       "today": {
         "title": "One group, clear roles",
-        "text": "TriesteImmobiliare owns residential Trieste and province; TriesteVillas stays on the premium end, TriesteAffitti on rentals, FriuliVillas and LignanoVillas on the wider region, TriesteBusiness on commercial and SloveniaVillas, for now as an atlas, on the Slovenian coast and the Karst. Less spread, more clarity."
+        "text": "TriesteImmobiliare owns residential Trieste and province; TriesteVillas stays on the premium end, TriesteAffitti on rentals, FriuliVillas, LignanoVillas and SappadaVillas on the wider region, TriesteBusiness on commercial and SloveniaVillas, for now as an atlas, on the Slovenian coast and the Karst. Less spread, more clarity."
       }
     },
     "valuesTitle": "One and the same working culture",
@@ -1191,6 +1197,16 @@
     "vendi": {
       "title": "Is your house on the Slovenian coast or the Karst?",
       "text": "TriesteImmobiliare sells in Trieste and its province. We do not act as agents in Slovenia today; we expect to start during 2027. For buyers who search in Trieste and look across the border too, SloveniaVillas – the TriesteVillas group's atlas – presents the coast and the Karst, with guides and tools for owners as well."
+    }
+  },
+  "sappadavillas": {
+    "vendi": {
+      "eyebrow": "Sappada · mountains",
+      "title": "Do you own a house in the mountains, in Sappada?",
+      "text": "For Sappada the TriesteVillas group has a site of its own, SappadaVillas: the fifteen hamlets one by one, with the hours of sunlight worked out on the terrain model, and the market with the Italian tax agency's figures. Its page for sellers explains the process step by step. Our office is in Trieste: we come to Sappada by appointment, and we reply in Italian or in English.",
+      "cta": "Selling in Sappada",
+      "hamlets": "The fifteen hamlets",
+      "market": "The market"
     }
   }
 }

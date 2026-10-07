@@ -8,7 +8,7 @@ import Logo from "@/components/Logo";
 //
 // Tutti sulla stessa lastra scura (--color-ink di questo sito, il blu notte della
 // palette TSI), ognuno nella versione che il proprio sito usa sulle superfici
-// scure: così sette identità diverse stanno in una griglia sola senza che una
+// scure: così otto identità diverse stanno in una griglia sola senza che una
 // sparisca sulla card bianca. Contrasto contro ink #0f2737 misurato il 07/10:
 // il tono più debole è il bronzo del gradiente FV #BE9A63 a 5,85:1, il grigio
 // «by TriesteVillas» di SV a 7,18:1, il bianco a 15,4:1. Nessun logo è ridisegnato:
@@ -25,6 +25,10 @@ import Logo from "@/components/Logo";
 //   di lignanovillas.
 // - SloveniaVillas: gli archi delle isocrone in versione «notte» e il logotipo in
 //   Fraunces, da src/components/shell/Marchio.tsx di sloveniavillas.
+// - SappadaVillas (07/10/2026): il logo orizzontale per fondi scuri di sappadavillas
+//   (public/brand/logo-orizzontale-scuro.svg, solo tracciati), copiato in
+//   public/brand/gruppo/. Contro ink: oro #cf9a4e a 6,14:1, il grigio di
+//   «by TriesteVillas» #a89c8a a 5,70:1, l'avorio a 12,7:1.
 // - TriesteBusiness: non ha un logo né un sito; si scrive il nome e basta,
 //   perché inventargli un segno vorrebbe dire dargli un'identità che non ha.
 //
@@ -35,7 +39,7 @@ import Logo from "@/components/Logo";
 // componente è usato (/gruppo).
 const fraunces = Fraunces({ subsets: ["latin"], axes: ["opsz"], display: "swap" });
 
-export type MarchioGruppo = "tsv" | "tsi" | "affitti" | "friuli" | "business" | "lignano" | "slovenia";
+export type MarchioGruppo = "tsv" | "tsi" | "affitti" | "friuli" | "business" | "lignano" | "sappada" | "slovenia";
 
 // Colori dai globals.css / tokens.css di ciascun sito (06/10/2026).
 const TA_MENTA = "#aed8c4"; // --color-sand di triesteaffitti
@@ -88,6 +92,8 @@ function Lockup({ marchio }: { marchio: MarchioGruppo }) {
           </span>
         </span>
       );
+    case "sappada":
+      return <img src="/brand/gruppo/sappadavillas-orizzontale-scuro.svg" alt="" width={824} height={152} className="h-11 w-auto" />;
     case "slovenia":
       return (
         <span className="inline-flex items-center gap-2.5">
