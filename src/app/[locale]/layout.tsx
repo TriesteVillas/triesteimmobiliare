@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 import RevealObserver from "@/components/RevealObserver";
 import Analytics from "@/components/Analytics";
 import CookieBanner from "@/components/CookieBanner";
+import BarcolanaStand from "@/components/barcolana/BarcolanaStand";
 import JsonLd from "@/components/JsonLd";
 import { SITE_URL, orgJsonLd, webSiteJsonLd } from "@/lib/seo";
 import "../globals.css";
@@ -109,6 +110,9 @@ export default async function LocaleLayout({
           <RevealObserver />
           <Analytics />
           <CookieBanner />
+          {/* Barcolana 58, stand 25 (7–11/10/2026): si spegne da solo domenica
+              alle 20 — l'orologio è in components/barcolana/orari.ts. */}
+          <BarcolanaStand locale={locale} />
         </NextIntlClientProvider>
       </body>
     </html>
