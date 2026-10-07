@@ -3,6 +3,7 @@
 // many German-speaking buyers, so hreflang is not cosmetic.
 
 import { routing, type Locale } from "@/i18n/routing";
+import type { VoceSchema } from "@/lib/dotazioni";
 
 // `?? ` da solo non basta: una variabile d'ambiente definita ma VUOTA (è ciò che
 // restituisce `vercel env pull` per le variabili marcate Sensitive) non è null,
@@ -239,8 +240,13 @@ type ListingSchemaInput = {
   priceSale: number | null;
   priceRent: number | null;
   trattativaRiservata: boolean;
+  // Stato commerciale SOLD: l'immobile resta in vetrina col suo prezzo (e col
+  // badge «Venduto»), ma a un motore di ricerca non lo si dichiara disponibile.
+  venduto: boolean;
   onlineDa: string | null;
-  amenities: string[];
+  // Le dotazioni che si SANNO (lib/dotazioni.ts → vociSchema): true = c'è,
+  // false = il CRM dice di no. Mai «campo non vuoto = true».
+  amenities: VoceSchema[];
 };
 
 // Scheda immobile: RealEstateListing (che è una WebPage) + l'immobile stesso in
@@ -284,10 +290,10 @@ export function listingJsonLd(p: ListingSchemaInput) {
     ...(p.annoCostruzione ? { yearBuilt: p.annoCostruzione } : {}),
     ...(p.amenities.length
       ? {
-          amenityFeature: p.amenities.map((name) => ({
+          amenityFeature: p.amenities.map((a) => ({
             "@type": "LocationFeatureSpecification",
-            name,
-            value: true,
+            name: a.name,
+            value: a.value,
           })),
         }
       : {}),
@@ -310,7 +316,7 @@ export function listingJsonLd(p: ListingSchemaInput) {
             "@type": "Offer",
             price,
             priceCurrency: "EUR",
-            availability: "https://schema.org/InStock",
+            availability: p.venduto ? "https://schema.org/SoldOut" : "https://schema.org/InStock",
             businessFunction: isRent
               ? "http://purl.org/goodrelations/v1#LeaseOut"
               : "http://purl.org/goodrelations/v1#Sell",

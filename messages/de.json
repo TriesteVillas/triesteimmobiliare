@@ -430,6 +430,7 @@
     "propertyType": "Immobilientyp",
     "propertyClass": "Immobilienklasse",
     "yes": "Ja",
+    "no": "Nein",
     "sameBuildingNav": "Gleiches Haus",
     "sameBuildingTitle": "Im selben Haus",
     "sameBuildingLead": "{n, plural, one {Die andere Wohnung, die in diesem Haus zum Verkauf steht.} other {Die anderen # Wohnungen, die in diesem Haus zum Verkauf stehen.}}",

@@ -459,6 +459,13 @@ export function mapRecord(recordId: string, f: Fields): Property {
   };
 }
 
+// Venduto: solo lo stato commerciale SOLD (UNDER_OFFER e RESERVED non si
+// annunciano). Stessa lettura di soldBadge in propertyView.ts; qui serve ai
+// dati strutturati, che a un venduto non devono dare `InStock`.
+export function isSold(p: Pick<Property, "statusCommerciale">): boolean {
+  return p.statusCommerciale?.toUpperCase().trim() === "SOLD";
+}
+
 // Gli «immobili simili» della scheda vivono in lib/simili.ts (dal 02/10/2026).
 
 // Normalize a property's zona to a known ZONE_ORDER code, or the "other" bucket.

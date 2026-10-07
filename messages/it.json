@@ -430,6 +430,7 @@
     "propertyType": "Tipo proprietà",
     "propertyClass": "Classe immobile",
     "yes": "Sì",
+    "no": "No",
     "sameBuildingNav": "Stesso palazzo",
     "sameBuildingTitle": "Nello stesso palazzo",
     "sameBuildingLead": "{n, plural, one {L'altra unità in vendita in questo edificio.} other {Le altre # unità in vendita in questo edificio.}}",

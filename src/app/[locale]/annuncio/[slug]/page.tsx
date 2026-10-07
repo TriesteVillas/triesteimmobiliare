@@ -6,8 +6,9 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { getProperties, getProperty } from "@/lib/airtable";
-import { aTrieste, zoneKey } from "@/lib/properties";
+import { aTrieste, isSold, zoneKey } from "@/lib/properties";
 import { scegliSimili } from "@/lib/simili";
+import { presenza, soloSiNo, statoDotazioni, vociSchema } from "@/lib/dotazioni";
 import { stessoPalazzo } from "@/lib/stesso-palazzo";
 import PropertyCharacteristics, {
   type Characteristic,
@@ -340,6 +341,15 @@ export default async function PropertyPage({ params }: { params: Params }) {
     },
   };
 
+  // Dotazioni: UNA lettura (lib/dotazioni.ts) per i dati strutturati più giù.
+  // Prima «campo non vuoto» valeva «c'è», e il "No" del CRM usciva nel JSON-LD
+  // come `Ascensore: true` (misurato il 06-07/10/2026).
+  const dot = statoDotazioni(property);
+  // Un Sì o un No del CRM ("Si", "No") si traduce nella lingua della pagina;
+  // un valore che dice di più ("Parzialmente", una frase) resta com'è.
+  const siNo = (raw: string) =>
+    soloSiNo(raw) ? (presenza(raw) ? t("yes") : t("no")) : raw;
+
   const characteristics = [
     // Order matters: PropertyCharacteristics keeps the first 8 (the headline
     // specs) always visible and collapses the rest behind a "show all" toggle.
@@ -365,9 +375,9 @@ export default async function PropertyPage({ params }: { params: Params }) {
     property.giardino && { icon: "garden", label: t("garden"), value: property.giardino },
     property.pianiEdificio && { icon: "building", label: t("floorsBuilding"), value: String(property.pianiEdificio) },
     property.annoCostruzione && { icon: "year", label: t("yearBuilt"), value: String(property.annoCostruzione) },
-    property.ascensore && { icon: "elevator", label: t("elevator"), value: property.ascensore },
+    property.ascensore && { icon: "elevator", label: t("elevator"), value: siNo(property.ascensore) },
     property.accessoDisabili && { icon: "accessible", label: t("accessibility"), value: t("yes") },
-    property.arredato && { icon: "furnished", label: t("furnished"), value: property.arredato },
+    property.arredato && { icon: "furnished", label: t("furnished"), value: siNo(property.arredato) },
     property.parcheggio && { icon: "parking", label: t("parking"), value: property.parcheggio },
     property.piscina && { icon: "pool", label: t("pool"), value: property.piscina },
     property.riscaldamento && { icon: "heating", label: t("heating"), value: property.riscaldamento },
@@ -392,18 +402,19 @@ export default async function PropertyPage({ params }: { params: Params }) {
     // copertina, quando c'è, ci porta.
   ].filter((x): x is { id: string; label: string } => Boolean(x));
 
-  // Dati strutturati della scheda. Le dotazioni seguono la stessa lettura che fa
-  // la pagina qui sopra: il campo Airtable è popolato SOLO quando la dotazione
-  // c'è, quindi la presenza vale "sì".
-  const amenities = [
-    property.terrazzo && t("terrace"),
-    property.balcone && t("balcony"),
-    property.giardino && t("garden"),
-    property.piscina && t("pool"),
-    property.ascensore && t("elevator"),
-    property.parcheggio && t("parking"),
-    property.accessoDisabili && t("accessibility"),
-  ].filter((x): x is string => Boolean(x));
+  // Dati strutturati della scheda, dalla lettura unica delle dotazioni (`dot`).
+  // Esce solo ciò che si sa — true = c'è, false = il CRM dice di no ("No",
+  // "Nessuno") — e il resto si tace. Il commento che stava qui («il campo è
+  // popolato SOLO quando la dotazione c'è») era falso.
+  const amenities = vociSchema(dot, {
+    terrazzo: t("terrace"),
+    balcone: t("balcony"),
+    giardino: t("garden"),
+    piscina: t("pool"),
+    ascensore: t("elevator"),
+    parcheggio: t("parking"),
+    accessoDisabili: t("accessibility"),
+  });
 
   const path = `/annuncio/${property.slug}`;
 
@@ -430,6 +441,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
             priceSale: property.priceSale,
             priceRent: property.priceRent,
             trattativaRiservata: property.trattativaRiservata,
+            venduto: isSold(property),
             onlineDa: property.onlineDa,
             amenities,
           }),
