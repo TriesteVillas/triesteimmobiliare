@@ -5,6 +5,7 @@ import Timeline from "@/components/Timeline";
 import Tilt from "@/components/motion/Tilt";
 import SellerCta from "@/components/SellerCta";
 import BuyerCta from "@/components/BuyerCta";
+import LastraLogo from "@/components/LoghiGruppo";
 import { pageAlternates, pageOpenGraph } from "@/lib/seo";
 import { sloveniaVillasUrl } from "@/lib/sloveniavillas";
 
@@ -122,6 +123,7 @@ export default async function GroupPage({
                   key={b}
                   className={`card-cine flex flex-col p-6 ${isSelf ? "ring-2 ring-brand/40" : ""}`}
                 >
+                  <LastraLogo marchio={b} />
                   <div className="flex items-baseline justify-between gap-3">
                     {site ? (
                       <a
