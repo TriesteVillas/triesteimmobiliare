@@ -69,6 +69,10 @@ export default function RiquadriEvidenza({
   const colonne = riquadri.length === 1 ? "" : riquadri.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-3";
   return (
     <section aria-label={etichetta} className="mt-6" data-reveal>
+      {/* Il titolo di sezione che i riquadri (h3) aspettano: senza, la scheda
+          saltava da h1 a h3 (audit del 07/10). Solo per i lettori di schermo:
+          a vista la sezione parla da sé. */}
+      <h2 className="sr-only">{etichetta}</h2>
       <ul className={`grid gap-3 ${colonne}`}>
         {riquadri.map((r, i) => (
           <li

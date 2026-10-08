@@ -1208,5 +1208,29 @@
       "hamlets": "The fifteen hamlets",
       "market": "The market"
     }
+  },
+  "audit0810": {
+    "notFound": {
+      "eyebrow": "Error 404",
+      "title": "This page is no longer here.",
+      "lead": "The listing you are looking for is no longer online, or its address has changed. Every property on sale today is in the catalogue.",
+      "immobili": "See the properties",
+      "home": "Back to the home page"
+    },
+    "energia": {
+      "unita": "kWh/m² year",
+      "fineLavori": "EPC on completion",
+      "nonDisponibile": "EPC not available"
+    },
+    "risorse": {
+      "aiChip": "Drafted with AI",
+      "aiNotice": "This guide was drafted with the help of artificial intelligence (AI-generated content — Art. 50 of EU Regulation 2024/1689) from the sources cited, and published under TriesteImmobiliare’s editorial responsibility. AI can make mistakes: if you spot an inaccuracy, tell us — the correction will stay visible in the updates box.",
+      "aiNoticeLink": "How we use AI",
+      "slVuoto": "The guides in Slovenian are not ready yet.",
+      "slVuotoLink": "Read the library in English"
+    },
+    "footer": {
+      "ai": "How we use AI"
+    }
   }
 }

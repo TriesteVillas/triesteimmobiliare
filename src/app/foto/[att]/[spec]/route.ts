@@ -34,7 +34,9 @@
 // butta via. Misurato il 2026-07-30 in produzione: stessa foto, cache key nuova
 // → MISS a 1,01 s; subito dopo → HIT a 0,085 s. Da qui le foto si servono con
 // un <img> nudo (src/components/PhotoImg.tsx), non con next/image.
-import { getPhotoSources } from "@/lib/airtable";
+import { getPhotoSources, getProperties } from "@/lib/airtable";
+import { VETRINA_ATTIVA } from "@/lib/vetrina";
+import { crmUrl } from "@/lib/crm";
 import { IPTC_MARCA, pacchettoXmp, type MarcaXmp } from "@/lib/trasparenza";
 
 // sharp gira solo su Node, non su Edge.
@@ -86,7 +88,22 @@ export async function GET(
   }
 
   const photo = (await getPhotoSources()).get(att);
-  if (!photo) {
+  // Ripiego sul CRM (08/10/2026): una casa nata solo nel CRM (`solo_locale`)
+  // non è su Airtable, e il suo allegato qui dava 404 — galleria vuota sul
+  // sito. Se il catalogo viene dalla vetrina e lì c'è una casa che porta
+  // questo allegato, la sorgente è la rotta pubblica delle foto del CRM, che
+  // ha il suo cancello (solo immobili pubblicabili, mai PRIVATE). Il confine
+  // di riservatezza resta lo stesso: si cerca solo nel catalogo pubblico.
+  let source: string | null = photo ? (width > 900 ? photo.url : photo.thumb) : null;
+  if (!source && VETRINA_ATTIVA) {
+    const casa = (await getProperties().catch(() => [])).find((p) =>
+      [p.coverPhoto, ...p.topPhotos, ...p.photos, ...p.planimetrie].some((ph) => ph?.id === att),
+    );
+    if (casa) {
+      source = `${crmUrl("/api/vetrina/foto")}/${encodeURIComponent(casa.recId)}/${att}/${width > 900 ? "xl" : "m"}`;
+    }
+  }
+  if (!source) {
     return new Response("foto non trovata", {
       status: 404,
       headers: { "Cache-Control": CACHE_MISS },
@@ -96,7 +113,6 @@ export async function GET(
   // Sorgente: la rendition `large` di Airtable (917 px) basta per le larghezze
   // piccole ed evita di scaricare l'originale da 12 MB per produrne una miniatura.
   // Sopra i 900 px serve l'originale, altrimenti si scalerebbe in su del già scalato.
-  const source = width > 900 ? photo.url : photo.thumb;
 
   try {
     const upstream = await fetch(source, { cache: "no-store" });

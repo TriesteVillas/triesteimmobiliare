@@ -1208,5 +1208,29 @@
       "hamlets": "Die fünfzehn Weiler",
       "market": "Der Markt"
     }
+  },
+  "audit0810": {
+    "notFound": {
+      "eyebrow": "Fehler 404",
+      "title": "Diese Seite gibt es nicht mehr.",
+      "lead": "Das gesuchte Angebot ist nicht mehr online, oder seine Adresse hat sich geändert. Alle Immobilien, die heute zum Verkauf stehen, finden Sie im Katalog.",
+      "immobili": "Zu den Immobilien",
+      "home": "Zur Startseite"
+    },
+    "energia": {
+      "unita": "kWh/m² Jahr",
+      "fineLavori": "Energieausweis nach Fertigstellung",
+      "nonDisponibile": "Energieausweis nicht verfügbar"
+    },
+    "risorse": {
+      "aiChip": "Mit KI erstellt",
+      "aiNotice": "Dieser Leitfaden wurde mit Hilfe künstlicher Intelligenz erstellt (KI-generierter Inhalt — Art. 50 der EU-Verordnung 2024/1689), auf Grundlage der zitierten Quellen, und unter redaktioneller Verantwortung von TriesteImmobiliare veröffentlicht. KI kann Fehler machen: Wenn Ihnen eine Ungenauigkeit auffällt, schreiben Sie uns — die Korrektur bleibt im Kasten der Aktualisierungen sichtbar.",
+      "aiNoticeLink": "Wie wir KI einsetzen",
+      "slVuoto": "Die Leitfäden auf Slowenisch sind noch nicht fertig.",
+      "slVuotoLink": "Die Bibliothek auf Englisch lesen"
+    },
+    "footer": {
+      "ai": "Wie wir KI einsetzen"
+    }
   }
 }

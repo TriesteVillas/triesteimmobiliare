@@ -2,7 +2,15 @@
 
 import { useState, type ReactNode } from "react";
 
-export type Characteristic = { icon: keyof typeof ICONS; label: string; value: string };
+export type Characteristic = {
+  icon: keyof typeof ICONS;
+  label: string;
+  value: string;
+  /** Sempre a vista, anche oltre il taglio del «mostra tutte»: la classe
+   *  energetica, che la pubblicità di un immobile deve riportare (D.Lgs.
+   *  192/2005 art. 6 c. 8). Come sul gemello triestevillas-web. */
+  alwaysVisible?: boolean;
+};
 
 const ICONS = {
   home: (
@@ -187,8 +195,16 @@ export default function PropertyCharacteristics({
   const [open, setOpen] = useState(false);
   if (items.length === 0) return null;
 
-  const hasMore = items.length > primaryCount;
-  const visible = !hasMore || open ? items : items.slice(0, primaryCount);
+  // Le prime `primaryCount` a vista; del resto, a vista le alwaysVisible
+  // (l'energetica) e dietro il toggle le altre. Fino all'08/10 la classe
+  // energetica era l'ultima voce della lista e la vedeva solo chi apriva il
+  // toggle: 13 annunci con la classe nel dato, 0 a vista (audit del 07/10).
+  const head = items.slice(0, primaryCount);
+  const rest = items.slice(primaryCount);
+  const pinned = rest.filter((it) => it.alwaysVisible);
+  const collapsed = rest.filter((it) => !it.alwaysVisible);
+  const hasMore = collapsed.length > 0;
+  const visible = open ? [...head, ...collapsed, ...pinned] : [...head, ...pinned];
 
   return (
     <section className="mt-8">

@@ -1,6 +1,7 @@
 import "server-only";
 import { aTrieste, matterportEmbed, slugify, type Photo, type Property } from "./properties";
 import { videoAnnuncio } from "../content/annunciVideo";
+import { crmUrl } from "@/lib/crm";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // IL CATALOGO DA POSTGRES — fase 2 del taglio Airtable → Postgres (24/08/2026).
@@ -27,7 +28,7 @@ import { videoAnnuncio } from "../content/annunciVideo";
 // ─────────────────────────────────────────────────────────────────────────────
 
 const VETRINA_URL =
-  process.env.VETRINA_URL ?? "https://tsv-pg.vercel.app/api/vetrina";
+  process.env.VETRINA_URL ?? crmUrl("/api/vetrina");
 const SITO = "triesteimmobiliare.com";
 const REVALIDATE_SECONDS = 600;
 
@@ -82,6 +83,8 @@ type RigaVetrina = {
   pubblicato_su: string[] | null;
   tags: string[] | null;
   ape_classe: string | null;
+  ape_ep_gl_nren?: string | number | null;
+  ape_stato?: string | null;
   arredato: string | null;
   piscina: string | null;
   parcheggio: string | null;
@@ -222,6 +225,8 @@ function mapRiga(r: RigaVetrina): Property {
     baths: num(r.bagni),
     floor: str(r.piano),
     energyClass: str(r.ape_classe),
+    energyIndex: num(r.ape_ep_gl_nren ?? null),
+    apeStato: str(r.ape_stato),
     description: str(r.descrizione_tsi) || str(r.descrizione),
     descriptionEn: str(r.descrizione_tsi_en),
     descriptionDe: str(r.descrizione_tsi_de),

@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { ViewTransition } from "react";
 import { notFound } from "next/navigation";
-import { redirect } from "@/i18n/navigation";
+import { permanentRedirect } from "@/i18n/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { getProperties, getProperty } from "@/lib/airtable";
-import { aTrieste, isSold, zoneKey } from "@/lib/properties";
+import { aTrieste, isSold, risolviSlug, tsvVince, zoneKey, ZONE_OTHER } from "@/lib/properties";
+import { etichettaTag, localizeValue } from "@/lib/listingI18n";
 import { scegliSimili } from "@/lib/simili";
 import { presenza, soloSiNo, statoDotazioni, vociSchema } from "@/lib/dotazioni";
 import { stessoPalazzo } from "@/lib/stesso-palazzo";
@@ -48,7 +49,7 @@ import {
 } from "@/lib/propertyView";
 import { pageAlternates, pageOpenGraph, listingJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
-import { formatPrice } from "@/lib/format";
+import { formatNumber, formatPrice } from "@/lib/format";
 import TaxBox from "@/components/TaxBox";
 import PropertyActions from "@/components/account/PropertyActions";
 import AccountPerks from "@/components/account/AccountPerks";
@@ -120,10 +121,7 @@ export async function generateMetadata({
   // su il pregio e' mestiere di TriesteVillas — se il record e' pubblicato
   // anche la', questa copia cede il posto. Sotto i 500k (o senza prezzo) vince
   // TSI, quindi qui si resta self-canonical. Hreflang omessi sul duplicato.
-  const tsvWins =
-    property.pubblicatoSu.includes("triestevillas.com") &&
-    property.priceSale != null &&
-    property.priceSale >= 500_000;
+  const tsvWins = tsvVince(property);
   const alternates = tsvWins
     ? {
         canonical: `https://triestevillas.com${locale === "it" ? "" : `/${locale}`}/annuncio/${slug}`,
@@ -131,7 +129,7 @@ export async function generateMetadata({
     : pageAlternates(locale, `/annuncio/${slug}`);
   const ogFoto = fotoPerAnteprima(property);
   return {
-    title: { absolute: `${title} · TriesteImmobiliare` },
+    title: { absolute: titoloSerp(title) },
     description,
     alternates,
     openGraph: pageOpenGraph(
@@ -148,6 +146,20 @@ export async function generateMetadata({
       ogFoto ? photoSrc(ogFoto, 2000) : undefined,
     ),
   };
+}
+
+// Il <title> della scheda (08/10/2026): oltre i 60-65 caratteri Google lo
+// tronca o lo riscrive, e qui si arrivava a 103 (audit SEO del 07/10). Il
+// marchio in coda resta finché ci sta; se il titolo da solo è troppo lungo si
+// taglia sul confine di parola, con i puntini.
+const TITOLO_MAX = 65;
+function titoloSerp(title: string): string {
+  const conMarchio = `${title} · TriesteImmobiliare`;
+  if (conMarchio.length <= TITOLO_MAX) return conMarchio;
+  if (title.length <= TITOLO_MAX) return title;
+  const taglio = title.slice(0, TITOLO_MAX - 1);
+  const spazio = taglio.lastIndexOf(" ");
+  return `${(spazio > 40 ? taglio.slice(0, spazio) : taglio).replace(/[\s,;:·—–-]+$/, "")}…`;
 }
 
 // Split a description into readable paragraphs. Honours author-made line breaks
@@ -185,13 +197,16 @@ export default async function PropertyPage({ params }: { params: Params }) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
   const all = await getProperties();
-  const property = all.find((p) => p.slug === slug);
-  // Old-site /annuncio/<slug> links still indexed by Google land here:
-  // send them to the listing index instead of a dead end.
-  if (!property) {
-    redirect({ href: "/immobili", locale });
-    notFound(); // unreachable — narrows the type (redirect isn't typed never)
+  // Uno slug vecchio di una casa ancora viva → 308 allo slug di oggi; uno slug
+  // che non porta a nessuna casa → 404 vero. Fino all'08/10 tutto andava con
+  // un 307 a /immobili, che Google legge come soft-404 (lib/properties.ts →
+  // risolviSlug, gemello di triesteaffitti).
+  const esito = risolviSlug(slug, all);
+  if (esito.tipo === "sposta") {
+    permanentRedirect({ href: `/annuncio/${esito.property.slug}`, locale });
   }
+  if (esito.tipo !== "esatto") notFound();
+  const property = esito.property;
 
   const t = await getTranslations("property");
   const tNav = await getTranslations("nav");
@@ -215,7 +230,17 @@ export default async function PropertyPage({ params }: { params: Params }) {
     all.filter((p) => !inPalazzo.has(p.slug)),
     4,
   );
-  const place = [property.via, property.zona, localizePlaceName(property.comune, locale)]
+  // La zona passa dal dizionario delle zone (messages → zones): «ALTE» è la
+  // sigla del gestionale, al pubblico è «Carso e Altopiano». Fuori elenco o
+  // uguale al comune («Muggia, Muggia») non si scrive.
+  const comuneLoc = localizePlaceName(property.comune, locale);
+  const zonaK = zoneKey(property);
+  const zonaLoc = zonaK === ZONE_OTHER ? null : tZones(zonaK);
+  const place = [
+    property.via,
+    zonaLoc && zonaLoc.toLowerCase() !== (comuneLoc ?? "").toLowerCase() ? zonaLoc : null,
+    comuneLoc,
+  ]
     .filter(Boolean)
     .join(", ");
   const hasLocation = property.lat != null && property.lng != null;
@@ -349,12 +374,34 @@ export default async function PropertyPage({ params }: { params: Params }) {
   // un valore che dice di più ("Parzialmente", una frase) resta com'è.
   const siNo = (raw: string) =>
     soloSiNo(raw) ? (presenza(raw) ? t("yes") : t("no")) : raw;
+  // I valori a elenco del CRM (tipologia, stato, cucina, piano…) nella lingua
+  // della pagina: su /en uscivano in italiano (lib/listingI18n.ts).
+  const lv = (raw: string) => localizeValue(raw, locale) ?? raw;
+  const tA = await getTranslations("audit0810");
+
+  // La riga energetica (D.Lgs. 192/2005 art. 6 c. 8; DM 26/06/2015): c'è
+  // SEMPRE, a vista, come sul gemello triestevillas-web. Classe e indice
+  // EPgl,nren quando li abbiamo; senza classe, lo stato dichiarato dal CRM —
+  // un dato mancante si dice, non sparisce (audit del 07/10: 13 annunci con
+  // la classe nel dato e 0 a vista, l'indice solo nel testo).
+  const energia: Characteristic = {
+    icon: "energy",
+    label: t("energyClass"),
+    value: property.energyClass
+      ? property.energyIndex != null
+        ? `${property.energyClass} · ${formatNumber(property.energyIndex, locale)} ${tA("energia.unita")}`
+        : property.energyClass
+      : property.apeStato === "APE a fine lavori"
+        ? tA("energia.fineLavori")
+        : tA("energia.nonDisponibile"),
+    alwaysVisible: true,
+  };
 
   const characteristics = [
     // Order matters: PropertyCharacteristics keeps the first 8 (the headline
     // specs) always visible and collapses the rest behind a "show all" toggle.
     // — Primary: always visible —
-    property.tipologia && { icon: "home", label: t("type"), value: property.tipologia },
+    property.tipologia && { icon: "home", label: t("type"), value: lv(property.tipologia) },
     {
       icon: "contract",
       label: t("contract"),
@@ -364,15 +411,16 @@ export default async function PropertyPage({ params }: { params: Params }) {
     property.rooms && { icon: "rooms", label: t("rooms"), value: property.rooms },
     property.camere && { icon: "bedroom", label: t("bedrooms"), value: String(property.camere) },
     property.baths && { icon: "baths", label: t("baths"), value: String(property.baths) },
-    property.floor && { icon: "floor", label: t("floor"), value: property.floor },
-    property.stato && { icon: "condition", label: t("condition"), value: property.stato },
+    property.floor && { icon: "floor", label: t("floor"), value: lv(property.floor) },
+    property.stato && { icon: "condition", label: t("condition"), value: lv(property.stato) },
+    energia,
     // — Secondary: revealed on click —
     property.tipoProprieta && { icon: "ownership", label: t("propertyType"), value: property.tipoProprieta },
     property.disponibilita && { icon: "availability", label: t("availability"), value: property.disponibilita },
-    property.cucina && { icon: "kitchen", label: t("kitchen"), value: property.cucina },
+    property.cucina && { icon: "kitchen", label: t("kitchen"), value: lv(property.cucina) },
     property.terrazzo && { icon: "terrace", label: t("terrace"), value: t("yes") },
     property.balcone && { icon: "balcony", label: t("balcony"), value: t("yes") },
-    property.giardino && { icon: "garden", label: t("garden"), value: property.giardino },
+    property.giardino && { icon: "garden", label: t("garden"), value: lv(property.giardino) },
     property.pianiEdificio && { icon: "building", label: t("floorsBuilding"), value: String(property.pianiEdificio) },
     property.annoCostruzione && { icon: "year", label: t("yearBuilt"), value: String(property.annoCostruzione) },
     property.ascensore && { icon: "elevator", label: t("elevator"), value: siNo(property.ascensore) },
@@ -380,10 +428,14 @@ export default async function PropertyPage({ params }: { params: Params }) {
     property.arredato && { icon: "furnished", label: t("furnished"), value: siNo(property.arredato) },
     property.parcheggio && { icon: "parking", label: t("parking"), value: property.parcheggio },
     property.piscina && { icon: "pool", label: t("pool"), value: property.piscina },
-    property.riscaldamento && { icon: "heating", label: t("heating"), value: property.riscaldamento },
+    property.riscaldamento && { icon: "heating", label: t("heating"), value: lv(property.riscaldamento) },
     property.classeImmobile && { icon: "grade", label: t("propertyClass"), value: property.classeImmobile },
-    property.energyClass && { icon: "energy", label: t("energyClass"), value: property.energyClass },
   ].filter((c): c is Characteristic => Boolean(c));
+
+  // Le chip dei tag: solo quelli della lista bianca, con l'etichetta pubblica
+  // nella lingua della pagina (lib/listingI18n.ts). Fino all'08/10 uscivano i
+  // tag grezzi del CRM in minuscolo («parz arredato», «non adatto anziani»).
+  const chips = [...new Set(property.tags.map((tag) => etichettaTag(tag, locale)).filter((x): x is string => !!x))];
 
   // Sticky anchor nav (immobiliare.it style) — only sections that exist.
   const nav = [
@@ -566,7 +618,9 @@ export default async function PropertyPage({ params }: { params: Params }) {
           <h1 className="display-chapter mt-4 max-w-3xl text-white [text-shadow:0_4px_30px_rgba(0,0,0,0.5)]">
             {title}
           </h1>
-          <p className="mt-2 text-sm text-white/65">
+          {/* Bianco quasi pieno con un'ombra: il grigio /65 su una foto
+              movimentata si leggeva male (audit visivo del 07/10). */}
+          <p className="mt-2 text-sm text-white/90 [text-shadow:0_1px_10px_rgba(0,0,0,0.65)]">
             {t("reference")} {property.id}
             {place && (
               <>
@@ -698,7 +752,9 @@ export default async function PropertyPage({ params }: { params: Params }) {
           {description && (
             <section id="descrizione" className="mt-8 scroll-mt-32" data-reveal>
               <h2 className="text-lg font-semibold">{t("descriptionTitle")}</h2>
-              <div className="mt-3 space-y-4 leading-relaxed text-neutral-700">
+              {/* 68ch: a tutta larghezza correva per ~140 caratteri a riga
+                  su desktop (audit visivo del 07/10), come TSV e TA ora no. */}
+              <div className="mt-3 max-w-[68ch] space-y-4 leading-relaxed text-neutral-700">
                 {toParagraphs(description).map((p, i) => (
                   <p key={i}>{p}</p>
                 ))}
@@ -787,16 +843,16 @@ export default async function PropertyPage({ params }: { params: Params }) {
             </section>
           )}
 
-          {property.tags.length > 0 && (
+          {chips.length > 0 && (
             <section className="mt-8">
               <h2 className="text-lg font-semibold">{t("featuresTitle")}</h2>
               <ul className="mt-3 flex flex-wrap gap-2">
-                {property.tags.map((tag) => (
+                {chips.map((chip) => (
                   <li
-                    key={tag}
+                    key={chip}
                     className="rounded-full bg-neutral-100 px-3 py-1 text-sm text-neutral-700"
                   >
-                    {tag.replace(/_/g, " ").toLowerCase()}
+                    {chip}
                   </li>
                 ))}
               </ul>
@@ -905,8 +961,10 @@ export default async function PropertyPage({ params }: { params: Params }) {
             <a className="hover:text-brand" href="mailto:info@triesteimmobiliare.com">
               info@triesteimmobiliare.com
             </a>
-            <a className="hover:text-brand" href="tel:0402473628">
-              040 2473628
+            {/* Linea unica del gruppo, telefono e WhatsApp (regola di Martino
+                del 09/06/2026): sostituisce il 040 dell'ufficio. */}
+            <a className="hover:text-brand" href="tel:+393318940822">
+              {locale === "it" ? "331 8940822" : "+39 331 8940822"}
             </a>
           </div>
 

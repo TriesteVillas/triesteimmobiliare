@@ -8,7 +8,9 @@ import { groupByZone, ZONE_ORDER, ZONE_OTHER } from "@/lib/properties";
 import { buildPropertyView } from "@/lib/propertyView";
 import ResourceCard from "@/components/resources/ResourceCard";
 import { getArticle, readingMinutes } from "@/lib/articles";
-import { pageAlternates, pageOpenGraph } from "@/lib/seo";
+import { absUrl, pageAlternates, pageOpenGraph } from "@/lib/seo";
+import { localizedTitle } from "@/lib/propertyView";
+import JsonLd from "@/components/JsonLd";
 
 export async function generateMetadata({
   params,
@@ -80,8 +82,26 @@ export default async function ImmobiliPage({
     groups.push({ code, label: tZones(code), items: [], ghosts: soli.map((t2) => ({ id: t2.id, band: t2.band })) });
   }
 
+  // ItemList delle schede, nell'ordine di vetrina (08/10/2026): il catalogo
+  // diceva ai motori solo «Organization», senza le case che contiene (audit
+  // SEO del 07/10). Le case che hanno il canonical su triestevillas.com ci
+  // stanno lo stesso: sono in pagina, e l'URL elencato è quello di qui.
+  const elenco = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "@id": `${absUrl(locale, "/immobili")}#elenco`,
+    numberOfItems: properties.length,
+    itemListElement: properties.map((p, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: absUrl(locale, `/annuncio/${p.slug}`),
+      name: localizedTitle(p, locale),
+    })),
+  };
+
   return (
     <>
+      <JsonLd data={elenco} />
       <section className="mx-auto max-w-6xl px-4 pb-16 pt-32">
         <header className="mb-12" data-reveal="now">
           <p className="eyebrow">{t("filterAll")}</p>

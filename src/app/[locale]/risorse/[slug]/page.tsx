@@ -18,6 +18,7 @@ import ResourceCard from "@/components/resources/ResourceCard";
 import BuyerConcierge from "@/components/compra/BuyerConcierge";
 import JsonLd from "@/components/JsonLd";
 import { intlLocale } from "@/lib/format";
+import { linkPaginaAi } from "@/lib/pagina-ai";
 import {
   partialAlternates, articleOpenGraph, seoTitle, seoDescription,
   absUrl, breadcrumbJsonLd, SITE_URL,
@@ -82,6 +83,14 @@ export default async function ArticlePage({
   const { locale, slug } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("risorse");
+  // Etichetta AI degli articoli (art. 50 Reg. UE 2024/1689; mandato di Davide
+  // dell'11/09 «in ogni articolo deve risultare chiaramente che sono generati
+  // da AI», esteso a TSI): fino all'08/10 nessuno dei 39 articoli la portava.
+  // Stesso impianto di triestevillas.com/risorse — chip in testa e nota per
+  // esteso in coda — col link alla pagina «Come usiamo l'AI» del gruppo, solo
+  // se oggi risponde nella lingua (lib/pagina-ai.ts).
+  const tAi = await getTranslations("audit0810.risorse");
+  const linkAi = await linkPaginaAi(locale);
 
   const article = await getArticle(slug);
   if (!article) notFound();
@@ -167,6 +176,22 @@ export default async function ArticlePage({
               {t("verified", { date: fmtDate(locale, article.verifiedAt) })}
             </span>
           ) : null}
+          {linkAi ? (
+            <a
+              href={linkAi}
+              target="_blank"
+              rel="noopener"
+              className="inline-flex items-center gap-1.5 rounded-full border border-brand/25 bg-white px-3 py-1 text-neutral-600 transition-colors hover:text-brand-dark"
+            >
+              <span aria-hidden>✦</span>
+              {tAi("aiChip")}
+            </a>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-brand/25 bg-white px-3 py-1 text-neutral-600">
+              <span aria-hidden>✦</span>
+              {tAi("aiChip")}
+            </span>
+          )}
         </div>
 
         {/* Corpo */}
@@ -209,8 +234,22 @@ export default async function ArticlePage({
           </details>
         ) : null}
 
+        {/* Dichiarazione AI per esteso: ogni guida la porta, sempre. */}
+        <p className="mt-8 rounded-2xl border border-brand/15 bg-paper px-5 py-4 text-xs leading-relaxed text-neutral-600">
+          <span aria-hidden>✦ </span>
+          {tAi("aiNotice")}
+          {linkAi ? (
+            <>
+              {" "}
+              <a href={linkAi} target="_blank" rel="noopener" className="underline underline-offset-2 transition-colors hover:text-brand-dark">
+                {tAi("aiNoticeLink")} ↗
+              </a>
+            </>
+          ) : null}
+        </p>
+
         {/* Disclaimer editoriale standard */}
-        <p className="mt-8 rounded-2xl border border-brand/15 bg-paper px-5 py-4 text-xs leading-relaxed text-neutral-500">
+        <p className="mt-4 rounded-2xl border border-brand/15 bg-paper px-5 py-4 text-xs leading-relaxed text-neutral-500">
           {t("disclaimer")}
         </p>
 

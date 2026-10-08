@@ -2,18 +2,19 @@ import type { MetadataRoute } from "next";
 import { getProperties } from "@/lib/airtable";
 import { getArticles, articleLocales } from "@/lib/articles";
 import { routing } from "@/i18n/routing";
-import { absUrl, HREFLANG, localizedPath, SITE_URL } from "@/lib/seo";
+import { absUrl, HREFLANG, localizedPath, SITE_URL, xDefault } from "@/lib/seo";
+import { tsvVince } from "@/lib/properties";
 
 // Solo-lingua dal 2026-08-11 (de-DE escludeva de-AT). La mappa è quella di
 // lib/seo.ts, importata e non ricopiata: con lo sloveno (2026-10-01) le copie
 // a mano erano diventate una trappola — una lingua aggiunta in un posto solo
 // avrebbe dato alla sitemap un hreflang `undefined`.
 
-// hreflang alternates for a path across all locales (+ x-default → it).
+// hreflang alternates for a path across all locales (+ x-default → en, v. seo.ts).
 function languagesFor(path: string, vere: readonly string[] = routing.locales): Record<string, string> {
   const languages: Record<string, string> = {};
   for (const l of routing.locales) if (vere.includes(l)) languages[HREFLANG[l]] = absUrl(l, path);
-  languages["x-default"] = absUrl(vere.includes("it") ? "it" : vere[0] ?? "it", path);
+  languages["x-default"] = absUrl(xDefault(vere), path);
   return languages;
 }
 
@@ -38,9 +39,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // «consistently and verifiably accurate», altrimenti impara a ignorarlo.
   // Le pagine fisse non ne hanno una → meglio nessun lastmod del timestamp
   // di build.
+  // /sl/risorse esiste nell'indice solo quando c'è almeno un articolo in
+  // sloveno (v. risorse/page.tsx): senza, la pagina è noindex e qui non va.
+  const risorseSl = articles.some((a) => !!a.body.sl);
   for (const path of staticPaths) {
-    const languages = languagesFor(path);
-    for (const locale of routing.locales) {
+    const vere = path === "/risorse" && !risorseSl ? routing.locales.filter((l) => l !== "sl") : routing.locales;
+    const languages = languagesFor(path, vere);
+    for (const locale of vere) {
       entries.push({
         url: `${SITE_URL}${localizedPath(locale, path) === "/" ? "" : localizedPath(locale, path)}`,
         changeFrequency: path === "/" || path === "/immobili" ? "daily" : "monthly",
@@ -72,6 +77,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   for (const p of properties) {
+    // Una casa condivisa con triestevillas.com dai 500k in su ha il canonical
+    // là (lib/properties.ts → tsvVince): in questa sitemap andrebbero URL non
+    // canonici, e Google li segnala come tali. Fuori.
+    if (tsvVince(p)) continue;
     const path = `/annuncio/${p.slug}`;
     const languages = languagesFor(path);
     for (const locale of routing.locales) {

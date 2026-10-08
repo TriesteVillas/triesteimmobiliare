@@ -2,6 +2,7 @@ import { formatPrice } from "./format";
 import { photoSrc, photoSrcSet } from "./photoSrc";
 import type { Photo, Property } from "./properties";
 import { etichettaCard } from "./trasparenza";
+import { localizeValue } from "./listingI18n";
 
 export type BadgeVariant = "default" | "private" | "cantiere" | "recent" | "featured" | "sold";
 export type Badge = { label: string; variant: BadgeVariant };
@@ -62,11 +63,35 @@ type Translate = (key: string, values?: Record<string, string | number>) => stri
 // valorizzato (mapRecord). Per lo sloveno la catena è titleSl → titleEn →
 // title: a chi legge in sloveno serve l'inglese, la lingua internazionale,
 // prima dell'italiano (come sul gemello triestevillas-web).
+// Tipografia normalizzata in uscita (tidyTitle, 08/10/2026): una casa presente
+// anche su triestevillas.com usciva là con «120 m²» e qui con «120mq».
 export function localizedTitle(p: Property, locale: string): string {
-  if (locale === "de") return p.titleDe ?? p.title;
-  if (locale === "en") return p.titleEn ?? p.title;
-  if (locale === "sl") return p.titleSl ?? p.titleEn ?? p.title;
-  return p.title;
+  if (locale === "de") return tidyTitle(p.titleDe ?? p.title);
+  if (locale === "en") return tidyTitle(p.titleEn ?? p.title);
+  if (locale === "sl") return tidyTitle(p.titleSl ?? p.titleEn ?? p.title);
+  return tidyTitle(p.title);
+}
+
+// Normalizzazione tipografica dei titoli, SOLO in resa — la fonte non si
+// riscrive mai. Gemella di tidyTitle in triestevillas-web/src/lib/propertyView.ts
+// (audit 2026-08-10), portata qui l'08/10/2026. Tre regole:
+// (1) titolo urlato (>60% di maiuscole) → sentence case; i token con cifre o
+//     "/" restano com'erano (sigle tipo «120MQ», «A/2»);
+// (2) «120mq» / «120 mq» → «120 m²»;
+// (3) via il punto finale (i puntini di sospensione restano).
+export function tidyTitle(title: string): string {
+  let s = title.replace(/\s+/g, " ").trim();
+  const letters = s.match(/\p{L}/gu) ?? [];
+  const uppers = s.match(/\p{Lu}/gu) ?? [];
+  if (letters.length >= 4 && uppers.length / letters.length > 0.6) {
+    s = s
+      .split(" ")
+      .map((tok) => (/[\d/]/.test(tok) ? tok : tok.toLowerCase()))
+      .join(" ");
+    s = s.replace(/\p{L}/u, (c) => c.toUpperCase());
+  }
+  s = s.replace(/(\d+)\s*mq(?![\p{L}\d])/giu, "$1 m²");
+  return s.replace(/(?<!\.)\.$/, "");
 }
 
 // Descrizione nella lingua del visitatore. La catena di fallback è esplicita e
@@ -202,7 +227,8 @@ export function buildPropertyView(
     ? Math.max(0, Math.floor((Date.now() - Date.parse(p.onlineDa)) / 86400000))
     : null;
   const meta = [
-    p.tipologia,
+    // La tipologia nella lingua della pagina: su /en usciva «Appartamento».
+    localizeValue(p.tipologia, locale),
     p.mq ? t("sqm", { value: p.mq }) : null,
     p.rooms ? roomsLabel(p.rooms, locale, t("rooms")) : null,
   ]

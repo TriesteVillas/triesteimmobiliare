@@ -1,8 +1,8 @@
 import type { FotoAi, FotoTrasparenza, MarcaXmp, TrasparenzaImmobile } from "./trasparenza";
 import { videoAnnuncio, type VideoAnnuncio } from "../content/annunciVideo";
-// Field-ID map for the Airtable PROPRIETA table (base app1ZDay9vQNU5V2u, table tblwAUWPnX7KF8FhU).
-// We key on field IDs (stable across renames) for both the live REST fetch
-// (returnFieldsByFieldId=true) and the dev seed.
+// Field-ID map for the Airtable PROPRIETA table (base e tabella: vedi la KB).
+// We key on field IDs (stable across renames) for the live REST fetch
+// (returnFieldsByFieldId=true).
 export const F = {
   id: "fldR3kYOEvMTn7qKA",
   internalName: "fldv1buS8yk2NZKOZ",
@@ -192,6 +192,11 @@ export type Property = {
   baths: number | null;
   floor: string | null;
   energyClass: string | null;
+  // Indice di prestazione energetica globale non rinnovabile (EPgl,nren, in
+  // kWh/m² anno) e lo stato dell'APE dal CRM («APE disponibile», «APE a fine
+  // lavori», «APE mancante»). Solo dalla vetrina: sul ramo Airtable sono null.
+  energyIndex: number | null;
+  apeStato: string | null;
   // Descrizione italiana già risolta (descrizione_TSI_# → descrizione).
   description: string | null;
   // Traduzioni grezze: null quando mancano. Non usarle direttamente in pagina —
@@ -322,9 +327,9 @@ export function slugify(input: string): string {
 // Title fallback when public_tsv_name is empty.
 //
 // The internal name is NOT used here any more, and the reason is the same one
-// already written for the slug: it very often carries the owner's surname —
-// "BANNE ORLANDO", "MIRAMARE ZINI", "COSTIERA ARTIOLI" are real values in the
-// live base. Keeping it as the title fallback meant that the day someone published
+// already written for the slug: it very often carries the owner's surname
+// (zone + surname is the usual shape of the real values in the live base —
+// never write one here: this repo is public). Keeping it as the title fallback meant that the day someone published
 // a listing before filling public_tsv_name, that surname would appear in the <h1>,
 // in <title>, in the OpenGraph card and in every photo alt text. Protecting the
 // URL and leaving the headline exposed protects nothing: the same string was one
@@ -358,6 +363,50 @@ function idNumber(tsvId: string | null): string {
   return m ? m[1] : "0";
 }
 
+// ─── Uno slug che non c'è più (08/10/2026) ──────────────────────────────────
+// Lo slug è slugify(nome pubblico) + numero di catalogo: cambia il nome
+// pubblico e cambia l'URL. Fino all'08/10 ogni slug sconosciuto andava con un
+// 307 a /immobili — temporaneo, e Google lo legge come soft-404 — e il vecchio
+// URL di una casa ancora in vendita si perdeva. Ora, come sul gemello
+// triesteaffitti (risolviSlug, 30/09):
+//   · slug esatto → la scheda;
+//   · lo stesso numero di catalogo (o la stessa base) su UNA sola scheda viva →
+//     308 allo slug di oggi;
+//   · nient'altro → 404 vero (notFound), con la pagina localizzata.
+// Con due candidate non si tira a indovinare: 404.
+export type EsitoSlug<T> =
+  | { tipo: "esatto"; property: T }
+  | { tipo: "sposta"; property: T }
+  | { tipo: "assente" };
+
+export function risolviSlug<T extends Pick<Property, "slug" | "id">>(
+  slug: string,
+  catalogo: readonly T[],
+): EsitoSlug<T> {
+  const esatta = catalogo.find((p) => p.slug === slug);
+  if (esatta) return { tipo: "esatto", property: esatta };
+  const una = (xs: T[]) => (xs.length === 1 ? xs[0] : null);
+  const s = slug.trim().toLowerCase();
+  const m = s.match(/^(.*)-(\d+)$/);
+  const numero = m && m[2] !== "0" ? m[2] : null;
+  const base = m ? m[1] : s;
+  const meta =
+    // 1) lo stesso numero di catalogo (il nome pubblico è cambiato)
+    (numero ? una(catalogo.filter((p) => idNumber(p.id) === numero)) : null) ??
+    // 2) la stessa base (il codice è cambiato, o il link aveva perso la coda)
+    una(catalogo.filter((p) => p.slug.startsWith(`${base}-`) && /^\d+$/.test(p.slug.slice(base.length + 1))));
+  return meta ? { tipo: "sposta", property: meta } : { tipo: "assente" };
+}
+
+// ─── Chi tiene il canonical di una casa condivisa con triestevillas.com ──────
+// Regola complementare a quella di TSV (audit 2026-08-11): dai 500k in su il
+// pregio è mestiere di TriesteVillas — se il record è pubblicato anche là,
+// questa copia cede il canonical e resta fuori dalla sitemap. Sotto i 500k (o
+// senza prezzo) vince TSI. Un posto solo, letto dalla scheda e dalla sitemap.
+export function tsvVince(p: Pick<Property, "pubblicatoSu" | "priceSale">): boolean {
+  return p.pubblicatoSu.includes("triestevillas.com") && p.priceSale != null && p.priceSale >= 500_000;
+}
+
 // Le stime ILIA e TARI (formule di Airtable) e la scheda TARI interattiva usano
 // l'aliquota e le tariffe del Comune di Trieste. Fuori Trieste — Muggia,
 // Duino-Aurisina… — stampavano l'importo di un altro Comune: si spengono, come su
@@ -376,8 +425,8 @@ export function mapRecord(recordId: string, f: Fields): Property {
   const name = buildName(f); // title fallback only (see slugSource for the URL)
   // Public display name: public_tsv_name when set, else a NEUTRAL fallback.
   // Never the internal name and never the internal id: `tsv_prop_id` is a free
-  // text field and 38 of the 765 records carry a speaking code (TSV-PROP-DUINO-
-  // LEVIGNE, PUCINO-CORSI, SAPPADA-BACH…) rather than a progressive number.
+  // text field and 38 of the 765 records carry a speaking code (place + word,
+  // sometimes a surname) rather than a progressive number.
   const title = str(f[F.publicName]) ?? name;
 
   const photos = attachments(f[F.foto], title); // full gallery
@@ -413,6 +462,8 @@ export function mapRecord(recordId: string, f: Fields): Property {
     baths: num(f[F.bagni]),
     floor: str(f[F.piano]),
     energyClass: str(f[F.ape]),
+    energyIndex: null,
+    apeStato: null,
     description: str(f[F.descrizioneTsi]) || str(f[F.descrizione]),
     descriptionEn: str(f[F.descrizioneTsiEn]),
     descriptionDe: str(f[F.descrizioneTsiDe]),

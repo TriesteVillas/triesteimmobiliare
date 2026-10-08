@@ -1208,5 +1208,29 @@
       "hamlets": "Petnajst zaselkov",
       "market": "Trg"
     }
+  },
+  "audit0810": {
+    "notFound": {
+      "eyebrow": "Napaka 404",
+      "title": "Te strani ni več.",
+      "lead": "Oglas, ki ga iščete, ni več objavljen ali pa se je njegov naslov spremenil. Vse nepremičnine, ki so danes naprodaj, so v katalogu.",
+      "immobili": "Oglejte si nepremičnine",
+      "home": "Nazaj na domačo stran"
+    },
+    "energia": {
+      "unita": "kWh/m² leto",
+      "fineLavori": "Energetska izkaznica po dokončanju del",
+      "nonDisponibile": "Energetska izkaznica ni na voljo"
+    },
+    "risorse": {
+      "aiChip": "Pripravljeno z UI",
+      "aiNotice": "Ta vodnik je bil pripravljen s pomočjo umetne inteligence (vsebina, ustvarjena z UI – 50. člen Uredbe (EU) 2024/1689) na podlagi navedenih virov in objavljen pod uredniško odgovornostjo TriesteImmobiliare. Umetna inteligenca se lahko zmoti: če opazite netočnost, nam pišite – popravek bo ostal viden v okvirju posodobitev.",
+      "aiNoticeLink": "Kako uporabljamo umetno inteligenco",
+      "slVuoto": "Vodniki v slovenščini še niso pripravljeni.",
+      "slVuotoLink": "Preberite knjižnico v angleščini"
+    },
+    "footer": {
+      "ai": "Kako uporabljamo umetno inteligenco"
+    }
   }
 }

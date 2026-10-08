@@ -37,11 +37,21 @@ export function absUrl(locale: string, path: string): string {
   return `${SITE_URL}${p === "/" ? "" : p}` || SITE_URL;
 }
 
-// Per-page metadata.alternates: self-canonical + every language + x-default→it.
+// La x-default: la pagina per chi parla una lingua che il sito non ha (un
+// francese, un olandese). Dall'08/10/2026 è l'INGLESE, come su
+// triestevillas.com dall'11/08 e su triesteaffitti.com: l'11/08 TSI aveva
+// preso dal gemello i codici solo-lingua ma non questa scelta, e la x-default
+// era rimasta sulla radice italiana (audit SEO del 07/10). Se la pagina non
+// esiste in inglese, l'italiano; poi la prima che c'è.
+export function xDefault(vere: readonly string[]): string {
+  return vere.includes("en") ? "en" : vere.includes("it") ? "it" : vere[0] ?? "it";
+}
+
+// Per-page metadata.alternates: self-canonical + every language + x-default→en.
 export function pageAlternates(locale: string, path: string) {
   const languages: Record<string, string> = {};
   for (const l of LOCALES) languages[HREFLANG[l]] = absUrl(l, path);
-  languages["x-default"] = absUrl("it", path);
+  languages["x-default"] = absUrl(xDefault(LOCALES), path);
   return { canonical: absUrl(locale, path), languages };
 }
 
@@ -58,7 +68,7 @@ export function partialAlternates(
 ) {
   const languages: Record<string, string> = {};
   for (const l of LOCALES) if (vere.includes(l)) languages[HREFLANG[l]] = absUrl(l, path);
-  languages["x-default"] = absUrl(vere.includes("it") ? "it" : vere[0] ?? "it", path);
+  languages["x-default"] = absUrl(xDefault(vere), path);
   const canonica = vere.includes(locale) ? locale : servita;
   return { canonical: absUrl(canonica, path), languages };
 }
@@ -162,7 +172,7 @@ export function orgJsonLd() {
     image: `${SITE_URL}/brand/og-default.jpg`,
     logo: `${SITE_URL}/brand/logo-full.png`,
     email: "info@triesteimmobiliare.com",
-    telephone: "+390402473628",
+    telephone: "+393318940822",
     areaServed: { "@type": "AdministrativeArea", name: "Trieste e Provincia, Friuli-Venezia Giulia" },
     address: {
       "@type": "PostalAddress",
@@ -174,7 +184,7 @@ export function orgJsonLd() {
       "@type": "Organization",
       name: "TriesteVillas srl",
       vatID: "IT01235580329",
-      url: "https://www.triestevillas.com",
+      url: "https://triestevillas.com",
       address: {
         "@type": "PostalAddress",
         streetAddress: "Via Milano 5",

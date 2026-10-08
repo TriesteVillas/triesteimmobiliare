@@ -5,7 +5,22 @@ import { getArticles, articleText, readingMinutes } from "@/lib/articles";
 import LibraryBrowser, { type LibraryItem } from "@/components/resources/LibraryBrowser";
 import BuyerConcierge from "@/components/compra/BuyerConcierge";
 import JsonLd from "@/components/JsonLd";
-import { pageAlternates, pageOpenGraph, absUrl, breadcrumbJsonLd, SITE_URL } from "@/lib/seo";
+import { partialAlternates, pageOpenGraph, absUrl, breadcrumbJsonLd, SITE_URL } from "@/lib/seo";
+import { routing } from "@/i18n/routing";
+import type { Article } from "@/lib/articles";
+
+// /sl/risorse (08/10/2026): fino a oggi ripiegava sull'inglese — titoli e
+// sommari «The six stages of a sale…», il 9% di parole slovene sulla pagina —
+// perché gli articoli TSI in sloveno non li scrive ancora nessuno. Ora mostra
+// SOLO gli articoli che hanno un testo sloveno; senza, la pagina lo dice, rimanda
+// alla biblioteca inglese ed esce dall'indice (noindex, e niente hreflang `sl`
+// dalle altre lingue). Quando arriva il primo articolo sloveno torna da sola.
+function soloNellaLingua(articles: Article[], locale: string): Article[] {
+  return locale === "sl" ? articles.filter((a) => !!a.body.sl) : articles;
+}
+function lingueIndice(articles: Article[]): string[] {
+  return routing.locales.filter((l) => l !== "sl" || articles.some((a) => !!a.body.sl));
+}
 
 // LE RISORSE — le guide di TriesteImmobiliare su vendere e comprare casa a
 // Trieste. Non un blog di novità: pezzi di riferimento, pochi, tenuti veri (ogni
@@ -19,10 +34,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "risorse" });
+  const articles = await getArticles().catch(() => []);
+  const vere = lingueIndice(articles);
   return {
     title: { absolute: t("meta.title") },
     description: t("meta.description"),
-    alternates: pageAlternates(locale, "/risorse"),
+    alternates: partialAlternates(locale, "/risorse", vere, vere.includes(locale) ? locale : "en"),
+    ...(vere.includes(locale) ? {} : { robots: { index: false, follow: true } }),
     openGraph: pageOpenGraph(locale, "/risorse", t("meta.title"), t("meta.description")),
   };
 }
@@ -36,7 +54,9 @@ export default async function RisorsePage({
   setRequestLocale(locale);
   const t = await getTranslations("risorse");
 
-  const articles = await getArticles();
+  const tutti = await getArticles();
+  const articles = soloNellaLingua(tutti, locale);
+  const tA = await getTranslations("audit0810.risorse");
   const items: LibraryItem[] = articles.map((a) => ({
     slug: a.slug,
     title: articleText(a.title, locale),
@@ -106,6 +126,13 @@ export default async function RisorsePage({
       <section className="mx-auto max-w-6xl px-6 pb-24 pt-10">
         {items.length > 0 ? (
           <LibraryBrowser items={items} allLabel={t("all")} />
+        ) : locale === "sl" && tutti.length > 0 ? (
+          <p className="max-w-2xl text-neutral-600">
+            {tA("slVuoto")}{" "}
+            <Link href="/risorse" locale="en" className="font-semibold text-brand underline-offset-4 hover:underline">
+              {tA("slVuotoLink")} →
+            </Link>
+          </p>
         ) : (
           <p className="text-neutral-500">{t("empty")}</p>
         )}
