@@ -1,5 +1,5 @@
 import "server-only";
-import { F, mapRecord, type Property } from "./properties";
+import { F, conSlugUnici, mapRecord, type Property } from "./properties";
 import { getPropertiesDaVetrina, VETRINA_ATTIVA } from "./vetrina";
 import { applicaTrasparenza } from "./trasparenza";
 import { BASE_ORIGINALI, getTrasparenzaSito } from "./trasparenza-vetrina";
@@ -131,7 +131,7 @@ async function getCatalogo(): Promise<Property[]> {
   // stesso ordinamento. La Private Collection NON passa di là e continua sotto
   // (PRIVATE_FILTER). Rollback = rimettere la variabile. Vedi src/lib/vetrina.ts.
   if (VETRINA_ATTIVA) {
-    return (await getPropertiesDaVetrina()).sort(compareShowcase);
+    return conSlugUnici(await getPropertiesDaVetrina()).sort(compareShowcase);
   }
   let raw: RawRecord[];
   if (TOKEN) {
@@ -145,9 +145,7 @@ async function getCatalogo(): Promise<Property[]> {
     console.warn("[airtable] AIRTABLE_TOKEN not set — catalogo vuoto (usa CATALOGO_SORGENTE=pg in locale).");
     raw = [];
   }
-  return raw
-    .map((r) => mapRecord(r.id, r.fields))
-    .sort(compareShowcase);
+  return conSlugUnici(raw.map((r) => mapRecord(r.id, r.fields))).sort(compareShowcase);
 }
 
 export async function getProperty(slug: string): Promise<Property | null> {

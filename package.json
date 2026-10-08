@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/check-analytics.mjs && node scripts/check-messaggi.mjs && node scripts/check-video-registro.mjs && node scripts/check-etichette-ai.mjs && node scripts/check-dotazioni.mjs",
+    "prebuild": "node scripts/check-analytics.mjs && node scripts/check-messaggi.mjs && node scripts/check-video-registro.mjs && node scripts/check-etichette-ai.mjs && node scripts/check-dotazioni.mjs && node scripts/check-nomi.mjs && npm test",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "node scripts/run-tests.mjs"
   },
   "dependencies": {
     "leaflet": "^1.9.4",

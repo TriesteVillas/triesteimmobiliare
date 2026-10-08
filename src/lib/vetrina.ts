@@ -46,7 +46,9 @@ type Allegato = {
 type RigaVetrina = {
   tsv_prop_id: string | null;
   airtable_id: string;
-  nome: string | null;
+  // Dei nomi si leggono SOLO public_name e le sue traduzioni (08/10/2026): la
+  // vetrina espone anche `nome`, che qui non serve, e il cancello
+  // scripts/check-nomi.mjs ferma il build se torna in questo tipo.
   public_name: string | null;
   public_name_en: string | null;
   public_name_de: string | null;

@@ -654,7 +654,7 @@ export async function createMatch(m: {
 // annullate — mai feedback/esiti, che sono materiale interno dell'agenzia.
 
 const T_VISITE = "tbl1xbk9IaZ0D7Vin"; // VISITE
-const LEAD_VISITE_FIELD = "VISITE"; // reverse-link su LEAD_ (fldVsbx1gfvZcl63Y)
+const LEAD_VISITE_FIELD = "VISITE"; // reverse-link su LEAD_
 
 export type UpcomingVisit = {
   id: string;

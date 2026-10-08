@@ -291,7 +291,7 @@ export async function createLeadAndRequest(input: RequestInput): Promise<string 
     cognome: input.cognome,
     email: input.email,
     ...(input.telefono ? { telefono: input.telefono } : {}),
-    // `citta` (fld8SLwGa2pKWeQzK) SOSTITUISCE `nazionalita`: quel campo resta sulla
+    // `citta` SOSTITUISCE `nazionalita`: quel campo resta sulla
     // tabella per non perdere lo storico pre-21/07/2026, ma da qui non lo scrive più
     // nessuno. Chi legge deve fare fallback — vedi digestRowFrom.
     citta: normCity(input.citta) || input.citta,

@@ -74,7 +74,7 @@ export async function GET(request: Request) {
        a ogni giro — per sempre, senza che niente lo dicesse. E qui un giro è
        UN GIORNO (`0 6 * * *`): una riga non servita stamattina si ripresenta
        domani mattina, non fra quindici minuti. Il caso
-       misurato: `recKPr7u9PQ2GD8He` (codice emesso il 01/09/2026) soddisfa
+       misurato: una richiesta col codice emesso il 01/09/2026 soddisfa
        questo filtro da 22 giorni, ~2.100 passaggi, zero righe di log.
        Un cron che dichiara solo i successi è un cron che dice «tutto bene»
        mentre una persona aspetta da tre settimane. */

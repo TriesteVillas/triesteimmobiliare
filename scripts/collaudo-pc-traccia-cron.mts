@@ -16,7 +16,7 @@
 //   ③ Se la porta del CRM è rotta, lenta o dice di no: il giro sopravvive?
 //   ④ `inviaMail` dice PERCHÉ ha fallito, o torna il `false` muto di prima?
 //   ⑤ Il giro intero DICHIARA i fallimenti invece di contare solo i successi?
-//      (è il caso `diego@…`: 22 giorni nella coda, ~2.100 passaggi, zero log)
+//      (il caso misurato del 01/09: 22 giorni nella coda, ~2.100 passaggi, zero log)
 import { execFileSync } from "node:child_process";
 import { createHmac } from "node:crypto";
 
@@ -57,7 +57,7 @@ let rispostaResend: () => Response = () =>
 const FRA_UN_ANNO = new Date(Date.now() + 365 * 86_400_000).toISOString();
 const min = (n: number) => new Date(Date.now() - n * 60_000).toISOString();
 // Una riga sola, vecchia abbastanza da essere servita subito: è la forma della
-// riga `recKPr7u9PQ2GD8He` che il giro non riesce a consegnare dal 01/09.
+// riga reale che il giro non riusciva a consegnare dal 01/09 (nella KB).
 const RECORDS = [
   { id: "recFERMA", fields: {
       stato: "Approved", brand: "TSI", codice: "TSI-FVKN-582M", email: "ferma@collaudo.invalid",

@@ -47,8 +47,8 @@ export type EsitoInvio =
  *
  * `sendMail` qui sotto torna `false` e basta: cattura l'errore e lo butta. È
  * la metà invisibile del buco di registro del giro delle credenziali, e ha un
- * caso misurato — la richiesta `recKPr7u9PQ2GD8He` (`diego@…`, codice emesso
- * il 01/09/2026) soddisfa il filtro del cron da **22 giorni**, cioè ~2.100
+ * caso misurato — una richiesta col codice emesso il 01/09/2026 (record e
+ * indirizzo nella KB, non in questo repo pubblico) soddisfa il filtro del cron da **22 giorni**, cioè ~2.100
  * passaggi, e non è mai stata servita. Nessun log, nessun contatore: dal
  * cruscotto di Resend si vedrebbe, da qui no.
  *

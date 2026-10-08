@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "./.test-out",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "es2022",
+    "jsx": "react-jsx",
+    "incremental": false,
+    "plugins": []
+  },
+  "include": ["src/lib/simili.test.ts", "src/lib/slug.test.ts"]
+}

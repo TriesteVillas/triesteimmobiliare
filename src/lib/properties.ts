@@ -5,7 +5,10 @@ import { videoAnnuncio, type VideoAnnuncio } from "../content/annunciVideo";
 // (returnFieldsByFieldId=true).
 export const F = {
   id: "fldR3kYOEvMTn7qKA",
-  internalName: "fldv1buS8yk2NZKOZ",
+  // Il nome interno NON si chiede ad Airtable (08/10/2026): non serve a niente
+  // in pagina (titolo e slug vengono dal nome pubblico o da tipologia · zona) e
+  // porta spesso il cognome di chi vende. Un campo che non arriva non può
+  // finire in pagina per sbaglio. Il cancello scripts/check-nomi.mjs lo tiene fuori.
   publicName: "fldcGog8cRFRjZIrI",
   contratto: "fld8sD96k6YChA8pA",
   cluster: "fldcdPH8aCWSfvFlD",
@@ -66,7 +69,7 @@ export const F = {
   topPhotos: "flduAPbRd81GwJhlw",
   planimetrie: "fld8kB5lTpuzZ2IB9",
   youtubeVideos: "fldzBgkjk7K8ACVxa",
-  // NB: youtube_walkthrough (fldfJBFclRBTD4oGs) was removed from Airtable — its
+  // NB: youtube_walkthrough was removed from Airtable — its
   // content was folded into youtube_video_urls. Requesting it 422'd the whole
   // fetch (UNKNOWN_FIELD_NAME), which broke prod builds and ISR revalidation.
   matterport: "fldVT95yZFaGa8yFv",
@@ -361,6 +364,38 @@ function slugSource(f: Fields): string {
 function idNumber(tsvId: string | null): string {
   const m = tsvId?.match(/(\d+)\s*$/);
   return m ? m[1] : "0";
+}
+
+/** Slug unici (08/10/2026, gemello di triestevillas-web). Il suffisso dello slug
+ *  è il numero finale del codice, e i codici senza cifre finali finiscono
+ *  tutti in «-0»: due case con lo stesso nome pubblico e un codice senza numero
+ *  avrebbero avuto lo stesso indirizzo, e la seconda sarebbe sparita dietro la
+ *  prima (la scheda prende la prima che trova). Gli slug esistenti NON cambiano
+ *  (il CRM li ricostruisce con la stessa regola, web/lib/url-sito.ts): solo un
+ *  doppione, dal secondo in poi in ordine di codice, prende in coda un pezzo
+ *  stabile calcolato dal codice — mai il codice in chiaro, che può essere
+ *  parlante. Lo verifica src/lib/slug.test.ts, nel prebuild. */
+export function conSlugUnici<T extends { id: string; slug: string }>(lista: T[]): T[] {
+  const perSlug = new Map<string, T[]>();
+  for (const p of lista) perSlug.set(p.slug, [...(perSlug.get(p.slug) ?? []), p]);
+  const nuovo = new Map<T, string>();
+  for (const [slug, gruppo] of perSlug) {
+    if (gruppo.length < 2) continue;
+    [...gruppo]
+      .sort((a, b) => a.id.localeCompare(b.id))
+      .slice(1)
+      .forEach((p) => nuovo.set(p, `${slug}-${impronta(p.id)}`));
+  }
+  return nuovo.size ? lista.map((p) => (nuovo.has(p) ? { ...p, slug: nuovo.get(p)! } : p)) : lista;
+}
+
+function impronta(s: string): string {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0).toString(36).slice(0, 5);
 }
 
 // ─── Uno slug che non c'è più (08/10/2026) ──────────────────────────────────
