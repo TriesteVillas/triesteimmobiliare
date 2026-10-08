@@ -3,9 +3,9 @@
 // - /de/ non esiste (404): i visitatori tedeschi vanno su /en/;
 // - le ancore EN sono diverse da quelle IT (#planimetrie → #plans, #capitolato → #spec).
 // Le UTM vivono qui e in nessun altro posto.
-// ⚠️ È «DUINO» E NON PIÙ «DUINO RICCESI» (24/09/2026), e il motivo va saputo.
-// Il CRM serve questo campo su una rotta PUBBLICA e senza autenticazione, e
-// «RICCESI» è il cognome di chi vende: darlo a un compratore gli dice chi è la
+// ⚠️ È «DUINO» E NON PIÙ «DUINO» + un cognome (24/09/2026), e il motivo va
+// saputo. Il CRM serve questo campo su una rotta PUBBLICA e senza
+// autenticazione, e quel cognome è di chi vende: darlo a un compratore gli dice chi è la
 // controparte prima che lo decida il venditore — è la regola ferrea del
 // gruppo. Da oggi la porta della vetrina toglie il termine riservato e lascia
 // il resto, perché il criterio non è «via il campo» ma «è segreto solo ciò che
