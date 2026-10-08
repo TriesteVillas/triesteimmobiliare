@@ -86,9 +86,10 @@ export default async function ArticlePage({
   // Etichetta AI degli articoli (art. 50 Reg. UE 2024/1689; mandato di Davide
   // dell'11/09 «in ogni articolo deve risultare chiaramente che sono generati
   // da AI», esteso a TSI): fino all'08/10 nessuno dei 39 articoli la portava.
-  // Stesso impianto di triestevillas.com/risorse — chip in testa e nota per
-  // esteso in coda — col link alla pagina «Come usiamo l'AI» del gruppo, solo
-  // se oggi risponde nella lingua (lib/pagina-ai.ts).
+  // Stesso impianto di triestevillas.com/risorse: il chip in testa, a vista,
+  // col link alla pagina «Come usiamo l'AI» del gruppo solo se oggi risponde
+  // nella lingua (lib/pagina-ai.ts); la dichiarazione per esteso chiude ogni
+  // guida, nel disclaimer.
   const tAi = await getTranslations("audit0810.risorse");
   const linkAi = await linkPaginaAi(locale);
 
@@ -234,22 +235,9 @@ export default async function ArticlePage({
           </details>
         ) : null}
 
-        {/* Dichiarazione AI per esteso: ogni guida la porta, sempre. */}
-        <p className="mt-8 rounded-2xl border border-brand/15 bg-paper px-5 py-4 text-xs leading-relaxed text-neutral-600">
-          <span aria-hidden>✦ </span>
-          {tAi("aiNotice")}
-          {linkAi ? (
-            <>
-              {" "}
-              <a href={linkAi} target="_blank" rel="noopener" className="underline underline-offset-2 transition-colors hover:text-brand-dark">
-                {tAi("aiNoticeLink")} ↗
-              </a>
-            </>
-          ) : null}
-        </p>
-
-        {/* Disclaimer editoriale standard */}
-        <p className="mt-4 rounded-2xl border border-brand/15 bg-paper px-5 py-4 text-xs leading-relaxed text-neutral-500">
+        {/* Disclaimer editoriale, che dall'08/10 apre con la dichiarazione AI
+            per esteso (messages → risorse.disclaimer). */}
+        <p className="mt-8 rounded-2xl border border-brand/15 bg-paper px-5 py-4 text-xs leading-relaxed text-neutral-500">
           {t("disclaimer")}
         </p>
 

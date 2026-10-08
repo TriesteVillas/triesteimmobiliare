@@ -1224,8 +1224,6 @@
     },
     "risorse": {
       "aiChip": "Pripravljeno z UI",
-      "aiNotice": "Ta vodnik je bil pripravljen s pomočjo umetne inteligence (vsebina, ustvarjena z UI – 50. člen Uredbe (EU) 2024/1689) na podlagi navedenih virov in objavljen pod uredniško odgovornostjo TriesteImmobiliare. Umetna inteligenca se lahko zmoti: če opazite netočnost, nam pišite – popravek bo ostal viden v okvirju posodobitev.",
-      "aiNoticeLink": "Kako uporabljamo umetno inteligenco",
       "slVuoto": "Vodniki v slovenščini še niso pripravljeni.",
       "slVuotoLink": "Preberite knjižnico v angleščini"
     },
