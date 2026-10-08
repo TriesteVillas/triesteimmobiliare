@@ -40,7 +40,7 @@
 ```
 
 Both POST to the **same** endpoint `/api/lead`, the same Airtable base/table
-(`app1ZDay9vQNU5V2u` / `tbl1RolmcvI7WxDdr`), differentiated by the `tipo` discriminator
+(base `TSV_PROPERTIES` / table `LEADS`), differentiated by the `tipo` discriminator
 in the JSON body. Brand tagging (`azienda`, `canale`) makes every lead filterable next to
 TSV / FriuliVillas in the shared CRM dashboards.
 
@@ -237,7 +237,7 @@ perfectly profiled bounce. The call fills the gaps.
 
 ## C. LEAD PAYLOAD MAPPING (exact JSON → exact Airtable field NAMES)
 
-Endpoint: `POST /api/lead`. Base `app1ZDay9vQNU5V2u`, table `tbl1RolmcvI7WxDdr`,
+Endpoint: `POST /api/lead`. Base `TSV_PROPERTIES`, table `LEADS`,
 `typecast: true`. **Only existing column names are written** (brief §5). typecast may create
 new *singleSelect options* (e.g. a new `tipo_richiesta` choice "Investimento") but never new
 columns. Conditional spreads (`...(x ? {x} : {})`) mean empty optionals are simply omitted.
@@ -369,8 +369,8 @@ only names already present in `route.ts`.
    `canale="Sito TriesteImmobiliare"`. The investor handler keeps the same tags. Result: a single
    Airtable view filtered by `azienda` shows TSI leads next to TSV/FriuliVillas with identical
    field shapes → existing CRM dashboards, digests and the WHT recap "just work" with zero new wiring.
-2. **Shared PROPRIETA DB by `pubblicato_su`.** Both sites read base `app1ZDay9vQNU5V2u` /
-   `tblwAUWPnX7KF8FhU`. A unit appears on TSI vs TSV purely by whether `pubblicato_su` contains
+2. **Shared PROPRIETA DB by `pubblicato_su`.** Both sites read base `TSV_PROPERTIES` /
+   table `PROPRIETA`. A unit appears on TSI vs TSV purely by whether `pubblicato_su` contains
    `triesteimmobiliare.com` (+ `tsv_com_online=TRUE`). No data duplication; one source of truth.
    The off-market teaser cards can be **derived** from PROPRIETA rows flagged off-market with all
    identifying fields stripped at render time (or hand-authored if no flag exists yet).

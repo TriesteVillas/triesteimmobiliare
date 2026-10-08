@@ -20,9 +20,9 @@ cinematografiche.
 
 - **Stack**: Next.js 16 (App Router) · React 19 · TypeScript · Tailwind 4 · next-intl · Leaflet
 - **Hosting**: Vercel (progetto `trieste-villas/triesteimmobiliare`, deploy automatico a ogni push su `main`)
-- **i18n**: IT (default, root) · EN · DE — `localePrefix: as-needed`
+- **i18n**: IT (default, root) · EN · DE · SL — `localePrefix: as-needed`
 - **Dati immobili**: fetch live/ISR (10 min) da Airtable `TSV_PROPERTIES`
-  (base `app1ZDay9vQNU5V2u`, tabella `PROPRIETA`)
+  (tabella `PROPRIETA`; gli identificativi di base e tabelle stanno nella KB del gruppo, non in questo repo pubblico)
 
 ## Regola di pubblicazione (gate)
 

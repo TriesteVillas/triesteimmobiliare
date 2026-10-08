@@ -101,9 +101,9 @@ Consider `/compra` content (buyer help, Ricerca libera) folded into `/immobili` 
 
 ## 5. CRM / Airtable wiring (NO schema changes)
 
-- **Properties** read: base `app1ZDay9vQNU5V2u`, table PROPRIETA `tblwAUWPnX7KF8FhU`.
+- **Properties** read: base `TSV_PROPERTIES`, table PROPRIETA (IDs kept in the group KB, not in this public repo).
   Publish gate: `tsv_com_online`=TRUE **and** `pubblicato_su` contains `triesteimmobiliare.com`.
-- **Leads** write: SAME base, table **LEADS `tbl1RolmcvI7WxDdr`** — this is the real unified CRM
+- **Leads** write: SAME base, table **LEADS** — this is the real unified CRM
   (4,035 records, fed by Gmail/Immobiliare.it too). Writes are by **field NAME + typecast:true**.
   typecast creates missing **singleSelect options** but NOT missing columns → **only write to
   existing field names.** Existing names used by `/api/lead`: `nome_completo, nome, cognome, email,
