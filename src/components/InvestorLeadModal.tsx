@@ -5,6 +5,8 @@ import { createPortal } from "react-dom";
 import { useLocale, useTranslations } from "next-intl";
 import RangeDual from "./RangeDual";
 import { useFocusTrap } from "@/lib/useFocusTrap";
+import { track } from "@/lib/track";
+import { formatEuroBreve } from "@/lib/format";
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -42,8 +44,6 @@ const OBIETTIVI = [
 ] as const;
 
 const BUDGET = { min: 100_000, max: 600_000, step: 25_000 };
-const fmtEur = (n: number) =>
-  n >= 1_000_000 ? `${(n / 1_000_000).toLocaleString("it-IT")} M€` : `${n / 1000}k €`;
 
 export default function InvestorLeadModal({
   open,
@@ -117,6 +117,7 @@ export default function InvestorLeadModal({
           lingua: locale,
         }),
       });
+      if (res.ok) track("generate_lead", { form: "investor" });
       setState(res.ok ? "ok" : "error");
     } catch {
       setState("error");
@@ -224,8 +225,8 @@ export default function InvestorLeadModal({
 
             <div className="mt-6">
               <p className="mb-2 text-sm font-medium text-neutral-700">{t("budget")}</p>
-              <RangeDual {...BUDGET} value={budget} maxLabel="600k €"
-                format={fmtEur}
+              <RangeDual {...BUDGET} value={budget} maxLabel={formatEuroBreve(BUDGET.max, locale)}
+                format={(n: number) => formatEuroBreve(n, locale)}
                 onChange={(v) => { setBudget(v); setBudgetTouched(true); }} />
             </div>
 

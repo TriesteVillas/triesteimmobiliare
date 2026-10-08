@@ -17,9 +17,9 @@ import {
 // best-effort: a saved lead is the source of truth, so an email failure never
 // fails the request.
 
-// LEADS now lives in the SAME base as the properties (app1ZDay9vQNU5V2u),
-// table tbl1RolmcvI7WxDdr. The site token (AIRTABLE_TOKEN) just needs
-// data.records:write on that base in addition to the existing read.
+// LEADS now lives in the SAME base as the properties (table LEAD_). The site
+// token (AIRTABLE_TOKEN) just needs data.records:write on that base in
+// addition to the existing read.
 const LEADS_BASE_ID = process.env.LEADS_BASE_ID ?? "app1ZDay9vQNU5V2u";
 const LEADS_TABLE = process.env.LEADS_TABLE ?? "tbl1RolmcvI7WxDdr";
 const LEADS_TOKEN = process.env.LEADS_AIRTABLE_TOKEN ?? process.env.AIRTABLE_TOKEN;
@@ -164,7 +164,7 @@ const RECAP = {
     purpose: "Purpose", condition: "Property condition", listing: "Property",
     request: "Request", message: "Message", visit: "Availability for the visit",
     timing: "Timing", roi: "Target yield", horizon: "Horizon", objective: "Objective",
-    closing: `Feel free to reply to this email or call us on ${mailContact.phone}.`,
+    closing: `Feel free to reply to this email or call us on +39 ${mailContact.phone}.`,
     sign: `TriesteImmobiliare · ${mailContact.email}`,
   },
   de: {
@@ -176,7 +176,7 @@ const RECAP = {
     purpose: "Zweck", condition: "Zustand der Immobilie", listing: "Immobilie",
     request: "Anfrage", message: "Nachricht", visit: "Verfügbarkeit für die Besichtigung",
     timing: "Zeitrahmen", roi: "Erwartete Rendite", horizon: "Horizont", objective: "Ziel",
-    closing: `Antworten Sie gerne auf diese E-Mail oder rufen Sie uns an unter ${mailContact.phone}.`,
+    closing: `Antworten Sie gerne auf diese E-Mail oder rufen Sie uns an unter +39 ${mailContact.phone}.`,
     sign: `TriesteImmobiliare · ${mailContact.email}`,
   },
   // Sloveno (2026-10-01). La chiusura dice in che lingua rispondiamo: nessuna
@@ -599,7 +599,15 @@ async function handleInvestitore(body: Record<string, unknown>, posata: boolean)
 }
 
 export async function POST(request: Request) {
-  if (!LEADS_TOKEN) {
+  // Il 503 vale solo quando il lead non avrebbe DOVE atterrare (stessa regola
+  // del gemello triesteaffitti). Con LEAD_SU_AIRTABLE=no (dal 25/08) il
+  // destinatario vero è il CRM via porta `ingresso`: che manchi il token
+  // Airtable non è un guasto. Fino all'08/10 il controllo era sul solo token,
+  // e il giorno in cui lo si fosse tolto da Vercel — come prevede il piano di
+  // spegnimento — tutti i moduli avrebbero risposto 503 con la porta sana.
+  const suAirtable = process.env.LEAD_SU_AIRTABLE !== "no";
+  const portaCrm = !!process.env.INGRESSO_HMAC;
+  if ((suAirtable && !LEADS_TOKEN) || (!suAirtable && !portaCrm)) {
     return NextResponse.json({ ok: false, error: "not_configured" }, { status: 503 });
   }
 

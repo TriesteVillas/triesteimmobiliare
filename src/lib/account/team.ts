@@ -4,8 +4,10 @@
 // VISITE.operatore è testo libero (es. "Cécile"): match accent-insensitive
 // sulla prima parola, mai substring (regola namematch del CRM).
 
-export const AGENCY_PHONE = "040 2473628";
-export const AGENCY_PHONE_HREF = "tel:+390402473628";
+// Linea unica del gruppo, telefono e WhatsApp (regola di Martino del
+// 09/06/2026): sostituisce il 040 dell'ufficio.
+export const AGENCY_PHONE = "331 8940822";
+export const AGENCY_PHONE_HREF = "tel:+393318940822";
 
 const OPERATORS: { key: string; email: string }[] = [
   { key: "giada", email: "giada@triestevillas.com" },

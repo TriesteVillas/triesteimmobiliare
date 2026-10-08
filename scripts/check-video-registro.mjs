@@ -27,7 +27,8 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import ts from "typescript";
 
-const VETRINA_URL = process.env.VETRINA_URL ?? "https://tsv-pg.vercel.app/api/vetrina";
+// Stesso ripiego di src/lib/crm.ts (CRM_BASE_URL), che da uno script .mjs non si importa.
+const VETRINA_URL = process.env.VETRINA_URL ?? `${(process.env.CRM_BASE_URL ?? "https://tsv-pg.vercel.app").replace(/\/+$/, "")}/api/vetrina`;
 const SITO = "triesteimmobiliare.com";
 const PREFISSO = "tsi";
 const TIMEOUT_MS = 8000;

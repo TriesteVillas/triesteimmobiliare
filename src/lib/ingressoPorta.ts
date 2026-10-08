@@ -1,4 +1,5 @@
 import { createHmac, randomUUID } from "node:crypto";
+import { crmUrl } from "@/lib/crm";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LA BUSSATA ALLA PORTA DEL CRM (dal 12/08/2026) — e dal 01/10/2026 la porta
@@ -41,7 +42,7 @@ import { createHmac, randomUUID } from "node:crypto";
 // quinto repo: è un secondo clone di triestevillas-web (verificato 12/08).
 // ─────────────────────────────────────────────────────────────────────────────
 
-const URL_PORTA = process.env.INGRESSO_URL ?? "https://tsv-pg.vercel.app/api/ingresso";
+const URL_PORTA = process.env.INGRESSO_URL ?? crmUrl("/api/ingresso");
 const SEGRETO = process.env.INGRESSO_HMAC ?? "";
 const PORTA = "sito-tsi";
 const SITO = "tsi";

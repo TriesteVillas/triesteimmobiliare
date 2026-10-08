@@ -1,6 +1,7 @@
 import "server-only";
 import { createHmac } from "node:crypto";
 import type { Grant } from "./store";
+import { crmUrl } from "@/lib/crm";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LA PRIVATE COLLECTION DA POSTGRES — fase A del taglio Airtable → Postgres.
@@ -34,7 +35,7 @@ import type { Grant } from "./store";
 // cliente perso.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const URL_PORTA = process.env.PC_PORTA_URL ?? "https://tsv-pg.vercel.app/api/pc-sito";
+const URL_PORTA = process.env.PC_PORTA_URL ?? crmUrl("/api/pc-sito");
 const PORTA = "pc-tsi";
 const SEGRETO = process.env.PC_PORTA_SEGRETO ?? "";
 

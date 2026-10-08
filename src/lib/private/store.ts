@@ -2,6 +2,7 @@ import "server-only";
 import { type Lang } from "./mail";
 import { BRAND, brandClause } from "./brand";
 import { normCity } from "../citynorm";
+import { crmUrl } from "@/lib/crm";
 import {
   PC_DA_POSTGRES, PC_MANCA_SEGRETO, PC_RICHIESTA_DA_POSTGRES,
   pgFindGrantByCode, pgFindGrantById, pgRegisterLogin, pgLogAccess, pgRecentViewExists,
@@ -52,7 +53,7 @@ export function requestsAirtableUrl(): string {
   if (PC_RICHIESTA_DA_POSTGRES) {
     // La coda «Accessi e richieste» del pannello del v4, filtrata sul marchio
     // di questo sito: è lì che la richiesta nata in casa si vede e si approva.
-    const base = (process.env.PC_PORTA_URL ?? "https://tsv-pg.vercel.app/api/pc-sito")
+    const base = (process.env.PC_PORTA_URL ?? crmUrl("/api/pc-sito"))
       .replace(/\/api\/pc-sito\/?$/, "");
     return `${base}/immobili/private?v=accessi&m=tsi`;
   }

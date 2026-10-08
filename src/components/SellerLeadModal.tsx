@@ -8,6 +8,7 @@ import { CITY_LIST_ID, citySuggestions } from "@/lib/cities";
 import AddressAutocomplete from "./AddressAutocomplete";
 import { sloveniaVillasHref } from "@/lib/sloveniavillas";
 import type { AddressSuggestion } from "@/lib/geocode";
+import { track } from "@/lib/track";
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -103,6 +104,7 @@ export default function SellerLeadModal({
           lingua: locale,
         }),
       });
+      if (res.ok) track("generate_lead", { form: "seller" });
       setState(res.ok ? "ok" : "error");
     } catch {
       setState("error");

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { track } from "@/lib/track";
 
 const SLOTS = ["Qualsiasi", "9-12", "12-14", "14-17", "17-20"] as const;
 const LOCALES: Record<string, string> = { it: "it-IT", en: "en-GB", de: "de-DE", sl: "sl-SI" };
@@ -91,6 +92,7 @@ export default function VisitForm({
           lingua,
         }),
       });
+      if (res.ok) track("generate_lead", { form: "visit", property_id: rif });
       setStatus(res.ok ? "ok" : "error");
     } catch {
       setStatus("error");

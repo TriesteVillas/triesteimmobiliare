@@ -6,6 +6,8 @@ import { useLocale, useTranslations } from "next-intl";
 import RangeDual from "./RangeDual";
 import { useFocusTrap } from "@/lib/useFocusTrap";
 import { CITY_LIST_ID, citySuggestions } from "@/lib/cities";
+import { track } from "@/lib/track";
+import { formatEuroBreve } from "@/lib/format";
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -42,8 +44,6 @@ const CONDIZIONI = [
 const BUDGET = { min: 50_000, max: 1_500_000, step: 25_000 };
 const MQ = { min: 30, max: 300, step: 10 };
 
-const fmtEur = (n: number) =>
-  n >= 1_000_000 ? `${(n / 1_000_000).toLocaleString("it-IT")} M€` : `${n / 1000}k €`;
 
 export default function BuyerLeadModal({
   open,
@@ -123,6 +123,7 @@ export default function BuyerLeadModal({
           lingua: locale,
         }),
       });
+      if (res.ok) track("generate_lead", { form: "buyer" });
       setState(res.ok ? "ok" : "error");
     } catch {
       setState("error");
@@ -221,14 +222,14 @@ export default function BuyerLeadModal({
             <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
                 <p className="mb-2 text-sm font-medium text-neutral-700">{t("budget")}</p>
-                <RangeDual {...BUDGET} value={budget} maxLabel="1,5 M€ +"
-                  format={fmtEur}
+                <RangeDual {...BUDGET} value={budget} maxLabel={`${formatEuroBreve(BUDGET.max, locale)} +`}
+                  format={(n: number) => formatEuroBreve(n, locale)}
                   onChange={(v) => { setBudget(v); setBudgetTouched(true); }} />
               </div>
               <div>
                 <p className="mb-2 text-sm font-medium text-neutral-700">{t("size")}</p>
-                <RangeDual {...MQ} value={mq} maxLabel="300+ mq"
-                  format={(n) => `${n} mq`}
+                <RangeDual {...MQ} value={mq} maxLabel="300+ m²"
+                  format={(n) => `${n} m²`}
                   onChange={(v) => { setMq(v); setMqTouched(true); }} />
               </div>
             </div>

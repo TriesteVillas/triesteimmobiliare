@@ -8,7 +8,10 @@ export const runtime = "nodejs";
 // pagina (il favstore la cachea a modulo), niente dati sensibili.
 export async function GET() {
   const acc = await currentWebAccount();
-  if (!acc) return NextResponse.json({ ok: false }, { status: 401 });
+  // Anonimo = 204, non 401 (08/10/2026): la chiamata parte da OGNI pagina, e
+  // un 401 per ogni visitatore non loggato era un errore in console (Best
+  // Practices di Lighthouse 92) per una cosa che non è un errore.
+  if (!acc) return new NextResponse(null, { status: 204, headers: { "Cache-Control": "no-store" } });
   const prefs = await listPrefsByEmail(acc.email);
   const votes: Record<string, "up" | "down"> = {};
   for (const p of prefs) {

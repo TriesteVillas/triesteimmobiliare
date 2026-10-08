@@ -83,7 +83,8 @@ export function ensureInit(): void {
   emit({ ready: true, favs: new Set(readLocalFavs()) });
   fetch("/api/account/me", { cache: "no-store" })
     .then(async (res) => {
-      if (!res.ok) return; // anonimo: si resta sui cuori locali
+      // Anonimo (204, prima 401): si resta sui cuori locali.
+      if (!res.ok || res.status === 204) return;
       const me = (await res.json()) as {
         nome?: string;
         favs?: string[];

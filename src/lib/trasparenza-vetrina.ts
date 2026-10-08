@@ -2,6 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import { LINGUE, normalizzaTrattamento, type Testi, type TrasparenzaVetrina } from "./trasparenza";
+import { crmUrl } from "@/lib/crm";
 import {
   CHIAVE_VIDEO,
   normalizzaTrattamentoVideo,
@@ -53,7 +54,7 @@ import {
 // anche la base degli originali (SPEC §5.6). Vedi la nota in fondo al file.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const VETRINA_URL = process.env.VETRINA_URL ?? "https://tsv-pg.vercel.app/api/vetrina";
+const VETRINA_URL = process.env.VETRINA_URL ?? crmUrl("/api/vetrina");
 const SITO = "triesteimmobiliare.com";
 const REVALIDATE_SECONDS = 600;
 // La build e la rigenerazione non devono restare appese a un CRM lento: oltre
@@ -66,7 +67,7 @@ export const BASE_ORIGINALI = (() => {
   try {
     return `${new URL(VETRINA_URL).origin}/api/vetrina/foto`;
   } catch {
-    return "https://tsv-pg.vercel.app/api/vetrina/foto";
+    return crmUrl("/api/vetrina/foto");
   }
 })();
 

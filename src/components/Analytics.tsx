@@ -43,10 +43,12 @@ export default function Analytics() {
   // documento, per tutti i punti di contatto del sito — così un modulo nuovo o
   // un numero di telefono in una pagina nuova sono già misurati senza toccare
   // niente:
-  //   · `generate_lead` (evento raccomandato GA4) a ogni submit di un <form>,
-  //     con `modulo` = id/nome del form. In fase di CATTURA, quindi anche se
-  //     React chiama preventDefault: conta la richiesta, non l'esito.
   //   · `contatto` al clic su tel: / WhatsApp / mailto:, con `canale`.
+  //   · `generate_lead` NON più da qui (08/10/2026, audit del 07/10): il
+  //     submit di QUALSIASI <form> contava come lead anche login,
+  //     registrazione, preferenze e ogni messaggio della chat, e la richiesta
+  //     fallita come quella riuscita. Ora parte SOLO dai moduli lead, dopo la
+  //     risposta ok del server (lib/track.ts aggiunge `modulo`).
   // Nel CRM v4 il job `eventi` li marca come eventi chiave e registra i due
   // parametri come dimensioni: senza, nei report non comparirebbero.
   useEffect(() => {
@@ -61,16 +63,9 @@ export default function Analytics() {
       else if (/wa\.me|api\.whatsapp\.com|^whatsapp:/i.test(h)) invia("contatto", { canale: "whatsapp" });
       else if (/^mailto:/i.test(h)) invia("contatto", { canale: "email" });
     };
-    const alSubmit = (e: Event) => {
-      const f = e.target as HTMLFormElement | null;
-      if (!f || f.tagName !== "FORM") return;
-      invia("generate_lead", { modulo: f.id || f.getAttribute("name") || f.getAttribute("aria-label") || "form" });
-    };
     document.addEventListener("click", alClic, true);
-    document.addEventListener("submit", alSubmit, true);
     return () => {
       document.removeEventListener("click", alClic, true);
-      document.removeEventListener("submit", alSubmit, true);
     };
   }, []);
   // ⚠️ NIENTE ANALYTICS DENTRO L'AREA RISERVATA — gemello della stessa esclusione su
@@ -79,7 +74,9 @@ export default function Analytics() {
   // collezione riservata spedita a un servizio di analytics a ogni uscita. L'area
   // ha già un tracciamento suo, PC_ACCESS_LOG, molto più preciso.
   const pathname = usePathname();
-  if (/^\/(it|en|de)?\/?private(\/|$)/.test(pathname ?? "")) return null;
+  // `sl` compreso (08/10/2026): dal 01/10 c'è /sl/private, e la regola che
+  // conosceva solo it/en/de lasciava partire GA4 col codice nella query.
+  if (/^\/(it|en|de|sl)?\/?private(\/|$)/.test(pathname ?? "")) return null;
   if (!GA_ID) return null;
   return (
     <>

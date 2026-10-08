@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { BUDGET_BANDS, bandLabel, type BudgetBand } from "@/lib/private/bands";
 import { CITY_LIST_ID, citySuggestions } from "@/lib/cities";
 import { introIsRich } from "@/lib/private/intro";
+import { track } from "@/lib/track";
 
 // Credential-request form for the Private Collection. Posts to
 // /api/private/request, which creates a tagged LEAD_ + a PC_RICHIESTE row.
@@ -45,7 +46,7 @@ export default function RequestForm({ triggerId }: { triggerId: string }) {
           zone, bands, immobileTrigger: triggerId, privacyOk, lingua: locale,
         }),
       });
-      if (res.ok) { setState("ok"); return; }
+      if (res.ok) { track("generate_lead", { form: "pc_request" }); setState("ok"); return; }
       // Il `required` del browser copre il campo vuoto, non un valore di una sola
       // lettera che il server rifiuta: senza questo ramo l'utente leggeva
       // "qualcosa è andato storto" e non aveva modo di capire cosa correggere.

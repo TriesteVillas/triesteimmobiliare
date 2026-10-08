@@ -29,7 +29,10 @@ const ON_DARK_MUTED = "#9db0b8";
 const ON_DARK_FAINT = "#7f939c";
 
 const EMAIL = "info@triesteimmobiliare.com";
-const PHONE = "040 2473628";
+// Linea unica del gruppo, telefono e WhatsApp (regola di Martino del
+// 09/06/2026): sostituisce il 040 dell'ufficio. Nelle mail esce senza +39
+// come vuole la regola per l'italiano; il link porta il prefisso.
+const PHONE = "331 8940822";
 const WHATSAPP = "331 8940822";
 const VAT = "01235580329";
 
@@ -144,8 +147,8 @@ export function brandMailShell(opts: {
           <span style="color:${ACCENT}">&nbsp;·&nbsp;</span><a href="mailto:${EMAIL}" style="color:${ON_DARK};text-decoration:none">${EMAIL}</a>
         </p>
         <p style="margin:8px 0 0;font-family:${FONT};font-size:12px;color:${ON_DARK_MUTED}">
-          <a href="tel:+390402473628" style="color:${ON_DARK};text-decoration:none">${PHONE}</a>
-          <span style="color:${ACCENT}">&nbsp;·&nbsp;</span><a href="https://wa.me/393318940822" target="_blank" style="color:${ON_DARK};text-decoration:none">WhatsApp ${WHATSAPP}</a>
+          <a href="tel:+393318940822" style="color:${ON_DARK};text-decoration:none">${PHONE}</a>
+          <span style="color:${ACCENT}">&nbsp;·&nbsp;</span><a href="https://wa.me/393318940822" target="_blank" style="color:${ON_DARK};text-decoration:none">WhatsApp</a>
         </p>
         <p style="margin:8px 0 0;font-family:${FONT};font-size:11px;color:${ON_DARK_MUTED}">${ADDRESS[lang]}</p>
         <p style="margin:6px 0 0;font-family:${FONT};font-size:11px;color:${ON_DARK_FAINT}">© ${new Date().getFullYear()} TriesteImmobiliare · P.IVA ${VAT}</p>

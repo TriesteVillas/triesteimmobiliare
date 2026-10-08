@@ -25,3 +25,15 @@ export function formatPrice(value: number, locale: string): string {
 export function formatNumber(value: number, locale: string): string {
   return new Intl.NumberFormat(LOCALE_TAG[locale] ?? "it-IT").format(value);
 }
+
+/** Un importo breve per le fasce di budget dei moduli («50K €», «€50k»,
+ *  «50 tis. €», «1,5 Mln €»), nella convenzione della lingua (08/10/2026):
+ *  prima era «50k €» / «1,5 M€» all'italiana anche su /en, /de e /sl. */
+export function formatEuroBreve(value: number, locale: string): string {
+  return new Intl.NumberFormat(LOCALE_TAG[locale] ?? "it-IT", {
+    style: "currency",
+    currency: "EUR",
+    notation: "compact",
+    maximumFractionDigits: 2,
+  }).format(value);
+}
