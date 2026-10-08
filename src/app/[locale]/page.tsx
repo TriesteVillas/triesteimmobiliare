@@ -110,10 +110,14 @@ export default async function Home({
           {/* Hero: tutto quanto è sopra la piega usa `data-reveal="now"`, che si
               anima in CSS senza aspettare l'hydration. Con `data-reveal` normale
               questo blocco restava invisibile fino al JS — vedi globals.css. */}
-          <div data-reveal="now">
+          {/* Il logo grande sopra il titolo solo da md in su (08/10/2026, come il
+              gemello triesteaffitti): sul telefono ripeteva la barchetta della
+              pillola subito sopra, e i suoi ~76 px spingevano «Sfoglia gli
+              immobili» sotto il primo schermo, dietro il banner dei cookie. */}
+          <div className="hidden md:block" data-reveal="now">
             <BoatMark className="h-12 w-auto sm:h-14" />
           </div>
-          <p className="eyebrow mt-7" data-reveal="now">
+          <p className="eyebrow md:mt-7" data-reveal="now">
             {t("hero.eyebrow")}
           </p>
           {/* Spazi VERI fra righe e parole (08/10/2026): erano span separati
