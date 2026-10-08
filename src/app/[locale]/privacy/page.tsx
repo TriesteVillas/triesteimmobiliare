@@ -16,14 +16,14 @@ const CONTROLLER =
 const CONTENT: Record<Locale, Content> = {
   it: {
     title: "Informativa sulla Privacy",
-    updated: "Ultimo aggiornamento: giugno 2026",
+    updated: "Ultimo aggiornamento: ottobre 2026",
     intro:
       "La presente informativa descrive come TriesteImmobiliare (marchio di TriesteVillas srl) tratta i dati personali raccolti tramite questo sito, ai sensi del Regolamento (UE) 2016/679 (GDPR).",
     sections: [
       { h: "1. Titolare del trattamento", p: CONTROLLER },
       {
         h: "2. Dati trattati",
-        p: "Dati di contatto che fornisci volontariamente tramite i moduli (nome, email, telefono, eventuale messaggio e immobile di interesse) e dati tecnici di navigazione (es. indirizzo IP, tipo di browser) raccolti tramite cookie tecnici necessari al funzionamento del sito.",
+        p: "Dati di contatto che fornisci volontariamente tramite i moduli (nome, email, telefono, eventuale messaggio e immobile di interesse) e dati tecnici di navigazione (es. indirizzo IP, tipo di browser) raccolti tramite cookie tecnici necessari al funzionamento del sito. Se scrivi all'assistente AI del sito, anche il testo delle conversazioni, che vengono registrate e possono essere rilette dal nostro team.",
       },
       {
         h: "3. Finalità e base giuridica",
@@ -39,7 +39,7 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         h: "6. Destinatari e responsabili",
-        p: "I dati possono essere trattati da nostri collaboratori autorizzati e da fornitori che agiscono come responsabili del trattamento per i servizi tecnici del sito (in particolare Airtable per la gestione dei contatti, Vercel per l'hosting e un provider di posta per l'invio delle email). I dati non sono diffusi.",
+        p: "I dati possono essere trattati da nostri collaboratori autorizzati e da fornitori che agiscono come responsabili del trattamento per i servizi tecnici del sito, in particolare: i fornitori di hosting e database del gestionale interno del gruppo (CRM), dove arrivano richieste e contatti; Airtable, per alcune funzioni non ancora passate al gestionale, tra cui l'area riservata e la Private Collection; Anthropic, per il modello dell'assistente AI e per gli strumenti di intelligenza artificiale usati nel gestionale; Vercel per l'hosting del sito; un provider di posta per l'invio delle email. I dati non sono diffusi.",
       },
       {
         h: "7. Trasferimenti extra-UE",
@@ -51,7 +51,7 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         h: "9. Cookie",
-        p: "Il sito usa cookie tecnici necessari al funzionamento e, solo con il tuo consenso, cookie di statistica di Google Analytics 4 (Google Ireland Ltd) per capire come viene usato il sito. Fino alla tua scelta non viene scritto nessun cookie di statistica; puoi cambiare idea in ogni momento dal link «Preferenze cookie» in fondo a ogni pagina. Nessuna pubblicità, nessuna profilazione. Eventuali servizi di terze parti (es. mappe, video) possono impostare cookie propri quando ne attivi i contenuti.",
+        p: "Il sito usa cookie tecnici necessari al funzionamento e, solo con il tuo consenso, cookie di statistica di Google Analytics 4 (Google Ireland Ltd) per capire come viene usato il sito. Il tag di Google si carica in ogni visita in modalità di consenso (Consent Mode v2), con l'archiviazione delle statistiche negata: fino alla tua scelta non scrive nessun cookie di statistica, ma può inviare a Google segnali senza cookie e senza identificativi, che Google usa per stime aggregate. Puoi cambiare idea in ogni momento dal link «Preferenze cookie» in fondo a ogni pagina. Nessuna pubblicità, nessuna profilazione. Eventuali servizi di terze parti (es. mappe, video) possono impostare cookie propri quando ne attivi i contenuti.",
       },
       {
         h: "10. Area riservata e personalizzazione",
@@ -65,14 +65,14 @@ const CONTENT: Record<Locale, Content> = {
   },
   en: {
     title: "Privacy Policy",
-    updated: "Last updated: June 2026",
+    updated: "Last updated: October 2026",
     intro:
       "This policy explains how TriesteImmobiliare (a TriesteVillas srl brand) processes the personal data collected through this website, under Regulation (EU) 2016/679 (GDPR).",
     sections: [
       { h: "1. Data controller", p: CONTROLLER },
       {
         h: "2. Data we process",
-        p: "Contact details you voluntarily provide through the forms (name, email, phone, any message and the property of interest) and technical browsing data (e.g. IP address, browser type) collected via technical cookies required for the site to work.",
+        p: "Contact details you voluntarily provide through the forms (name, email, phone, any message and the property of interest) and technical browsing data (e.g. IP address, browser type) collected via technical cookies required for the site to work. If you write to the site's AI assistant, also the text of the conversations, which are recorded and may be read back by our team.",
       },
       {
         h: "3. Purposes and legal basis",
@@ -88,7 +88,7 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         h: "6. Recipients and processors",
-        p: "Data may be handled by our authorised staff and by suppliers acting as data processors for the site's technical services (notably Airtable for contact management, Vercel for hosting and an email provider for sending emails). Data is not disseminated.",
+        p: "Data may be handled by our authorised staff and by suppliers acting as data processors for the site's technical services, notably: the hosting and database providers of the group's internal management system (CRM), where requests and contacts arrive; Airtable, for some functions not yet moved to the management system, including the reserved area and the Private Collection; Anthropic, for the AI assistant's model and for the artificial intelligence tools used in the management system; Vercel for hosting the site; an email provider for sending emails. Data is not disseminated.",
       },
       {
         h: "7. Non-EU transfers",
@@ -100,7 +100,7 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         h: "9. Cookies",
-        p: "The site uses technical cookies required for operation and, only with your consent, Google Analytics 4 statistics cookies (Google Ireland Ltd) to understand how the site is used. No statistics cookie is set until you choose; you can change your mind at any time via the “Cookie preferences” link at the bottom of every page. No advertising, no profiling. Third-party services (e.g. maps, video) may set their own cookies when you activate their content.",
+        p: "The site uses technical cookies required for operation and, only with your consent, Google Analytics 4 statistics cookies (Google Ireland Ltd) to understand how the site is used. Google's tag loads on every visit in consent mode (Consent Mode v2), with analytics storage denied: until you choose it sets no statistics cookie, but it may send Google cookieless signals without identifiers, which Google uses for aggregate estimates. You can change your mind at any time via the “Cookie preferences” link at the bottom of every page. No advertising, no profiling. Third-party services (e.g. maps, video) may set their own cookies when you activate their content.",
       },
       {
         h: "10. Account area and personalisation",
@@ -114,14 +114,14 @@ const CONTENT: Record<Locale, Content> = {
   },
   de: {
     title: "Datenschutzerklärung",
-    updated: "Zuletzt aktualisiert: Juni 2026",
+    updated: "Zuletzt aktualisiert: Oktober 2026",
     intro:
       "Diese Erklärung beschreibt, wie TriesteImmobiliare (eine Marke der TriesteVillas srl) die über diese Website erhobenen personenbezogenen Daten gemäß der Verordnung (EU) 2016/679 (DSGVO) verarbeitet.",
     sections: [
       { h: "1. Verantwortlicher", p: CONTROLLER },
       {
         h: "2. Verarbeitete Daten",
-        p: "Kontaktdaten, die Sie freiwillig über die Formulare angeben (Name, E-Mail, Telefon, ggf. Nachricht und betreffende Immobilie), sowie technische Nutzungsdaten (z. B. IP-Adresse, Browsertyp), die über technisch notwendige Cookies erfasst werden.",
+        p: "Kontaktdaten, die Sie freiwillig über die Formulare angeben (Name, E-Mail, Telefon, ggf. Nachricht und betreffende Immobilie), sowie technische Nutzungsdaten (z. B. IP-Adresse, Browsertyp), die über technisch notwendige Cookies erfasst werden. Wenn Sie dem KI-Assistenten der Website schreiben, auch der Text der Gespräche, die aufgezeichnet werden und von unserem Team nachgelesen werden können.",
       },
       {
         h: "3. Zwecke und Rechtsgrundlage",
@@ -137,7 +137,7 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         h: "6. Empfänger und Auftragsverarbeiter",
-        p: "Die Daten können von autorisierten Mitarbeitern und von Dienstleistern als Auftragsverarbeiter für die technischen Dienste der Website verarbeitet werden (insbesondere Airtable für die Kontaktverwaltung, Vercel für das Hosting und ein E-Mail-Anbieter für den Versand). Die Daten werden nicht verbreitet.",
+        p: "Die Daten können von autorisierten Mitarbeitern und von Dienstleistern als Auftragsverarbeiter für die technischen Dienste der Website verarbeitet werden, insbesondere: die Hosting- und Datenbankanbieter des internen Verwaltungssystems der Gruppe (CRM), in dem Anfragen und Kontakte eingehen; Airtable für einige noch nicht in das Verwaltungssystem überführte Funktionen, darunter der geschützte Bereich und die Private Collection; Anthropic für das Modell des KI-Assistenten und für die im Verwaltungssystem eingesetzten KI-Werkzeuge; Vercel für das Hosting der Website; ein E-Mail-Anbieter für den Versand. Die Daten werden nicht verbreitet.",
       },
       {
         h: "7. Übermittlung außerhalb der EU",
@@ -149,7 +149,7 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         h: "9. Cookies",
-        p: "Die Website verwendet technisch notwendige Cookies und, nur mit Ihrer Einwilligung, Statistik-Cookies von Google Analytics 4 (Google Ireland Ltd), um die Nutzung der Website zu verstehen. Bis zu Ihrer Entscheidung wird kein Statistik-Cookie gesetzt; Sie können Ihre Wahl jederzeit über den Link „Cookie-Einstellungen“ am Ende jeder Seite ändern. Keine Werbung, kein Profiling. Dienste Dritter (z. B. Karten, Videos) können eigene Cookies setzen, wenn Sie deren Inhalte aktivieren.",
+        p: "Die Website verwendet technisch notwendige Cookies und, nur mit Ihrer Einwilligung, Statistik-Cookies von Google Analytics 4 (Google Ireland Ltd), um die Nutzung der Website zu verstehen. Das Google-Tag lädt bei jedem Besuch im Einwilligungsmodus (Consent Mode v2), mit abgelehnter Speicherung für Statistiken: Bis zu Ihrer Entscheidung setzt es kein Statistik-Cookie, kann Google aber Signale ohne Cookies und ohne Kennungen senden, die Google für zusammengefasste Schätzungen nutzt. Sie können Ihre Wahl jederzeit über den Link „Cookie-Einstellungen“ am Ende jeder Seite ändern. Keine Werbung, kein Profiling. Dienste Dritter (z. B. Karten, Videos) können eigene Cookies setzen, wenn Sie deren Inhalte aktivieren.",
       },
       {
         h: "10. Kontobereich und Personalisierung",
@@ -163,14 +163,14 @@ const CONTENT: Record<Locale, Content> = {
   },
   sl: {
     title: "Obvestilo o zasebnosti",
-    updated: "Zadnja posodobitev: junij 2026",
+    updated: "Zadnja posodobitev: oktober 2026",
     intro:
       "To obvestilo opisuje, kako TriesteImmobiliare (blagovna znamka družbe TriesteVillas srl) obdeluje osebne podatke, zbrane prek te spletne strani, v skladu z Uredbo (EU) 2016/679 (Splošna uredba o varstvu podatkov – GDPR).",
     sections: [
       { h: "1. Upravljavec", p: CONTROLLER },
       {
         h: "2. Obdelovani podatki",
-        p: "Kontaktni podatki, ki jih prostovoljno posredujete prek obrazcev (ime, e-pošta, telefon, morebitno sporočilo in nepremičnina, ki vas zanima), ter tehnični podatki o brskanju (npr. naslov IP, vrsta brskalnika), zbrani prek tehničnih piškotkov, potrebnih za delovanje spletne strani.",
+        p: "Kontaktni podatki, ki jih prostovoljno posredujete prek obrazcev (ime, e-pošta, telefon, morebitno sporočilo in nepremičnina, ki vas zanima), ter tehnični podatki o brskanju (npr. naslov IP, vrsta brskalnika), zbrani prek tehničnih piškotkov, potrebnih za delovanje spletne strani. Če pišete pomočniku UI na spletni strani, tudi besedilo pogovorov, ki se beležijo in jih naša ekipa lahko ponovno prebere.",
       },
       {
         h: "3. Nameni in pravna podlaga",
@@ -186,7 +186,7 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         h: "6. Prejemniki in obdelovalci",
-        p: "Podatke lahko obdelujejo naši pooblaščeni sodelavci in ponudniki, ki kot obdelovalci skrbijo za tehnične storitve spletne strani (zlasti Airtable za upravljanje stikov, Vercel za gostovanje in ponudnik e-pošte za pošiljanje sporočil). Podatkov ne objavljamo.",
+        p: "Podatke lahko obdelujejo naši pooblaščeni sodelavci in ponudniki, ki kot obdelovalci skrbijo za tehnične storitve spletne strani, zlasti: ponudniki gostovanja in podatkovne baze notranjega upravljavskega sistema skupine (CRM), kamor prihajajo povpraševanja in stiki; Airtable za nekatere funkcije, ki še niso prenesene v upravljavski sistem, med njimi zaprto območje in Private Collection; Anthropic za model pomočnika UI in za orodja umetne inteligence, ki se uporabljajo v upravljavskem sistemu; Vercel za gostovanje spletne strani; ponudnik e-pošte za pošiljanje sporočil. Podatkov ne objavljamo.",
       },
       {
         h: "7. Prenosi zunaj EU",
@@ -198,7 +198,7 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         h: "9. Piškotki",
-        p: "Spletna stran uporablja tehnične piškotke, potrebne za delovanje, in – samo z vašo privolitvijo – statistične piškotke Google Analytics 4 (Google Ireland Ltd), s katerimi razumemo, kako se stran uporablja. Dokler se ne odločite, se ne shrani noben statistični piškotek; svojo odločitev lahko kadar koli spremenite prek povezave »Nastavitve piškotkov« v nogi vsake strani. Brez oglaševanja, brez profiliranja. Storitve tretjih oseb (npr. zemljevidi, videoposnetki) lahko ob aktivaciji njihove vsebine nastavijo lastne piškotke.",
+        p: "Spletna stran uporablja tehnične piškotke, potrebne za delovanje, in – samo z vašo privolitvijo – statistične piškotke Google Analytics 4 (Google Ireland Ltd), s katerimi razumemo, kako se stran uporablja. Googlova oznaka se naloži ob vsakem obisku v načinu privolitve (Consent Mode v2), s shranjevanjem za statistiko zavrnjenim: dokler se ne odločite, ne shrani nobenega statističnega piškotka, lahko pa Googlu pošlje signale brez piškotkov in brez identifikatorjev, ki jih Google uporablja za združene statistične izračune. Svojo odločitev lahko kadar koli spremenite prek povezave »Nastavitve piškotkov« v nogi vsake strani. Brez oglaševanja, brez profiliranja. Storitve tretjih oseb (npr. zemljevidi, videoposnetki) lahko ob aktivaciji njihove vsebine nastavijo lastne piškotke.",
       },
       {
         h: "10. Uporabniški račun in prilagajanje",
