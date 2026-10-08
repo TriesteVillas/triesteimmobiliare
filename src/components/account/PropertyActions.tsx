@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { subscribe, getSnapshot, getServerSnapshot, toggleFav, toggleAlert, setVote } from "./favstore";
@@ -13,25 +13,56 @@ import { subscribe, getSnapshot, getServerSnapshot, toggleFav, toggleAlert, setV
 //  - campana = avviso di prezzo (solo loggati: serve un'email da avvisare);
 //  - "non fa per me" = dislike con motivo facoltativo — il segnale negativo
 //             che insegna al motore cosa NON proporre. Spegne cuore e campana.
+// Da anonimi ogni tasto risponde con un invito all'account: il cuore salva sul
+// dispositivo e lo dice, campana e "non fa per me" spiegano perché serve.
+type Invito = "fav" | "alert" | "vote";
+
 export default function PropertyActions({ slug }: { slug: string }) {
   const t = useTranslations("account");
   const s = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const fav = s.favs.has(slug);
   const alert = s.alerts.has(slug);
   const down = (s.votes[slug] ?? null) === "down";
-  const [prompt, setPrompt] = useState<null | "alert" | "vote">(null);
+  const [prompt, setPrompt] = useState<null | Invito>(null);
   const [noteOpen, setNoteOpen] = useState(false);
   const [note, setNote] = useState("");
   const [thanks, setThanks] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const needAuth = (kind: "alert" | "vote") => {
+  // Un tasto dopo l'altro: il timer del primo invito non deve chiudere il secondo.
+  const needAuth = (kind: Invito) => {
+    if (timer.current) clearTimeout(timer.current);
     setPrompt(kind);
-    setTimeout(() => setPrompt(null), 9000);
+    timer.current = setTimeout(() => setPrompt(null), 9000);
   };
+
+  // L'invito copre il prezzo: si chiude anche toccando fuori o con Esc.
+  useEffect(() => {
+    if (!prompt) return;
+    const fuori = (e: PointerEvent) => {
+      if (box.current && !box.current.contains(e.target as Node)) setPrompt(null);
+    };
+    const esc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setPrompt(null);
+    };
+    document.addEventListener("pointerdown", fuori);
+    document.addEventListener("keydown", esc);
+    return () => {
+      document.removeEventListener("pointerdown", fuori);
+      document.removeEventListener("keydown", esc);
+    };
+  }, [prompt]);
+
+  useEffect(() => () => {
+    if (timer.current) clearTimeout(timer.current);
+  }, []);
 
   const onHeart = () => {
     const now = toggleFav(slug);
     if (now && down) setVote(slug, null); // salvarla smentisce il "non fa per me"
+    if (now && !s.authed) needAuth("fav"); // salvata solo su questo dispositivo: dirlo
+    else if (prompt === "fav") setPrompt(null);
   };
 
   const onBell = () => {
@@ -70,7 +101,7 @@ export default function PropertyActions({ slug }: { slug: string }) {
     }`;
 
   return (
-    <div className="relative">
+    <div ref={box} className="relative">
       <div className="flex flex-wrap items-center gap-2">
         <button type="button" onClick={onHeart} aria-pressed={fav} className={pill(fav, "border-red-400/60 bg-red-500/15 text-red-300")}>
           <HeartIcon filled={fav} className="h-4.5 w-4.5" />
@@ -116,10 +147,13 @@ export default function PropertyActions({ slug }: { slug: string }) {
       )}
       {thanks && <p className="mt-2 text-xs text-emerald-300">{t("voteThanks")}</p>}
 
+      {/* L'invito si apre SOPRA i tasti: sotto finiva nel fondo dell'hero, che
+          ha overflow-hidden e su cui sale il foglio della scheda (z-10, -mt-5) —
+          su desktop se ne leggeva una riga e il link non si vedeva (08/10). */}
       {prompt && (
-        <div className="absolute left-0 top-full z-[5] mt-2 w-72 rounded-xl border border-white/15 bg-ink/95 p-3 shadow-xl backdrop-blur">
+        <div role="status" className="absolute bottom-full left-0 z-[5] mb-2 w-72 max-w-[calc(100vw-3rem)] rounded-xl border border-white/15 bg-ink/95 p-3 shadow-xl backdrop-blur">
           <p className="text-xs leading-relaxed text-white/80">
-            {prompt === "alert" ? t("alertAnon") : t("voteAnon")}
+            {prompt === "fav" ? t("anonSavedHint") : prompt === "alert" ? t("alertAnon") : t("voteAnon")}
           </p>
           <Link href="/account" className="mt-2 inline-block text-xs font-semibold text-sand underline underline-offset-2">
             {t("anonSavedCta")}
