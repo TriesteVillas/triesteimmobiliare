@@ -14,9 +14,17 @@ export const routing = defineRouting({
   // la versione inglese. La fonte unica degli hreflang è l'HTML
   // (pageAlternates / partialAlternates in lib/seo.ts); le pagine che non lo
   // emettono (/account, /private) sono noindex.
-  // ⚠️ `localeDetection` resta ACCESO, com'era: su TSV è stato spento per un
-  // avvelenamento della cache CDN, e qui è una decisione ancora da prendere.
+  // `localeDetection` SPENTO dall'08/10/2026 (audit dei siti del 07/10), come
+  // sul gemello TSV dall'11/08: la negoziazione cookie/Accept-Language
+  // rispondeva 307 su / verso /en, /de o /sl secondo il browser, e su TSV, con
+  // lo stesso stack, aveva riscritto risposte CACHABILI cross-lingua (una URL
+  // /en rimasta ~1,7 h in CDN col corpo TEDESCO). Ogni URL = una lingua; il
+  // cambio lingua sono i link veri del selettore. Spento anche il cookie
+  // NEXT_LOCALE: con la detection spenta non serve, e un Set-Cookie dentro una
+  // risposta cachata era il residuo esatto di quel guasto.
   alternateLinks: false,
+  localeDetection: false,
+  localeCookie: false,
 });
 
 export type Locale = (typeof routing.locales)[number];
