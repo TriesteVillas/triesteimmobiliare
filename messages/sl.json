@@ -46,8 +46,8 @@
       "ogDescription": "Stanovanjska ponudba TriesteImmobiliare, območje za območjem."
     },
     "group": {
-      "title": "Skupina TriesteVillas – osem blagovnih znamk",
-      "description": "TriesteImmobiliare v ekosistemu TriesteVillas: osem znamk za luksuzne in stanovanjske nepremičnine, najeme, FJK, poslovne nepremičnine, Lignano, Sappado in slovensko obalo.",
+      "title": "Skupina TriesteVillas – za vsak trg svoja znamka",
+      "description": "TriesteImmobiliare v ekosistemu TriesteVillas: po ena znamka za luksuzne in stanovanjske nepremičnine, najeme, FJK, poslovne nepremičnine, Lignano, Sappado in slovensko obalo.",
       "ogTitle": "Skupina TriesteVillas: različne znamke, enotno vodstvo",
       "ogDescription": "Nepremičninski ekosistem, zgrajen na specializaciji, ne splošna ponudba za vse."
     },
@@ -130,7 +130,7 @@
       },
       "marketing": {
         "title": "Trženje, po katerem nas poznajo",
-        "text": "TriesteVillas je med najbolj spremljanimi agencijami v regiji na družbenih omrežjih, z milijoni ogledov na leto na YouTubu in Facebooku. TriesteImmobiliare se sicer ne ukvarja z luksuzom, a si ne zasluži nič manj."
+        "text": "Kanal TriesteVillas na YouTubu ima od leta 2015 več kot 1,9 milijona ogledov in 140 videoposnetkov (podatek iz oktobra 2026). TriesteImmobiliare se sicer ne ukvarja z luksuzom, a si ne zasluži nič manj."
       },
       "cta": "Kako prodajamo"
     },
@@ -142,7 +142,7 @@
     },
     "groupRouting": {
       "eyebrow": "Različne znamke, enotno vodstvo",
-      "title": "Osem znamk, ena struktura.",
+      "title": "Za vsak trg svoja znamka, ena struktura.",
       "body": "TriesteImmobiliare je del ekosistema TriesteVillas. Vsaka znamka pokriva svoj trg: vi vstopite skozi prava vrata.",
       "luxury": "Luksuzna nepremičnina → TriesteVillas",
       "fvg": "Preostala FJK → FriuliVillas / LignanoVillas",
@@ -232,7 +232,7 @@
       },
       "forzaDelGruppo": {
         "title": "Smo TriesteVillas",
-        "text": "TriesteImmobiliare ni nov napis nad vrati: je stanovanjska veja TriesteVillas, ene najbolj spremljanih agencij v regiji na družbenih omrežjih, z milijoni ogledov na leto na YouTubu in Facebooku. Vaš dom pride v to izložbo. Kadar pomaga, vključimo tudi FriuliVillas, LignanoVillas in TriesteAffitti: začasne najeme, prerazporeditev kapitala ali poteze, ki bolje ustrezajo vašemu naslednjemu koraku."
+        "text": "TriesteImmobiliare ni nov napis nad vrati: je stanovanjska veja TriesteVillas, katere kanal na YouTubu ima od leta 2015 več kot 1,9 milijona ogledov. Vaš dom pride v to izložbo. Kadar pomaga, vključimo tudi FriuliVillas, LignanoVillas in TriesteAffitti: začasne najeme, prerazporeditev kapitala ali poteze, ki bolje ustrezajo vašemu naslednjemu koraku."
       }
     },
     "process": {
@@ -354,7 +354,7 @@
     }
   },
   "immobili": {
-    "title": "Nepremičnine",
+    "title": "Nepremičnine na prodaj v Trstu in pokrajini",
     "intro": "Vse nepremičnine, ki so trenutno na voljo v Trstu in tržaški pokrajini, razvrščene po območjih.",
     "filterAll": "Vsa območja",
     "buyerHelp": {
@@ -483,9 +483,9 @@
       "eyebrow": "Ne splošna ponudba za vse",
       "title": "Dobro zgrajen sistem.",
       "body": "Vseh nepremičnin ne prodajamo, oddajamo ali upravljamo na enak način. Luksuzna nepremičnina, stanovanje, najem, poslovna nepremičnina ali vrhunska nepremičnina zunaj mesta zahtevajo drugačen jezik, drugačne postopke in drugačne strategije. Zato vsega nismo postavili pod eno znamko: zgradili smo ekosistem specializiranih znamk.",
-      "tagline": "Ne enaka grafika, ne ponavljajoče se ime. Ista kultura dela."
+      "tagline": "Različne znamke, ista kultura dela."
     },
-    "brandsTitle": "Osem znamk, enotno vodstvo",
+    "brandsTitle": "Za vsak trg svoja znamka, enotno vodstvo",
     "brandsSubtitle": "Ena struktura za vse nepremičninske potrebe v Trstu in v vsej Furlaniji - Julijski krajini ter atlas slovenske obale in Krasa.",
     "brands": {
       "tsv": {
@@ -500,23 +500,23 @@
       },
       "affitti": {
         "name": "TriesteAffitti",
-        "tag": "Najemi od 1 do 18 mesecev",
-        "desc": "Najemi, urejeni po premišljeni metodi: začasni, z regulirano najemnino in klasični. Znamka je nastala leta 2013 za turistične najeme in se razvila v zrelejši, bolj urejen sistem."
+        "tag": "Najemi: Flex, 3+2 in 4+4",
+        "desc": "Najemi, urejeni po premišljeni metodi: začasni od 1 do 18 mesecev (Flex), 3+2 z dogovorjeno najemnino in 4+4. Skupina je začela leta 2013 s turističnimi najemi; iz njih je pozneje zrasel TriesteAffitti, bolj urejen sistem."
       },
       "friuli": {
         "name": "FriuliVillas",
-        "tag": "Vrhunske nepremičnine v preostali FJK",
-        "desc": "Vrhunske nepremičnine v preostali Furlaniji - Julijski krajini: Gradež, Videm, Trbiž, Lignano, Sappada. Ozemeljska razširitev znanja, razvitega v Trstu."
+        "tag": "Furlanija - Julijska krajina, v štirih območjih",
+        "desc": "Znamka skupine za Furlanijo - Julijsko krajino v štirih območjih: obala in laguna, gričevje in nižina, gore, Trst in Kras. Ozemeljska razširitev znanja, razvitega v Trstu."
       },
       "business": {
         "name": "TriesteBusiness",
         "tag": "Poslovne nepremičnine in naložbe",
-        "desc": "Nepremičnine in posli s poslovno usmeritvijo: poslovni prostori, delujoča podjetja, zemljišča, stavbe, pisarne, hale in nastanitveni objekti. Premoženje, ki ga je treba presojati drugače kot stanovanjske nepremičnine."
+        "desc": "Poslovne nepremičnine višjega razreda v vsej Furlaniji - Julijski krajini: hoteli in nastanitveni objekti, cele stavbe, trgovine in pisarne na najboljših lokacijah, industrija in logistika, zemljišča in razvojni projekti, posebni posli. Premoženje, ki ga je treba presojati drugače kot stanovanjske nepremičnine."
       },
       "lignano": {
         "name": "LignanoVillas",
-        "tag": "Vrhunske nepremičnine v Lignanu",
-        "desc": "Vrhunski posli v Lignanu, z bolj mednarodnim pogledom. Za tuje kupce in lastnike, ki iščejo strukturo, kontekst in kakovost upravljanja."
+        "tag": "Lignano Sabbiadoro",
+        "desc": "Spletna stran skupine za Lignano: nakup, lastništvo, oddajanje in nova umestitev nepremičnin na obali, z mednarodnim pogledom."
       },
       "sappada": {
         "name": "SappadaVillas",
@@ -593,7 +593,7 @@
       "company": "TriesteVillas srl",
       "address": "Via Milano 5, 34132 Trst",
       "vat": "Davčna številka / ID za DDV 01235580329",
-      "rea": "Vpisana pri Trgovinski zbornici v Trstu · REA št. TS 134793",
+      "rea": "Vpisana pri Trgovinski zbornici Venezia Giulia · REA št. TS 134793",
       "capital": "Osnovni kapital 10.200,00 €, v celoti vplačan",
       "pec": "milou@pec.emailc.it"
     }

@@ -46,8 +46,8 @@
       "ogDescription": "Das Wohnimmobilien-Portfolio von TriesteImmobiliare, Zone für Zone."
     },
     "group": {
-      "title": "Die TriesteVillas-Gruppe — acht Marken",
-      "description": "TriesteImmobiliare im TriesteVillas-Ökosystem: acht Marken für Luxus, Wohnen, Vermietung, FVG, Business, Lignano, Sappada und die slowenische Küste. Eine Regie.",
+      "title": "Die TriesteVillas-Gruppe — eine Marke für jeden Markt",
+      "description": "TriesteImmobiliare im TriesteVillas-Ökosystem: je eine Marke für Luxus, Wohnen, Vermietung, FVG, Business, Lignano, Sappada und die slowenische Küste. Eine Regie.",
       "ogTitle": "Die TriesteVillas-Gruppe: verschiedene Marken, eine einzige Regie",
       "ogDescription": "Ein Immobilien-Ökosystem, aufgebaut nach Spezialisierung, kein beliebiger Sammelbehälter."
     },
@@ -130,7 +130,7 @@
       },
       "marketing": {
         "title": "Das Marketing, für das man uns kennt",
-        "text": "TriesteVillas gehört zu den meistgefolgten Agenturen der Region in den sozialen Medien, mit Millionen Aufrufen pro Jahr auf YouTube und Facebook. TriesteImmobiliare verdient nicht weniger, auch wenn es nicht das Luxussegment bedient."
+        "text": "Der YouTube-Kanal von TriesteVillas zählt seit 2015 über 1,9 Millionen Aufrufe und 140 Videos (Stand: Oktober 2026). TriesteImmobiliare verdient nicht weniger, auch wenn es nicht das Luxussegment bedient."
       },
       "cta": "So verkaufen wir"
     },
@@ -142,7 +142,7 @@
     },
     "groupRouting": {
       "eyebrow": "Verschiedene Marken, eine einzige Regie",
-      "title": "Acht Marken, eine einzige Struktur.",
+      "title": "Eine Marke für jeden Markt, eine einzige Struktur.",
       "body": "TriesteImmobiliare gehört zum Ökosystem von TriesteVillas. Jede Marke deckt einen Markt ab: Sie kommen durch die richtige Tür.",
       "luxury": "Luxusimmobilie → TriesteVillas",
       "fvg": "Übriges Friaul-Julisch Venetien → FriuliVillas / LignanoVillas",
@@ -232,7 +232,7 @@
       },
       "forzaDelGruppo": {
         "title": "Wir sind TriesteVillas",
-        "text": "TriesteImmobiliare ist keine neue Marke: Es ist der Wohnimmobilien-Spin-off von TriesteVillas, einer der meistgefolgten Agenturen der Region in den sozialen Medien, mit Millionen Aufrufen pro Jahr auf YouTube und Facebook. Ihre Immobilie kommt in dieses Schaufenster. Und wenn nötig, beziehen wir auch FriuliVillas, LignanoVillas und TriesteAffitti ein: befristete Vermietungen, Kapitalumschichtung oder Lösungen, die besser zu Ihrem nächsten Schritt passen."
+        "text": "TriesteImmobiliare ist keine neue Marke: Es ist der Wohnimmobilien-Spin-off von TriesteVillas, dessen YouTube-Kanal seit 2015 über 1,9 Millionen Aufrufe zählt. Ihre Immobilie kommt in dieses Schaufenster. Und wenn nötig, beziehen wir auch FriuliVillas, LignanoVillas und TriesteAffitti ein: befristete Vermietungen, Kapitalumschichtung oder Lösungen, die besser zu Ihrem nächsten Schritt passen."
       }
     },
     "process": {
@@ -354,7 +354,7 @@
     }
   },
   "immobili": {
-    "title": "Immobilien",
+    "title": "Immobilien zum Verkauf in Triest und Provinz",
     "intro": "Alle derzeit verfügbaren Immobilien in Triest und Provinz, nach Zone gruppiert.",
     "filterAll": "Alle Zonen",
     "buyerHelp": {
@@ -483,9 +483,9 @@
       "eyebrow": "Kein beliebiger Sammelbehälter",
       "title": "Ein gut aufgebautes System.",
       "body": "Nicht alle Immobilien werden auf dieselbe Weise verkauft, vermietet oder verwaltet. Eine Luxusimmobilie, eine Wohnimmobilie, eine Vermietung, ein Gewerbeobjekt oder eine Premium-Immobilie außerhalb der Stadt erfordern unterschiedliche Sprachen, Prozesse und Strategien. Deshalb haben wir nicht alles unter eine einzige Marke gestellt: Wir haben ein Ökosystem spezialisierter Marken aufgebaut.",
-      "tagline": "Keine gleiche Grafik, kein wiederholter Name. Dieselbe Arbeitskultur."
+      "tagline": "Verschiedene Marken, dieselbe Arbeitskultur."
     },
-    "brandsTitle": "Acht Marken, eine einzige Regie",
+    "brandsTitle": "Eine Marke für jeden Markt, eine einzige Regie",
     "brandsSubtitle": "Eine einzige Struktur, um jeden Immobilienbedarf in Triest und im gesamten Friaul-Julisch Venetien abzudecken, dazu ein Atlas der slowenischen Küste und des Karsts.",
     "brands": {
       "tsv": {
@@ -500,23 +500,23 @@
       },
       "affitti": {
         "name": "TriesteAffitti",
-        "tag": "Vermietungen 1–18 Monate",
-        "desc": "Methodisch aufgebaute Vermietungen: befristete, vereinbarte und klassische Mietverträge. 2013 für touristische Vermietungen gegründet, weiterentwickelt zu einem reiferen und geordneteren System."
+        "tag": "Vermietung: Flex, 3+2 und 4+4",
+        "desc": "Methodisch aufgebaute Vermietungen: befristet von 1 bis 18 Monaten (Flex), 3+2 mit vereinbarter Miete und 4+4. Die Gruppe begann 2013 mit touristischen Vermietungen; daraus ist später TriesteAffitti gewachsen, ein geordneteres System."
       },
       "friuli": {
         "name": "FriuliVillas",
-        "tag": "Premium im übrigen Friaul-Julisch Venetien",
-        "desc": "Premium-Immobilien im übrigen Friaul-Julisch Venetien: Grado, Udine, Tarvis, Lignano, Sappada. Die räumliche Erweiterung des in Triest entwickelten Know-hows."
+        "tag": "Friaul-Julisch Venetien, in vier Gebieten",
+        "desc": "Die Marke der Gruppe für Friaul-Julisch Venetien, in vier Gebieten gelesen: Küste und Lagune, Hügelland und Ebene, Berge, Triest und Karst. Die räumliche Erweiterung des in Triest entwickelten Know-hows."
       },
       "business": {
         "name": "TriesteBusiness",
         "tag": "Gewerbe und Investitionen",
-        "desc": "Immobilien und Vorhaben mit geschäftlicher Ausrichtung: Geschäftsräume, Betriebe, Grundstücke, Gebäude, Büros, Hallen und Beherbergungsbetriebe. Anlagen, die nach anderen Logiken als Wohnimmobilien zu lesen sind."
+        "desc": "Gewerbeimmobilien der gehobenen Klasse in ganz Friaul-Julisch Venetien: Hotels und Beherbergungsbetriebe, ganze Gebäude, Geschäfte und Büros in den besten Lagen, Industrie und Logistik, Grundstücke und Projektentwicklungen, Sondertransaktionen. Anlagen, die nach anderen Logiken als Wohnimmobilien zu lesen sind."
       },
       "lignano": {
         "name": "LignanoVillas",
-        "tag": "Premium in Lignano",
-        "desc": "Premium-Verkäufe in Lignano, gelesen mit einer internationaleren Linse. Für ausländische Käufer und Eigentümer, die Struktur, Kontext und Qualität in der Abwicklung suchen."
+        "tag": "Lignano Sabbiadoro",
+        "desc": "Die Website der Gruppe für Lignano: Immobilien an der Küste kaufen, besitzen, vermieten und neu positionieren, mit internationalem Blick."
       },
       "sappada": {
         "name": "SappadaVillas",
@@ -593,7 +593,7 @@
       "company": "TriesteVillas srl",
       "address": "Via Milano 5, 34132 Triest",
       "vat": "Steuernr. / USt-IdNr. 01235580329",
-      "rea": "Eingetragen bei der Handelskammer Triest · REA-Nr. TS 134793",
+      "rea": "Eingetragen bei der Handelskammer Venezia Giulia · REA-Nr. TS 134793",
       "capital": "Stammkapital 10.200,00 € voll eingezahlt",
       "pec": "milou@pec.emailc.it"
     }

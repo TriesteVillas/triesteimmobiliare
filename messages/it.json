@@ -46,8 +46,8 @@
       "ogDescription": "Il portfolio residenziale di TriesteImmobiliare, zona per zona."
     },
     "group": {
-      "title": "Il Gruppo TriesteVillas — otto brand",
-      "description": "TriesteImmobiliare nell'ecosistema TriesteVillas: otto brand per luxury, residenziale, affitti, FVG, business, Lignano, Sappada e la costa slovena. Una regia sola.",
+      "title": "Il Gruppo TriesteVillas — un marchio per ogni mercato",
+      "description": "TriesteImmobiliare nell'ecosistema TriesteVillas: un marchio per il luxury, il residenziale, gli affitti, il FVG, il commerciale, Lignano, Sappada e la costa slovena. Una regia sola.",
       "ogTitle": "Il Gruppo TriesteVillas: brand diversi, una regia sola",
       "ogDescription": "Un ecosistema immobiliare costruito per specializzazione, non un contenitore generico."
     },
@@ -130,7 +130,7 @@
       },
       "marketing": {
         "title": "Il marketing per cui ci conoscono",
-        "text": "TriesteVillas è tra le agenzie del territorio più seguite sui social, con milioni di visualizzazioni l'anno tra YouTube e Facebook. TriesteImmobiliare, pur non trattando il luxury, non merita di meno."
+        "text": "Il canale YouTube di TriesteVillas conta oltre 1,9 milioni di visualizzazioni e 140 video dal 2015 (dato di ottobre 2026). TriesteImmobiliare, pur non trattando il luxury, non merita di meno."
       },
       "cta": "Scopri come vendiamo"
     },
@@ -142,7 +142,7 @@
     },
     "groupRouting": {
       "eyebrow": "Brand diversi, una regia sola",
-      "title": "Otto brand, un'unica struttura.",
+      "title": "Un marchio per ogni mercato, un'unica struttura.",
       "body": "TriesteImmobiliare fa parte dell'ecosistema TriesteVillas. Ogni brand presidia un mercato: tu entri dalla porta giusta.",
       "luxury": "Immobile di lusso → TriesteVillas",
       "fvg": "Resto del FVG → FriuliVillas / LignanoVillas",
@@ -232,7 +232,7 @@
       },
       "forzaDelGruppo": {
         "title": "Siamo TriesteVillas",
-        "text": "TriesteImmobiliare non è un'insegna nuova: è lo spin-off residenziale di TriesteVillas, tra le agenzie del territorio più seguite sui social, con milioni di visualizzazioni l'anno tra YouTube e Facebook. La tua casa entra in quella vetrina. E se serve, ragioniamo anche con FriuliVillas, LignanoVillas e TriesteAffitti: locazioni transitorie, riallocazione del capitale o operazioni più adatte al tuo prossimo passo."
+        "text": "TriesteImmobiliare non è un'insegna nuova: è lo spin-off residenziale di TriesteVillas, il cui canale YouTube conta oltre 1,9 milioni di visualizzazioni dal 2015. La tua casa entra in quella vetrina. E se serve, ragioniamo anche con FriuliVillas, LignanoVillas e TriesteAffitti: locazioni transitorie, riallocazione del capitale o operazioni più adatte al tuo prossimo passo."
       }
     },
     "process": {
@@ -354,7 +354,7 @@
     }
   },
   "immobili": {
-    "title": "Immobili",
+    "title": "Immobili in vendita a Trieste e Provincia",
     "intro": "Tutti gli immobili attualmente disponibili a Trieste e Provincia, raggruppati per zona.",
     "filterAll": "Tutte le zone",
     "buyerHelp": {
@@ -483,9 +483,9 @@
       "eyebrow": "Non un contenitore generico",
       "title": "Un sistema costruito bene.",
       "body": "Non tutti gli immobili si vendono, si affittano o si gestiscono nello stesso modo. Un immobile luxury, un appartamento residenziale, una locazione, un asset commerciale o una proprietà premium fuori città richiedono linguaggi, processi e strategie diverse. Per questo non abbiamo messo tutto sotto un solo marchio: abbiamo costruito un ecosistema di brand specializzati.",
-      "tagline": "Non una grafica uguale, non un nome ripetuto. La stessa cultura del lavoro."
+      "tagline": "Marchi diversi, la stessa cultura del lavoro."
     },
-    "brandsTitle": "Otto brand, un'unica regia",
+    "brandsTitle": "Un marchio per ogni mercato, un'unica regia",
     "brandsSubtitle": "Una sola struttura per coprire ogni esigenza immobiliare a Trieste e in tutto il Friuli-Venezia Giulia, più un atlante della costa slovena e del Carso.",
     "brands": {
       "tsv": {
@@ -500,23 +500,23 @@
       },
       "affitti": {
         "name": "TriesteAffitti",
-        "tag": "Locazioni 1–18 mesi",
-        "desc": "Locazioni costruite con metodo: transitori, concordati e classici. Nato nel 2013 per gli affitti turistici, evoluto in un sistema più maturo e ordinato."
+        "tag": "Locazioni Flex, 3+2 e 4+4",
+        "desc": "Locazioni costruite con metodo: transitorie da 1 a 18 mesi (Flex), 3+2 a canone concordato e 4+4. Il gruppo ha cominciato nel 2013 dagli affitti turistici; le locazioni sono poi maturate in TriesteAffitti, un sistema più ordinato."
       },
       "friuli": {
         "name": "FriuliVillas",
-        "tag": "Premium nel resto del FVG",
-        "desc": "Immobili premium nel resto del Friuli-Venezia Giulia: Grado, Udine, Tarvisio, Lignano, Sappada. L'estensione territoriale del know-how sviluppato su Trieste."
+        "tag": "Il Friuli Venezia Giulia, in quattro aree",
+        "desc": "Il marchio del gruppo dedicato al Friuli Venezia Giulia, letto in quattro aree: costa e laguna, colline e pianura, montagna, Trieste e Carso. L'estensione territoriale del know-how sviluppato su Trieste."
       },
       "business": {
         "name": "TriesteBusiness",
         "tag": "Commerciale e investimenti",
-        "desc": "Immobili e operazioni a vocazione business: locali, attività, terreni, palazzi, uffici, capannoni e strutture ricettive. Asset da leggere con logiche diverse dal residenziale."
+        "desc": "Il commerciale di fascia alta in tutto il Friuli Venezia Giulia: alberghi e strutture ricettive, palazzi interi e cielo-terra, negozi e uffici nelle vie forti, industriale e logistica, terreni e sviluppi, operazioni speciali. Asset da leggere con logiche diverse dal residenziale."
       },
       "lignano": {
         "name": "LignanoVillas",
-        "tag": "Premium a Lignano",
-        "desc": "Compravendite premium a Lignano, lette con una lente più internazionale. Per compratori e proprietari esteri che cercano struttura, contesto e qualità nella gestione."
+        "tag": "Lignano Sabbiadoro",
+        "desc": "Il sito del gruppo per Lignano: comprare, possedere, affittare e riposizionare immobili sulla costa, con uno sguardo internazionale."
       },
       "sappada": {
         "name": "SappadaVillas",
@@ -593,7 +593,7 @@
       "company": "TriesteVillas srl",
       "address": "Via Milano 5, 34132 Trieste",
       "vat": "C.F. / P.IVA 01235580329",
-      "rea": "Iscritta alla C.C.I.A.A. di Trieste · REA n° TS 134793",
+      "rea": "Iscritta alla Camera di Commercio Venezia Giulia · REA n° TS 134793",
       "capital": "Capitale sociale 10.200,00 € i.v.",
       "pec": "milou@pec.emailc.it"
     }
