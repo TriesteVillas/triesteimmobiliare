@@ -215,15 +215,19 @@ html[data-reveal-armed] [data-reveal="scale"] {
  * Quando usarla. Solo su ciò che è già nel viewport al caricamento (l'hero).
  * Più in basso non serve e si perderebbe l'entrata allo scroll: lì resta
  * `data-reveal` normale. RevealObserver ignora di proposito questa variante. */
+/* Solo `transform`, mai l'opacità (08/10/2026). Partendo da `opacity: 0`
+ * Chrome non registra la pittura dell'elemento finché è trasparente: il
+ * sottotitolo dell'hero è l'elemento LCP della home, e l'LCP mobile arrivava
+ * a 7,3 s (sonda dell'audit del 07/10: 2.404 ms così, 464 ms senza la
+ * dissolvenza). Lo slittamento resta; il testo è dipinto dal primo frame. */
 html[data-reveal-armed] [data-reveal="now"] {
-  opacity: 0;
-  transform: translateY(32px);
+  opacity: 1;
+  transform: translateY(24px);
   transition: none;
   animation: reveal-now 750ms var(--ease-lux) var(--reveal-delay, 0ms) both;
 }
 @keyframes reveal-now {
   to {
-    opacity: 1;
     transform: none;
   }
 }
@@ -490,6 +494,15 @@ html[data-header-hidden] header[data-pill] {
   line-height: 1.25;
   text-transform: uppercase;
   color: rgba(20, 52, 74, 0.55);
+}
+/* Sul telefono almeno 12 px (08/10/2026): a 10,6 px le etichette della
+   striscia delle promesse erano il grosso del testo minuto della home mobile
+   (audit visivo del 07/10). Un po' meno spaziatura, così stanno in cella. */
+@media (max-width: 767px) {
+  .stat-label {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+  }
 }
 
 /* Edge-to-edge scrolling ribbon (Marquee). */

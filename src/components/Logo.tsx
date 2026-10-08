@@ -14,13 +14,18 @@ export function BoatMark({
   tone?: Tone;
   className?: string;
 }) {
+  // WebP a 320×169 (08/10/2026): il PNG 531×280 pesava 141 KB (62 il bianco)
+  // per un segno alto 20–56 px; 169 px coprono il più grande a DPR 3, e i file
+  // scendono a 17 e 8 KB. `eager`: è nella testata, sopra la piega — in lazy il
+  // browser lo dipingeva in ritardo. I PNG restano in public/ per chi li linka.
   return (
     <Image
-      src={tone === "light" ? "/brand/boat-white.png" : "/brand/boat.png"}
+      src={tone === "light" ? "/brand/boat-white.webp" : "/brand/boat.webp"}
       alt=""
       aria-hidden
-      width={531}
-      height={280}
+      width={320}
+      height={169}
+      loading="eager"
       className={className}
     />
   );

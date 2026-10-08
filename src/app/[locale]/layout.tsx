@@ -28,10 +28,15 @@ const ALLOW_INDEX = process.env.NEXT_PUBLIC_ALLOW_INDEX === "true";
 // html[data-reveal-armed]) so content stays visible when JS never runs.
 const REVEAL_ARM_SCRIPT = `if(!matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.setAttribute("data-reveal-armed","");`;
 
-// `latin-ext` dal 2026-10-01 (sloveno): senza, č š ž escono dal font di
-// sistema in mezzo a una parola in Poppins. Stessa scelta del gemello TSV.
+// `subsets` in next/font/google decide solo cosa si PRECARICA: il CSS dichiara
+// comunque tutti i sottoinsiemi del font con il loro unicode-range, e il
+// browser scarica il latin-ext (č š ž dello sloveno) solo dove una pagina lo
+// usa. Dal 01/10 c'era anche "latin-ext" qui, e ogni pagina IT/EN/DE
+// precaricava a priorità alta quattro file in più che non le servono, in gara
+// con l'immagine LCP (audit delle prestazioni del 07/10). La «Ä» tedesca sta
+// nel latin.
 const poppins = Poppins({
-  subsets: ["latin", "latin-ext"],
+  subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-poppins",
 });

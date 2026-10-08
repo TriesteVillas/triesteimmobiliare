@@ -40,12 +40,21 @@ export default function AutoVideo({
 
   useEffect(() => {
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    // Save-Data e rete 2g valgono come «niente movimento»: la sorgente non si
+    // monta e resta il poster (stesse guardie di SfondoVideo). Fino all'08/10
+    // questo era l'unico video di prima pagina del gruppo senza: con Save-Data
+    // la home scaricava comunque gli ~0,9 MB del filmato aereo (audit del 07/10).
+    const rete = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+    const risparmio =
+      rete?.saveData === true ||
+      (typeof rete?.effectiveType === "string" && /^(slow-)?2g$/.test(rete.effectiveType));
 
     const syncMotionPreference = () => {
-      prefersReducedMotionRef.current = motionQuery.matches;
-      setPrefersReducedMotion(motionQuery.matches);
+      const fermo = motionQuery.matches || risparmio;
+      prefersReducedMotionRef.current = fermo;
+      setPrefersReducedMotion(fermo);
 
-      if (motionQuery.matches) {
+      if (fermo) {
         videoRef.current?.pause();
       } else if (!lazy || isInViewportRef.current) {
         tryPlay();

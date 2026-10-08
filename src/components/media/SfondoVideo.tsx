@@ -7,7 +7,7 @@ import EtichettaVideo from "@/components/EtichettaVideo";
 import { tSfondoVideo } from "./sfondoVideoStrings";
 
 // IL VIDEO DI TESTATA DELLA SCHEDA (02/10/2026) — filmato muto in loop servito
-// da public/, registrato in src/content/annunciVideo.ts (mp4 1080 / mp4Sm 720,
+// da public/, registrato in src/content/annunciVideo.ts (mp4 1080 / mp4Sm 540,
 // `ai`). Porta su triesteimmobiliare.com lo SfondoVideo di triestevillas.com
 // (src/components/media/SfondoVideo.tsx di quel repo, 01/10/2026), che a sua
 // volta veniva da triesteaffitti.com: stesso motore, stesse garanzie. Le
@@ -90,6 +90,24 @@ function bloccato(): boolean {
   const rete = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
   if (rete?.saveData) return true;
   return typeof rete?.effectiveType === "string" && /^(slow-)?2g$/.test(rete.effectiveType);
+}
+
+// Smontare un <video> da React NON garantisce che il browser chiuda il download
+// (audit delle prestazioni del 07/10/2026, §6.2): su una rete lenta il fail-safe
+// spegneva il componente e il file da 2–3 MB continuava ad arrivare fino a 18 s.
+// Prima di lasciarlo si ferma, si toglie la sorgente e si ricarica a vuoto: è la
+// sequenza che le specifiche HTML danno per interrompere il fetch.
+function interrompi(...videos: (HTMLVideoElement | null)[]) {
+  for (const v of videos) {
+    if (!v) continue;
+    try {
+      v.pause();
+      v.removeAttribute("src");
+      v.load();
+    } catch {
+      /* già staccato: niente da interrompere */
+    }
+  }
 }
 
 // Vero solo sul client dopo l'idratazione: niente che dipenda da matchMedia o
@@ -276,13 +294,21 @@ export default function SfondoVideo({
     };
     // File assente (404) o illeggibile prima del primo fotogramma: resta la foto.
     const onError = () => {
-      if (suonataRef.current !== sorgente) setSpento(true);
+      if (suonataRef.current !== sorgente) {
+        interrompi(a, b);
+        setSpento(true);
+      }
     };
     a.addEventListener("playing", onPlaying, { once: true });
     a.addEventListener("error", onError);
     return () => {
       a.removeEventListener("playing", onPlaying);
       a.removeEventListener("error", onError);
+      // Cambio di sorgente (rotazione) o pagina lasciata: le due copie vecchie
+      // sono già fuori dal DOM, e il loro download esce con loro. Solo quelle
+      // staccate: il doppio giro degli effetti di StrictMode (sviluppo) lascia
+      // gli stessi elementi montati, e lì togliere la sorgente spegnerebbe il video.
+      interrompi(...[a, b].filter((v) => !v.isConnected));
     };
   }, [avviato, sorgente]);
 
@@ -305,7 +331,10 @@ export default function SfondoVideo({
       // NotSupportedError = file illeggibile o assente. AbortError (una pausa
       // arrivata prima del play) non è un guasto.
       const nome = (e as { name?: string } | null)?.name;
-      if (mai && (nome === "NotAllowedError" || nome === "NotSupportedError")) setSpento(true);
+      if (mai && (nome === "NotAllowedError" || nome === "NotSupportedError")) {
+        interrompi(scena.current.active, scena.current.standby);
+        setSpento(true);
+      }
     };
     active.play().catch(rifiuto);
     if (Number(standby.style.opacity) > 0) standby.play().catch(() => {});
@@ -313,7 +342,10 @@ export default function SfondoVideo({
     // un video che sta già suonando non va smontato.
     const timeout = mai
       ? window.setTimeout(() => {
-          if (suonataRef.current !== sorgente) setSpento(true);
+          if (suonataRef.current !== sorgente) {
+            interrompi(scena.current.active, scena.current.standby);
+            setSpento(true);
+          }
         }, TIMEOUT_MS)
       : 0;
 

@@ -15,7 +15,7 @@
 
    DOVE VANNO I FILE — una cartella per immobile, col codice in minuscolo:
      public/media/annunci/<codice-minuscolo>/hero-<hash8>-1080.mp4        → `mp4`
-     public/media/annunci/<codice-minuscolo>/hero-<hash8>-720.mp4         → `mp4Sm`
+     public/media/annunci/<codice-minuscolo>/hero-<hash8>-540.mp4         → `mp4Sm`
      public/media/annunci/<codice-minuscolo>/hero-<hash8>-poster.webp     → `poster`
      public/media/annunci/<codice-minuscolo>/hero-<hash8>-poster-sm.webp  → `posterSm`
    (es. public/media/annunci/tsv-prop-capodistria-41/…). `<hash8>` = i primi 8
@@ -45,7 +45,14 @@
    non si scrive `fotoRitoccate` a caso.
 
    Codifica: H.264 yuv420p, `+faststart`, senza traccia audio. `mp4` 1080p per
-   gli schermi larghi, `mp4Sm` 720p sotto i 640 px; `poster` un fotogramma in
+   gli schermi larghi, `mp4Sm` 540p (960×540, ~400 kbps) sotto i 640 px — fino
+   all'08/10/2026 era un 720p a 0,6–0,8 Mbps: sul telefono il video faceva da
+   solo metà dei byte della scheda (audit delle prestazioni del 07/10), e la
+   fascia 16:9 di un telefono è larga ~720 px fisici. Si ricava dal 1080:
+     ffmpeg -i hero-<hash8>-1080.mp4 -vf scale=960:540:flags=lanczos -c:v libx264 \
+       -preset slow -crf 27 -maxrate 420k -bufsize 840k -pix_fmt yuv420p \
+       -movflags +faststart -an hero-<hash8>-540.mp4
+   `poster` un fotogramma in
    WebP (1920×1080), `posterSm` lo stesso a 960×540. Il poster oggi la scheda
    non lo scarica (sotto il video c'è già la copertina): sta nel registro per
    parità col formato degli altri due siti. */
@@ -53,7 +60,7 @@
 export type VideoAnnuncio = {
   /** 1080p, per gli schermi larghi. */
   mp4: string;
-  /** 720p, sotto i 640 px di larghezza. Senza, si usa `mp4` ovunque. */
+  /** 540p, sotto i 640 px di larghezza. Senza, si usa `mp4` ovunque. */
   mp4Sm?: string;
   /** Un fotogramma del filmato (WebP). */
   poster?: string;
@@ -72,7 +79,7 @@ export const ANNUNCI_VIDEO: Readonly<Record<string, VideoAnnuncio>> = {
   // muto. Riga nel registro dei video del CRM: ai_animato, foto_ai.
   "TSV-PROP-CAPODISTRIA-41": {
     mp4: "/media/annunci/tsv-prop-capodistria-41/hero-d9b75ed9-1080.mp4",
-    mp4Sm: "/media/annunci/tsv-prop-capodistria-41/hero-d9b75ed9-720.mp4",
+    mp4Sm: "/media/annunci/tsv-prop-capodistria-41/hero-d9b75ed9-540.mp4",
     poster: "/media/annunci/tsv-prop-capodistria-41/hero-d9b75ed9-poster.webp",
     posterSm: "/media/annunci/tsv-prop-capodistria-41/hero-d9b75ed9-poster-sm.webp",
     ai: true,
@@ -85,7 +92,7 @@ export const ANNUNCI_VIDEO: Readonly<Record<string, VideoAnnuncio>> = {
   // CRM: ai_animato, foto_ai.
   "TSV-PROP-CONTOVELLO-62": {
     mp4: "/media/annunci/tsv-prop-contovello-62/hero-8d15d444-1080.mp4",
-    mp4Sm: "/media/annunci/tsv-prop-contovello-62/hero-8d15d444-720.mp4",
+    mp4Sm: "/media/annunci/tsv-prop-contovello-62/hero-8d15d444-540.mp4",
     poster: "/media/annunci/tsv-prop-contovello-62/hero-8d15d444-poster.webp",
     posterSm: "/media/annunci/tsv-prop-contovello-62/hero-8d15d444-poster-sm.webp",
     ai: true,
@@ -96,7 +103,7 @@ export const ANNUNCI_VIDEO: Readonly<Record<string, VideoAnnuncio>> = {
   // Riga nel registro dei video del CRM: ai_animato, foto_ai.
   "TSV-PROP-0181": {
     mp4: "/media/annunci/tsv-prop-0181/hero-6b3c6412-1080.mp4",
-    mp4Sm: "/media/annunci/tsv-prop-0181/hero-6b3c6412-720.mp4",
+    mp4Sm: "/media/annunci/tsv-prop-0181/hero-6b3c6412-540.mp4",
     poster: "/media/annunci/tsv-prop-0181/hero-6b3c6412-poster.webp",
     posterSm: "/media/annunci/tsv-prop-0181/hero-6b3c6412-poster-sm.webp",
     ai: true,
@@ -107,7 +114,7 @@ export const ANNUNCI_VIDEO: Readonly<Record<string, VideoAnnuncio>> = {
   // Riga nel registro dei video del CRM: ai_animato, foto_ai.
   "TSV-PROP-0186": {
     mp4: "/media/annunci/tsv-prop-0186/hero-6fdf42fc-1080.mp4",
-    mp4Sm: "/media/annunci/tsv-prop-0186/hero-6fdf42fc-720.mp4",
+    mp4Sm: "/media/annunci/tsv-prop-0186/hero-6fdf42fc-540.mp4",
     poster: "/media/annunci/tsv-prop-0186/hero-6fdf42fc-poster.webp",
     posterSm: "/media/annunci/tsv-prop-0186/hero-6fdf42fc-poster-sm.webp",
     ai: true,
@@ -118,7 +125,7 @@ export const ANNUNCI_VIDEO: Readonly<Record<string, VideoAnnuncio>> = {
   // Riga nel registro dei video del CRM: ai_animato, foto_ai.
   "TSV-PROP-0183": {
     mp4: "/media/annunci/tsv-prop-0183/hero-f8d10b40-1080.mp4",
-    mp4Sm: "/media/annunci/tsv-prop-0183/hero-f8d10b40-720.mp4",
+    mp4Sm: "/media/annunci/tsv-prop-0183/hero-f8d10b40-540.mp4",
     poster: "/media/annunci/tsv-prop-0183/hero-f8d10b40-poster.webp",
     posterSm: "/media/annunci/tsv-prop-0183/hero-f8d10b40-poster-sm.webp",
     ai: true,
@@ -129,7 +136,7 @@ export const ANNUNCI_VIDEO: Readonly<Record<string, VideoAnnuncio>> = {
   // Riga nel registro dei video del CRM: ai_animato, foto_ai.
   "TSV-PROP-0184": {
     mp4: "/media/annunci/tsv-prop-0184/hero-c50cd306-1080.mp4",
-    mp4Sm: "/media/annunci/tsv-prop-0184/hero-c50cd306-720.mp4",
+    mp4Sm: "/media/annunci/tsv-prop-0184/hero-c50cd306-540.mp4",
     poster: "/media/annunci/tsv-prop-0184/hero-c50cd306-poster.webp",
     posterSm: "/media/annunci/tsv-prop-0184/hero-c50cd306-poster-sm.webp",
     ai: true,
@@ -140,7 +147,7 @@ export const ANNUNCI_VIDEO: Readonly<Record<string, VideoAnnuncio>> = {
   // Riga nel registro dei video del CRM: ai_animato, foto_ai.
   "TSV-PROP-0185": {
     mp4: "/media/annunci/tsv-prop-0185/hero-004f8adc-1080.mp4",
-    mp4Sm: "/media/annunci/tsv-prop-0185/hero-004f8adc-720.mp4",
+    mp4Sm: "/media/annunci/tsv-prop-0185/hero-004f8adc-540.mp4",
     poster: "/media/annunci/tsv-prop-0185/hero-004f8adc-poster.webp",
     posterSm: "/media/annunci/tsv-prop-0185/hero-004f8adc-poster-sm.webp",
     ai: true,
