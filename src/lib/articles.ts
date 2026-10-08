@@ -1,7 +1,7 @@
 import "server-only";
 
 // Le Risorse — la biblioteca editoriale di TriesteImmobiliare.
-// Fonte di verità: Airtable WEB_ARTICLES (tblTgqKEDUYc80jcv), condivisa con
+// Fonte di verità: Airtable WEB_ARTICLES, condivisa con
 // TriesteVillas: ogni lettura è filtrata per BRAND, come le tabelle WEB_* degli
 // account. Il sito vede solo le righe stato=Pubblicato con data di uscita
 // passata — bozze, programmati e coda idee restano nel CRM.
@@ -80,6 +80,44 @@ export function articleServedLocale(a: Article, locale: string): string {
   return locale;
 }
 
+/** Una guida si PROPONE in una pagina solo se esiste nella sua lingua (08/10/2026).
+ *  Vale per lo sloveno, dove il ripiego è l'inglese: le fasce «guide» di /sl,
+ *  /sl/immobili e /sl/vendi mostravano titoli e sommari inglesi («The six
+ *  stages of a sale…») e portavano la quota di parole slovene della pagina al
+ *  69-80% (audit dei contenuti del 07/10). Senza articoli sloveni la fascia
+ *  sparisce, come /sl/risorse rimanda già alla biblioteca inglese; quando il
+ *  CRM scriverà i *_sl torna da sola. Per it/en/de non cambia niente. */
+export function proponibileIn(a: Article, locale: string): boolean {
+  return locale !== "sl" || !!a.body.sl;
+}
+
+// ─── Il recapito dentro il testo delle guide (08/10/2026) ───────────────────
+// I corpi arrivano dal CRM (WEB_ARTICLES) e le guide del primo lotto chiudono
+// con «oppure chiama 040 2473628» — il fisso dell'ufficio che la regola dei
+// recapiti di Martino (09/06/2026) ha sostituito col 331 8940822, telefono e
+// WhatsApp. Su 39 pagine il numero vecchio restava nel testo (audit del 07/10)
+// mentre il resto del sito dava già il nuovo. La correzione vera è nel CRM;
+// questa è la rete sotto: il numero vecchio non arriva più in pagina, anche
+// da un articolo scritto domani con il testo di ieri. In italiano senza +39.
+const FISSO = String.raw`(?:\+39\s?)?0\s?4\s?0[\s.]?2\s?4\s?7[\s.]?3\s?6[\s.]?2\s?8`;
+const APOS = String.raw`(?:'|’|&#39;|&#x27;)`;
+const RECAPITO_VECCHIO: { re: RegExp; con: string }[] = [
+  // La frase che dava fisso E WhatsApp: diventa un numero solo, per tutti e due.
+  { re: new RegExp(String.raw`chiama ${FISSO} \(dall${APOS}estero \+39\) o scrivi su WhatsApp al 331 ?8940822`, "g"), con: "chiama o scrivi su WhatsApp al 331 8940822" },
+  { re: new RegExp(String.raw`call ${FISSO} \(from abroad \+39\) or send a WhatsApp message to (?:\+39 )?331 ?8940822`, "g"), con: "call or send a WhatsApp message to +39 331 8940822" },
+  { re: new RegExp(String.raw`rufen Sie ${FISSO} an \(aus dem Ausland \+39\) oder schreiben Sie per WhatsApp an (?:\+39 )?331 ?8940822`, "g"), con: "rufen Sie uns an oder schreiben Sie per WhatsApp an +39 331 8940822" },
+  // I link tel: col fisso.
+  { re: /tel:\+?(?:39)?0402473628/g, con: "tel:+393318940822" },
+];
+
+function recapitoAttuale(testo: string, lingua: ArticleLocale): string {
+  if (!testo) return testo;
+  let t = testo;
+  for (const { re, con } of RECAPITO_VECCHIO) t = t.replace(re, con);
+  // Ogni altro fisso rimasto: il numero nuovo, col +39 fuori dall'italiano.
+  return t.replace(new RegExp(FISSO, "g"), lingua === "it" ? "331 8940822" : "+39 331 8940822");
+}
+
 type RawRecord = { id: string; fields: Record<string, unknown> };
 
 const str = (v: unknown): string => (typeof v === "string" ? v.trim() : "");
@@ -106,7 +144,12 @@ function mapArticle(r: RawRecord): Article {
     aggiornamenti: strOrNull(f["aggiornamenti_pubblici"]),
     title: { it: str(f["titolo_it"]), en: str(f["titolo_en"]), de: str(f["titolo_de"]), sl: str(f["titolo_sl"]) },
     abstract: { it: str(f["abstract_it"]), en: str(f["abstract_en"]), de: str(f["abstract_de"]), sl: str(f["abstract_sl"]) },
-    body: { it: str(f["corpo_it"]), en: str(f["corpo_en"]), de: str(f["corpo_de"]), sl: str(f["corpo_sl"]) },
+    body: {
+      it: recapitoAttuale(str(f["corpo_it"]), "it"),
+      en: recapitoAttuale(str(f["corpo_en"]), "en"),
+      de: recapitoAttuale(str(f["corpo_de"]), "de"),
+      sl: recapitoAttuale(str(f["corpo_sl"]), "sl"),
+    },
   };
 }
 
@@ -116,8 +159,8 @@ const FIELD_NAMES = [
   "fonti", "aggiornamenti_pubblici", "titolo_it", "titolo_en", "titolo_de", "titolo_sl", "abstract_it", "abstract_en",
   "abstract_de", "abstract_sl", "corpo_it", "corpo_en", "corpo_de", "corpo_sl",
 ];
-// I tre campi *_sl (titolo_sl fld90Or5GUMAtiAGw, abstract_sl fldaTNKldxO5b7xPG,
-// corpo_sl fldgrs4XJaOwT5gGz) esistono su WEB_ARTICLES dall'11/09/2026, creati
+// I tre campi *_sl (titolo_sl, abstract_sl, corpo_sl) esistono su
+// WEB_ARTICLES dall'11/09/2026, creati
 // per triestevillas.com: la tabella è condivisa, quindi valgono anche qui.
 
 // stato e brand stanno nella formula; la data di pubblicazione si ri-controlla

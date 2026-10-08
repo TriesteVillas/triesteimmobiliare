@@ -30,7 +30,11 @@ export default async function ContactPage({
   setRequestLocale(locale);
   const t = await getTranslations("contact");
   const phone = t("phone");
-  const telHref = `tel:+39${phone.replace(/\s+/g, "")}`;
+  // Il numero arriva dai testi, col +39 fuori dall'italiano (regola dei recapiti
+  // del 09/06/2026): il link prende solo le cifre e il prefisso una volta sola,
+  // come nel piede di pagina (Footer.tsx).
+  const cifre = phone.replace(/\D+/g, "").replace(/^(?:00)?39(?=3)/, "");
+  const telHref = `tel:+39${cifre}`;
 
   const rows = [
     { label: t("emailLabel"), value: t("email"), href: `mailto:${t("email")}` },

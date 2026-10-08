@@ -7,7 +7,7 @@ import { getProperties, getPrivateTeasers } from "@/lib/airtable";
 import { groupByZone, ZONE_ORDER, ZONE_OTHER } from "@/lib/properties";
 import { buildPropertyView } from "@/lib/propertyView";
 import ResourceCard from "@/components/resources/ResourceCard";
-import { getArticle, readingMinutes } from "@/lib/articles";
+import { getArticle, proponibileIn, readingMinutes } from "@/lib/articles";
 import { absUrl, pageAlternates, pageOpenGraph } from "@/lib/seo";
 import { localizedTitle } from "@/lib/propertyView";
 import JsonLd from "@/components/JsonLd";
@@ -50,7 +50,7 @@ export default async function ImmobiliPage({
         getArticle(sl).catch(() => null),
       ),
     )
-  ).filter((a): a is NonNullable<typeof a> => a !== null);
+  ).filter((a): a is NonNullable<typeof a> => a !== null && proponibileIn(a, locale));
 
   // Immobili pubblici (i cluster PRIVATE sono esclusi alla fonte) + i teaser
   // senza dettaglio della Private Collection, raggruppati per zona insieme.

@@ -21,8 +21,10 @@ cinematografiche.
 - **Stack**: Next.js 16 (App Router) · React 19 · TypeScript · Tailwind 4 · next-intl · Leaflet
 - **Hosting**: Vercel (progetto `trieste-villas/triesteimmobiliare`, deploy automatico a ogni push su `main`)
 - **i18n**: IT (default, root) · EN · DE · SL — `localePrefix: as-needed`
-- **Dati immobili**: fetch live/ISR (10 min) da Airtable `TSV_PROPERTIES`
-  (tabella `PROPRIETA`; gli identificativi di base e tabelle stanno nella KB del gruppo, non in questo repo pubblico)
+- **Dati immobili**: fetch live/ISR (10 min) dalla vetrina pubblica del CRM (Postgres),
+  con `CATALOGO_SORGENTE=pg` — acceso in produzione dal 24/08/2026; senza, il ramo di
+  ripiego legge Airtable `TSV_PROPERTIES` (tabella `PROPRIETA`; gli identificativi di
+  base e tabelle stanno nella KB del gruppo, non in questo repo pubblico)
 
 ## Regola di pubblicazione (gate)
 
@@ -32,33 +34,36 @@ Un immobile appare su questo sito solo se **entrambe** vere:
    l'immobile è offline su tutti i siti);
 2. `pubblicato_su` (multipleSelects) contiene **`triesteimmobiliare.com`**.
 
-Il filtro vive in `src/lib/airtable.ts` (`SITE_TARGETS`) e referenzia i campi
-per **nome**; le colonne della scheda sono invece agganciate per **field ID**
-(`src/lib/properties.ts`, oggetto `F`) — rinominare è sicuro, cancellare no.
+Con la vetrina accesa la regola la applica il CRM (`/api/vetrina?sito=triesteimmobiliare.com`).
+Sul ramo Airtable il filtro vive in `src/lib/airtable.ts` (`SITE_TARGETS`) e
+referenzia i campi per **nome**; le colonne della scheda sono invece agganciate per
+**field ID** (`src/lib/properties.ts`, oggetto `F`) — rinominare è sicuro, cancellare no.
 
 ## Lead
 
 I form (richiesta info, prenota visita, invia a un amico, popup buyer, valutazione
-venditore) scrivono nella tabella `LEAD_` della stessa base via `/api/lead`, con
-`azienda: TriesteImmobiliare` e `canale: Sito TriesteImmobiliare`. Le email
-(Resend) sono best-effort e al momento non configurate: fa fede il record Airtable.
+venditore) passano da `/api/lead`, che posa la richiesta nella porta `ingresso` del
+CRM (`src/lib/ingressoPorta.ts`, firma `INGRESSO_HMAC`). Con `LEAD_SU_AIRTABLE=no`
+(produzione, dal 25/08/2026) la porta è l'unico deposito e la scrittura su Airtable
+`LEAD_` è spenta; senza il flag resta anche quella. Le email (Resend) sono best-effort.
 
 ## Setup locale
 
 Richiede **Node ≥ 22.12**.
 
 ```bash
-npm install
-cp .env.example .env.local   # opzionale: senza token usa lo snapshot src/lib/seed.json
+npm ci
+cp .env.example .env.local   # e mettere CATALOGO_SORGENTE=pg per il catalogo
 npm run dev                  # http://localhost:3000
+npm run prebuild             # i cancelli del repo, compresi i test (npm test)
 ```
 
-Senza `AIRTABLE_TOKEN` il sito rende i dati dallo snapshot committato
-`src/lib/seed.json` (i soli immobili TSI al momento della rigenerazione). In
-produzione impostare `AIRTABLE_TOKEN` (PAT con `data.records:read` +
-`data.records:write` per i lead sulla base `TSV_PROPERTIES`) e, se serve,
-`AIRTABLE_BASE_ID`.
+Lo snapshot committato `src/lib/seed.json` non c'è più (08/10/2026: conteneva due
+record veri dell'anagrafica, in un repo pubblico). In locale il catalogo si legge
+dalla vetrina pubblica del CRM con `CATALOGO_SORGENTE=pg`; senza, e senza
+`AIRTABLE_TOKEN`, è vuoto. Articoli, account e Private Collection leggono ancora
+Airtable e in locale, senza token, restano vuoti.
 
 ## Contatti del brand
 
-info@triesteimmobiliare.com · 040 2473628 · Via Torino 34, secondo piano · Trieste
+info@triesteimmobiliare.com · 331 8940822 (telefono e WhatsApp) · Via Torino 34, secondo piano · Trieste

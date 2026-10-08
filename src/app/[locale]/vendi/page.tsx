@@ -9,7 +9,7 @@ import VideoSito from "@/components/VideoSito";
 import ResourceCard from "@/components/resources/ResourceCard";
 import SloveniaVillasRiquadro from "@/components/SloveniaVillasRiquadro";
 import SappadaVillasRiquadro from "@/components/SappadaVillasRiquadro";
-import { getArticle, readingMinutes } from "@/lib/articles";
+import { getArticle, proponibileIn, readingMinutes } from "@/lib/articles";
 import { pageAlternates, pageOpenGraph, faqJsonLd } from "@/lib/seo";
 
 export async function generateMetadata({
@@ -59,7 +59,7 @@ export default async function SellPage({
         getArticle(s).catch(() => null),
       ),
     )
-  ).filter((a): a is NonNullable<typeof a> => a !== null);
+  ).filter((a): a is NonNullable<typeof a> => a !== null && proponibileIn(a, locale));
 
   // FAQ rich-results — questions localized, answers reuse the recovered blocks.
   // La prima domanda era «quanto costa vendere con noi», e la risposta era la

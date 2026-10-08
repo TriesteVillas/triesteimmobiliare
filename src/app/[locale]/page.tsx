@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { pageAlternates, pageOpenGraph } from "@/lib/seo";
 import { getProperties } from "@/lib/airtable";
-import { getArticles, readingMinutes } from "@/lib/articles";
+import { getArticles, proponibileIn, readingMinutes } from "@/lib/articles";
 import ResourceCard from "@/components/resources/ResourceCard";
 import { zoneKey } from "@/lib/properties";
 import { buildPropertyView } from "@/lib/propertyView";
@@ -67,8 +67,11 @@ export default async function Home({
 
   const properties = await getProperties();
   // Le tre guide in vetrina (in evidenza, poi le più recenti: l'ordine lo
-  // decide getArticles). Se la Biblioteca è vuota la fascia sparisce.
-  const articoli = (await getArticles().catch(() => [])).slice(0, 3);
+  // decide getArticles). Se la Biblioteca è vuota la fascia sparisce; su /sl
+  // solo le guide che esistono in sloveno (lib/articles.ts → proponibileIn).
+  const articoli = (await getArticles().catch(() => []))
+    .filter((a) => proponibileIn(a, locale))
+    .slice(0, 3);
 
   // La strip conserva l'ordine di vetrina deciso nel CRM. `home: true`: in
   // home le card non portano pillole AI, solo il segno discreto sulle
