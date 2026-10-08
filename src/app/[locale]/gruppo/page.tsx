@@ -9,6 +9,7 @@ import LastraLogo from "@/components/LoghiGruppo";
 import { pageAlternates, pageOpenGraph } from "@/lib/seo";
 import { sloveniaVillasUrl } from "@/lib/sloveniavillas";
 import { sappadaVillasUrl } from "@/lib/sappadavillas";
+import { sitiGruppo } from "@/lib/siti-gruppo";
 
 export async function generateMetadata({
   params,
@@ -26,39 +27,10 @@ export async function generateMetadata({
 }
 
 const BRANDS = ["tsv", "tsi", "affitti", "friuli", "business", "lignano", "sappada", "slovenia"] as const;
-type BrandSiteLocale = "it" | "en" | "de" | "sl";
 type BrandSites = Partial<Record<(typeof BRANDS)[number], string>>;
-// URLs verified live on 2026-07-23. TriesteBusiness stays unlinked because it has no website.
-const BRAND_SITES: Record<BrandSiteLocale, BrandSites> = {
-  it: {
-    tsv: "https://www.triestevillas.com/",
-    affitti: "https://www.triesteaffitti.com/",
-    friuli: "https://friulivillas.com/",
-    lignano: "https://www.lignanovillas.com/it/",
-  },
-  en: {
-    tsv: "https://www.triestevillas.com/en",
-    affitti: "https://www.triesteaffitti.com/",
-    friuli: "https://friulivillas.com/en/",
-    lignano: "https://www.lignanovillas.com/",
-  },
-  de: {
-    tsv: "https://www.triestevillas.com/de",
-    affitti: "https://www.triesteaffitti.com/",
-    friuli: "https://friulivillas.com/de/",
-    lignano: "https://www.lignanovillas.com/de/",
-  },
-  // Sloveno (2026-10-01): /sl verificato in produzione solo su triestevillas.com.
-  // FriuliVillas, LignanoVillas e TriesteAffitti il 01/10 rispondevano 404 su
-  // /sl, quindi qui portano alla loro versione inglese (come la D7 del TSV):
-  // si passa a /sl quando i gemelli lo pubblicano.
-  sl: {
-    tsv: "https://www.triestevillas.com/sl",
-    affitti: "https://www.triesteaffitti.com/",
-    friuli: "https://friulivillas.com/en/",
-    lignano: "https://www.lignanovillas.com/",
-  },
-};
+// Gli indirizzi per lingua: lib/siti-gruppo.ts, la stessa tabella del piè di
+// pagina (08/10/2026; fino ad allora una copia a mano con rimandi 308).
+// TriesteBusiness stays unlinked because it has no website yet.
 const STORY = [
   { year: "2013", key: "start" },
   { year: "2020", key: "pivot" },
@@ -84,7 +56,7 @@ export default async function GroupPage({
   // lib/sloveniavillas.ts, non da questa tabella. Lo stesso per SappadaVillas
   // (07/10/2026), che ha le quattro lingue: lib/sappadavillas.ts.
   const brandSites: BrandSites = {
-    ...(BRAND_SITES[locale as BrandSiteLocale] ?? BRAND_SITES.it),
+    ...sitiGruppo(locale),
     slovenia: sloveniaVillasUrl(locale),
     sappada: sappadaVillasUrl(locale),
   };

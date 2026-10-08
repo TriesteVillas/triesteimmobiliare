@@ -4,6 +4,7 @@ import Logo from "./Logo";
 import CookiePrefsButton from "./CookiePrefsButton";
 import { sloveniaVillasUrl } from "@/lib/sloveniavillas";
 import { sappadaVillasUrl } from "@/lib/sappadavillas";
+import { sitiGruppo } from "@/lib/siti-gruppo";
 
 // TriesteImmobiliare's own channel (the flagship's socials stay on TSV).
 const SOCIALS = [
@@ -24,36 +25,8 @@ const NAV = [
   { href: "/contatti", key: "contact" },
 ] as const;
 
-type GroupSiteLocale = "it" | "en" | "de" | "sl";
-const GROUP_SITES = {
-  it: {
-    tsv: "https://www.triestevillas.com/",
-    affitti: "https://www.triesteaffitti.com/",
-    friuli: "https://friulivillas.com/",
-    lignano: "https://www.lignanovillas.com/it/",
-  },
-  en: {
-    tsv: "https://www.triestevillas.com/en",
-    affitti: "https://www.triesteaffitti.com/",
-    friuli: "https://friulivillas.com/en/",
-    lignano: "https://www.lignanovillas.com/",
-  },
-  de: {
-    tsv: "https://www.triestevillas.com/de",
-    affitti: "https://www.triesteaffitti.com/",
-    friuli: "https://friulivillas.com/de/",
-    lignano: "https://www.lignanovillas.com/de/",
-  },
-  // Sloveno: /sl esiste solo su triestevillas.com (verificato il 2026-10-01);
-  // gli altri gemelli portano alla versione inglese finché non lo pubblicano.
-  // Stessa tabella di gruppo/page.tsx.
-  sl: {
-    tsv: "https://www.triestevillas.com/sl",
-    affitti: "https://www.triesteaffitti.com/",
-    friuli: "https://friulivillas.com/en/",
-    lignano: "https://www.lignanovillas.com/",
-  },
-} as const satisfies Record<GroupSiteLocale, Record<string, string>>;
+// Gli indirizzi per lingua dei siti del gruppo: lib/siti-gruppo.ts, una
+// tabella sola con /gruppo (fino all'08/10 erano due copie con rimandi 308).
 
 // Sibling brands (the group ecosystem). TriesteBusiness routes to /gruppo because it has no website.
 const GROUP = [
@@ -79,9 +52,13 @@ export default async function Footer() {
   const tLegal = await getTranslations("group.legal");
   const year = new Date().getFullYear();
   const phone = tContact("phone");
-  const telHref = `tel:+39${phone.replace(/\s+/g, "")}`;
+  // Il numero arriva dai testi, con o senza +39 secondo la lingua: il link
+  // prende solo le cifre e il prefisso una volta sola.
+  const cifre = phone.replace(/\D+/g, "").replace(/^(?:00)?39(?=3)/, "");
+  const telHref = `tel:+39${cifre}`;
+  const tA = await getTranslations("audit0810.footer");
   const groupSites = {
-    ...(GROUP_SITES[locale as GroupSiteLocale] ?? GROUP_SITES.it),
+    ...sitiGruppo(locale),
     slovenia: sloveniaVillasUrl(locale),
     sappada: sappadaVillasUrl(locale),
   };
@@ -114,10 +91,12 @@ export default async function Footer() {
           <h2 className="text-xs font-semibold uppercase tracking-wide text-white/50">
             {t("sitemapTitle")}
           </h2>
-          <ul className="space-y-2 text-white/70">
+          {/* Bersagli tattili da 28 px (py-1) invece di 20: lo spazio fra le
+              righe scende di conseguenza, il ritmo resta quello di prima. */}
+          <ul className="space-y-0 text-white/70">
             {NAV.map((item) => (
               <li key={item.key}>
-                <Link href={item.href} className="transition-colors hover:text-white">
+                <Link href={item.href} className="inline-block py-1 transition-colors hover:text-white">
                   {tNav(item.key)}
                 </Link>
               </li>
@@ -129,7 +108,7 @@ export default async function Footer() {
           <h2 className="text-xs font-semibold uppercase tracking-wide text-white/50">
             {t("groupTitle")}
           </h2>
-          <ul className="space-y-2 text-white/70">
+          <ul className="space-y-0 text-white/70">
             {GROUP.map((b) => {
               if (b.external) {
                 return (
@@ -138,7 +117,7 @@ export default async function Footer() {
                       href={groupSites[b.site]}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="transition-colors hover:text-white"
+                      className="inline-block py-1 transition-colors hover:text-white"
                     >
                       {b.label} ↗
                     </a>
@@ -148,7 +127,7 @@ export default async function Footer() {
 
               return (
                 <li key={b.label}>
-                  <Link href={b.href} className="transition-colors hover:text-white">
+                  <Link href={b.href} className="inline-block py-1 transition-colors hover:text-white">
                     {b.label}
                   </Link>
                 </li>
@@ -165,7 +144,7 @@ export default async function Footer() {
             <div>
               <dt className="sr-only">{tContact("emailLabel")}</dt>
               <dd>
-                <a href={`mailto:${tContact("email")}`} className="transition-colors hover:text-white">
+                <a href={`mailto:${tContact("email")}`} className="inline-block py-1 transition-colors hover:text-white">
                   {tContact("email")}
                 </a>
               </dd>
@@ -173,7 +152,7 @@ export default async function Footer() {
             <div>
               <dt className="sr-only">{tContact("phoneLabel")}</dt>
               <dd>
-                <a href={telHref} className="transition-colors hover:text-white">
+                <a href={telHref} className="inline-block py-1 transition-colors hover:text-white">
                   {phone}
                 </a>
               </dd>
@@ -193,12 +172,10 @@ export default async function Footer() {
             <p>{tLegal("vat")}</p>
             <p>{tLegal("rea")}</p>
             <p>{tLegal("capital")}</p>
-            <p>
-              PEC{" "}
-              <a href={`mailto:${tLegal("pec")}`} className="transition-colors hover:text-white/80">
-                {tLegal("pec")}
-              </a>
-            </p>
+            {/* La PEC come testo, non mailto: (08/10/2026): una mail normale
+                verso una casella PEC rischia il rifiuto o di non essere letta,
+                e chi scrive va mandato all'indirizzo di sopra. */}
+            <p>PEC {tLegal("pec")}</p>
           </div>
         </div>
       </div>
@@ -213,6 +190,18 @@ export default async function Footer() {
             {/* La porta per cambiare idea sul consenso: senza, un sì dato una
                 volta resterebbe dato per sempre. */}
             <CookiePrefsButton className="underline underline-offset-2 transition-colors hover:text-white/70" />
+            {/* «Come usiamo l'AI»: la pagina del gruppo su triestevillas.com,
+                come prevede l'AI pledge (08/10/2026: TSI non ne ha una sua).
+                Sempre a vista: le pagine /ai rispondono 200 nelle quattro
+                lingue (verificato l'08/10). */}
+            <a
+              href={locale === "it" ? "https://triestevillas.com/ai" : `https://triestevillas.com/${locale}/ai`}
+              target="_blank"
+              rel="noopener"
+              className="underline underline-offset-2 transition-colors hover:text-white/70"
+            >
+              {tA("ai")}
+            </a>
             <span className="text-white/75">{t("appointmentNote")}</span>
           </div>
         </div>

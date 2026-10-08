@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Fragment } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { pageAlternates, pageOpenGraph } from "@/lib/seo";
@@ -112,20 +113,29 @@ export default async function Home({
           <p className="eyebrow mt-7" data-reveal="now">
             {t("hero.eyebrow")}
           </p>
-          <h1 className="display-hero mt-3 max-w-3xl text-brand-dark">
-            <span className="block">{t("hero.titleLine1")}</span>
+          {/* Spazi VERI fra righe e parole (08/10/2026): erano span separati
+              solo da margini CSS, e il testo dell'H1 — quello che leggono Google
+              e i lettori di schermo — usciva «…Trieste,fattosulserio.Senza…».
+              Fra le parole cinetiche lo spazio vero prende il posto del margine
+              (mr-[0.24em]); fra le righe a blocco non si vede. `text-balance`:
+              l'ultima parola della riga grigia restava da sola a capo. */}
+          <h1 className="display-hero mt-3 max-w-3xl text-balance text-brand-dark">
+            <span className="block">{t("hero.titleLine1")}</span>{" "}
             <span className="block text-brand">
               {heroWords.map((w, i) => (
-                <span key={i} className="kinetic-line mr-[0.24em] last:mr-0">
-                  <span
-                    className="kinetic-word"
-                    style={{ ["--word-delay" as string]: `${150 + i * 70}ms` }}
-                  >
-                    {w}
+                <Fragment key={i}>
+                  {i > 0 && " "}
+                  <span className="kinetic-line">
+                    <span
+                      className="kinetic-word"
+                      style={{ ["--word-delay" as string]: `${150 + i * 70}ms` }}
+                    >
+                      {w}
+                    </span>
                   </span>
-                </span>
+                </Fragment>
               ))}
-            </span>
+            </span>{" "}
             <span className="block text-neutral-500">{t("hero.titleLine2")}</span>
           </h1>
           {/* Questo <p> è l'elemento LCP misurato della home. */}
@@ -254,7 +264,7 @@ export default async function Home({
         </p>
         <Link
           href="/gruppo"
-          className="mt-6 inline-block text-sm font-semibold text-brand underline-offset-4 hover:underline"
+          className="mt-4 inline-block py-2 text-sm font-semibold text-brand underline-offset-4 hover:underline"
         >
           {t("positioning.cta")} →
         </Link>
@@ -370,7 +380,7 @@ export default async function Home({
             </div>
             <Link
               href="/risorse"
-              className="text-sm font-semibold text-brand underline-offset-4 hover:underline"
+              className="inline-block py-2 text-sm font-semibold text-brand underline-offset-4 hover:underline"
             >
               {t("resources.cta")} →
             </Link>
@@ -418,7 +428,7 @@ export default async function Home({
           </ul>
           <Link
             href="/gruppo"
-            className="mt-6 inline-block text-sm font-semibold text-brand underline-offset-4 hover:underline"
+            className="mt-4 inline-block py-2 text-sm font-semibold text-brand underline-offset-4 hover:underline"
           >
             {t("groupRouting.cta")} →
           </Link>

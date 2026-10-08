@@ -18,6 +18,7 @@ import { attivo, oraRoma } from "./orari";
 //    tiene la data di Roma, non un booleano, così giovedì riappare col giorno nuovo);
 //  · mai nelle aree riservate (account, proprietari, Private Collection,
 //    admin) né sulle tavole da stampare;
+//  · dall'08/10 non si apre da solo sulle schede annuncio (SCHEDE, qui sotto);
 //  · `?barcolana` nell'indirizzo lo riapre comunque, per farlo vedere a qualcuno.
 //
 // Lingua: italiano sulle pagine italiane, inglese per tutte le altre.
@@ -27,6 +28,11 @@ const Pannello = dynamic(() => import("./BarcolanaStandDialog"), { ssr: false })
 
 const CHIAVE = "tsv_barcolana58_chiuso";
 const RISERVATE = /^\/(account|admin|area|owner|private|proprietario)(\/|$)|\/tavola(\/|$)/;
+// Le schede annuncio: chi arriva da Google o da un portale su una casa precisa
+// deve trovare la casa, non un invito a tutto schermo (audit del 07/10; unica
+// correzione ammessa da Martino sulla campagna viva). Si apre da solo altrove;
+// `?barcolana` lo riapre anche qui.
+const SCHEDE = /^\/annuncio(\/|$)/;
 
 function chiusoIl(): string | null {
   try {
@@ -46,6 +52,7 @@ export default function BarcolanaStand({ locale }: { locale: string }) {
     const percorso = pathname.replace(/^\/(it|en|de|sl)(?=\/|$)/, "") || "/";
     if (RISERVATE.test(percorso)) return;
     const forza = new URLSearchParams(window.location.search).has("barcolana");
+    if (!forza && SCHEDE.test(percorso)) return;
     if (!forza && chiusoIl() === oraRoma(ora).data) return;
     // Un respiro dopo il caricamento: prima la pagina, poi l'invito.
     const t = window.setTimeout(() => setAperto(true), forza ? 200 : 1800);

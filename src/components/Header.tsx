@@ -35,7 +35,7 @@ export default async function Header() {
           scende nel menu (−98 px), il lockup rimpicciolisce sotto sm (−26 px) e
           i margini interni si stringono (+8 px di spazio). */}
       <div className="pill-header mx-auto flex h-14 max-w-5xl items-center justify-between rounded-full pl-4 pr-2 sm:pl-5 sm:pr-3">
-        <Link href="/" aria-label="TriesteImmobiliare" className="flex min-w-0 items-center">
+        <Link href="/" aria-label="TriesteImmobiliare" className="flex min-w-0 items-center py-1.5">
           <Logo
             markClassName="h-5 w-auto sm:h-6"
             wordClassName="text-sm sm:text-base"

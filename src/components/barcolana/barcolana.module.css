@@ -183,6 +183,12 @@
   display: block;
   height: 12px;
   width: auto;
+  /* In una colonna flex il figlio si STIRA sulla larghezza della colonna (la
+     riga «Architetti associati», ~101 px): il logo 435×71 usciva a 101×10,
+     schiacciato (audit del 07/10). Niente stiramento, proporzioni sue. */
+  align-self: flex-start;
+  max-width: none;
+  object-fit: contain;
 }
 .metroNome span {
   font-size: 7.5px;
