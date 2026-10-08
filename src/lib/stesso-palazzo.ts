@@ -1,11 +1,11 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // «NELLO STESSO PALAZZO» — le altre unità in vendita dello stesso edificio.
 //
-// Nato il 05/10/2026 per Largo Amulia 6 a Muggia: sette appartamenti dello
+// Nato il 05/10/2026 per un palazzo di Muggia: sette appartamenti dello
 // stesso palazzo venduti uno per uno, e Martino vuole che ogni scheda rimandi
 // a tutte le altre. I «simili» non lo possono fare, e non devono: tengono al
-// massimo UNA unità per edificio di proposito (lib/simili.ts, le 7 di Palazzo
-// Haggi che si rubavano le card a vicenda). Qui è il contrario: le si mostra
+// massimo UNA unità per edificio di proposito (lib/simili.ts, le 7 unità di uno
+// stesso palazzo che si rubavano le card a vicenda). Qui è il contrario: le si mostra
 // tutte, in una sezione a sé, e le si toglie dai simili.
 //
 // Decide SOLO il campo `progetto` (singleSelect di Airtable), come per Elegie

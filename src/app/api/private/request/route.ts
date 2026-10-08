@@ -8,6 +8,8 @@ import {
 import { ackEmail, sendMail, type Lang } from "@/lib/private/mail";
 import { MAIL_REPLY_TO } from "@/lib/private/brand";
 import { BUDGET_BANDS } from "@/lib/private/bands";
+import { eGettone, risolviGettone } from "@/lib/private/teaser";
+import { getPrivateProperties } from "@/lib/airtable";
 
 // Private Collection credential request from the public ghost-card form.
 // Creates a tagged LEAD_ (fonte = PRIVATE COLLECTION) + a PC_RICHIESTE row
@@ -93,7 +95,14 @@ export async function POST(request: Request) {
   const bands = (Array.isArray(body.bands) ? body.bands : [])
     .map((b) => clean(b, 10))
     .filter((b) => BANDS.has(b));
-  const immobileTrigger = clean(body.immobileTrigger, 40);
+  // Il teaser porta un gettone opaco (lib/private/teaser.ts): qui torna il
+  // codice del CRM, lato server. Un gettone che non corrisponde più a nessuna
+  // casa riservata si lascia vuoto; un valore che non è un gettone (link vecchi)
+  // passa com'era.
+  const triggerGrezzo = clean(body.immobileTrigger, 40);
+  const immobileTrigger = eGettone(triggerGrezzo)
+    ? (risolviGettone(triggerGrezzo, (await getPrivateProperties().catch(() => [])).map((p) => p.id)) ?? "")
+    : triggerGrezzo;
   const lingua = (["it", "en", "de", "sl"].includes(clean(body.lingua)) ? clean(body.lingua) : "it") as Lang;
 
   if (body.privacyOk !== true) {

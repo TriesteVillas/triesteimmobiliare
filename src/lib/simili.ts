@@ -11,7 +11,7 @@
 // al prezzo entro ±30/60%. Misurata sulle 58 schede di triestevillas.com:
 //  · 20 schede proponevano una casa VENDUTA (nessun filtro sullo stato);
 //  · 35 avevano due o più unità dello stesso progetto o edificio (le 7 di
-//    Palazzo Haggi si rubavano le card a vicenda);
+//    uno stesso palazzo si rubavano le card a vicenda);
 //  · 26 mescolavano ville e appartamenti (la tipologia non contava) — 14 pur
 //    avendo almeno tre alternative della famiglia giusta nello stesso comune;
 //  · l'appartamento di Barcola a 585.000 non vedeva l'altro di Barcola a
@@ -130,7 +130,7 @@ export function puntiLuogo(c: CasaPerSimili, v: CasaPerSimili): number {
 /** Tipologia: identica 60 · stessa famiglia 35 · famiglia DIVERSA −40.
  *  Il −40 non c'è nel CRM, ed è voluto: lì una villa e un appartamento si
  *  separano solo per i 60 punti mancanti, e qui superficie e distanza — che
- *  il CRM non ha — bastavano a colmarli (la villa di Via Buonarroti si vedeva
+ *  il CRM non ha — bastavano a colmarli (una villa del catalogo si vedeva
  *  proporre due appartamenti prima di una villa). A parità di famiglia la zona
  *  resta il criterio che pesa di più. */
 export function puntiTipologia(c: CasaPerSimili, v: CasaPerSimili): number {
@@ -192,7 +192,7 @@ export function punteggio(c: CasaPerSimili, v: CasaPerSimili): number {
   );
 }
 
-// Lo stesso progetto (Haggi, Dreher, Duino…) o lo stesso edificio (stesse
+// Lo stesso progetto (un cantiere con più unità) o lo stesso edificio (stesse
 // coordinate a ~10 m) è UN gruppo: una card sola per gruppo.
 function gruppo(p: CasaPerSimili): string {
   if (norm(p.progetto)) return `progetto:${norm(p.progetto)}`;

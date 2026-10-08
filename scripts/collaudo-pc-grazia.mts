@@ -10,7 +10,7 @@
 //   printf '{"name":"server-only","version":"0.0.0-stub","main":"index.js"}' > node_modules/server-only/package.json
 //   printf '' > node_modules/server-only/index.js
 process.env.AIRTABLE_TOKEN ||= "finto-per-il-collaudo";
-process.env.AIRTABLE_BASE_ID ||= "app1ZDay9vQNU5V2u";
+if (!process.env.AIRTABLE_BASE_ID) throw new Error("AIRTABLE_BASE_ID mancante (vedi KB)");
 
 const GRAZIA = Number(process.env.PC_GRAZIA_MIN ?? 120);
 const min = (n: number) => new Date(Date.now() - n * 60_000).toISOString();

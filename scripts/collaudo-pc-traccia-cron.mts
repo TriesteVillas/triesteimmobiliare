@@ -24,7 +24,7 @@ const SEGRETO = "segreto-finto-del-collaudo";
 const FIGLIO = process.env.COLLAUDO_RAMO === "spento";
 
 process.env.AIRTABLE_TOKEN ||= "finto-per-il-collaudo";
-process.env.AIRTABLE_BASE_ID ||= "app1ZDay9vQNU5V2u";
+if (!process.env.AIRTABLE_BASE_ID) throw new Error("AIRTABLE_BASE_ID mancante (vedi KB)");
 process.env.CRON_SECRET ||= "cron-finto-del-collaudo";
 // ⛔ ASSEGNAZIONE SECCA, non `||=`: se questa macchina avesse in ambiente la
 // chiave VERA di Resend, un `||=` la lascerebbe in piedi — e basterebbe un buco

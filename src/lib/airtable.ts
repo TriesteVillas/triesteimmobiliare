@@ -5,6 +5,7 @@ import { applicaTrasparenza } from "./trasparenza";
 import { BASE_ORIGINALI, getTrasparenzaSito } from "./trasparenza-vetrina";
 import { priceSlotLabel } from "./private/bands";
 import { BRAND } from "./private/brand";
+import { gettoneTeaser } from "./private/teaser";
 
 const BASE_ID = process.env.AIRTABLE_BASE_ID ?? "app1ZDay9vQNU5V2u";
 const TABLE_ID = "tblwAUWPnX7KF8FhU";
@@ -136,14 +137,13 @@ async function getCatalogo(): Promise<Property[]> {
   if (TOKEN) {
     raw = await fetchAllRaw(FILTER);
   } else {
-    // Dev convenience: render real content from a committed snapshot until the
-    // production AIRTABLE_TOKEN is set. Production always has the token.
-    console.warn("[airtable] AIRTABLE_TOKEN not set — using dev seed snapshot.");
-    // The seed bypasses FILTER, so the PRIVATE exclusion has to be re-applied by
-    // hand here: a public grid must never show an off-market unit, not even in dev.
-    raw = ((await import("./seed.json")).default as RawRecord[]).filter(
-      (r) => String(r.fields[F.cluster] ?? "").toUpperCase().trim() !== "PRIVATE",
-    );
+    // Senza token (sviluppo locale) il catalogo è VUOTO. Fino all'08/10/2026
+    // qui si leggeva uno snapshot committato (src/lib/seed.json) con due record
+    // VERI dell'anagrafica — nome interno, via, civico, coordinate e prezzo —
+    // in un repo pubblico: tolto (audit dei siti del 07/10). In locale si lavora
+    // con CATALOGO_SORGENTE=pg, che legge la vetrina pubblica del CRM.
+    console.warn("[airtable] AIRTABLE_TOKEN not set — catalogo vuoto (usa CATALOGO_SORGENTE=pg in locale).");
+    raw = [];
   }
   return raw
     .map((r) => mapRecord(r.id, r.fields))
@@ -181,9 +181,7 @@ export async function getPhotoSources(): Promise<Map<string, PhotoSource>> {
   if (TOKEN) {
     raw = await fetchAllRaw(FILTER, PHOTO_FIELDS);
   } else {
-    raw = ((await import("./seed.json")).default as RawRecord[]).filter(
-      (r) => String(r.fields[F.cluster] ?? "").toUpperCase().trim() !== "PRIVATE",
-    );
+    raw = []; // niente snapshot committato: v. getCatalogo()
   }
 
   const index = new Map<string, PhotoSource>();
@@ -221,13 +219,10 @@ export async function getPrivateProperties(): Promise<Property[]> {
   if (TOKEN) {
     raw = await fetchAllRaw(PRIVATE_FILTER);
   } else {
-    // Ramo di sviluppo senza token: il seed è uno snapshot committato e non contiene
-    // pc_visibile_su, quindi qui il gate resta il solo cluster. Non è un buco (senza
-    // token non si parla con Airtable, e in produzione TOKEN c'è sempre), ma va
-    // ricordato che l'area riservata non è collaudabile in locale dal solo seed.
-    raw = ((await import("./seed.json")).default as RawRecord[]).filter(
-      (r) => String(r.fields[F.cluster] ?? "").toUpperCase().trim() === "PRIVATE",
-    );
+    // Ramo di sviluppo senza token: nessun record (lo snapshot committato è stato
+    // tolto l'08/10/2026, v. getCatalogo). L'area riservata non si collauda in
+    // locale senza token.
+    raw = [];
   }
   // Newest entry first (pc_data_ingresso, written by the CRM toggle). Records
   // without a date sink to the bottom; price desc breaks ties, so a same-day
@@ -247,12 +242,15 @@ export async function getPrivateProperty(slug: string): Promise<Property | null>
   return all.find((p) => p.slug === slug) ?? null;
 }
 
-// Proiezione pubblica del teaser: deliberatamente PRIVA di titolo, foto e prezzo.
+// Proiezione pubblica del teaser: deliberatamente PRIVA di titolo, foto, prezzo
+// e codice (l'id è un gettone opaco dall'08/10/2026).
 // Al browser arrivano solo la zona (per collocare la card) e una forbice grossolana,
 // così la pagina pubblica non può far trapelare nulla dell'immobile riservato.
 export type Teaser = { id: string; zona: string | null; band: string | null };
 
 export async function getPrivateTeasers(): Promise<Teaser[]> {
   const all = await getPrivateProperties();
-  return all.map((p) => ({ id: p.id, zona: p.zona, band: priceSlotLabel(p.priceSale) }));
+  // `id` è un gettone opaco, non il codice del CRM (lib/private/teaser.ts):
+  // finisce nell'HTML pubblico, nel link del teaser.
+  return all.map((p) => ({ id: gettoneTeaser(p.id), zona: p.zona, band: priceSlotLabel(p.priceSale) }));
 }
