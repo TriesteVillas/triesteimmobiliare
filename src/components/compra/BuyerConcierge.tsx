@@ -9,11 +9,27 @@ import ChatRichText from "./ChatRichText";
 // apre una conversazione vera. Stessa filosofia del Concierge Private
 // Collection: il widget è stupido di proposito, tutta l'intelligenza (prompt,
 // tool su articoli e immobili, guardrail, registro conversazioni) vive nel CRM
-// dietro /api/concierge/chat. Qui: UI, storia locale, gate identità, stato
-// blocked.
+// dietro /api/concierge/chat. Qui: UI, storia locale, il passaggio a una
+// persona, stato blocked.
+//
+// IL PASSAGGIO (09/10/2026, richiesta di Martino: «dopo 2-3 risposte invita
+// super cortesemente a scriverci direttamente per aprire un filo di dialogo»).
+// Fino a quel giorno, alla quarta domanda, il CRM chiedeva nome e recapito per
+// CONTINUARE A PARLARE COL BOT. Ora:
+//  - in fondo al pannello, i segni delle domande che restano al concierge
+//    (RISPOSTE_LIBERE, tre come TURNI_LIBERI del bridge);
+//  - dopo la penultima risposta, l'invito a scrivere a una persona;
+//  - dopo l'ultima, il campo sparisce e nella conversazione si apre la LETTERA
+//    AL TEAM (domande fatte, due righe, cerco/ho una casa, nome, recapito,
+//    consenso), che va a /api/concierge/lettera → porta unica dei moduli del
+//    CRM, e NON al bot. In alternativa WhatsApp ed email già scritti con le
+//    domande. La lettera si apre anche prima, da «Scrivete a una persona»;
+//  - il bridge non riceve più identità: il suo cancello resta solo un freno
+//    (alla quarta domanda non chiama il modello) — vedi il proxy.
+// Lo stesso giro di sloveniavillas.com. Gemello in triestevillas-web.
 //
 // Differenze deliberate rispetto al widget PC:
-//  - il gate identità compare solo quando lo chiede il CRM;
+//  - la lettera la apre il widget contando le risposte (il bridge non lo dice);
 //  - l'ingresso è una search bar, non un bottone flottante — la domanda scritta
 //    lì diventa il primo turno della conversazione;
 //  - su "blocked" non c'è nessun logout da eseguire: si chiude la sessione di
@@ -21,18 +37,24 @@ import ChatRichText from "./ChatRichText";
 //  - il sid è generato qui e serve a: bucket rate-limit, firma dei turni,
 //    id sessione nel registro CRM. Ruotarlo non compra nulla (vedi proxy).
 
-type Msg = { role: "user" | "assistant"; content: string; sig?: string };
+/** `servizio`: un testo che non è una risposta del concierge (il grazie della
+ *  lettera, il freno del bridge): non conta fra le risposte e non viaggia al bridge. */
+type Msg = { role: "user" | "assistant"; content: string; sig?: string; servizio?: boolean };
 type Stored = {
   sid: string;
   msgs: Msg[];
   blocked: boolean;
-  gate: boolean;
-  identificato: boolean;
-  gateMessages: Msg[] | null;
+  passaggio: boolean;
+  consegnato: boolean;
 };
-type GateErrors = { name: boolean; contact: boolean; consent: boolean };
+type LetteraErrors = { name: boolean; contact: boolean; consent: boolean };
 
 const STORAGE_KEY = "tsi_web_chat";
+/** Le risposte del concierge per conversazione, poi la lettera. ⚠️ Rispecchia
+ *  TURNI_LIBERI del bridge (vecchio impianto, src/lib/conciergegate.ts): se lì
+ *  si alza, qui si alza, o il widget chiude prima del bridge. */
+const RISPOSTE_LIBERE = 3;
+const RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 function freshSid(): string {
   const bytes = new Uint8Array(12);
@@ -46,30 +68,30 @@ function loadStored(): Stored {
     if (raw) {
       const d = JSON.parse(raw) as Partial<Stored>;
       if (typeof d.sid === "string" && /^web_[a-z0-9]{10,32}$/.test(d.sid)) {
-        const identificato = d.identificato === true;
-        // Senza i messaggi esatti da rimandare il gate sarebbe una porta murata: si autoripara chiudendosi.
-        const gate = d.gate === true && !identificato && Array.isArray(d.gateMessages);
+        const vecchio = d as Partial<Stored> & { identificato?: unknown; gate?: unknown };
+        const msgs = Array.isArray(d.msgs) ? (d.msgs as Msg[]) : [];
+        // Una conversazione salvata dal widget di prima: `identificato` era il
+        // modulo già passato (vale come lettera consegnata), `gate` il punto in
+        // cui ora si apre la lettera.
+        const consegnato = d.consegnato === true || vecchio.identificato === true;
         return {
           sid: d.sid,
-          msgs: Array.isArray(d.msgs) ? (d.msgs as Msg[]) : [],
+          msgs,
           blocked: d.blocked === true,
-          gate,
-          identificato,
-          gateMessages: gate ? (d.gateMessages as Msg[]) : null,
+          passaggio: d.passaggio === true || vecchio.gate === true || consegnato || risposteDate(msgs) >= RISPOSTE_LIBERE,
+          consegnato,
         };
       }
     }
   } catch {
     /* storage bloccato: chat effimera */
   }
-  return {
-    sid: freshSid(),
-    msgs: [],
-    blocked: false,
-    gate: false,
-    identificato: false,
-    gateMessages: null,
-  };
+  return { sid: freshSid(), msgs: [], blocked: false, passaggio: false, consegnato: false };
+}
+
+/** Le risposte vere del concierge già date (non i testi di servizio). */
+function risposteDate(msgs: Msg[]): number {
+  return msgs.filter((m) => m.role === "assistant" && !m.servizio).length;
 }
 
 function saveStored(s: Stored): void {
@@ -139,31 +161,36 @@ export default function BuyerConcierge({
   context?: { slug: string; title: string; city?: string };
 } = {}) {
   const t = useTranslations("concierge");
+  const tl = useTranslations("conciergeLettera");
   const locale = useLocale();
   const [open, setOpen] = useState(false);
   const [sid, setSid] = useState("");
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [blocked, setBlocked] = useState(false);
-  const [gate, setGate] = useState(false);
-  const [identificato, setIdentificato] = useState(false);
-  const [gateMessages, setGateMessages] = useState<Msg[] | null>(null);
+  const [passaggio, setPassaggio] = useState(false);
+  const [consegnato, setConsegnato] = useState(false);
+  /** La lettera aperta a mano, prima che le risposte finiscano (non si salva). */
+  const [aMano, setAMano] = useState(false);
   const [bar, setBar] = useState("");
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
   const [error, setError] = useState(false);
-  const [gateName, setGateName] = useState("");
-  const [gateEmail, setGateEmail] = useState("");
-  const [gatePhone, setGatePhone] = useState("");
-  const [gateConsent, setGateConsent] = useState(false);
-  const [gateSending, setGateSending] = useState(false);
-  const [gateFailed, setGateFailed] = useState(false);
-  const [gateErrors, setGateErrors] = useState<GateErrors>({
-    name: false,
-    contact: false,
-    consent: false,
-  });
+  // La lettera. I dati personali NON vanno nel sessionStorage: stanno qui e basta.
+  const [nota, setNota] = useState("");
+  const [intento, setIntento] = useState<"" | "buyer" | "valutazione">("");
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [consenso, setConsenso] = useState(false);
+  const [letteraInvio, setLetteraInvio] = useState(false);
+  const [letteraErrore, setLetteraErrore] = useState(false);
+  const [errori, setErrori] = useState<LetteraErrors>({ name: false, contact: false, consent: false });
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const letteraRef = useRef<HTMLFormElement>(null);
+
+  const letteraAperta = !blocked && !consegnato && (passaggio || aMano);
+  const fermo = blocked || passaggio || consegnato || aMano;
 
   // Idratazione solo al mount (sessionStorage non esiste sul server).
   useEffect(() => {
@@ -172,18 +199,19 @@ export default function BuyerConcierge({
     setSid(s.sid);
     setMsgs(s.msgs);
     setBlocked(s.blocked);
-    setGate(s.gate);
-    setIdentificato(s.identificato);
-    setGateMessages(s.gateMessages);
+    setPassaggio(s.passaggio);
+    setConsegnato(s.consegnato);
   }, []);
 
   useEffect(() => {
     if (open && scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [open, msgs, typing, gate]);
+  }, [open, msgs, typing, letteraAperta]);
 
   useEffect(() => {
-    if (open && !blocked && !gate) inputRef.current?.focus();
-  }, [open, blocked, gate]);
+    if (!open) return;
+    if (letteraAperta) letteraRef.current?.focus({ preventScroll: true });
+    else if (!fermo) inputRef.current?.focus();
+  }, [open, fermo, letteraAperta]);
 
   useEffect(() => {
     if (!open) return;
@@ -196,11 +224,11 @@ export default function BuyerConcierge({
 
   const send = async (text: string) => {
     const q = text.trim();
-    if (!q || typing || blocked || gate || !sid) return;
+    if (!q || typing || fermo || !sid) return;
     setError(false);
     const history: Msg[] = [...msgs, { role: "user", content: q }];
     setMsgs(history);
-    saveStored({ sid, msgs: history, blocked, gate, identificato, gateMessages });
+    saveStored({ sid, msgs: history, blocked, passaggio, consegnato });
     setTyping(true);
     try {
       const res = await fetch("/api/concierge/chat", {
@@ -208,7 +236,8 @@ export default function BuyerConcierge({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           sid,
-          messages: history,
+          // I testi di servizio (il grazie della lettera) non sono turni del bot.
+          messages: history.filter((m) => !m.servizio).map(({ role, content, sig }) => ({ role, content, sig })),
           locale,
           origin: window.location.pathname,
           ...(context ? { slug: context.slug } : {}),
@@ -220,30 +249,21 @@ export default function BuyerConcierge({
         blocked?: boolean;
         sig?: string;
         gate?: boolean;
-        identificato?: boolean;
       };
       if (!res.ok || !d.ok) {
         setError(true);
         return;
       }
-      const next: Msg[] = d.text ? [...history, { role: "assistant", content: d.text, sig: d.sig }] : history;
+      // `gate`: il bridge non risponde più (le risposte libere sono finite, o il
+      // conto qui era indietro). Il suo testo chiedeva i dati per continuare:
+      // non si mostra, si apre la lettera.
+      const next: Msg[] = d.gate || !d.text ? history : [...history, { role: "assistant", content: d.text, sig: d.sig }];
       const isBlocked = d.blocked === true;
-      const isIdentificato = identificato || d.identificato === true;
-      const isGate = d.gate === true && !isIdentificato;
-      const nextGateMessages = isGate ? history : null;
+      const isPassaggio = d.gate === true || risposteDate(next) >= RISPOSTE_LIBERE;
       setMsgs(next);
       setBlocked(isBlocked);
-      setGate(isGate);
-      setIdentificato(isIdentificato);
-      setGateMessages(nextGateMessages);
-      saveStored({
-        sid,
-        msgs: next,
-        blocked: isBlocked,
-        gate: isGate,
-        identificato: isIdentificato,
-        gateMessages: nextGateMessages,
-      });
+      setPassaggio(isPassaggio);
+      saveStored({ sid, msgs: next, blocked: isBlocked, passaggio: isPassaggio, consegnato });
     } catch {
       setError(true);
     } finally {
@@ -253,81 +273,82 @@ export default function BuyerConcierge({
 
   // Altri pezzi della pagina (es. il percorso "Your route") possono aprire il
   // Concierge senza conoscerlo: window event, con eventuale domanda di apertura.
+  // Se il concierge non risponde più, la domanda diventa l'inizio della lettera.
   useEffect(() => {
     const onOpen = (e: Event) => {
       const q = (e as CustomEvent<string>).detail;
       setOpen(true);
-      if (typeof q === "string" && q.trim()) void send(q);
+      if (typeof q !== "string" || !q.trim()) return;
+      if (fermo && !blocked && !consegnato) {
+        setNota((n) => (n.includes(q.trim()) ? n : n.trim() ? `${n.trim()}\n${q.trim()}` : q.trim()));
+        return;
+      }
+      void send(q);
     };
     window.addEventListener("tsv:concierge", onOpen);
     return () => window.removeEventListener("tsv:concierge", onOpen);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sid, msgs, blocked, typing, gate, identificato, gateMessages]);
+  }, [sid, msgs, blocked, typing, passaggio, consegnato, aMano]);
 
-  const submitGate = async () => {
-    const nome = gateName.trim();
-    const email = gateEmail.trim();
-    const telefono = gatePhone.trim();
-    const nextErrors: GateErrors = {
-      name: nome.length < 2,
-      contact: !email && !telefono,
-      consent: !gateConsent,
+  const domandeFatte = msgs.filter((m) => m.role === "user").map((m) => m.content);
+
+  const inviaLettera = async () => {
+    const n = nome.trim();
+    const em = email.trim();
+    const tel = telefono.trim();
+    const nextErrori: LetteraErrors = {
+      name: n.replace(/[^\p{L}]/gu, "").length < 2,
+      contact: !(RE_EMAIL.test(em) || tel.replace(/\D/g, "").length >= 6),
+      consent: !consenso,
     };
-    setGateErrors(nextErrors);
-    if (nextErrors.name || nextErrors.contact || nextErrors.consent) return;
-    if (!gateMessages || gateSending || !sid) {
-      setGateFailed(true);
-      return;
-    }
-
-    setGateFailed(false);
-    setGateSending(true);
+    setErrori(nextErrori);
+    if (nextErrori.name || nextErrori.contact || nextErrori.consent || letteraInvio || !sid) return;
+    setLetteraErrore(false);
+    setLetteraInvio(true);
     try {
-      const res = await fetch("/api/concierge/chat", {
+      const res = await fetch("/api/concierge/lettera", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           sid,
-          messages: gateMessages,
           locale,
           origin: window.location.pathname,
-          ...(context ? { slug: context.slug } : {}),
-          identita: { nome, email, telefono, consenso: true },
+          domande: domandeFatte,
+          nota: nota.trim(),
+          ...(intento ? { intento } : {}),
+          identita: { nome: n, email: RE_EMAIL.test(em) ? em : "", telefono: tel, consenso: true },
         }),
       });
-      const d = (await res.json().catch(() => ({}))) as {
-        ok?: boolean;
-        text?: string;
-        blocked?: boolean;
-        sig?: string;
-        gate?: boolean;
-        identificato?: boolean;
-      };
-      if (!res.ok || !d.ok || d.gate === true || d.identificato !== true || !d.text) {
-        setGateFailed(true);
+      const d = (await res.json().catch(() => ({}))) as { ok?: boolean };
+      if (!res.ok || d.ok !== true) {
+        setLetteraErrore(true);
         return;
       }
-
-      const next: Msg[] = [...msgs, { role: "assistant", content: d.text, sig: d.sig }];
-      const isBlocked = d.blocked === true;
+      const next: Msg[] = [...msgs, { role: "assistant", content: tl("grazie", { nome: n.split(/\s+/)[0] }), servizio: true }];
       setMsgs(next);
-      setBlocked(isBlocked);
-      setGate(false);
-      setIdentificato(true);
-      setGateMessages(null);
-      saveStored({
-        sid,
-        msgs: next,
-        blocked: isBlocked,
-        gate: false,
-        identificato: true,
-        gateMessages: null,
-      });
+      setConsegnato(true);
+      setPassaggio(true);
+      setAMano(false);
+      saveStored({ sid, msgs: next, blocked, passaggio: true, consegnato: true });
     } catch {
-      setGateFailed(true);
+      setLetteraErrore(true);
     } finally {
-      setGateSending(false);
+      setLetteraInvio(false);
     }
+  };
+
+  const ricomincia = () => {
+    const s = { sid: freshSid(), msgs: [] as Msg[], blocked: false, passaggio: false, consegnato: false };
+    setSid(s.sid);
+    setMsgs([]);
+    setBlocked(false);
+    setPassaggio(false);
+    setConsegnato(false);
+    setAMano(false);
+    setNota("");
+    setError(false);
+    setLetteraErrore(false);
+    saveStored(s);
   };
 
   const openWith = (q?: string) => {
@@ -352,8 +373,20 @@ export default function BuyerConcierge({
   const esempi = (t.raw(context ? "listingExamples" : "barExamples") as string[]) ?? [];
   const placeholderVivo = usePlaceholderVivo(esempi, !bar && !open, esempi[0] ?? barPlaceholder);
   const emptyLine = context ? t("listingEmpty", { title: context.title }) : t("empty");
-  const gateField =
+  const campo =
     "w-full rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-white/35 outline-none transition-colors focus:border-sand/60";
+
+  // I segni delle domande e la loro frase.
+  const date = risposteDate(msgs);
+  const conto = passaggio || consegnato
+    ? tl("contoFinito")
+    : date === 0 ? tl("conto", { n: RISPOSTE_LIBERE }) : tl("contoRestano", { n: Math.max(RISPOSTE_LIBERE - date, 0) });
+
+  // WhatsApp ed email già scritti con le domande, per chi non vuole lasciare dati in un modulo.
+  const elenco = domandeFatte.slice(-6).map((d) => `- ${d.replace(/\s+/g, " ").slice(0, 200)}`).join("\n");
+  const testoContatto = domandeFatte.length ? `${tl("testoContatto")}\n${tl("domandeContatto")}\n${elenco}` : tl("testoContatto");
+  const waHref = `https://wa.me/393318940822?text=${encodeURIComponent(testoContatto.slice(0, 1200))}`;
+  const mailHref = `mailto:info@triesteimmobiliare.com?subject=${encodeURIComponent(tl("oggettoEmail"))}&body=${encodeURIComponent(testoContatto.slice(0, 1500))}`;
 
   return (
     <>
@@ -420,21 +453,21 @@ export default function BuyerConcierge({
                   type="button"
                   onClick={() => setOpen(false)}
                   aria-label={t("close")}
-                  className="btn-press flex h-8 w-8 items-center justify-center rounded-full text-white/50 transition-colors hover:text-white"
+                  className="btn-press flex h-8 w-8 items-center justify-center rounded-full text-white/55 transition-colors hover:text-white"
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" className="h-4 w-4" aria-hidden="true">
                     <path d="M18 6 6 18M6 6l12 12" />
                   </svg>
                 </button>
               </div>
-              <p className="mt-2 text-[11px] leading-relaxed text-white/45">{t("disclaimer")}</p>
+              <p className="mt-2 text-[11px] leading-relaxed text-white/55">{t("disclaimer")}</p>
             </div>
 
             {/* Storia */}
-            <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-5 py-4">
-              {msgs.length === 0 && !typing && (
+            <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-5 py-4" aria-live="polite">
+              {msgs.length === 0 && !typing && !letteraAperta && (
                 <div className="mt-4">
-                  <p className="text-center text-sm text-white/45">{emptyLine}</p>
+                  <p className="text-center text-sm text-white/55">{emptyLine}</p>
                   <div className="mt-5 flex flex-col items-stretch gap-2">
                     {starters.map((s) => (
                       <button
@@ -456,7 +489,7 @@ export default function BuyerConcierge({
                       m.role === "user"
                         ? "rounded-br-md bg-sand text-ink"
                         : "rounded-bl-md border border-white/10 bg-white/[0.05] text-white/85"
-                    }`}
+                    } ${m.role === "assistant" && i === msgs.length - 1 ? "concierge-svela" : ""}`}
                   >
                     {/* Solo i turni del BOT passano dal renderer: il testo dell'ospite
                         si mostra com'è, senza interpretarne i simboli. */}
@@ -483,167 +516,239 @@ export default function BuyerConcierge({
                   {t("closed")}
                 </p>
               )}
-              {gate && (
+
+              {/* L'invito dopo la penultima risposta: una volta, sotto la risposta. */}
+              {!fermo && !typing && risposteDate(msgs) === RISPOSTE_LIBERE - 1 && msgs[msgs.length - 1]?.role === "assistant" && (
+                <div className="rounded-xl border border-dashed border-sand/35 px-4 py-3 text-xs leading-relaxed text-white/55">
+                  <p>{tl("invito")}</p>
+                  <button
+                    type="button"
+                    onClick={() => setAMano(true)}
+                    className="btn-press mt-2 rounded-full border border-sand/60 px-3.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-sand/10"
+                  >
+                    {tl("scrivi")}
+                  </button>
+                </div>
+              )}
+
+              {/* LA LETTERA AL TEAM — carta chiara nella notte del pannello. */}
+              {letteraAperta && (
                 <form
+                  ref={letteraRef}
+                  tabIndex={-1}
+                  aria-labelledby="concierge-lettera-titolo"
                   onSubmit={(e) => {
                     e.preventDefault();
-                    void submitGate();
+                    void inviaLettera();
                   }}
                   noValidate
-                  className="rounded-xl border border-white/15 bg-white/[0.04] p-3.5"
+                  className="concierge-lettera rounded-2xl border border-sand/35 bg-gradient-to-b from-sand/[0.09] to-white/[0.03] p-4 outline-none"
                 >
-                  <p className="text-sm font-semibold text-white">{t("gateTitle")}</p>
-                  <p className="mt-1 text-xs leading-relaxed text-white/55">{t("gateIntro")}</p>
+                  <p className="eyebrow !text-[11px] !text-sand">✉ {tl("occhiello")}</p>
+                  <p id="concierge-lettera-titolo" className="mt-1.5 font-display text-lg leading-snug text-white">{tl("titolo")}</p>
+                  <p className="mt-1.5 text-xs leading-relaxed text-white/55">{domandeFatte.length ? tl("intro") : tl("introSubito")}</p>
+
+                  {domandeFatte.length > 0 && (
+                    <div className="mt-3 rounded-r-lg border-l-2 border-sand bg-black/15 px-3 py-2">
+                      <p className="text-[10.5px] font-semibold uppercase tracking-[0.12em] text-sand">{tl("domande")}</p>
+                      <ol className="mt-1 list-decimal space-y-0.5 pl-4 text-xs leading-relaxed text-white/85">
+                        {domandeFatte.slice(-6).map((d, i) => <li key={i}>{d}</li>)}
+                      </ol>
+                    </div>
+                  )}
+
+                  <label className="mt-3 block">
+                    <span className="mb-1 block text-[11px] font-medium text-white/55">{tl("nota")}</span>
+                    <textarea
+                      value={nota}
+                      onChange={(e) => setNota(e.target.value)}
+                      rows={3}
+                      maxLength={1500}
+                      placeholder={context ? tl("notaSegnapostoScheda") : tl("notaSegnaposto")}
+                      className={`${campo} resize-y`}
+                    />
+                  </label>
+
+                  <fieldset className="mt-2.5 flex flex-wrap items-center gap-2">
+                    <legend className="float-left mr-1 text-[11px] font-medium text-white/55">{tl("intento")}</legend>
+                    {(["buyer", "valutazione"] as const).map((v) => (
+                      <label key={v} className="cursor-pointer">
+                        <input type="radio" name="concierge-intento" value={v} checked={intento === v} onChange={() => setIntento(v)} className="peer sr-only" />
+                        <span className="inline-flex min-h-8 items-center rounded-full border border-white/15 px-3 text-xs text-white/85 transition-colors peer-checked:border-sand peer-checked:bg-sand/15 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-sand">
+                          {v === "buyer" ? tl("intentoCompro") : tl("intentoHo")}
+                        </span>
+                      </label>
+                    ))}
+                  </fieldset>
 
                   <div className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                     <label className="sm:col-span-2">
-                      <span className="mb-1 block text-[11px] font-medium text-white/65">{t("gateName")}</span>
+                      <span className="mb-1 block text-[11px] font-medium text-white/55">{tl("nome")}</span>
                       <input
-                        value={gateName}
+                        value={nome}
                         onChange={(e) => {
-                          setGateName(e.target.value);
-                          setGateErrors((current) => ({ ...current, name: false }));
+                          setNome(e.target.value);
+                          setErrori((c) => ({ ...c, name: false }));
                         }}
                         autoComplete="name"
-                        required
-                        minLength={2}
-                        maxLength={120}
-                        aria-invalid={gateErrors.name}
-                        className={gateField}
+                        maxLength={80}
+                        aria-invalid={errori.name}
+                        className={campo}
                       />
-                      {gateErrors.name && (
-                        <span className="mt-1 block text-[11px] text-red-300">{t("gateErrName")}</span>
-                      )}
+                      {errori.name && <span className="mt-1 block text-[11px] text-red-300">{tl("errNome")}</span>}
                     </label>
-
                     <label>
-                      <span className="mb-1 block text-[11px] font-medium text-white/65">{t("gateEmail")}</span>
+                      <span className="mb-1 block text-[11px] font-medium text-white/55">{tl("email")}</span>
                       <input
                         type="email"
-                        value={gateEmail}
+                        value={email}
                         onChange={(e) => {
-                          setGateEmail(e.target.value);
-                          setGateErrors((current) => ({ ...current, contact: false }));
+                          setEmail(e.target.value);
+                          setErrori((c) => ({ ...c, contact: false }));
                         }}
                         autoComplete="email"
-                        maxLength={320}
-                        aria-invalid={gateErrors.contact}
-                        className={gateField}
+                        inputMode="email"
+                        maxLength={160}
+                        aria-invalid={errori.contact}
+                        className={campo}
                       />
                     </label>
-
                     <label>
-                      <span className="mb-1 block text-[11px] font-medium text-white/65">{t("gatePhone")}</span>
+                      <span className="mb-1 block text-[11px] font-medium text-white/55">{tl("telefono")}</span>
                       <input
                         type="tel"
-                        value={gatePhone}
+                        value={telefono}
                         onChange={(e) => {
-                          setGatePhone(e.target.value);
-                          setGateErrors((current) => ({ ...current, contact: false }));
+                          setTelefono(e.target.value);
+                          setErrori((c) => ({ ...c, contact: false }));
                         }}
                         autoComplete="tel"
-                        maxLength={50}
-                        aria-invalid={gateErrors.contact}
-                        className={gateField}
+                        inputMode="tel"
+                        maxLength={40}
+                        aria-invalid={errori.contact}
+                        className={campo}
                       />
                     </label>
                   </div>
-                  <p className={`mt-1.5 text-[11px] ${gateErrors.contact ? "text-red-300" : "text-white/40"}`}>
-                    {gateErrors.contact ? t("gateErrContact") : t("gateEitherHint")}
+                  <p className={`mt-1.5 text-[11px] ${errori.contact ? "text-red-300" : "text-white/55"}`}>
+                    {errori.contact ? tl("errRecapito") : tl("unoDeiDue")}
                   </p>
 
-                  <label className="mt-3 flex items-start gap-2 text-xs leading-relaxed text-white/60">
+                  <label className="mt-3 flex items-start gap-2 text-xs leading-relaxed text-white/55">
                     <input
                       type="checkbox"
-                      checked={gateConsent}
+                      checked={consenso}
                       onChange={(e) => {
-                        setGateConsent(e.target.checked);
-                        setGateErrors((current) => ({ ...current, consent: false }));
+                        setConsenso(e.target.checked);
+                        setErrori((c) => ({ ...c, consent: false }));
                       }}
-                      required
-                      aria-invalid={gateErrors.consent}
+                      aria-invalid={errori.consent}
                       className="mt-0.5 h-4 w-4 shrink-0 accent-[#cfb795]"
                     />
                     <span>
-                      {t("gateConsentPre")}{" "}
+                      {tl("consensoPre")}
                       <Link href="/privacy" className="font-medium text-sand underline underline-offset-2 hover:text-white">
-                        {t("gateConsentLink")}
+                        {tl("consensoLink")}
                       </Link>
+                      {tl("consensoDopo")}
                     </span>
                   </label>
-                  {gateErrors.consent && (
-                    <p className="mt-1 text-[11px] text-red-300">{t("gateErrConsent")}</p>
-                  )}
-                  <p className="mt-2 text-[11px] leading-relaxed text-white/40">{t("gatePrivacyNote")}</p>
+                  {errori.consent && <p className="mt-1 text-[11px] text-red-300">{tl("errConsenso")}</p>}
+                  <p className="mt-2 text-[11px] leading-relaxed text-white/55">{tl("riservatezza")}</p>
 
-                  {gateFailed && (
-                    <p role="alert" className="mt-2 text-xs text-red-300">
-                      {t("gateError")}
-                    </p>
+                  {letteraErrore && (
+                    <p role="alert" className="mt-2 text-xs text-red-300">{tl("errore")}</p>
                   )}
-                  <button
-                    type="submit"
-                    disabled={gateSending}
-                    className="btn-press mt-3 w-full rounded-xl bg-sand px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-[#e0cba8] disabled:opacity-50"
-                  >
-                    {gateSending ? t("gateSending") : t("gateSubmit")}
-                  </button>
-                  <p className="mt-2 text-center text-[11px] text-white/45">
-                    {t("gateAccountPre")}{" "}
-                    <Link href="/account" className="font-medium text-sand hover:text-white">
-                      {t("gateAccountLink")}
-                    </Link>
-                  </p>
+                  <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+                    <button
+                      type="submit"
+                      disabled={letteraInvio}
+                      className="btn-press rounded-xl bg-sand px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-[#e0cba8] disabled:opacity-50"
+                    >
+                      {letteraInvio ? tl("inCorso") : tl("invia")}
+                    </button>
+                    {!passaggio && (
+                      <button type="button" onClick={() => setAMano(false)} className="text-xs font-medium text-white/55 underline underline-offset-2 hover:text-white">
+                        {tl("chiudi")}
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-white/10 pt-3 text-[11px] text-white/55">
+                    <span>{tl("oppure")}</span>
+                    <a href={waHref} target="_blank" rel="noopener noreferrer" className="font-medium text-sand/90 transition-colors hover:text-sand">
+                      WhatsApp
+                    </a>
+                    <a href={mailHref} className="font-medium text-sand/90 transition-colors hover:text-sand">
+                      Email
+                    </a>
+                  </div>
                 </form>
+              )}
+
+              {consegnato && (
+                <div className="flex items-center gap-2 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-sand">
+                  <SparkIcon className="h-3.5 w-3.5" />
+                  <span>{tl("consegnata")}</span>
+                  <button type="button" onClick={ricomincia} className="ml-auto normal-case tracking-normal font-medium text-white/55 underline underline-offset-2 hover:text-white">
+                    {tl("nuova")}
+                  </button>
+                </div>
               )}
             </div>
 
-            {/* Handoff umano: sempre a un tap, mai nascosto dietro la chat. */}
-            <div className="flex items-center justify-center gap-4 border-t border-white/10 px-5 py-2 text-[11px] text-white/40">
-              <span>{t("humanLine")}</span>
-              <a
-                href="https://wa.me/393318940822"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium text-sand/90 transition-colors hover:text-sand"
-              >
-                WhatsApp
-              </a>
-              <a href="mailto:info@triesteimmobiliare.com" className="font-medium text-sand/90 transition-colors hover:text-sand">
-                Email
-              </a>
+            {/* I segni delle domande che restano al concierge, e la persona sempre a un tap. */}
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-white/10 px-5 py-2 text-[11px] text-white/55">
+              <span className="inline-flex gap-1.5" aria-hidden="true">
+                {Array.from({ length: RISPOSTE_LIBERE }, (_, i) => (
+                  <i key={i} className={`h-1.5 w-1.5 rotate-45 border border-sand ${i < Math.min(risposteDate(msgs), RISPOSTE_LIBERE) || passaggio || consegnato ? "bg-sand" : ""}`} />
+                ))}
+              </span>
+              <span>{conto}</span>
+              {!letteraAperta && !consegnato && !blocked ? (
+                <button type="button" onClick={() => setAMano(true)} className="ml-auto font-medium text-sand/90 underline underline-offset-2 transition-colors hover:text-sand">
+                  {tl("scrivi")}
+                </button>
+              ) : consegnato || blocked ? (
+                <span className="ml-auto flex gap-3">
+                  <a href={waHref} target="_blank" rel="noopener noreferrer" className="font-medium text-sand/90 transition-colors hover:text-sand">WhatsApp</a>
+                  <a href={mailHref} className="font-medium text-sand/90 transition-colors hover:text-sand">Email</a>
+                </span>
+              ) : null}
             </div>
 
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const v = input;
-                setInput("");
-                void send(v);
-              }}
-              className="flex items-center gap-2 border-t border-white/10 px-4 py-3"
-            >
-              <input
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                disabled={blocked || gate}
-                maxLength={2000}
-                placeholder={gate ? t("gatePlaceholder") : blocked ? t("closed") : t("placeholder")}
-                className="w-full rounded-xl border border-white/15 bg-white/[0.04] px-4 py-2.5 text-sm text-white placeholder:text-white/35 outline-none transition-colors focus:border-sand/60 disabled:opacity-50"
-              />
-              <button
-                type="submit"
-                disabled={blocked || gate || typing || !input.trim()}
-                aria-label={t("send")}
-                className="btn-press flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sand text-ink transition-colors hover:bg-[#e0cba8] disabled:opacity-40"
+            {(!fermo || blocked) && (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const v = input;
+                  setInput("");
+                  void send(v);
+                }}
+                className="flex items-center gap-2 border-t border-white/10 px-4 py-3"
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
-                  <path d="m22 2-7 20-4-9-9-4Z" />
-                  <path d="M22 2 11 13" />
-                </svg>
-              </button>
-            </form>
+                <input
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  disabled={blocked}
+                  maxLength={2000}
+                  placeholder={blocked ? t("closed") : t("placeholder")}
+                  className="w-full rounded-xl border border-white/15 bg-white/[0.04] px-4 py-2.5 text-sm text-white placeholder:text-white/35 outline-none transition-colors focus:border-sand/60 disabled:opacity-50"
+                />
+                <button
+                  type="submit"
+                  disabled={blocked || typing || !input.trim()}
+                  aria-label={t("send")}
+                  className="btn-press flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sand text-ink transition-colors hover:bg-[#e0cba8] disabled:opacity-40"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
+                    <path d="m22 2-7 20-4-9-9-4Z" />
+                    <path d="M22 2 11 13" />
+                  </svg>
+                </button>
+              </form>
+            )}
           </div>
         </div>
       )}
