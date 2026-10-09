@@ -1028,6 +1028,28 @@
       "vista_mare": "Sea view"
     }
   },
+  "accountVerifica": {
+    "bannerTitle": "Confirm your email",
+    "bannerBody": "To link your account to your file with us, and see your scheduled viewings here, confirm that {email} is yours using the link we send you by email. Can't find it? Ask for a new one below.",
+    "bannerResend": "Send me the link",
+    "bannerSent": "Done: check your inbox, and your spam folder too.",
+    "bannerNoMail": "Automatic emails are not available right now: please write to info@triesteimmobiliare.com.",
+    "bannerRate": "We sent you a link a few minutes ago: check your inbox or try again later.",
+    "title": "Email confirmation",
+    "checking": "One moment, we are checking the link…",
+    "done": "Email confirmed. Taking you to your account…",
+    "already": "This email is already confirmed.",
+    "goAccount": "Go to your account",
+    "needPassword": "To confirm your email, enter the password you chose when you signed up.",
+    "phPassword": "Password",
+    "cta": "Confirm email",
+    "badPassword": "Incorrect password.",
+    "badToken": "This link is not valid or has expired. Sign in to your account and request a new one.",
+    "noToken": "Invalid link: open the link you received by email.",
+    "forgot": "Forgot your password? Reset it with “Forgot your password?” on the sign-in page: that confirms your email too.",
+    "errRate": "Too many attempts: try again in a few minutes.",
+    "errGeneric": "Something went wrong. Please try again."
+  },
   "concierge": {
     "title": "Concierge AI",
     "barPlaceholder": "Ask anything about buying in Italy…",

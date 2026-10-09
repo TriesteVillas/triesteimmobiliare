@@ -1,5 +1,6 @@
 import "server-only";
 import { ACCT_SITE_URL } from "./brand";
+import { signVerifyToken } from "./session";
 import { brandMailShell, mailCta, mailText, type MailLang } from "@/lib/brandMail";
 
 // Email transazionali dell'area clienti, via Resend, fail-closed: se
@@ -80,4 +81,72 @@ export function resetEmail(lang: Lang, nome: string, token: string): { subject: 
       lang,
     ),
   };
+}
+
+// ---- Verifica dell'email (09/10/2026) ------------------------------------------
+// Il link conferma solo insieme alla credenziale dell'account (sessione in quel
+// browser, o la password): la mail lo dice, perché chi la apre da un altro
+// dispositivo se la vedrà chiedere. E dice a chi NON si è registrato che può
+// ignorarla senza conseguenze — è vero: senza conferma l'account non è legato
+// al suo lead (lib/account/verifica.ts). EN/DE/SL come il gemello triestevillas-web.
+
+const VERIFY_COPY: Record<
+  Lang,
+  { subject: string; hi: (n: string) => string; body: string; cta: string; why: string; ignore: string }
+> = {
+  it: {
+    subject: "Conferma la tua email",
+    hi: (n) => `Ciao${n ? ` ${esc(n)}` : ""},`,
+    body: "per completare il tuo account conferma che questo indirizzo è tuo. Il link vale 48 ore; se lo apri da un altro dispositivo ti chiederemo la password scelta alla registrazione.",
+    cta: "Confermo la mia email",
+    why: "Dopo la conferma troverai nel tuo account anche le visite in programma con noi.",
+    ignore: "Se la registrazione non l'hai fatta tu, ignora questa email: senza conferma l'account non viene collegato ai tuoi dati.",
+  },
+  en: {
+    subject: "Confirm your email",
+    hi: (n) => `Hello${n ? ` ${esc(n)}` : ""},`,
+    body: "to complete your account, please confirm that this address is yours. The link is valid for 48 hours; if you open it on another device, we will ask for the password you chose when you signed up.",
+    cta: "Confirm my email",
+    why: "Once confirmed, your account will also show the viewings you have scheduled with us.",
+    ignore: "If you did not sign up, just ignore this email: without confirmation the account is not linked to your details.",
+  },
+  de: {
+    subject: "Bestätigen Sie Ihre E-Mail-Adresse",
+    hi: (n) => `Guten Tag${n ? ` ${esc(n)}` : ""},`,
+    body: "um Ihr Konto abzuschließen, bestätigen Sie bitte, dass diese Adresse Ihnen gehört. Der Link ist 48 Stunden gültig; wenn Sie ihn auf einem anderen Gerät öffnen, fragen wir nach dem Passwort, das Sie bei der Registrierung gewählt haben.",
+    cta: "E-Mail-Adresse bestätigen",
+    why: "Nach der Bestätigung sehen Sie in Ihrem Konto auch die mit uns vereinbarten Besichtigungen.",
+    ignore: "Falls Sie sich nicht registriert haben, ignorieren Sie diese E-Mail: Ohne Bestätigung wird das Konto nicht mit Ihren Daten verknüpft.",
+  },
+  sl: {
+    subject: "Potrdite svoj e-poštni naslov",
+    hi: (n) => `Pozdravljeni${n ? ` ${esc(n)}` : ""},`,
+    body: "za dokončanje registracije potrdite, da je ta naslov vaš. Povezava velja 48 ur; če jo odprete na drugi napravi, vas bomo prosili za geslo, ki ste ga izbrali ob registraciji.",
+    cta: "Potrdite e-poštni naslov",
+    why: "Po potrditvi boste v svojem računu videli tudi oglede, ki ste jih dogovorili z nami.",
+    ignore: "Če se niste registrirali vi, to sporočilo prezrite: brez potrditve račun ni povezan z vašimi podatki.",
+  },
+};
+
+export function verifyEmail(lang: Lang, nome: string, token: string): { subject: string; html: string } {
+  const c = VERIFY_COPY[lang] ?? VERIFY_COPY.it;
+  const url = `${ACCT_SITE_URL}${lang === "it" ? "" : `/${lang}`}/account/verifica?token=${encodeURIComponent(token)}`;
+  return {
+    subject: c.subject,
+    html: shell(
+      `<p>${c.hi(nome)}</p><p>${c.body}</p>
+       ${mailCta(url, c.cta)}
+       <p>${c.why}</p>
+       <p style="${mailText.small}">${c.ignore}</p>`,
+      lang,
+    ),
+  };
+}
+
+/** Firma un link nuovo e lo spedisce. false se il mailer non c'è o l'invio fallisce. */
+export async function sendVerifyMail(acc: { id: string; email: string; nome: string; lingua: string }): Promise<boolean> {
+  if (!acctMailConfigured()) return false;
+  const lang = (["it", "en", "de", "sl"].includes(acc.lingua) ? acc.lingua : "it") as Lang;
+  const m = verifyEmail(lang, acc.nome.split(" ")[0] ?? "", await signVerifyToken({ uid: acc.id, em: acc.email }));
+  return (await sendAcctMail(acc.email, m.subject, m.html)).sent;
 }

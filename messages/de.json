@@ -1028,6 +1028,28 @@
       "vista_mare": "Meerblick"
     }
   },
+  "accountVerifica": {
+    "bannerTitle": "Bestätigen Sie Ihre E-Mail-Adresse",
+    "bannerBody": "Um Ihr Konto mit Ihren Unterlagen bei uns zu verknüpfen und hier Ihre geplanten Besichtigungen zu sehen, bestätigen Sie mit dem Link, den wir Ihnen per E-Mail senden, dass {email} Ihnen gehört. Nicht gefunden? Fordern Sie unten einen neuen an.",
+    "bannerResend": "Link senden",
+    "bannerSent": "Erledigt: Bitte prüfen Sie Ihr Postfach, auch den Spam-Ordner.",
+    "bannerNoMail": "Der automatische Versand ist im Moment nicht verfügbar: Schreiben Sie an info@triesteimmobiliare.com.",
+    "bannerRate": "Wir haben Ihnen vor wenigen Minuten einen Link geschickt: Prüfen Sie Ihr Postfach oder versuchen Sie es später erneut.",
+    "title": "Bestätigung der E-Mail-Adresse",
+    "checking": "Einen Moment, wir prüfen den Link…",
+    "done": "E-Mail-Adresse bestätigt. Wir bringen Sie zu Ihrem Konto…",
+    "already": "Diese E-Mail-Adresse ist bereits bestätigt.",
+    "goAccount": "Zu Ihrem Konto",
+    "needPassword": "Geben Sie zur Bestätigung das Passwort ein, das Sie bei der Registrierung gewählt haben.",
+    "phPassword": "Passwort",
+    "cta": "E-Mail-Adresse bestätigen",
+    "badPassword": "Falsches Passwort.",
+    "badToken": "Der Link ist ungültig oder abgelaufen. Melden Sie sich in Ihrem Konto an und fordern Sie einen neuen Link an.",
+    "noToken": "Ungültiger Link: Öffnen Sie den per E-Mail erhaltenen Link.",
+    "forgot": "Passwort vergessen? Setzen Sie es über „Passwort vergessen?“ auf der Anmeldeseite zurück: Damit ist auch Ihre E-Mail-Adresse bestätigt.",
+    "errRate": "Zu viele Versuche: Bitte in einigen Minuten erneut versuchen.",
+    "errGeneric": "Etwas ist schiefgelaufen. Bitte erneut versuchen."
+  },
   "concierge": {
     "title": "Concierge AI",
     "barPlaceholder": "Fragen Sie alles zum Hauskauf in Italien…",

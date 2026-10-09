@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { currentAcctSession } from "@/lib/account/auth";
+import { currentWebAccount } from "@/lib/account/auth";
 import { signWebTurn, verifyWebTurn } from "@/lib/concierge/sig";
 
 export const runtime = "nodejs";
@@ -104,8 +104,11 @@ export async function POST(request: Request) {
     typeof body.slug === "string" && /^[a-z0-9][a-z0-9-]{1,118}$/.test(body.slug) ? body.slug : "";
 
   // Se l'utente è loggato all'area clienti, l'email viaggia col turno e il CRM
-  // aggancia account e scheda lead. Solo firma verificata, niente body.
-  const acct = await currentAcctSession();
+  // aggancia account e scheda lead. Solo sessione verificata, niente body — e
+  // dal 09/10/2026 solo se l'email dell'account è VERIFICATA: il bridge lega il
+  // turno al lead che ha quell'email, e chi si fosse registrato con l'email di
+  // un altro finirebbe con le sue domande sulla scheda di quel cliente.
+  const acct = await currentWebAccount();
 
   // IL PASSAGGIO (09/10/2026): dopo tre risposte il widget apre la LETTERA AL
   // TEAM, che va al CRM da /api/concierge/lettera (la porta unica dei moduli) e
@@ -127,7 +130,7 @@ export async function POST(request: Request) {
         locale,
         origin,
         ...(slug ? { slug } : {}),
-        email: acct?.em ?? "",
+        email: acct?.emailVerificata ? acct.email : "",
         brand: "TSI",
         ip,
         // ISO-2 dal geo di Vercel: dà la bandierina (e il paese certo) alla vista

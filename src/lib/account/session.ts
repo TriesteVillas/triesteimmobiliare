@@ -1,5 +1,6 @@
 import "server-only";
 import { ACCT_BRAND } from "./brand";
+import { firmaVerifica, improntaCredenziale, leggiVerifica, type DatiVerifica } from "./verifica";
 
 // Cookie di sessione firmato dell'area clienti. Stesso schema HMAC-SHA256 della
 // Private Collection e dell'Owner Portal (chiave PRIVATE_GATE_SECRET, Web Crypto
@@ -20,6 +21,10 @@ export type AcctSession = {
   nm: string; // nome (saluto)
   exp: number; // unix seconds
   b?: string; // claim di brand, come la PC: ridondante coi segreti diversi, regge all'errore umano
+  // Impronta della password al momento del login (verifica.ts): cambiata la
+  // password, la sessione non vale più. I cookie di prima del 09/10/2026 non
+  // ce l'hanno e cadono una volta (auth.ts): si rientra e basta.
+  pf?: string;
 };
 
 const SECRET = process.env.PRIVATE_GATE_SECRET ?? "";
@@ -59,8 +64,9 @@ export function acctGateConfigured(): boolean {
   return SECRET.length >= 16;
 }
 
-export async function signAcctSession(s: Omit<AcctSession, "k" | "b">): Promise<string> {
+export async function signAcctSession(s: Omit<AcctSession, "k" | "b" | "pf"> & { pf: string }): Promise<string> {
   // k e b si stampano QUI, non nei chiamanti: nessuna nuova via di login può dimenticarli.
+  // pf invece lo deve passare il chiamante (credFingerprint dell'hash corrente): è obbligatorio nel tipo.
   const full: AcctSession = { ...s, k: "acct", b: ACCT_BRAND.code };
   const body = b64urlEncode(new TextEncoder().encode(JSON.stringify(full)));
   const sig = b64urlEncode(await hmac(body));
@@ -137,4 +143,21 @@ export function randomToken(): string {
 export async function sha256Hex(s: string): Promise<string> {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+// ---- Verifica dell'email (09/10/2026) -----------------------------------------
+// La logica sta in verifica.ts (pura, testata); qui solo il legame col segreto
+// e col marchio di questo sito. Il token del link non si salva da nessuna parte:
+// è firmato, vale 48 ore, e da solo non verifica niente (esitoVerifica).
+
+export function credFingerprint(passwordHash: string): Promise<string> {
+  return improntaCredenziale(SECRET, passwordHash);
+}
+
+export function signVerifyToken(d: DatiVerifica): Promise<string> {
+  return firmaVerifica(SECRET, ACCT_BRAND.code, d, Math.floor(Date.now() / 1000));
+}
+
+export function readVerifyToken(token: string): Promise<DatiVerifica | null> {
+  return leggiVerifica(SECRET, ACCT_BRAND.code, token, Math.floor(Date.now() / 1000));
 }

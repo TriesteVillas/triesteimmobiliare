@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { cookies, headers } from "next/headers";
 import { ACCT_SESSION_DAYS } from "@/lib/account/brand";
-import { ACCT_COOKIE, acctGateConfigured, hashPassword, signAcctSession } from "@/lib/account/session";
+import { ACCT_COOKIE, acctGateConfigured, credFingerprint, hashPassword, signAcctSession } from "@/lib/account/session";
 import { createAccount, findAccountByEmail, logEvent, upsertPref } from "@/lib/account/store";
+import { sendVerifyMail } from "@/lib/account/mail";
 import { resolveSiteProp } from "@/lib/account/props";
 
 export const runtime = "nodejs";
@@ -10,6 +11,11 @@ export const runtime = "nodejs";
 // Registrazione self-service con email+password. I preferiti accumulati da
 // anonimo (localStorage) arrivano in `favs` e vengono migrati sul record.
 // Rate limit in-memory per IP, come /api/private/access.
+//
+// Dal 09/10/2026 l'account nasce NON verificato e senza lead: parte la mail
+// col link di verifica, e solo la conferma (/api/account/verify) lo lega alla
+// scheda lead e gli mostra le visite. Prima il legame era immediato, e bastava
+// scrivere l'email di un altro per vederne gli appuntamenti.
 const attempts = new Map<string, { n: number; t: number }>();
 const WINDOW_MS = 10 * 60 * 1000;
 const MAX_ATTEMPTS = 6;
@@ -65,6 +71,8 @@ export async function POST(request: Request) {
   if (!id) return NextResponse.json({ ok: false, error: "not_configured" }, { status: 503 });
 
   await logEvent({ evento: "signup", accountId: id, email, ip, ua, dettaglio: "email+password" });
+  const verificaInviata = await sendVerifyMail({ id, email, nome, lingua });
+  if (verificaInviata) await logEvent({ evento: "verify_email", accountId: id, email, ip, ua, dettaglio: "link inviato" });
 
   // Migrazione dei cuori anonimi: best-effort, un errore non blocca la registrazione.
   for (const slug of favs) {
@@ -85,7 +93,7 @@ export async function POST(request: Request) {
   }
 
   const exp = Math.floor(Date.now() / 1000) + ACCT_SESSION_DAYS * 86400;
-  const token = await signAcctSession({ uid: id, em: email, nm: nome.split(" ")[0], exp });
+  const token = await signAcctSession({ uid: id, em: email, nm: nome.split(" ")[0], exp, pf: await credFingerprint(hash) });
   const jar = await cookies();
   jar.set(ACCT_COOKIE, token, {
     httpOnly: true,
@@ -94,5 +102,5 @@ export async function POST(request: Request) {
     path: "/",
     maxAge: ACCT_SESSION_DAYS * 86400,
   });
-  return NextResponse.json({ ok: true, nome: nome.split(" ")[0], migrated: favs.length });
+  return NextResponse.json({ ok: true, nome: nome.split(" ")[0], migrated: favs.length, verifica: verificaInviata });
 }

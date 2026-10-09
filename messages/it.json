@@ -1028,6 +1028,28 @@
       "vista_mare": "Vista mare"
     }
   },
+  "accountVerifica": {
+    "bannerTitle": "Conferma la tua email",
+    "bannerBody": "Per collegare l'account alla tua scheda presso di noi, e vedere qui le visite in programma, conferma che {email} è tua con il link che ti mandiamo via email. Non lo trovi? Chiedine uno qui sotto.",
+    "bannerResend": "Mandami il link",
+    "bannerSent": "Fatto: controlla la posta, anche lo spam.",
+    "bannerNoMail": "L'invio automatico non è disponibile in questo momento: scrivici a info@triesteimmobiliare.com.",
+    "bannerRate": "Ti abbiamo già mandato un link pochi minuti fa: controlla la posta o riprova più tardi.",
+    "title": "Conferma dell'email",
+    "checking": "Un momento, stiamo controllando il link…",
+    "done": "Email confermata. Ti stiamo portando al tuo account…",
+    "already": "Questa email è già confermata.",
+    "goAccount": "Vai al tuo account",
+    "needPassword": "Per confermare l'email inserisci la password che hai scelto alla registrazione.",
+    "phPassword": "Password",
+    "cta": "Conferma l'email",
+    "badPassword": "Password non corretta.",
+    "badToken": "Link non valido o scaduto. Accedi al tuo account e chiedi un nuovo link.",
+    "noToken": "Link non valido: apri il link ricevuto via email.",
+    "forgot": "Non ricordi la password? Reimpostala da «Password dimenticata?» nella pagina di accesso: anche così l'email risulta confermata.",
+    "errRate": "Troppi tentativi: riprova tra qualche minuto.",
+    "errGeneric": "Qualcosa non ha funzionato. Riprova."
+  },
   "concierge": {
     "title": "Concierge AI",
     "barPlaceholder": "Chiedi qualsiasi cosa sul comprare in Italia…",

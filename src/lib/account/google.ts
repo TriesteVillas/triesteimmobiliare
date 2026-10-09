@@ -2,10 +2,11 @@ import "server-only";
 import { NextResponse } from "next/server";
 import { cookies, headers } from "next/headers";
 import { ACCT_BRAND, ACCT_SITE_URL, ACCT_SESSION_DAYS } from "./brand";
-import { ACCT_COOKIE, signAcctSession, randomToken } from "./session";
+import { ACCT_COOKIE, credFingerprint, signAcctSession, randomToken } from "./session";
 import {
   findAccountByGoogleSub,
   findAccountByEmail,
+  getAccount,
   linkGoogleSub,
   createAccount,
   registerLogin,
@@ -112,12 +113,18 @@ export async function handleAccountGoogleCallback(request: Request): Promise<Nex
 
   let acc = await findAccountByGoogleSub(sub);
   let created = false;
-  if (!acc) {
-    const byEmail = await findAccountByEmail(email);
-    if (byEmail) {
-      await linkGoogleSub(byEmail.id, sub);
-      acc = byEmail;
-    }
+  // Un account già esistente che Google trova non verificato — per email, o per
+  // sub se un collegamento si era interrotto a metà — passa da linkGoogleSub:
+  // via la password scelta da chi l'ha creato, poi lead e verifica. Si rilegge
+  // dopo, perché la sessione deve nascere con l'impronta della password NUOVA
+  // (vuota), o cadrebbe alla prima pagina.
+  const daCollegare = acc ? (acc.emailVerificata ? null : acc) : await findAccountByEmail(email);
+  if (daCollegare && daCollegare.stato !== "Attivo") {
+    acc = daCollegare; // sospeso o cancellato: niente legami, lo ferma il controllo qui sotto
+  } else if (daCollegare) {
+    await linkGoogleSub(daCollegare, sub);
+    acc = await getAccount(daCollegare.id);
+    if (!acc) return fail("error");
   }
   if (!acc) {
     // A differenza dell'Owner Portal (dati sensibili dei proprietari, approvazione
@@ -145,7 +152,13 @@ export async function handleAccountGoogleCallback(request: Request): Promise<Nex
   }
 
   const exp = Math.floor(Date.now() / 1000) + ACCT_SESSION_DAYS * 86400;
-  const token = await signAcctSession({ uid: acc.id, em: acc.email, nm: (acc.nome || name).split(" ")[0], exp });
+  const token = await signAcctSession({
+    uid: acc.id,
+    em: acc.email,
+    nm: (acc.nome || name).split(" ")[0],
+    exp,
+    pf: await credFingerprint(acc.hash),
+  });
   jar.set(ACCT_COOKIE, token, {
     httpOnly: true,
     secure: true,

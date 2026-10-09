@@ -19,6 +19,7 @@ import { buildPropertyView, priceLabel } from "@/lib/propertyView";
 import { intlLocale } from "@/lib/format";
 import PropertyCard from "@/components/PropertyCard";
 import AuthPanel from "@/components/account/AuthPanel";
+import VerificaEmail from "@/components/account/VerificaEmail";
 import PrefsForm from "@/components/account/PrefsForm";
 import FavExtras from "@/components/account/FavExtras";
 import CostPlanner, { type CostRow } from "@/components/account/CostPlanner";
@@ -106,7 +107,8 @@ export default async function AccountPage({
     listMatchesByEmail(acc.email),
     getProperties(),
     getPrivateProperties().catch(() => [] as Property[]),
-    listUpcomingVisits(acc.leadIds).catch(() => [] as UpcomingVisit[]),
+    // Vuoto finché l'email non è verificata: il controllo è in listUpcomingVisits.
+    listUpcomingVisits(acc).catch(() => [] as UpcomingVisit[]),
   ]);
   const bySlug = new Map<string, Property>();
   const byRecId = new Map<string, Property>();
@@ -188,6 +190,10 @@ export default async function AccountPage({
           {t("logout")}
         </a>
       </div>
+
+      {/* Email non ancora verificata: niente legame col lead né visite finché
+          il titolare della casella non conferma (lib/account/verifica.ts). */}
+      {!acc.emailVerificata && <VerificaEmail email={acc.email} />}
 
       {/* Concierge AI in testa, non in fondo: è la porta d'ingresso di tutta
           l'area. Widget dark-themed → card scura sul tema chiaro. */}

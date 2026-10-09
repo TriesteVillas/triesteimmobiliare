@@ -1028,6 +1028,28 @@
       "vista_mare": "Pogled na morje"
     }
   },
+  "accountVerifica": {
+    "bannerTitle": "Potrdite svoj e-poštni naslov",
+    "bannerBody": "Da račun povežete s svojimi podatki pri nas in tukaj vidite dogovorjene oglede, s povezavo, ki vam jo pošljemo po e-pošti, potrdite, da je {email} vaš. Je ne najdete? Spodaj zahtevajte novo.",
+    "bannerResend": "Pošljite mi povezavo",
+    "bannerSent": "Opravljeno: preverite pošto, tudi mapo z neželeno pošto.",
+    "bannerNoMail": "Samodejno pošiljanje trenutno ni na voljo: pišite nam na info@triesteimmobiliare.com.",
+    "bannerRate": "Povezavo smo vam poslali pred nekaj minutami: preverite pošto ali poskusite znova pozneje.",
+    "title": "Potrditev e-poštnega naslova",
+    "checking": "Trenutek, preverjamo povezavo …",
+    "done": "E-poštni naslov je potrjen. Preusmerjamo vas v vaš račun …",
+    "already": "Ta e-poštni naslov je že potrjen.",
+    "goAccount": "Na vaš račun",
+    "needPassword": "Za potrditev vnesite geslo, ki ste ga izbrali ob registraciji.",
+    "phPassword": "Geslo",
+    "cta": "Potrdite e-poštni naslov",
+    "badPassword": "Napačno geslo.",
+    "badToken": "Povezava ni veljavna ali je potekla. Prijavite se v svoj račun in zahtevajte novo povezavo.",
+    "noToken": "Neveljavna povezava: odprite povezavo, ki ste jo prejeli po e-pošti.",
+    "forgot": "Ste pozabili geslo? Ponastavite ga prek »Ste pozabili geslo?« na strani za prijavo: s tem je potrjen tudi vaš e-poštni naslov.",
+    "errRate": "Preveč poskusov: poskusite znova čez nekaj minut.",
+    "errGeneric": "Nekaj je šlo narobe. Poskusite znova."
+  },
   "concierge": {
     "title": "Concierge AI",
     "barPlaceholder": "Vprašajte kar koli o nakupu nepremičnine v Italiji …",

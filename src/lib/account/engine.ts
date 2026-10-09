@@ -375,7 +375,10 @@ export async function runEngine(): Promise<EngineResult> {
 
     // web_intel sulla scheda lead collegata: best-effort, un lead rotto non
     // ferma il giro. Campo macchina: si scrive sempre, senza confronto.
-    if (acc.leadIds.length) {
+    // Solo se l'email è verificata (09/10/2026): i lead_link degli account con
+    // password nati prima di quel giorno non provano niente, e l'attività di un
+    // estraneo non deve finire sulla scheda di un cliente.
+    if (acc.emailVerificata && acc.leadIds.length) {
       try {
         await patchLeadWebIntel(
           acc.leadIds[0],

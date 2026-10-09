@@ -80,6 +80,10 @@ export default function Analytics() {
   // `sl` compreso (08/10/2026): dal 01/10 c'è /sl/private, e la regola che
   // conosceva solo it/en/de lasciava partire GA4 col codice nella query.
   if (/^\/(it|en|de|sl)?\/?private(\/|$)/.test(pathname ?? "")) return null;
+  // Stessa ragione per le due pagine dell'area clienti che si aprono da un link
+  // con un token nella query (09/10/2026): il reset della password — quel token
+  // da solo cambia la password — e la verifica dell'email. Gemello su TSV.
+  if (/^\/(it|en|de|sl)?\/?account\/(reset|verifica)(\/|$)/.test(pathname ?? "")) return null;
   if (!GA_ID) return null;
   return (
     <>

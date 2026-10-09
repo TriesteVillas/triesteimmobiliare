@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies, headers } from "next/headers";
 import { ACCT_SESSION_DAYS } from "@/lib/account/brand";
-import { ACCT_COOKIE, acctGateConfigured, signAcctSession, verifyPassword } from "@/lib/account/session";
+import { ACCT_COOKIE, acctGateConfigured, credFingerprint, signAcctSession, verifyPassword } from "@/lib/account/session";
 import { findAccountByEmail, logEvent, registerLogin, upsertPref, listPrefsByEmail } from "@/lib/account/store";
 import { resolveSiteProp } from "@/lib/account/props";
 
@@ -52,7 +52,13 @@ export async function POST(request: Request) {
   }
 
   const exp = Math.floor(Date.now() / 1000) + ACCT_SESSION_DAYS * 86400;
-  const token = await signAcctSession({ uid: acc.id, em: acc.email, nm: acc.nome.split(" ")[0] || acc.email, exp });
+  const token = await signAcctSession({
+    uid: acc.id,
+    em: acc.email,
+    nm: acc.nome.split(" ")[0] || acc.email,
+    exp,
+    pf: await credFingerprint(acc.hash),
+  });
   const jar = await cookies();
   jar.set(ACCT_COOKIE, token, {
     httpOnly: true,

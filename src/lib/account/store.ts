@@ -181,27 +181,17 @@ export type NewAccountInput = {
 
 export async function createAccount(input: NewAccountInput): Promise<string | null> {
   const email = normEmail(input.email);
-  // Fase ombra v1↔v4: anche la registrazione account si POSA nel fondo
-  // `ingresso` — era una delle due porte rimaste fuori (misurato il 24/08:
-  // 4 lead ACCOUNT SITO mai visti dal v4 dal 13/08). Accanto ad Airtable,
-  // mai bloccante, spenta senza INGRESSO_HMAC (src/lib/ingressoPorta.ts).
-  await bussaIngresso(
-    "account",
-    { nome: input.nome, email, telefono: input.telefono },
-    {
-      lingua: input.lingua,
-      via: input.googleSub ? "google" : "password",
-      consenso_marketing: input.consMarketing,
-      consenso_profilazione: input.consProfilazione,
-      ...(input.criteri ? { criteri: input.criteri } : {}),
-    },
-  );
-  const leadId = await linkOrCreateLead({
-    email,
-    nome: input.nome,
-    telefono: input.telefono ?? "",
-    lingua: input.lingua,
-  });
+  // Lead e porta del CRM SOLO a email provata (09/10/2026). Da Google la
+  // casella è provata subito; dalla registrazione con password no, e fino a
+  // quel giorno l'account si agganciava lo stesso al lead con quell'email:
+  // chiunque scrivesse l'email di un cliente ne vedeva le visite in /account
+  // e gli scriveva un telefono sulla scheda. Ora lead e bussata arrivano con
+  // confermaEmail, dal link di verifica, dal reset o da Google.
+  const verificata = input.emailVerificata === true;
+  if (verificata) await bussaAccount({ ...input, email, telefono: input.telefono ?? "" }, "google");
+  const leadId = verificata
+    ? await linkOrCreateLead({ email, nome: input.nome, telefono: input.telefono ?? "", lingua: input.lingua })
+    : null;
   const now = new Date().toISOString();
   return aPost(T_ACC, {
     account: `${ACCT_BRAND.code} · ${email}`,
@@ -231,8 +221,21 @@ export async function patchAccount(id: string, fields: Record<string, unknown>):
   await aPatch(T_ACC, id, fields);
 }
 
-export async function linkGoogleSub(id: string, sub: string): Promise<void> {
-  await aPatch(T_ACC, id, { google_sub: sub, email_verificata: true });
+// Google su un account che esiste già con quell'email. Se l'account era già
+// verificato si aggiunge solo il sub. Se NON lo era, Google è la prima prova
+// della casella — ma la password l'ha scelta chi ha creato l'account, e nessuno
+// ha mai provato che fosse il titolare dell'email: si toglie (con lei cadono le
+// sessioni aperte, vedi auth.ts) e solo allora arrivano lead e verifica. Il
+// titolare continua con Google, o si mette una password sua da «password
+// dimenticata». Senza questo, chi avesse registrato l'email di un altro
+// entrerebbe con la sua password in un account appena verificato dal titolare.
+export async function linkGoogleSub(acc: WebAccount, sub: string): Promise<void> {
+  if (acc.emailVerificata) {
+    await aPatch(T_ACC, acc.id, { google_sub: sub });
+    return;
+  }
+  await aPatch(T_ACC, acc.id, { google_sub: sub, password_hash: "", reset_hash: "", reset_exp: null });
+  await confermaEmail({ ...acc, hash: "" }, "google");
 }
 
 export async function registerLogin(acc: WebAccount): Promise<void> {
@@ -250,10 +253,59 @@ export async function setPassword(id: string, hash: string): Promise<void> {
   await aPatch(T_ACC, id, { password_hash: hash, reset_hash: "", reset_exp: null });
 }
 
+// ---- Email provata → lead ------------------------------------------------------
+// Il solo punto da cui un account non nato da Google arriva a LEAD_ e alla porta
+// del CRM: lo chiamano il link di verifica (con la credenziale, verifica.ts),
+// il reset della password (il token è arrivato alla casella) e Google su un
+// account esistente (linkGoogleSub). Prima di qui l'account esiste — preferiti,
+// preferenze, concierge — ma non è legato a nessuna scheda e non vede visite.
+
+// Fase ombra v1↔v4: la registrazione account si POSA nel fondo `ingresso` del
+// CRM (misurato il 24/08: 4 lead ACCOUNT SITO mai visti dal v4 dal 13/08).
+// Accanto ad Airtable, mai bloccante, spenta senza INGRESSO_HMAC
+// (src/lib/ingressoPorta.ts). Dal 09/10/2026 bussa a email provata, come fa
+// TriesteAffitti (tsv-pg lib/ta-sito.ts, posaModuloAccount): il giorno in cui
+// il CRM eseguirà queste righe, non deve agganciare a un lead chi l'email non
+// l'ha provata.
+async function bussaAccount(
+  a: {
+    nome: string;
+    email: string;
+    telefono: string;
+    lingua: string;
+    consMarketing: boolean;
+    consProfilazione: boolean;
+    criteri?: string;
+    googleSub?: string;
+  },
+  verificataCon: "google" | "link" | "reset",
+): Promise<void> {
+  await bussaIngresso(
+    "account",
+    { nome: a.nome, email: normEmail(a.email), telefono: a.telefono },
+    {
+      lingua: a.lingua,
+      via: a.googleSub ? "google" : "password",
+      verificata_con: verificataCon,
+      consenso_marketing: a.consMarketing,
+      consenso_profilazione: a.consProfilazione,
+      ...(a.criteri ? { criteri: a.criteri } : {}),
+    },
+  );
+}
+
+export async function confermaEmail(acc: WebAccount, via: "google" | "link" | "reset"): Promise<string | null> {
+  await bussaAccount(acc, via);
+  const leadId = await linkOrCreateLead({ email: acc.email, nome: acc.nome, telefono: acc.telefono, lingua: acc.lingua });
+  await aPatch(T_ACC, acc.id, { email_verificata: true, ...(leadId ? { lead_link: [leadId] } : {}) });
+  return leadId;
+}
+
 // ---- LEAD_: aggancio email-first ---------------------------------------------
 // Stessa logica della PC (createLeadAndRequest): l'account si lega al lead che
 // POSSIEDE l'email — match esatto per riga sul campo multilinea — preferendo la
-// scheda con storia. Se non esiste, il lead si crea: ogni registrato È un lead.
+// scheda con storia. Se non esiste, il lead si crea: ogni registrato con
+// l'email provata È un lead. ⚠️ Si chiama solo a casella provata (sopra).
 
 export async function linkOrCreateLead(input: {
   email: string;
@@ -667,7 +719,16 @@ export type UpcomingVisit = {
   confermata: boolean; // conferma_il valorizzato
 };
 
-export async function listUpcomingVisits(leadIds: string[]): Promise<UpcomingVisit[]> {
+// Solo ad account con l'email VERIFICATA (09/10/2026): il legame col lead l'ha
+// scritto anche la registrazione con password di prima, senza prova della
+// casella — i lead_link degli account non verificati di allora restano a DB e
+// qui non contano. Il controllo sta qui e non nella pagina, così vale per
+// qualunque chiamante.
+export async function listUpcomingVisits(
+  acc: Pick<WebAccount, "leadIds" | "emailVerificata">,
+): Promise<UpcomingVisit[]> {
+  if (!acc.emailVerificata) return [];
+  const leadIds = acc.leadIds;
   if (!leadIds.length) return [];
   // 1. id visite dal reverse-link dei lead (niente formula su campi link:
   //    ARRAYJOIN esporrebbe i nomi primari, non i recId).
