@@ -2,6 +2,7 @@ import "server-only";
 import { createHmac } from "node:crypto";
 import type { Grant } from "./store";
 import { crmUrl } from "@/lib/crm";
+import { leggiRispostaInvito, type EsitoInvito, type InvitoLetto } from "@/lib/account/benvenuto";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LA PRIVATE COLLECTION DA POSTGRES — fase A del taglio Airtable → Postgres.
@@ -635,5 +636,82 @@ export async function segnalaGiroVivo(r: RiassuntoGiroPc): Promise<EsitoTracciaC
     const perche = `rete: ${String(e).slice(0, 160)}`;
     console.error("[pc battito]", perche);
     return { esito: "guasto", perche };
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LO SPAZIO PERSONALE GIÀ PRONTO — l'invito del CRM (09/10/2026)
+//
+// A chi ha visitato una casa con noi il CRM manda un link personale
+// (`/account/benvenuto?k=<gettone>`): un clic, una password, ed è dentro. Il
+// gettone è opaco; a chi appartiene lo dice il CRM da questa stessa porta,
+// azione `account-invito`, e il MARCHIO lo decide `x-porta` come per i codici:
+// un gettone di triestevillas.com qui risponde `marchio`, mai una persona.
+// Quando lo spazio è nato (o c'era già), il sito lo dice al CRM con
+// `account-invito-usato`, che chiude il gettone e scrive la riga sul lead.
+// La logica pura — come si legge la risposta, quale pagina si mostra — sta in
+// `src/lib/account/benvenuto.ts`, provata da benvenuto.test.ts.
+//
+// ── PERCHÉ NON `bussa()` ───────────────────────────────────────────────────
+// Per la stessa ragione della chat e di `crea-richiesta`: `bussa` alza su
+// qualunque risposta non-2xx, e qui un «no» del CRM (link scaduto, già usato)
+// e un guasto (porta che non risponde, segreto sbagliato) portano a pagine
+// diverse. Dire «il link non vale» a chi ha un link buono, solo perché la porta
+// era giù, sarebbe una bugia: quella pagina dice «riprova tra poco».
+//
+// ── NIENTE INTERRUTTORE ────────────────────────────────────────────────────
+// Non sposta niente da Airtable a Postgres: è una strada nuova, che senza un
+// link del CRM nessuno percorre. Basta il segreto della porta; se manca, la
+// pagina lo tratta come un guasto e il log lo dice.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** Quanto si aspetta la porta: la lettura sta dentro il rendering di una
+ *  pagina, e una pagina appesa è peggio di una che dice «riprova». */
+const ATTESA_INVITO_MS = 8_000;
+
+/** A chi appartiene il gettone. Non alza mai: un guasto torna come `guasto`. */
+export async function pAccountInvito(k: string): Promise<InvitoLetto> {
+  if (SEGRETO.length === 0) {
+    console.error("[account invito] manca PC_PORTA_SEGRETO: nessun invito si può leggere.");
+    return { tipo: "guasto", perche: "manca PC_PORTA_SEGRETO" };
+  }
+  const corpo = JSON.stringify({ azione: "account-invito", k });
+  let r: Response;
+  try {
+    r = await fetch(URL_PORTA, {
+      method: "POST",
+      headers: { "x-porta": PORTA, "x-firma": firmaDi(corpo), "Content-Type": "application/json" },
+      body: corpo,
+      signal: AbortSignal.timeout(ATTESA_INVITO_MS),
+      cache: "no-store",
+    });
+  } catch (e) {
+    const perche = `rete: ${String(e).slice(0, 160)}`;
+    console.error("[account invito]", perche);
+    return { tipo: "guasto", perche };
+  }
+  const dati: unknown = await r.json().catch(() => null);
+  const letto = leggiRispostaInvito(r.status, dati);
+  if (letto.tipo === "guasto") console.error("[account invito]", letto.perche);
+  return letto;
+}
+
+/** «Lo spazio è nato» (o c'era già). Best-effort, come le altre scritture di
+ *  questo file: l'account esiste comunque, e il gettone non chiuso scade da
+ *  solo. Non alza mai. */
+export async function pAccountInvitoUsato(k: string, esito: EsitoInvito): Promise<void> {
+  if (SEGRETO.length === 0) return;
+  const corpo = JSON.stringify({ azione: "account-invito-usato", k, esito });
+  try {
+    const r = await fetch(URL_PORTA, {
+      method: "POST",
+      headers: { "x-porta": PORTA, "x-firma": firmaDi(corpo), "Content-Type": "application/json" },
+      body: corpo,
+      signal: AbortSignal.timeout(ATTESA_INVITO_MS),
+      cache: "no-store",
+    });
+    if (!r.ok) console.error("[account invito usato]", esito, `http ${r.status}`);
+  } catch (e) {
+    console.error("[account invito usato]", esito, `rete: ${String(e).slice(0, 160)}`);
   }
 }

@@ -172,14 +172,20 @@ export type NewAccountInput = {
   telefono?: string;
   hash?: string; // registrazione email+password
   googleSub?: string; // registrazione via Google
-  emailVerificata?: boolean; // true solo se garantita dal provider (Google)
+  emailVerificata?: boolean; // true solo a casella provata: Google, o il link d'invito del CRM
   lingua: string;
   consMarketing: boolean;
   consProfilazione: boolean;
   criteri?: string;
 };
 
-export async function createAccount(input: NewAccountInput): Promise<string | null> {
+// La forma dell'id di una scheda LEAD_. Nel campo collegato, con typecast, un
+// valore di un'altra forma non fallirebbe: CREEREBBE una scheda con quel nome.
+const LEAD_REC = /^rec[A-Za-z0-9]{14}$/;
+
+export async function createAccount(
+  input: NewAccountInput & { leadId?: string | null; senzaLead?: boolean },
+): Promise<string | null> {
   const email = normEmail(input.email);
   // Lead e porta del CRM SOLO a email provata (09/10/2026). Da Google la
   // casella è provata subito; dalla registrazione con password no, e fino a
@@ -188,10 +194,24 @@ export async function createAccount(input: NewAccountInput): Promise<string | nu
   // e gli scriveva un telefono sulla scheda. Ora lead e bussata arrivano con
   // confermaEmail, dal link di verifica, dal reset o da Google.
   const verificata = input.emailVerificata === true;
-  if (verificata) await bussaAccount({ ...input, email, telefono: input.telefono ?? "" }, "google");
-  const leadId = verificata
-    ? await linkOrCreateLead({ email, nome: input.nome, telefono: input.telefono ?? "", lingua: input.lingua })
-    : null;
+  // L'account preparato dal CRM (/account/benvenuto, 09/10/2026): il lead lo
+  // dice chi chiama, perché il CRM la persona la conosce già e l'email l'ha
+  // provata lui, mandandole il link. `leadId` aggancia QUELLA scheda, senza
+  // cercarne né crearne altre; `senzaLead` (lead nato nel CRM, che qui non ha
+  // un id) non aggancia niente — una scheda creata qui tornerebbe nel CRM come
+  // doppione. E niente bussata all'ingresso: il CRM l'ha già saputo dalla sua
+  // porta (account-invito-usato), che scrive la riga sul lead. Senza i due
+  // campi, tutto come prima.
+  const daInvito = !!input.leadId || input.senzaLead === true;
+  if (verificata && !daInvito) await bussaAccount({ ...input, email, telefono: input.telefono ?? "" }, "google");
+  if (input.leadId && !LEAD_REC.test(input.leadId)) console.error("[acct] leadId dell'invito non valido, nessun aggancio");
+  const leadId = daInvito
+    ? input.leadId && LEAD_REC.test(input.leadId)
+      ? input.leadId
+      : null
+    : verificata
+      ? await linkOrCreateLead({ email, nome: input.nome, telefono: input.telefono ?? "", lingua: input.lingua })
+      : null;
   const now = new Date().toISOString();
   return aPost(T_ACC, {
     account: `${ACCT_BRAND.code} · ${email}`,

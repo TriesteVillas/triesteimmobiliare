@@ -83,7 +83,9 @@ export default function Analytics() {
   // Stessa ragione per le due pagine dell'area clienti che si aprono da un link
   // con un token nella query (09/10/2026): il reset della password — quel token
   // da solo cambia la password — e la verifica dell'email. Gemello su TSV.
-  if (/^\/(it|en|de|sl)?\/?account\/(reset|verifica)(\/|$)/.test(pathname ?? "")) return null;
+  // Dal 09/10/2026 anche lo spazio già pronto (/account/benvenuto?k=…): quel
+  // gettone apre un modulo con nome ed email della persona.
+  if (/^\/(it|en|de|sl)?\/?account\/(reset|verifica|benvenuto)(\/|$)/.test(pathname ?? "")) return null;
   if (!GA_ID) return null;
   return (
     <>
