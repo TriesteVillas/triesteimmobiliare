@@ -5,6 +5,8 @@
 // Gmail/Outlook/Apple Mail agree on it. The header logo is a PNG because Gmail
 // does not render SVG reliably; white alt text covers blocked images.
 
+import { escHtml } from "./guardiaMail";
+
 const SITE = (
   (process.env.NEXT_PUBLIC_SITE_URL || "").trim() ||
   "https://www.triesteimmobiliare.com"
@@ -86,11 +88,18 @@ export function mailSafeUrl(url: string): string {
   );
 }
 
-/** Centered CTA button for email bodies. */
+/** Centered CTA button for email bodies.
+ *
+ *  `href` arriva GREZZO (mai già escapato): qui si mette al riparo dal
+ *  quoted-printable e poi si escapa per intero dentro l'attributo. Fino al
+ *  09/10/2026 l'href entrava com'era, e una virgoletta nell'url di «Invia a un
+ *  amico» apriva attributi nuovi nel tag (v. lib/guardiaMail.ts). Solo http(s):
+ *  qualunque altro schema non diventa un bottone. */
 export function mailCta(href: string, label: string): string {
+  if (!/^https?:\/\//i.test(href)) return "";
   return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:26px auto 6px">
     <tr><td style="background:${BRAND};border-radius:8px">
-      <a href="${mailSafeUrl(href)}" target="_blank" style="display:inline-block;padding:13px 30px;font-family:${FONT};font-size:14px;font-weight:600;letter-spacing:.3px;color:#ffffff;text-decoration:none">${label}</a>
+      <a href="${escHtml(mailSafeUrl(href))}" target="_blank" style="display:inline-block;padding:13px 30px;font-family:${FONT};font-size:14px;font-weight:600;letter-spacing:.3px;color:#ffffff;text-decoration:none">${label}</a>
     </td></tr>
   </table>`;
 }

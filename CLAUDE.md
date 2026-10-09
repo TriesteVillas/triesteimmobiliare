@@ -56,7 +56,10 @@ divergono senza che nessuno se ne accorga. `src/lib/simili.ts`, `src/lib/dotazio
 `src/components/media/SfondoVideo.tsx` e il formato di `src/content/annunciVideo.ts` (TSV,
 TA), `src/components/barcolana/*` (TSV, TA), `src/lib/track.ts` (TSV), `src/lib/listingI18n.ts`
 (da TSV: valori a elenco e lista bianca dei tag), `risolviSlug` in `src/lib/properties.ts`
-(da TA), `conSlugUnici` in `src/lib/properties.ts` (da TSV). `simili.ts` è **byte-identico**
+(da TA), `conSlugUnici` in `src/lib/properties.ts` (da TSV). Dal 09/10/2026
+`src/lib/guardiaMail.ts`, **byte-identico**: url solo del gruppo, escape completo degli
+href e limite d'invio per le mail che un modulo manda a un indirizzo scelto da chi compila
+(«Invia a un amico» non è più un relay). `simili.ts` è **byte-identico**
 nei quattro portali: si controlla con `shasum`.
 
 Lo **slug** delle schede è `slugify(nome pubblico)-<numero di catalogo>` ed è lo stesso su

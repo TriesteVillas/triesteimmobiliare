@@ -21,12 +21,16 @@ export default function LeadForm({
   url,
   sito,
   lingua,
+  invioAmico = true,
 }: {
   rif: string;
   immobileNome: string;
   url: string;
   sito: string;
   lingua: string;
+  /** «Invia a un amico» solo se il sito sa spedire posta (RESEND_* su Vercel):
+   *  senza, il tasto non c'è — prima diceva «Inviato!» e non partiva niente. */
+  invioAmico?: boolean;
 }) {
   const t = useTranslations("lead");
 
@@ -44,7 +48,12 @@ export default function LeadForm({
   const [friendPrivacy, setFriendPrivacy] = useState(false);
   const [friendStatus, setFriendStatus] = useState<Status>("idle");
 
-  const base = { rif, immobileNome, url, sito, lingua };
+  // Honeypot (09/10/2026), come nei modali della home di triestevillas.com: un
+  // campo fuori schermo che un umano non compila. Pieno → la rotta risponde ok
+  // e non fa niente.
+  const [sitoWeb, setSitoWeb] = useState("");
+
+  const base = { rif, immobileNome, url, sito, lingua, sito_web: sitoWeb };
 
   async function submit(payload: Record<string, unknown>): Promise<boolean> {
     try {
@@ -73,12 +82,24 @@ export default function LeadForm({
   async function onSendFriend(e: React.FormEvent) {
     e.preventDefault();
     setFriendStatus("sending");
-    const ok = await submit({ tipo: "amico", emailAmico, email, messaggio, privacyOk: friendPrivacy });
+    // Niente `messaggio`: il modulo dell'amico non ha un campo suo, e quello
+    // del modulo info è scritto all'agenzia, non all'amico.
+    const ok = await submit({ tipo: "amico", emailAmico, email, privacyOk: friendPrivacy });
     setFriendStatus(ok ? "ok" : "error");
   }
 
   const field =
     "w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 outline-none focus:border-brand";
+
+  const honeypot = (
+    <div aria-hidden="true" className="absolute -left-[9999px] top-0 h-px w-px overflow-hidden">
+      <label>
+        Sito web
+        <input type="text" name="sito_web" tabIndex={-1} autoComplete="off"
+          value={sitoWeb} onChange={(e) => setSitoWeb(e.target.value)} />
+      </label>
+    </div>
+  );
 
   const privacyLabel = (
     <span className="text-neutral-600">
@@ -94,7 +115,7 @@ export default function LeadForm({
       <h2 className="text-lg font-semibold">{t("title")}</h2>
 
       {/* Two compact CTAs — reveal the matching form on click. */}
-      <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+      <div className={`mt-4 grid grid-cols-1 gap-2 ${invioAmico ? "sm:grid-cols-2" : ""}`}>
         <button
           type="button"
           onClick={() => setMode("info")}
@@ -106,7 +127,7 @@ export default function LeadForm({
         >
           {t("submit")}
         </button>
-        <button
+        {invioAmico && <button
           type="button"
           onClick={() => setMode("amico")}
           className={`rounded-full border border-brand px-5 py-3 text-sm font-semibold transition-colors ${
@@ -114,7 +135,7 @@ export default function LeadForm({
           }`}
         >
           {t("friendToggle")}
-        </button>
+        </button>}
       </div>
 
       {mode === "info" &&
@@ -122,6 +143,7 @@ export default function LeadForm({
           <p className="mt-4 rounded-lg bg-brand/10 p-4 text-sm text-brand-dark">{t("thanks")}</p>
         ) : (
           <form onSubmit={onSubmit} className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {honeypot}
             <label className="sm:col-span-2">
               <span className="mb-1 block text-sm font-medium text-neutral-700">{t("reason")}</span>
               <select className={field} value={motivo} onChange={(e) => setMotivo(e.target.value)}>
@@ -162,11 +184,12 @@ export default function LeadForm({
           </form>
         ))}
 
-      {mode === "amico" &&
+      {invioAmico && mode === "amico" &&
         (friendStatus === "ok" ? (
           <p className="mt-4 rounded-lg bg-brand/10 p-4 text-sm text-brand-dark">{t("friendThanks")}</p>
         ) : (
           <form onSubmit={onSendFriend} className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {honeypot}
             <p className="text-xs text-neutral-500 sm:col-span-2">{t("friendNote")}</p>
             <input className={field} type="email" placeholder={t("friendEmail")} value={emailAmico} onChange={(e) => setEmailAmico(e.target.value)} required />
             <input className={field} type="email" placeholder={t("yourEmail")} value={email} onChange={(e) => setEmail(e.target.value)} required />

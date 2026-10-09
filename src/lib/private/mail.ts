@@ -29,8 +29,9 @@ export function mailConfigured(): boolean {
   return !!RESEND_API_KEY;
 }
 
+// Anche le virgolette (09/10/2026): `esc` finisce dentro gli href dei bottoni.
 const esc = (s: string) =>
-  s.replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" })[c]!);
+  s.replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" })[c]!);
 
 /** L'indirizzo da cui esce davvero questa posta. Serve a chi la registra
  *  altrove (la porta del CRM v4) per scrivere il mittente VERO invece di
@@ -206,7 +207,7 @@ export function credentialEmail(lang: Lang, name: string, code: string, expiresL
     <p style="${mailText.small};margin:8px 0 22px;text-align:center">${L.validity(expiresLabel, validityDays)}</p>
     ${mailCta(enterUrl, L.enter)}
     <p style="${mailText.p}">${L.zoomLine}</p>
-    ${ZOOM_URL ? mailCta(esc(ZOOM_URL), `${esc(L.zoomCta)} →`) : ""}
+    ${ZOOM_URL ? mailCta(ZOOM_URL, `${esc(L.zoomCta)} →`) : ""}
     <p style="${mailText.small}">${L.contacts}</p>
     <p style="${mailText.p}">${L.closing}<br><strong>TriesteImmobiliare Private Collection</strong></p>`;
   return { subject: L.subject, html: clientShell(inner, lang) };

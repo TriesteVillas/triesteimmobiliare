@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { bussaIngresso } from "@/lib/ingressoPorta";
+import { chiaveEmail, escHtml, ipDi, limitatore, urlDelGruppo } from "@/lib/guardiaMail";
+import { SITE_URL } from "@/lib/seo";
 import { normCity } from "@/lib/citynorm";
 import { splitNomeCerta } from "@/lib/nomesplit";
 import {
@@ -113,8 +115,11 @@ function senzaDeposito(posata: boolean, modulo: string): NextResponse | null {
 // funzione ingoiava anche i rifiuti di Resend (`.catch(() => {})` senza guardare
 // `res.ok`), e il 30/07 è costato mezz'ora capire perché i recap non partivano
 // mentre tutto il resto sì. Se Resend dice di no, adesso finisce nei log.
-async function sendEmail(to: string, subject: string, html: string, replyTo?: string) {
-  if (!RESEND_API_KEY || !RESEND_FROM) return; // email not configured yet
+//
+// Restituisce se Resend ha accettato: chi deve dire al visitatore che la mail è
+// partita («Invia a un amico») lo guarda; gli altri lo ignorano come prima.
+async function sendEmail(to: string, subject: string, html: string, replyTo?: string): Promise<boolean> {
+  if (!RESEND_API_KEY || !RESEND_FROM) return false; // email not configured yet
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -134,10 +139,41 @@ async function sendEmail(to: string, subject: string, html: string, replyTo?: st
       console.error(
         `[lead] resend ${res.status} per "${subject}" → ${to}: ${(await res.text()).slice(0, 300)}`,
       );
+      return false;
     }
+    return true;
   } catch (e) {
     console.error(`[lead] resend irraggiungibile per "${subject}" → ${to}:`, e);
+    return false;
   }
+}
+
+// «INVIA A UN AMICO» NON È UN RELAY (09/10/2026, gemello di triestevillas-web).
+// Mandava una mail firmata dal nostro dominio a qualunque indirizzo, con nome
+// dell'immobile, messaggio e bottone presi dal corpo della richiesta. Ora: nome
+// e indirizzo della scheda vengono dal CATALOGO per codice (`schedaDalCodice`),
+// il messaggio non c'è (il modulo non ha mai avuto un campo per l'amico:
+// arrivava il testo scritto all'agenzia), e prima della porta passano tre
+// cancelli — mail configurata, stesso destinatario al più 5 volte l'ora, stesso
+// IP al più 10. Il limite vive nella memoria dell'istanza: v. lib/guardiaMail.ts
+// per quello che non copre.
+const amicoPerDestinatario = limitatore(5, 60 * 60_000);
+const amicoPerIp = limitatore(10, 60 * 60_000);
+
+type SchedaMail = { nome: string; url: string };
+
+/** La scheda pubblica del catalogo per codice, con l'indirizzo nella lingua
+ *  del visitatore — lo stesso che la pagina passa al modulo. `null` se il
+ *  codice non è di una scheda pubblicata; lancia se il catalogo non risponde. */
+async function schedaDalCodice(rif: string, lingua: string): Promise<SchedaMail | null> {
+  if (!rif) return null;
+  const { getProperties } = await import("@/lib/airtable");
+  const p = (await getProperties()).find((x) => x.id === rif);
+  if (!p) return null;
+  return {
+    nome: p.title,
+    url: `${SITE_URL}${lingua === "it" ? "" : `/${lingua}`}/annuncio/${p.slug}`,
+  };
 }
 
 const esc = (s: string) =>
@@ -620,6 +656,35 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 });
   }
 
+  // Honeypot (09/10/2026, come su triestevillas.com): `sito_web` è un campo che
+  // il modulo della scheda rende fuori schermo e che un umano non compila. Se
+  // arriva pieno si risponde ok e non si scrive NIENTE — né la porta, né mail.
+  if (clean(body.sito_web, 200)) return NextResponse.json({ ok: true });
+
+  // I cancelli di «Invia a un amico» vengono PRIMA della porta: una
+  // segnalazione che non partirà non deve diventare un lead nel CRM.
+  let schedaAmico: SchedaMail | null = null;
+  if (body.tipo === "amico") {
+    if (!RESEND_API_KEY || !RESEND_FROM) {
+      console.error("[lead] amico: invio non configurato (RESEND_API_KEY/RESEND_FROM assenti)");
+      return NextResponse.json({ ok: false, error: "mail_not_configured" }, { status: 503 });
+    }
+    const destinatario = chiaveEmail(clean(body.emailAmico, 160));
+    if (!amicoPerIp(ipDi(request.headers)) || (destinatario && !amicoPerDestinatario(destinatario))) {
+      console.warn("[lead] amico: limite d'invio raggiunto");
+      return NextResponse.json({ ok: false, error: "too_many" }, { status: 429 });
+    }
+    try {
+      schedaAmico = await schedaDalCodice(clean(body.rif, 40), linguaRecap(clean(body.lingua)));
+    } catch (e) {
+      console.error("[lead] amico: catalogo irraggiungibile:", e);
+      return NextResponse.json({ ok: false, error: "catalog_unavailable" }, { status: 502 });
+    }
+    if (!schedaAmico) {
+      return NextResponse.json({ ok: false, error: "listing_unknown" }, { status: 400 });
+    }
+  }
+
   // La submission si POSA nel fondo `ingresso` del CRM PRIMA della validazione
   // («prima si posa, poi si capisce»): una richiesta che questa rotta rifiuta
   // ci arriva lo stesso, e il CRM la scarta con la stessa regola. Nata il 12/08
@@ -672,9 +737,15 @@ export async function POST(request: Request) {
   const motivo = MOTIVI.has(clean(body.motivo)) ? clean(body.motivo) : "Altro";
   const rif = clean(body.rif, 40);
   const immobileNome = clean(body.immobileNome, 200);
-  const url = clean(body.url, 500);
   const disponibilita = clean(body.disponibilita, 800);
   const lingua = linguaRecap(clean(body.lingua));
+  // L'url finisce in un bottone di una mail: solo questo sito o un dominio del
+  // gruppo; altrimenti la scheda ricostruita dal codice, altrimenti niente.
+  const url =
+    schedaAmico?.url ??
+    urlDelGruppo(clean(body.url, 500), SITE_URL) ??
+    (await schedaDalCodice(rif, lingua).catch(() => null))?.url ??
+    "";
   const sito = clean(body.sito, 60) || "triesteimmobiliare.com";
   const isTI = sito === "triesteimmobiliare.com";
   const canale = isTI ? "Sito TriesteImmobiliare" : "Sito TriesteVillas";
@@ -735,11 +806,14 @@ export async function POST(request: Request) {
   // Best-effort notifications.
   const listingLine = immobileNome
     ? `<p><strong>${esc(immobileNome)}</strong>${rif ? ` (${esc(rif)})` : ""}${
-        url ? `<br><a href="${mailSafeUrl(esc(url))}">${esc(url)}</a>` : ""
+        url ? `<br><a href="${escHtml(mailSafeUrl(url))}">${esc(url)}</a>` : ""
       }</p>`
     : "";
 
   if (tipo === "Invia a un amico") {
+    if (!schedaAmico) {
+      return NextResponse.json({ ok: false, error: "listing_unknown" }, { status: 400 });
+    }
     const fl = lingua;
     const L = RECAP[fl];
     const FRIEND = {
@@ -748,19 +822,20 @@ export async function POST(request: Request) {
       de: { subj: "Eine Immobilie für Sie — TriesteImmobiliare", intro: "Diese Immobilie wurde Ihnen empfohlen:", card: "Empfohlene Immobilie", cta: "Zur Immobilie", sign: "— TriesteImmobiliare" },
       sl: { subj: "Nepremičnina, ki bi vas lahko zanimala – TriesteImmobiliare", intro: "Nekdo vam priporoča to nepremičnino:", card: "Priporočena nepremičnina", cta: "Oglejte si nepremičnino", sign: "— TriesteImmobiliare" },
     }[fl];
+    // Nome e indirizzo della scheda dal catalogo, mai dal corpo; niente codice
+    // interno (il `tsv_prop_id` può essere parlante) e niente messaggio.
     const friendBody = `<p style="${mailText.title}">${FRIEND.intro}</p>
-      ${mailRecapCard(FRIEND.card, [
-        [L.listing, esc(immobileNome + (rif ? ` (${rif})` : ""))],
-        [L.message, esc(messaggio)],
-      ])}
-      ${url ? mailCta(esc(url), FRIEND.cta) : ""}
+      ${mailRecapCard(FRIEND.card, [[L.listing, escHtml(schedaAmico.nome)]])}
+      ${mailCta(schedaAmico.url, FRIEND.cta)}
       <p style="${mailText.small}">${FRIEND.sign}</p>`;
-    await sendEmail(
+    const partita = await sendEmail(
       emailAmico,
       FRIEND.subj,
       brandMailShell({ lang: fl, body: friendBody }),
       isEmail(email) ? email : undefined,
     );
+    // «Inviato!» solo se Resend l'ha presa davvero.
+    if (!partita) return NextResponse.json({ ok: false, error: "mail_failed" }, { status: 502 });
     // Notify the team — otherwise a referral leaves no internal trace beyond Airtable.
     await sendEmail(
       NOTIFY_EMAIL,
@@ -795,12 +870,13 @@ export async function POST(request: Request) {
           nome,
           [
             [L.request, tipo === "Prenota visita" ? tipo : motivo],
-            [L.listing, immobileNome + (rif ? ` (${rif})` : "")],
+            // Al cliente il nome pubblico, non il codice interno.
+            [L.listing, immobileNome],
             [L.message, messaggio],
             [L.visit, disponibilita],
           ],
           url
-            ? mailCta(esc(url), CTA_SCHEDA[lingua])
+            ? mailCta(url, CTA_SCHEDA[lingua])
             : "",
         ),
         NOTIFY_EMAIL,
