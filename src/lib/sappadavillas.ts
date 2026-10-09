@@ -40,9 +40,12 @@ export function sappadaVillasUrl(locale: string, pagina: Pagina = "home"): strin
  *  lib/sloveniavillas.ts. */
 export function sappadaVillasHref(locale: string, pagina: Pagina, collocazione: "vendi" | "routing"): string {
   const u = new URL(sappadaVillasUrl(locale, pagina));
-  u.searchParams.set("utm_source", "triesteimmobiliare");
-  u.searchParams.set("utm_medium", collocazione);
+  // Sorgente col dominio e mezzo «referral», come gli altri siti del gruppo (09/10/2026): con la
+  // collocazione nel mezzo, GA4 metteva questi clic nel canale «Unassigned». La collocazione va in utm_content.
+  u.searchParams.set("utm_source", "triesteimmobiliare.com");
+  u.searchParams.set("utm_medium", "referral");
   u.searchParams.set("utm_campaign", "sappadavillas");
+  u.searchParams.set("utm_content", collocazione);
   u.searchParams.set("utm_term", lingua(locale));
   return u.toString();
 }
