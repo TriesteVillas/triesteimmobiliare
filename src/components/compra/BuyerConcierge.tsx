@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import ChatRichText from "./ChatRichText";
+import { track } from "@/lib/track";
 
 // Concierge AI pubblico del Buyer Hub — la barra "semplice quanto Google" che
 // apre una conversazione vera. Stessa filosofia del Concierge Private
@@ -332,6 +333,9 @@ export default function BuyerConcierge({
         setLetteraErrore(true);
         return;
       }
+      // generate_lead quando la lettera al team è arrivata (09/10/2026): dal
+      // CRM ne nasce un lead (modulo «chat»), quindi è una richiesta vera.
+      track("generate_lead", { form: "concierge_lettera" });
       const next: Msg[] = [...msgs, { role: "assistant", content: tl("grazie", { nome: n.split(/\s+/)[0] }), servizio: true }];
       setMsgs(next);
       setConsegnato(true);
