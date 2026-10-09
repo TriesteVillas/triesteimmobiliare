@@ -188,6 +188,7 @@ export default function BuyerConcierge({
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const letteraRef = useRef<HTMLFormElement>(null);
+  const ultimaRef = useRef<HTMLDivElement>(null);
 
   const letteraAperta = !blocked && !consegnato && (passaggio || aMano);
   const fermo = blocked || passaggio || consegnato || aMano;
@@ -203,8 +204,15 @@ export default function BuyerConcierge({
     setConsegnato(s.consegnato);
   }, []);
 
+  // Lo scorrimento: in fondo, tranne quando si apre la lettera dopo una
+  // risposta — allora all'INIZIO di quella risposta, che si legge dall'alto; la
+  // lettera viene dopo. In fondo l'ultima risposta finirebbe fuori vista.
   useEffect(() => {
-    if (open && scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    const el = scrollRef.current;
+    if (!open || !el) return;
+    const u = ultimaRef.current;
+    if (letteraAperta && u && msgs[msgs.length - 1]?.role === "assistant") el.scrollTop = Math.max(0, u.offsetTop - 12);
+    else el.scrollTop = el.scrollHeight;
   }, [open, msgs, typing, letteraAperta]);
 
   useEffect(() => {
@@ -464,7 +472,7 @@ export default function BuyerConcierge({
             </div>
 
             {/* Storia */}
-            <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-5 py-4" aria-live="polite">
+            <div ref={scrollRef} className="relative flex-1 space-y-3 overflow-y-auto px-5 py-4" aria-live="polite">
               {msgs.length === 0 && !typing && !letteraAperta && (
                 <div className="mt-4">
                   <p className="text-center text-sm text-white/55">{emptyLine}</p>
@@ -483,7 +491,7 @@ export default function BuyerConcierge({
                 </div>
               )}
               {msgs.map((m, i) => (
-                <div key={i} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
+                <div key={i} ref={i === msgs.length - 1 ? ultimaRef : undefined} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
                   <div
                     className={`max-w-[85%] whitespace-pre-line rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                       m.role === "user"
