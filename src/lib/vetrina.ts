@@ -109,7 +109,6 @@ type RigaVetrina = {
   classe_immobile: string | null;
   imposte_prima: string | null;
   imposte_seconda: string | null;
-  note_imposte: string | null;
   soggetto_iva: string | null;
   spese_condo_mensili: string | null;
   ilia_annua: string | null;
@@ -263,7 +262,6 @@ function mapRiga(r: RigaVetrina): Property {
     pubblicatoSu: Array.isArray(r.pubblicato_su) ? r.pubblicato_su : [],
     impostePrima: num(r.imposte_prima),
     imposteSeconda: num(r.imposte_seconda),
-    noteImposte: str(r.note_imposte),
     soggettoIva: flag(r.soggetto_iva),
     condoMensile: num(r.spese_condo_mensili),
     // ILIA e TARI stimate con aliquota e tariffe di Trieste: fuori Trieste

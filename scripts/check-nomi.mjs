@@ -18,6 +18,11 @@
 //     come nomi SOLO public_name e le sue traduzioni;
 //  3. la mappa dei campi Airtable (src/lib/properties.ts, F) non chiede il nome
 //     interno: un campo che non arriva non può finire in pagina per sbaglio.
+//  4. (09/10/2026) la stessa regola del punto 1 per la nota interna sulle
+//     imposte: è un campo di APPUNTI di chi lavora la casa, non un testo per
+//     chi compra, e il popup delle imposte la stampava come «criteri di
+//     calcolo». Il popup mostra solo le cifre. Non è un nome, ma vale lo
+//     stesso: dal sito esce solo ciò che è scritto per il cliente.
 //
 // La vetrina del CRM ha il suo cancello lato server (tsv-pg scripts/check-nomi.mjs
 // §7). Il confronto dei testi con i nomi veri si fa nel CRM, mai qui.
@@ -29,7 +34,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const errori = [];
 
 const CAMPI_VIETATI =
-  /\b(internal_name|internalName|nome_interno|nomeInterno|nickname|nome_proprietario|proprietario_[a-z_]+|proprietari_[a-z_]+|owner_[a-z_]+|ownerName)\b/g;
+  /\b(internal_name|internalName|nome_interno|nomeInterno|nickname|nome_proprietario|proprietario_[a-z_]+|proprietari_[a-z_]+|owner_[a-z_]+|ownerName|note_imposte|noteImposte)\b/g;
 
 function file(dir) {
   const out = [];
@@ -48,7 +53,9 @@ for (const p of [...file(join(root, "src")), ...file(join(root, "messages"))]) {
   const testo = readFileSync(p, "utf8");
   for (const m of testo.matchAll(CAMPI_VIETATI)) {
     errori.push(
-      `${relative(root, p)}:${riga(testo, m.index)}: campo «${m[0]}» — porta un nome interno o di un proprietario, che dal sito non esce (regola del 25/08/2026)`,
+      /^note/i.test(m[0])
+        ? `${relative(root, p)}:${riga(testo, m.index)}: campo «${m[0]}» — è la nota INTERNA sulle imposte, che dal sito non esce (09/10/2026, §4)`
+        : `${relative(root, p)}:${riga(testo, m.index)}: campo «${m[0]}» — porta un nome interno o di un proprietario, che dal sito non esce (regola del 25/08/2026)`,
     );
   }
 }

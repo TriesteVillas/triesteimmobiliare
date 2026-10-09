@@ -354,8 +354,10 @@ export default async function PropertyPage({ params }: { params: Params }) {
     acquistoPop: {
       title: t("taxInfoTitle"),
       body: [t("taxAiDisclaimer")],
-      criteria: property.noteImposte,
-      criteriaLabel: t("taxCriteria"),
+      // Niente «criteri di calcolo» dal 09/10/2026: quel testo era la nota
+      // INTERNA sulle imposte che teniamo nel CRM (appunti di lavoro, non
+      // scritti per chi compra). Restano le cifre; un testo tornerà solo da un
+      // campo scritto per il cliente. Il cancello è scripts/check-nomi.mjs §4.
     },
     condoPop: { title: t("taxCondoInfoTitle"), body: [t("taxCondoInfoBody")] },
     iliaPop: { title: t("taxIliaInfoTitle"), body: [t("taxIliaInfoBody")] },
