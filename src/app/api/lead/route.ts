@@ -31,6 +31,23 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const RESEND_FROM = process.env.RESEND_FROM;
 const NOTIFY_EMAIL = process.env.LEAD_NOTIFY_EMAIL ?? "info@triesteimmobiliare.com";
 
+// ── LE NOTIFICHE INTERNE LE MANDA IL CRM (09/10/2026) ──────────────────────
+// Martino, dopo il controllo dei moduli di tutti i siti: «sono tutti in plain
+// text… nella marea di mail che riceviamo non attraggono la mia attenzione».
+// Da quel giorno l'avviso a noi di ogni modulo lo manda il CRM, uno solo per
+// tutti i siti, in HTML, con chi è la persona e i tasti per rispondere
+// (tsv-pg `web/lib/ingresso/avviso-moduli.ts`). Qui la mail a una casella
+// INTERNA non parte più: quando si arriva a mandarla la porta del CRM ha già
+// accettato la richiesta (con `LEAD_SU_AIRTABLE=no`, se non accetta la rotta
+// risponde 502 prima), quindi l'avviso del CRM arriva. Le mail AL CLIENTE
+// (riepilogo, amico) restano qui com'erano.
+// Per riaccendere le notifiche del sito in emergenza: `NOTIFICHE_INTERNE=sito`
+// sul progetto Vercel e una ridistribuzione.
+const NOTIFICHE_DAL_CRM = process.env.NOTIFICHE_INTERNE !== "sito";
+const CASELLE_INTERNE = new Set(
+  [NOTIFY_EMAIL, "info@triesteimmobiliare.com", "richieste@triestevillas.com", "martino@triestevillas.com"].map((x) => x.trim().toLowerCase()),
+);
+
 const MOTIVI = new Set([
   "Richiedere maggiori informazioni",
   "Richiedere più foto",
@@ -119,6 +136,7 @@ function senzaDeposito(posata: boolean, modulo: string): NextResponse | null {
 // Restituisce se Resend ha accettato: chi deve dire al visitatore che la mail è
 // partita («Invia a un amico») lo guarda; gli altri lo ignorano come prima.
 async function sendEmail(to: string, subject: string, html: string, replyTo?: string): Promise<boolean> {
+  if (NOTIFICHE_DAL_CRM && CASELLE_INTERNE.has(to.trim().toLowerCase())) return true;
   if (!RESEND_API_KEY || !RESEND_FROM) return false; // email not configured yet
   try {
     const res = await fetch("https://api.resend.com/emails", {
