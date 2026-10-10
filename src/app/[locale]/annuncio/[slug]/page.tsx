@@ -693,7 +693,7 @@ export default async function PropertyPage({ params }: { params: Params }) {
           nome interno); il prezzo solo se la pagina lo mostra — la stessa regola
           di priceLabel: niente in trattativa riservata. */}
       <TrackViewItem
-        id={property.id}
+        id={property.recId}
         nome={property.title}
         tipologia={property.tipologia}
         zona={property.zona ?? property.comune}

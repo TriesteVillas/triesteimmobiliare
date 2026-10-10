@@ -12,6 +12,9 @@ import { track } from "@/lib/track";
 // attirano, non solo quali codici.
 // ⛔ Mai il nome interno (che qui non arriva) e mai un prezzo in trattativa
 // riservata: si manda solo ciò che la pagina pubblica già mostra.
+// ⛔ E l'id è il record opaco (`rec…`), MAI il codice TSV-PROP: è testo libero
+// e a volte porta il cognome di chi vende (regola ferrea del gruppo). Il nome
+// leggibile sta in `item_name`, che è il nome pubblico.
 //
 // ⚠️ DIFFERENZA VOLUTA DAL GEMELLO TSV: QUANDO parte. Qui lo script di GA4
 // (anche `ga4-init`, quello che definisce `gtag`) è `lazyOnload`: next/script lo
