@@ -54,6 +54,7 @@ import TaxBox from "@/components/TaxBox";
 import PropertyActions from "@/components/account/PropertyActions";
 import AccountPerks from "@/components/account/AccountPerks";
 import DwellTracker from "@/components/account/DwellTracker";
+import TrackViewItem from "@/components/TrackViewItem";
 import BuyerConcierge from "@/components/compra/BuyerConcierge";
 import ElegieDuinoInvito, { ElegieChip, ElegiePlansHint } from "@/components/ElegieDuinoInvito";
 import { isElegieProgetto } from "@/lib/elegie";
@@ -687,6 +688,18 @@ export default async function PropertyPage({ params }: { params: Params }) {
       </Scene>
       {/* Tracker view+dwell: attivo solo per utenti loggati, renderizza nulla. */}
       <DwellTracker slug={property.slug} />
+      {/* view_item GA4 con l'immobile (per tutti, consenso permettendo; 10/10/2026,
+          gemello di triestevillas.com). Il nome è quello pubblico (`title`, mai il
+          nome interno); il prezzo solo se la pagina lo mostra — la stessa regola
+          di priceLabel: niente in trattativa riservata. */}
+      <TrackViewItem
+        id={property.id}
+        nome={property.title}
+        tipologia={property.tipologia}
+        zona={property.zona ?? property.comune}
+        contratto={property.contratto}
+        prezzo={property.trattativaRiservata ? null : property.contratto === "AFFITTO" ? property.priceRent : property.priceSale}
+      />
 
       {/* Paper sheet — the dossier */}
       <div className="relative z-10 -mt-5 rounded-t-[2.25rem] bg-paper text-neutral-900 shadow-[0_-24px_60px_rgba(15,39,55,0.16)]">

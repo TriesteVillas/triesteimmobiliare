@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Script from "next/script";
 import { usePathname } from "next/navigation";
 import { useUtmGruppo } from "@/lib/utm-gruppo";
+import { useProvenienzaModuli } from "@/lib/provenienza-moduli";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Google Analytics 4.
@@ -41,6 +42,13 @@ const GA_ID = "G-K3ZQZN73NV";
 export default function Analytics() {
   // I link verso gli altri siti del gruppo escono con la provenienza (lib/utm-gruppo.ts).
   useUtmGruppo("triesteimmobiliare.com");
+  // Ogni invio verso il sito porta la provenienza della visita al CRM (lib/provenienza-moduli.ts).
+  // Sta prima dei `return null` qui sotto di proposito: nell'area riservata e
+  // nelle pagine col gettone nella query GA4 resta spento, l'innesto no — una
+  // richiesta d'accesso alla Private Collection porta anche lei la sua
+  // provenienza (solo percorso e UTM: codice e gettoni della query non ne fanno
+  // mai parte, lib/provenienza.ts tiene della query le sole utm_*).
+  useProvenienzaModuli();
   // ── Gli eventi che contano (23/09/2026) ────────────────────────────────────
   // Senza eventi GA4 misura pagine e basta. Un ascoltatore solo, delegato al
   // documento, per tutti i punti di contatto del sito — così un modulo nuovo o

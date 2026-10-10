@@ -59,7 +59,16 @@ TA), `src/components/barcolana/*` (TSV, TA), `src/lib/track.ts` (TSV), `src/lib/
 (da TA), `conSlugUnici` in `src/lib/properties.ts` (da TSV). Dal 09/10/2026
 `src/lib/guardiaMail.ts`, **byte-identico**: url solo del gruppo, escape completo degli
 href e limite d'invio per le mail che un modulo manda a un indirizzo scelto da chi compila
-(«Invia a un amico» non è più un relay). `simili.ts` è **byte-identico**
+(«Invia a un amico» non è più un relay). Dal 10/10/2026 `src/lib/provenienza.ts` e
+`src/lib/provenienza-moduli.ts`, **byte-identici** su tutti i siti del gruppo
+(SloveniaVillas compresa; test `provenienza.test.ts`): da dove è arrivata la visita
+(pagina d'ingresso, referrer, UTM, clic da annuncio), letta dal browser senza salvare
+niente e mandata al CRM con ogni modulo — l'innesto in `Analytics` mette l'intestazione
+`x-provenienza` su ogni POST verso il sito, `bussaIngresso` la legge. Il formato è un
+contratto col CRM (`tsv-pg web/lib/ingresso/provenienza.ts`). ⚠️ La porta della
+Private Collection (`lib/private/porta.ts` → `/api/pc-sito`) non la porta: il CRM lì non
+la legge, e la richiesta d'accesso ce l'ha solo nella copia grezza posata da
+`bussaIngresso`. `simili.ts` è **byte-identico**
 nei quattro portali: si controlla con `shasum`.
 
 Lo **slug** delle schede è `slugify(nome pubblico)-<numero di catalogo>` ed è lo stesso su
