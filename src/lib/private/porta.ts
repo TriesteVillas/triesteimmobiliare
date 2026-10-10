@@ -367,8 +367,21 @@ export type EsitoCreaRichiesta =
  * portano a decisioni opposte — non riprovare, e riprovare su Airtable.
  */
 export async function pgCreaRichiesta(m: ModuloPcDaSpedire): Promise<EsitoCreaRichiesta> {
+  // Da dove è arrivata la visita (10/10/2026, lib/provenienza.ts): l'intestazione
+  // che l'innesto di Analytics mette su ogni invio verso il sito. Il CRM la scrive
+  // sul lead e sulla richiesta. `next/headers` si importa qui dentro: fuori da una
+  // richiesta lancia, e allora la provenienza manca e basta.
+  let provenienza: unknown = null;
+  try {
+    const { headers } = await import("next/headers");
+    const { INTESTAZIONE_PROVENIENZA, provenienzaDaIntestazione } = await import("@/lib/provenienza");
+    provenienza = provenienzaDaIntestazione((await headers()).get(INTESTAZIONE_PROVENIENZA));
+  } catch {
+    provenienza = null;
+  }
   const corpo = JSON.stringify({
     azione: "crea-richiesta",
+    ...(provenienza ? { provenienza } : {}),
     nome: m.nome, cognome: m.cognome, email: m.email, telefono: m.telefono,
     citta: m.citta, intro: m.intro, zone: m.zone, bands: m.bands,
     immobileTrigger: m.immobileTrigger, lingua: m.lingua,
